@@ -3,14 +3,19 @@ package com.ssafy.projectree.domain.user.model.entity;
 import com.ssafy.projectree.global.model.entity.BaseEntity;
 import com.ssafy.projectree.global.model.enums.OAuthProvider;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "user")
 @Getter
 @Setter
-public class User extends BaseEntity {
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
