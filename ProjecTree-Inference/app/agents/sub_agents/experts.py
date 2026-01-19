@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate
 from app.core.llm import mini_llm,large_llm
 from langchain.agents import create_agent
-from langchain.agents.structured_output import ToolStrategy
+from langchain.agents.structured_output import ToolStrategy, AutoStrategy
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from app.agents.states.state import PlanNodeState, RecommendationState
 from app.agents.tools.tavily import search_tool
@@ -25,7 +25,7 @@ def create_expert_agent(system_prompt: str):
     return create_agent(llm, 
     tools, 
     system_prompt=system_prompt, 
-    response_format=TechList)
+    response_format=AutoStrategy(TechList))
 
 
 frontend_executor = create_expert_agent(FE_SYSTEM_PROMPT)
