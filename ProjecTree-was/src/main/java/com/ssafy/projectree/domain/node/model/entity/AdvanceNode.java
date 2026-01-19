@@ -8,11 +8,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "subtask_node")
+@Table(name = "advance_node")
 @PrimaryKeyJoinColumn(name = "node_id")
 @Getter
 @Setter
-public class SubTaskNode extends Node{
+public class AdvanceNode extends Node{
 	private Integer difficult;
 
 	@Column(columnDefinition = "TEXT")
