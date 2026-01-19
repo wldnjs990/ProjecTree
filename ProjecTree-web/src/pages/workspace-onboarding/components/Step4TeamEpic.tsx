@@ -29,15 +29,65 @@ interface Step4TeamEpicProps {
     teamMembers: TeamMember[];
   };
   onChange: (updates: Partial<Step4TeamEpicProps['data']>) => void;
+  onNext: () => void;
+  onPrev: () => void;
 }
 
-export default function Step4TeamEpic({ data, onChange }: Step4TeamEpicProps) {
+export default function Step4TeamEpic({
+  data,
+  onChange,
+  onNext,
+  onPrev,
+}: Step4TeamEpicProps) {
   const [epicName, setEpicName] = useState('');
   const [epicDescription, setEpicDescription] = useState('');
   const [memberEmail, setMemberEmail] = useState('');
   const [memberRole, setMemberRole] = useState('편집자 - 편집 가능');
+  const [emailError, setEmailError] = useState('');
 
-  // 에픽 추가
+  // 이메일 유효성 검사 함수
+  const validateEmail = (email: string): boolean => {
+    // 빈 값 체크
+    if (!email.trim()) {
+      setEmailError('');
+      return false;
+    }
+
+    // 이메일 형식 정규식 (RFC 5322 기반 간소화 버전)
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailRegex.test(email)) {
+      setEmailError('올바른 이메일 형식이 아닙니다');
+      return false;
+    }
+
+    // 중복 이메일 체크
+    const isDuplicate = data.teamMembers.some(
+      (member) => member.email.toLowerCase() === email.toLowerCase()
+    );
+
+    if (isDuplicate) {
+      setEmailError('이미 초대된 이메일입니다');
+      return false;
+    }
+
+    setEmailError('');
+    return true;
+  };
+
+  // 이메일 입력 핸들러
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const email = e.target.value;
+    setMemberEmail(email);
+
+    // 실시간 유효성 검사 (입력 중일 때는 형식만 체크)
+    if (email.trim()) {
+      validateEmail(email);
+    } else {
+      setEmailError('');
+    }
+  };
+
   const handleAddEpic = () => {
     if (epicName.trim()) {
       const newEpic: Epic = {
@@ -51,142 +101,387 @@ export default function Step4TeamEpic({ data, onChange }: Step4TeamEpicProps) {
     }
   };
 
-  // 에픽 삭제
   const handleRemoveEpic = (id: string) => {
     onChange({
       epics: data.epics.filter((epic) => epic.id !== id),
     });
   };
 
-  // 팀원 초대
   const handleInviteMember = () => {
-    if (memberEmail.trim() && memberEmail.includes('@')) {
-      const newMember: TeamMember = {
-        email: memberEmail,
-        role: memberRole,
-      };
-      onChange({ teamMembers: [...data.teamMembers, newMember] });
-      setMemberEmail('');
-      setMemberRole('편집자 - 편집 가능');
+    // 최종 유효성 검사
+    if (!validateEmail(memberEmail)) {
+      return;
     }
+
+    const newMember: TeamMember = {
+      email: memberEmail.trim(),
+      role: memberRole,
+    };
+    onChange({ teamMembers: [...data.teamMembers, newMember] });
+    setMemberEmail('');
+    setMemberRole('편집자 - 편집 가능');
+    setEmailError('');
   };
 
   return (
-    <div className="space-y-8">
-      {/* 초기 에픽 설정 */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-lg">초기 에픽 설정</h3>
+    <div className="flex flex-col gap-6">
+      {/* 헤더 */}
+      <div className="flex flex-col items-center gap-2">
+        <h2
+          style={{
+            fontFamily: 'Roboto',
+            fontWeight: 100,
+            fontSize: '18.8px',
+            lineHeight: '28px',
+            letterSpacing: '-0.5px',
+            color: 'var(--figma-text-cod-gray)',
+          }}
+        >
+          팀 및 에픽
+        </h2>
+        <p
+          style={{
+            fontFamily: 'Roboto',
+            fontWeight: 100,
+            fontSize: '13.3px',
+            lineHeight: '20px',
+            color: 'var(--figma-text-emperor)',
+          }}
+        >
+          팀원을 초대하고 초기 에픽을 설정하세요
+        </p>
+      </div>
 
-        {/* 에픽명과 추가 버튼 */}
-        <div className="flex gap-2">
-          <Input
-            placeholder="에픽명 (20자 이내)"
-            value={epicName}
-            onChange={(e) => setEpicName(e.target.value)}
-            maxLength={20}
-            className="flex-1"
-          />
-          <Button
-            variant="outline"
-            onClick={handleAddEpic}
-            disabled={!epicName.trim()}
-            className="whitespace-nowrap"
+      {/* 폼 필드 */}
+      <div className="flex flex-col gap-6">
+        {/* 초기 에픽 설정 */}
+        <div className="flex flex-col gap-4">
+          <h3
+            style={{
+              fontFamily: 'Roboto',
+              fontWeight: 100,
+              fontSize: '15px',
+              lineHeight: '20px',
+              color: 'var(--figma-text-cod-gray)',
+            }}
           >
-            <Plus className="h-4 w-4 mr-1" />
-            에픽 추가
+            초기 에픽 설정
+          </h3>
+
+          {/* 에픽명과 추가 버튼 */}
+          <div className="flex gap-2">
+            <Input
+              placeholder="에픽명 (20자 이내)"
+              value={epicName}
+              onChange={(e) => setEpicName(e.target.value)}
+              maxLength={20}
+              className="flex-1"
+              style={{
+                fontFamily: 'Roboto',
+                fontWeight: 100,
+                fontSize: '14px',
+                lineHeight: '16px',
+                height: '44px',
+                padding: '12.5px 12px',
+                background: 'rgba(255, 255, 255, 0.002)',
+                border: '1px solid var(--figma-border-mercury)',
+                boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
+                borderRadius: '6px',
+              }}
+            />
+            <Button
+              variant="outline"
+              onClick={handleAddEpic}
+              disabled={!epicName.trim()}
+              className="whitespace-nowrap"
+              style={{
+                fontFamily: 'Roboto',
+                fontWeight: 100,
+                fontSize: '13.2px',
+                height: '44px',
+                padding: '8px 16px',
+                background: 'transparent',
+                color: 'var(--figma-text-cod-gray)',
+                border: '1px solid var(--figma-border-mercury)',
+                borderRadius: '6px',
+              }}
+            >
+              <Plus className="mr-1 h-4 w-4" />
+              에픽 추가
+            </Button>
+          </div>
+
+          {/* 에픽 설명 */}
+          <Textarea
+            placeholder="에픽 설명 (선택사항)"
+            value={epicDescription}
+            onChange={(e) => setEpicDescription(e.target.value)}
+            rows={4}
+            className="resize-none"
+            style={{
+              fontFamily: 'Roboto',
+              fontWeight: 100,
+              fontSize: '14px',
+              lineHeight: '16px',
+              padding: '12.5px 12px',
+              background: 'rgba(255, 255, 255, 0.002)',
+              border: '1px solid var(--figma-border-mercury)',
+              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
+              borderRadius: '6px',
+            }}
+          />
+        </div>
+
+        {/* 에픽 목록 */}
+        {data.epics.length > 0 && (
+          <div className="flex flex-col gap-2">
+            {data.epics.map((epic) => (
+              <div
+                key={epic.id}
+                className="flex items-start justify-between rounded-lg p-3"
+                style={{
+                  background: 'var(--figma-gray-concrete)',
+                  border: '1px solid var(--figma-border-mercury)',
+                }}
+              >
+                <div className="flex-1">
+                  <h4
+                    style={{
+                      fontFamily: 'Roboto',
+                      fontWeight: 400,
+                      fontSize: '14px',
+                      color: 'var(--figma-text-cod-gray)',
+                    }}
+                  >
+                    {epic.name}
+                  </h4>
+                  <p
+                    style={{
+                      fontFamily: 'Roboto',
+                      fontWeight: 100,
+                      fontSize: '13px',
+                      color: 'var(--figma-text-emperor)',
+                    }}
+                  >
+                    {epic.description}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleRemoveEpic(epic.id)}
+                  className="ml-2 rounded-full p-1 hover:bg-gray-200"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 이메일 초대 */}
+        <div className="flex flex-col gap-4">
+          <h3
+            style={{
+              fontFamily: 'Roboto',
+              fontWeight: 100,
+              fontSize: '15px',
+              lineHeight: '20px',
+              color: 'var(--figma-text-cod-gray)',
+            }}
+          >
+            이메일 초대
+          </h3>
+
+          <div className="flex flex-col gap-2">
+            <Input
+              type="email"
+              placeholder="name@company.com"
+              value={memberEmail}
+              onChange={handleEmailChange}
+              style={{
+                fontFamily: 'Roboto',
+                fontWeight: 100,
+                fontSize: '14px',
+                lineHeight: '16px',
+                height: '44px',
+                padding: '12.5px 12px',
+                background: 'rgba(255, 255, 255, 0.002)',
+                border: emailError
+                  ? '1px solid var(--figma-required-crimson)'
+                  : '1px solid var(--figma-border-mercury)',
+                boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
+                borderRadius: '6px',
+              }}
+            />
+            {emailError && (
+              <span
+                style={{
+                  fontFamily: 'Roboto',
+                  fontWeight: 100,
+                  fontSize: '12px',
+                  lineHeight: '16px',
+                  color: 'var(--figma-required-crimson)',
+                }}
+              >
+                {emailError}
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label
+              style={{
+                fontFamily: 'Roboto',
+                fontWeight: 100,
+                fontSize: '13.1px',
+                lineHeight: '14px',
+                color: 'var(--figma-text-cod-gray)',
+              }}
+            >
+              권한
+            </Label>
+            <Select value={memberRole} onValueChange={setMemberRole}>
+              <SelectTrigger
+                style={{
+                  fontFamily: 'Roboto',
+                  fontWeight: 100,
+                  fontSize: '14px',
+                  height: '44px',
+                  background: 'rgba(255, 255, 255, 0.002)',
+                  border: '1px solid var(--figma-border-mercury)',
+                  boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
+                  borderRadius: '6px',
+                }}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="편집자 - 편집 가능">
+                  편집자 - 편집 가능
+                </SelectItem>
+                <SelectItem value="뷰어 - 보기만 가능">
+                  뷰어 - 보기만 가능
+                </SelectItem>
+                <SelectItem value="관리자 - 모든 권한">
+                  관리자 - 모든 권한
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button
+            className="w-full"
+            onClick={handleInviteMember}
+            disabled={!memberEmail.trim() || !!emailError}
+            style={{
+              fontFamily: 'Roboto',
+              fontWeight: 100,
+              fontSize: '13.2px',
+              lineHeight: '20px',
+              height: '44px',
+              background:
+                !memberEmail.trim() || !!emailError
+                  ? 'var(--figma-gray-concrete)'
+                  : 'var(--figma-primary-blue)',
+              color:
+                !memberEmail.trim() || !!emailError
+                  ? 'var(--figma-text-emperor)'
+                  : 'var(--figma-white)',
+              borderRadius: '6px',
+              border: 'none',
+              cursor:
+                !memberEmail.trim() || !!emailError ? 'not-allowed' : 'pointer',
+            }}
+          >
+            초대 메일 보내기
           </Button>
         </div>
 
-        {/* 에픽 설명 */}
-        <Textarea
-          placeholder="에픽 설명 (선택사항)"
-          value={epicDescription}
-          onChange={(e) => setEpicDescription(e.target.value)}
-          rows={4}
-          className="resize-none"
-        />
-      </div>
-
-      {/* 에픽 목록 */}
-      {data.epics.length > 0 && (
-        <div className="space-y-2">
-          {data.epics.map((epic) => (
-            <div
-              key={epic.id}
-              className="flex items-start justify-between p-3 border rounded-lg bg-gray-50"
+        {/* 초대된 팀원 목록 */}
+        {data.teamMembers.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <Label
+              style={{
+                fontFamily: 'Roboto',
+                fontWeight: 100,
+                fontSize: '13.1px',
+                lineHeight: '14px',
+                color: 'var(--figma-text-cod-gray)',
+              }}
             >
-              <div className="flex-1">
-                <h4 className="font-medium">{epic.name}</h4>
-                <p className="text-sm text-gray-600">{epic.description}</p>
-              </div>
-              <button
-                onClick={() => handleRemoveEpic(epic.id)}
-                className="ml-2 hover:bg-gray-200 rounded-full p-1"
+              초대된 팀원
+            </Label>
+            {data.teamMembers.map((member, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between rounded p-2"
+                style={{
+                  background: 'var(--figma-gray-concrete)',
+                  border: '1px solid var(--figma-border-mercury)',
+                }}
               >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 이메일 초대 */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-lg">이메일 초대</h3>
-
-        <div className="space-y-2">
-          <Input
-            type="email"
-            placeholder="name@company.com"
-            value={memberEmail}
-            onChange={(e) => setMemberEmail(e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label>권한</Label>
-          <Select value={memberRole} onValueChange={setMemberRole}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="편집자 - 편집 가능">
-                편집자 - 편집 가능
-              </SelectItem>
-              <SelectItem value="뷰어 - 보기만 가능">
-                뷰어 - 보기만 가능
-              </SelectItem>
-              <SelectItem value="관리자 - 모든 권한">
-                관리자 - 모든 권한
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Button
-          className="w-full"
-          onClick={handleInviteMember}
-          disabled={!memberEmail.trim() || !memberEmail.includes('@')}
-        >
-          초대 메일 보내기
-        </Button>
+                <span
+                  style={{
+                    fontFamily: 'Roboto',
+                    fontWeight: 100,
+                    fontSize: '13px',
+                    color: 'var(--figma-text-cod-gray)',
+                  }}
+                >
+                  {member.email}
+                </span>
+                <span
+                  style={{
+                    fontFamily: 'Roboto',
+                    fontWeight: 100,
+                    fontSize: '13px',
+                    color: 'var(--figma-text-emperor)',
+                  }}
+                >
+                  {member.role}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* 초대된 팀원 목록 */}
-      {data.teamMembers.length > 0 && (
-        <div className="space-y-2">
-          <Label>초대된 팀원</Label>
-          {data.teamMembers.map((member, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-2 border rounded bg-gray-50"
-            >
-              <span className="text-sm">{member.email}</span>
-              <span className="text-sm text-gray-600">{member.role}</span>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* 버튼 영역 */}
+      <div className="mt-4 flex justify-between">
+        <button
+          onClick={onPrev}
+          style={{
+            fontFamily: 'Roboto',
+            fontWeight: 100,
+            fontSize: '13.2px',
+            lineHeight: '20px',
+            padding: '8px 32px',
+            background: 'transparent',
+            color: 'var(--figma-text-emperor)',
+            borderRadius: '6px',
+            border: '1px solid var(--figma-border-mercury)',
+            cursor: 'pointer',
+          }}
+        >
+          이전
+        </button>
+        <button
+          onClick={onNext}
+          style={{
+            fontFamily: 'Roboto',
+            fontWeight: 100,
+            fontSize: '13.2px',
+            lineHeight: '20px',
+            padding: '8px 32px',
+            background: 'var(--figma-primary-blue)',
+            color: 'var(--figma-white)',
+            borderRadius: '6px',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          AI 분석 시작
+        </button>
+      </div>
     </div>
   );
 }

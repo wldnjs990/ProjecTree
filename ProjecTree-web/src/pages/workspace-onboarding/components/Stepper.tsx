@@ -5,40 +5,62 @@ interface StepperProps {
 }
 
 export default function Stepper({ currentStep }: StepperProps) {
-  // constants에서 단계 정보 가져오기
   const steps = ONBOARDING_TEXTS.steps;
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-center">
+    <div className="mb-10 flex justify-center">
+      <div className="flex items-center">
         {steps.map((step, index) => (
           <div key={step.number} className="flex items-center">
-            {/* 단계 원 */}
+            {/* 단계 원과 라벨 */}
             <div className="flex flex-col items-center">
+              {/* 원형 배경 */}
               <div
-                className={`
-                  w-12 h-12 rounded-full flex items-center justify-center font-semibold
-                  ${
-                    step.number < currentStep
-                      ? 'bg-blue-600 text-white' // 완료된 단계
-                      : step.number === currentStep
-                        ? 'bg-blue-600 text-white' // 현재 단계
-                        : 'bg-gray-300 text-gray-600' // 미완료 단계
-                  }
-                `}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-sm"
+                style={{
+                  backgroundColor:
+                    step.number <= currentStep
+                      ? 'var(--figma-primary-blue)'
+                      : 'var(--figma-gray-concrete)',
+                  color:
+                    step.number <= currentStep
+                      ? 'var(--figma-white)'
+                      : 'var(--figma-text-emperor)',
+                  fontFamily: 'Roboto',
+                  fontWeight: 100,
+                  fontSize: '14px',
+                  lineHeight: '20px',
+                }}
               >
-                {step.number < currentStep ? '✓' : step.number}
+                {step.number}
               </div>
-              <span className="text-sm mt-2 text-gray-700">{step.label}</span>
+              {/* 라벨 */}
+              <span
+                className="mt-2 text-center"
+                style={{
+                  fontFamily: 'Roboto',
+                  fontWeight: 100,
+                  fontSize: '11.4px',
+                  lineHeight: '16px',
+                  color:
+                    step.number <= currentStep
+                      ? 'var(--figma-text-cod-gray)'
+                      : 'var(--figma-text-emperor)',
+                }}
+              >
+                {step.label}
+              </span>
             </div>
 
             {/* 연결선 (마지막 단계가 아닐 때만) */}
             {index < steps.length - 1 && (
               <div
-                className={`
-                  w-16 h-1 mx-2 mb-6
-                  ${step.number < currentStep ? 'bg-blue-600' : 'bg-gray-300'}
-                `}
+                className="mx-2 mb-6"
+                style={{
+                  width: '48px',
+                  height: '2px',
+                  backgroundColor: 'var(--figma-gray-concrete)',
+                }}
               />
             )}
           </div>
