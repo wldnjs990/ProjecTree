@@ -24,9 +24,6 @@ Markdown 형식의 JSON을 출력하지 말고, 반드시 도구를 호출하세
 2. 검색 결과가 불충분하더라도, 현재 가진 정보로 'TechList' 도구를 사용하여 즉시 답변을 생성하세요.
 3. 절대 같은 검색어를 반복하지 마세요.
 
-[User Input]
-user_task: {user_task}
-task_description: {task_description}
 """
 
 BE_SYSTEM_PROMPT = """
@@ -53,10 +50,5 @@ Markdown 형식의 JSON을 출력하지 말고, 반드시 도구를 호출하세
 1. 최대 3번까지만 검색을 수행하세요.
 2. 검색 결과가 불충분하더라도, 현재 가진 정보로 'TechList' 도구를 사용하여 즉시 답변을 생성하세요.
 3. 절대 같은 검색어를 반복하지 마세요.
-
-
-[User Input]
-user_task: {user_task}
-task_description: {task_description}
 """
 SEARCH_SYSTEM_PROMPT = "당신은 웹 검색 전문가입니다. 주어진 기술적 질문이나 개선 사항에 대해 최신 정보를 검색하여 답변하세요. 답변은 한국어로 하세요. 가능한 구체적인 도구명이나 라이브러리명을 언급하세요."
