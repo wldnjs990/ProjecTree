@@ -1,7 +1,9 @@
 # 📋 ProjecTree 프론트엔드 README
 
 ## 🗂️ 폴더구조
+
 - 폴더구조는 보편적으로 사용되는 react 폴더구조를 사용합니다.
+
 ```
 src/
 ├── apis/                              # API 호출 함수
@@ -102,3 +104,129 @@ src/
 ├── App.tsx                            # 앱 루트 컴포넌트
 └── main.tsx                           # 엔트리 포인트
 ```
+
+## 공용 prettier 설정
+
+- 다음 익스텐션을 설치해주세요.
+- Prettier - Code formatter
+  ![alt text](image-1.png)
+
+- prettier를 vscode에 적용하기 위한 익스텐션입니다.
+
+- settings.json 파일에 다음 코드를 추가해주세요.
+- 파일을 저장할때, .prettierrc.json에서 설정한 포멧으로 코드가 정돈됩니다.
+- {}는 빼고 넣어주세요.
+
+```json
+// settings.json
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
+}
+```
+
+## tailwindcss 익스텐션 설치
+
+- 다음 익스텐션을 설치해주세요.
+- Tailwind CSS IntelliSense
+  ![alt text](image.png)
+
+- 테일윈드 클래스 자동완성을 도와주는 익스텐션입니다.
+
+## 프로젝트 alias 설정
+
+- @/를 사용하면 ./src 루트 경로를 이용할 수 있습니다.
+- alias 설정하기 위한 코드는 다음과 같습니다. 다음 프로젝트 할 때 참고하세요.
+
+```json
+// tsconfig.app.json에 추가
+"paths": {
+  "@/*": ["./src/*"]
+},
+```
+
+```json
+// tsconfig.json에 추가
+"compilerOptions": {
+  "baseUrl": ".",
+  "paths": {
+    "@/*": ["./src/*"]
+  }
+}
+```
+
+- 그리고 vite 프로젝트에서 vite-tsconfig-paths 이 패키지를 설치해야합니다.
+
+```bash
+# npm일때
+npm install vite-tsconfig-paths
+# pnpm일때
+pnpm install vite-tsconfig-paths
+```
+
+```javascript
+import tsconfigPaths from 'vite-tsconfig-paths';
+// vite.config.ts
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    tsconfigPaths(), // tsconfigPaths 추가하면 끝
+  ],
+});
+```
+
+## route 등록
+
+- route 등록은 src/routes/publicRoutes.tsx 파일에서 등록하시면 됩니다.
+
+```tsx
+import HomePage from '@/pages/HomePage';
+import type { RouteObject } from 'react-router';
+
+export const publicRoutes: RouteObject[] = [
+  {
+    path: '/',
+    element: <HomePage />,
+    loader: async () => {},
+  },
+  // 여기 추가!
+];
+```
+
+- 이 코드를 복사해서 gpt한테 객체 라우트 방식에 대해 알려달라하고 공부해주세요(기존 route와 사용법이 좀 다릅니다.)
+
+## shadcn 사용법
+
+- shadcn 공식 홈페이지에서 필요한 컴포넌트를 긁어올 수 있습니다.
+
+```bash
+npx shadcn@latest add button
+npx shadcn@latest add card
+```
+
+- 설치하면 src/components/ui 경로에 해당 컴포넌트가 추가됩니다.
+- 이렇게 만들어지는 컴포넌트는 모두가 공용으로 사용할거라 코드 수정을 하려면 팀원들과 먼저 이야기를 나눠야 합니다.
+- 만약 Button 컴포넌트를 긁어왔다면 사용할 파일에 Button 컴포넌트를 import 해서 사용하면 됩니다.
+
+```tsx
+import { Button } from '@/components/ui/button';
+
+export default function HomePage() {
+  return (
+    <>
+      <div>예시용 homepage입니다.</div>
+      <Button
+        className="w-20"
+        onClick={() => {
+          alert('일반 html 태그 사용하는것처럼 쓰면 됩니당.');
+        }}
+      >
+        Shadcn 버튼 컴포넌트
+      </Button>
+    </>
+  );
+}
+```
+
+- className이나 onClick 등 거의 모든 기능들을 컴포넌트에 사용할 수 있으니 이걸로 커스텀하시면 됩니다.
