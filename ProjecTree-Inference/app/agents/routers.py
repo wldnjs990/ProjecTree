@@ -34,7 +34,7 @@ def route_node(state: PlanNodeState) -> str:
     elif node_type == "Task":
         return "task_node_process"
     elif node_type == "SubTask":
-        return "sub_task_node_process"
+        return "advance_node_process"
     return "epic_node_process"
 
 
@@ -48,9 +48,9 @@ def route_teck_stack(state: PlanNodeState) -> str:
     return "tech_steck_create"
 
 
-def route_sub_task_tech_stack(state: PlanNodeState) -> str:
+def route_advance_tech_stack(state: PlanNodeState) -> str:
     """서브 태스크 기술 스택 라우팅"""
-    return "sub_task_tech_stack_create"
+    return "advance_tech_stack_create"
 
 
 def route_feedback_loop(state: PlanNodeState) -> str:

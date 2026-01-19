@@ -17,6 +17,12 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str
+
+    LANGFUSE_SECRET_KEY: str
+    LANGFUSE_PUBLIC_KEY: str
+    LANGFUSE_BASE_URL: str
+    OPENAI_API_KEY: str
+    OPENAI_BASE_URL: str
     # =========================================================
     # 2. 선택 변수 (기본값을 주면 .env에 없어도 됨)
     # =========================================================

@@ -12,7 +12,7 @@ from app.agents.nodes.process import (
     epic_node_process,
     story_node_process,
     task_node_process,
-    sub_task_node_process,
+    advance_node_process,
 )
 from app.agents.nodes.creation import sub_node_info_create
 from app.agents.nodes.feedback import node_feedback, struct_feedback
@@ -63,7 +63,7 @@ builder.add_node("epic_node_process", epic_node_process)
 builder.add_node("story_node_process", story_node_process)
 builder.add_node("sub_node_info_create", sub_node_info_create)
 builder.add_node("task_node_process", task_node_process)
-builder.add_node("sub_task_node_process", sub_task_node_process)
+builder.add_node("advance_node_process", advance_node_process)
 builder.add_node("tech_stack_recommendation", recommend_graph)
 builder.add_node("structured_output_parser", structured_output_parser)
 builder.add_node("node_feedback", node_feedback)
@@ -89,13 +89,13 @@ builder.add_conditional_edges(
         "epic_node_process",
         "story_node_process",
         "task_node_process",
-        "sub_task_node_process",
+        "advance_node_process",
     ],
 )
 builder.add_edge("epic_node_process", "node_feedback")
 builder.add_edge("story_node_process", "node_feedback")
 builder.add_edge("task_node_process", "tech_stack_recommendation")
-builder.add_edge("sub_task_node_process", "tech_stack_recommendation")
+builder.add_edge("advance_node_process", "tech_stack_recommendation")
 builder.add_edge("tech_stack_recommendation", "node_feedback")
 
 builder.add_conditional_edges(

@@ -78,7 +78,7 @@ def task_node_process(state: PlanNodeState) -> PlanNodeState:
     return {"node_data": {**node_data, "id": node_id}}
 
 
-def sub_task_node_process(state: PlanNodeState) -> PlanNodeState:
+def advance_node_process(state: PlanNodeState) -> PlanNodeState:
     """Create SubTask Node in DB."""
     node_data = state.get("node_data", {})
 
