@@ -48,14 +48,10 @@ def run_expert_node(state: RecommendationState, executor: Any):
     )
     output = response.get("structured_response")
     if output is None:
-        print(f"⚠️ 경고: {user_task}에 대한 구조화된 응답(Tool Call)이 없습니다.")
-        # 모델이 그냥 텍스트로 답했을 경우를 대비해 로그를 찍어봅니다.
-        # print(response.get("messages")[-1].content)
-
-        # 에러를 내지 않고 넘어가려면 빈 리스트 반환
-        return {"tech_list": []}
+        print(f"경고: {user_task}에 대한 구조화된 응답(Tool Call)이 없습니다.")
+        return {"tech_list": TechList()}
     print(output)
-    return {"tech_list": [output]}
+    return {"tech_list": output}
 
 
 def frontend_expert(state: RecommendationState) -> RecommendationState:

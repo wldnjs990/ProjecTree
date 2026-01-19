@@ -9,7 +9,7 @@ class RecommendationState(TypedDict):
     task_type: str
     node_name: str
     node_description: str
-    tech_list: Annotated[List[TechList], operator.add]
+    tech_list: TechList
     messages: Annotated[list, add_messages]  # 대화 기록
     tech_comment: str  # 기술 추천 코멘트
 
