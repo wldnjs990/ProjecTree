@@ -9,7 +9,7 @@ from app.services.db_service import (
 from app.core.llm import mini_llm
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
-from app.schemas.analysis import TaskAnalysis
+from app.agents.schemas.analysis import TaskAnalysis
 
 llm = mini_llm
 

@@ -39,16 +39,15 @@ recommend_graph_builder = StateGraph(RecommendationState)
 recommend_graph_builder.add_node("frontend_expert", frontend_expert)
 recommend_graph_builder.add_node("backend_expert", backend_expert)
 recommend_graph_builder.add_node("web_search_agent", web_search_agent)
-recommend_graph_builder.add_node("tech_name_agent", tech_name_agent)
 recommend_graph_builder.add_node("tech_stack_integrator", tech_stack_integrator)
 
 recommend_graph_builder.add_conditional_edges(
     START, route_task, ["frontend_expert", "backend_expert", "web_search_agent"]
 )
-recommend_graph_builder.add_edge("frontend_expert", "tech_name_agent")
-recommend_graph_builder.add_edge("backend_expert", "tech_name_agent")
-recommend_graph_builder.add_edge("web_search_agent", "tech_name_agent")
-recommend_graph_builder.add_edge("tech_name_agent", "tech_stack_integrator")
+recommend_graph_builder.add_edge("frontend_expert", "tech_stack_integrator")
+recommend_graph_builder.add_edge("backend_expert", "tech_stack_integrator")
+recommend_graph_builder.add_edge("web_search_agent", "tech_stack_integrator")
+#recommend_graph_builder.add_edge("tech_name_agent", "tech_stack_integrator")
 recommend_graph_builder.add_edge("tech_stack_integrator", END)
 
 recommend_graph = recommend_graph_builder.compile()
