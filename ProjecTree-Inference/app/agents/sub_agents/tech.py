@@ -33,7 +33,4 @@ def tech_name_agent(state: RecommendationState) -> RecommendationState:
     except Exception as e:
         print(f"Extraction failed: {e}")
         return state
-
-    mapped_recs = []
-    vocab_ids = []
     

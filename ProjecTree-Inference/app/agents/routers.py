@@ -19,13 +19,13 @@ def route_fetch(state: PlanNodeState) -> str:
 
 def route_node(state: PlanNodeState) -> str:
     """노드 타입에 따른 프로세스 라우팅"""
-    node_type = state.get("node_type", "Epic")
+    node_type = state.get("node_type")
     if node_type == "Epic":
         return "epic_node_process"
     elif node_type == "Story":
         return "story_node_process"
     elif node_type == "Task":
-        return "task_node_process"
+        return ["fe_task_node_process", "be_task_node_process"]
     elif node_type == "SubTask":
         return "advance_node_process"
     return "epic_node_process"

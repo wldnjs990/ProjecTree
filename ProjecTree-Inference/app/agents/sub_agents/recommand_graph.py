@@ -7,7 +7,6 @@ from app.agents.sub_agents.experts import (
     backend_expert,
     web_search_agent,
 )
-from app.agents.sub_agents.tech import tech_name_agent
 
 # Recommendation Graph Builder
 recommend_graph_builder = StateGraph(RecommendationState)
