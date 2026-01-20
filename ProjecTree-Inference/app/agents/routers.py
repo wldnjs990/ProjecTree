@@ -2,22 +2,15 @@ from app.agents.states.state import RecommendationState, PlanNodeState
 from langgraph.graph import END
 
 
-def route_task(state: PlanNodeState) -> str:
+def route_task(state: RecommendationState) -> str:
     """Task 노드일 경우 FE/BE/Search 전문가로 라우팅"""
-    node_type = state.get("node_type", "")
-    if node_type == "Task":
-        task_type = state.get("node_data", {}).get("type", "BE")
-        if task_type == "FE":
-            return "frontend_expert"
-        elif task_type == "BE":
-            return "backend_expert"
-        else:
-            return "web_search_agent"
-    elif node_type == "SubTask":
+    task_type = state.get("task_type", "")
+    if task_type == "frontend":
+        return "frontend_expert"
+    elif task_type == "backend":
+        return "backend_expert"
+    elif task_type == "search":
         return "web_search_agent"
-
-    return "web_search_agent"
-
 
 def route_fetch(state: PlanNodeState) -> str:
     """Fetch 관련 라우팅"""

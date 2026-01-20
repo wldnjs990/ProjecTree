@@ -6,6 +6,7 @@ from app.services.db_service import (
     fetch_tech_info,
     create_candidate,
 )
+from contextlib import closing
 
 
 @tool
@@ -18,26 +19,24 @@ def insert_official_tech_name(tech_name: str) -> Dict:
     Args:
         tech_name (str): 삽입할 기술 스택의 공식 명칭 (kebab-case, 예: 'react', 'spring-boot')
     """
-    db = next(get_db())
-    try:
+    with next(get_db()) as db:
         return create_tech_info(db, tech_name)
-    finally:
-        db.close()
 
 
 @tool
 def search_official_tech_name(keyword: str) -> Optional[Dict]:
     """
-    기술 스택의 공식 영문 명칭을 데이터베이스에서 검색합니다.
-    기술의 이름이 확실하지 않거나, 공식 명칭을 확인해야 할 때 이 도구를 사용하세요.
+    기술 스택의 공식 영문 명칭을 데이터베이스에서 부분 일치로 검색합니다.
+    기술의 정확한 이름을 모르거나, 유사한 공식 명칭 후보들을 확인하고 싶을 때 사용하세요.
+    검색된 기술 중 가장 적합한 것을 선택하여 출력에 반영하세요.
+    
     Args:
-        keyword (str): 검색할 기술 스택의 이름 (kebab-case, 예: 'react', 'spring')
+        keyword (str): 검색할 기술 스택의 이름 (예: 'react' -> 'react', 'react-native' 등 검색됨)
+    Returns:
+        Optional[Dict]: 검색된 기술의 id와 name을 포함한 딕셔너리. 결과가 없으면 빈 딕셔너리를 반환합니다.
     """
-    db = next(get_db())
-    try:
+    with next(get_db()) as db:
         return fetch_tech_info(db, keyword)
-    finally:
-        db.close()
 
 
 @tool
@@ -50,11 +49,6 @@ def insert_candidate_tool(node_id: int, candidates: List[Dict[str, str]]) -> str
         node_id (int): 현재 노드의 ID (Parent Node ID).
         candidates (List[Dict[str, str]]): 저장할 후보 리스트. 각 후보는 {"name": "...", "description": "...", "type": "..."} 형태여야 합니다.
     """
-    db = next(get_db())
-    try:
+    with next(get_db()) as db:
         create_candidate(db, node_id, candidates)
         return "Candidates inserted successfully."
-    except Exception as e:
-        return f"Error inserting candidates: {e}"
-    finally:
-        db.close()

@@ -1,11 +1,15 @@
+import operator
 from typing import Annotated, TypedDict, List, Dict, Any, Optional
 from langgraph.graph.message import add_messages
+from app.agents.schemas.expert import TechList
 
 
 class RecommendationState(TypedDict):
     current_node_type: str
-    question: str
-    context: str
+    task_type: str
+    node_name: str
+    node_description: str
+    tech_list: TechList
     messages: Annotated[list, add_messages]  # 대화 기록
 
 

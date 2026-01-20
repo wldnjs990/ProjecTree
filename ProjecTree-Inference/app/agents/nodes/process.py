@@ -9,7 +9,7 @@ from app.services.db_service import (
 from app.core.llm import mini_llm
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
-from app.schemas.analysis import TaskAnalysis
+from app.agents.schemas.analysis import TaskAnalysis
 
 llm = mini_llm
 
@@ -51,6 +51,11 @@ def story_node_process(state: PlanNodeState) -> PlanNodeState:
 
     return {"node_data": {**node_data, "id": node_id}}
 
+def fe_task_node_process(state: PlanNodeState) -> PlanNodeState:
+    pass
+
+def be_task_node_process(state: PlanNodeState) -> PlanNodeState:
+    pass
 
 def task_node_process(state: PlanNodeState) -> PlanNodeState:
     """Create Task Node in DB with analysis."""

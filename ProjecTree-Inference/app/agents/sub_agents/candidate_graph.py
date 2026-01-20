@@ -12,7 +12,7 @@ from langchain_community.tools import (
 llm = mini_llm
 tools = [insert_candidate_tool]
 
-from app.agents.prompts.candidate_prompts import (
+from app.agents.prompts.system.candidate_prompts import (
     EPIC_SYS,
     STORY_SYS,
     TASK_SYS,

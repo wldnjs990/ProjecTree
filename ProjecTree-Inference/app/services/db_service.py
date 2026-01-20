@@ -4,24 +4,22 @@ from app.db.session import SessionLocal, get_db
 from typing import List, Optional, Dict, Any
 from sqlalchemy import text
 
-# Assuming models are defined in a models.py or similar, but since I don't see them in the file list,
-# I will use raw SQL or SQLAlchemy Core for now to effectively map to the provided schema.
-# Or better, I'll define a minimal ORM mapping here if strictly needed, or just use the table logic if models exist.
-# Checking file list again... I saw `app/db` has `session.py` and `vector_db.py`.
-# There's no evident `models.py`. I will use SQLAlchemy Core/Text for robustness against missing models,
-# or assume a `models` package exists if the user codebase implies it.
-# Given the user gave me SQL DDL, I should probably rely on raw SQL or simple Table reflection if I want to be safe.
-# UPDATE: I'll try to implement using standard SQLAlchemy style assuming `app.db.models` might exist or I can create `app/db/models.py`.
-# For now, to avoid "ImportError", I will create a `app/db/models.py` file with the schema provided.
 
-
-def fetch_tech_info(db: Session, name: str) -> Optional[Dict]:
-    """Fetch tech vocabulary by name."""
+def fetch_tech_info(db: Session, name: str) -> Dict:
+    """Fetch all matching tech vocabularies by name."""
+    
+    # 대소문자 구분 없이 검색하려면 PostgreSQL의 경우 'ILIKE'를 사용하세요.
+    # stmt = text("SELECT id, name FROM public.tech_vocabulary WHERE name ILIKE :name")
     stmt = text("SELECT id, name FROM public.tech_vocabulary WHERE name = :name")
+    
+    # fetchall()을 사용하여 모든 매칭 결과 가져오기
     result = db.execute(stmt, {"name": name}).fetchone()
-    if result:
-        return {"id": result.id, "name": result.name}
-    return None
+    
+    if result is None:
+        return {}
+    
+    # 리스트 컴프리헨션으로 결과 변환
+    return {"id": result.id, "name": result.name}
 
 
 def create_tech_info(db: Session, name: str) -> Dict:
