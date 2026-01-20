@@ -34,5 +34,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-
 }
