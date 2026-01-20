@@ -8,17 +8,17 @@ pipeline {
             }
         }
 
-        stage('Install') {
-            steps {
-                dir('ProjecTree-web') {
-                    sh 'pnpm install'
+        stage('Install & Build') {
+            agent {
+                docker {
+                    image 'node:24-alpine'
+                    args '-v /var/jenkins_home/workspace:/var/jenkins_home/workspace'
                 }
             }
-        }
-
-        stage('Build') {
             steps {
                 dir('ProjecTree-web') {
+                    sh 'npm install -g pnpm'
+                    sh 'pnpm install'
                     sh 'pnpm build'
                 }
             }
