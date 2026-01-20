@@ -6,7 +6,7 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     // 실제 로그인 로직은 나중에 추가
-    navigate('/');
+    navigate('/user-onboarding');
   };
 
   return (

@@ -1,5 +1,6 @@
 import HomePage from '@/pages/HomePage';
 import WorkspaceOnboardingPage from '@/pages/workspace-onboarding/WorkspaceOnboardingPage';
+import UserOnboardingPage from '@/pages/user-onboarding/UserOnboardingPage';
 import LoginPage from '@/pages/LoginPage';
 import WorkSpacePage from '@/pages/workspace/WorkSpacePage';
 import WorkspaceLoungePage from '@/pages/workspaceLounge/WorkspaceLoungePage';
@@ -22,6 +23,10 @@ export const publicRoutes: RouteObject[] = [
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/user-onboarding',
+    element: <UserOnboardingPage />,
   },
   {
     path: '/workspace-onboarding',
