@@ -15,7 +15,7 @@ public enum ErrorCode {
     @Getter
     private String defaultMessage;
 
-    //4040101
+    //10001
     public int status() {
         return domainCode.getValue() * 10000 + exceptionCode.getValue();
     }
