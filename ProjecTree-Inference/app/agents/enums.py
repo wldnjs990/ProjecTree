@@ -4,14 +4,21 @@ from typing import Optional
 
 class NodeType(str, Enum):
     """노드 타입 정의 - 계층 구조: Epic > Story > Task > Advance"""
+    PROJECT = "PROJECT"
     EPIC = "EPIC"
     STORY = "STORY"
     TASK = "TASK"
     ADVANCE = "ADVANCE"
 
+class TaskType(str, Enum):
+    """Task 타입 정의"""
+    FRONTEND = "FrontEnd"
+    BACKEND = "BackEnd"
+    ADVANCE = "Advance"
 
 # 계층 구조 매핑: 부모 타입 -> 자식 타입
 NODE_HIERARCHY = {
+    NodeType.PROJECT: NodeType.EPIC,
     NodeType.EPIC: NodeType.STORY,
     NodeType.STORY: NodeType.TASK,
     NodeType.TASK: NodeType.ADVANCE,
@@ -23,7 +30,8 @@ NODE_PARENT_MAP = {
     NodeType.STORY: NodeType.EPIC,
     NodeType.TASK: NodeType.STORY,
     NodeType.ADVANCE: NodeType.TASK,
-    NodeType.EPIC: None,  # Epic은 최상위 계층
+    NodeType.EPIC: NodeType.PROJECT,
+    NodeType.PROJECT: None,  # Project는 최상위 계층
 }
 
 
