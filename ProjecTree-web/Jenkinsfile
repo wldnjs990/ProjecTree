@@ -8,18 +8,12 @@ pipeline {
             }
         }
 
-        stage('Install') {
+        stage('Install & Build') {
             steps {
                 dir('ProjecTree-web') {
-                    sh 'pnpm install'
-                }
-            }
-        }
-
-        stage('Build') {
-            steps {
-                dir('ProjecTree-web') {
-                    sh 'pnpm build'
+                    sh '''
+                        docker run --rm -v $(pwd):/app -w /app node:24-alpine sh -c "npm install -g pnpm && pnpm install && pnpm build"
+                    '''
                 }
             }
         }
