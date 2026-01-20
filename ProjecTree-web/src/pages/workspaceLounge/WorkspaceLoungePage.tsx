@@ -1,29 +1,25 @@
-import { ProjectCard } from "./components";
+import { useState } from "react";
+import { LoungeSidebar, WorkspaceContent } from "./components";
 
-// 확인용 임시 데이터
-const mockProject = {
-  id: "1",
-  title: "여행 일정 추천 AI 서비스",
-  description: "사용자 취향을 분석해 여행지를 추천해주는 서비스입니다.",
-  role: "Owner",
-  progressP0: 45,
-  progressP1: 30,
-  progressP2: 60,
-  lastModified: "2시간 전",
-  members: [
-    { name: "김싸피", avatar: "", online: true },
-    { name: "이개발", avatar: "", online: false },
-  ],
-};
-
+/**
+ * [페이지] 워크스페이스 라운지 메인 페이지
+ * - 사이드바(LoungeSidebar)와 메인 콘텐츠(WorkspaceContent)를 포함하는 레이아웃 컨테이너
+ * - 사이드바의 접힘/펼침 상태(sidebarCollapsed)를 관리하여 자식 컴포넌트에 전달
+ */
 export default function WorkspaceLoungePage() {
+  // 사이드바 접힘 상태 관리 (true: 접힘, false: 펼쳐짐)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   return (
-    <div className="p-10 bg-zinc-50 h-screen">
-      <h1 className="text-2xl font-bold mb-6">워크스페이스 라운지 (테스트)</h1>
-      <div className="w-[400px]">
-        {/* 방금 만든 카드를 여기에 배치! */}
-        <ProjectCard project={mockProject} />
-      </div>
+    <div className="flex h-screen bg-zinc-50 overflow-hidden">
+      {/* 1. 좌측 사이드바: 네비게이션 및 프로필 설정 */}
+      <LoungeSidebar
+        collapsed={sidebarCollapsed}
+        onToggle={() => setSidebarCollapsed(prev => !prev)}
+      />
+
+      {/* 2. 우측 메인 콘텐츠: 워크스페이스 목록 검색/필터/정렬 */}
+      <WorkspaceContent />
     </div>
   );
 }

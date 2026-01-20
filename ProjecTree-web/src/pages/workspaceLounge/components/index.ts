@@ -1,2 +1,4 @@
 export { ProjectCard } from "./ProjectCard";
-// LoungeSidebar는 다음 단계에서 구현 후 추가
+export { LoungeSidebar } from "./LoungeSidebar";
+export { WorkspaceContent } from "./WorkspaceContent";
+
