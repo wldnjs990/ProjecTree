@@ -51,6 +51,11 @@ def story_node_process(state: PlanNodeState) -> PlanNodeState:
 
     return {"node_data": {**node_data, "id": node_id}}
 
+def fe_task_node_process(state: PlanNodeState) -> PlanNodeState:
+    pass
+
+def be_task_node_process(state: PlanNodeState) -> PlanNodeState:
+    pass
 
 def task_node_process(state: PlanNodeState) -> PlanNodeState:
     """Create Task Node in DB with analysis."""

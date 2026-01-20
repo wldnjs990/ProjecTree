@@ -1,1 +1,1 @@
-
+# 기술 비교 (md 형식)\n\n| 기술 구성 | 장점 | 단점 | 택시 포인트 | 추천 점수 |\n|---|---|---|---|---|\n| socketio-based-real-time-chat-stack | 빠른 개발, 자동 재연결, 방 관리 용이 | 대규모 확장에서 추가 구성 필요 | 생산성, 생태계, 번들 크기 | 5 |\n| native-websocket-optimized-chat-stack | 경량, 제어권 강화 | 재연결/오프라인 처리 직접 구현 필요 | 번들 크기 민감도 | 4 |\n| state-machine-driven-chat-ui-stack | 상태 예측 가능, 복잡 대화 관리에 강점 | 초기 설계 비용/러닝커브 | 상태 관리 명확성, 테스트 용이 | 3 |\n\n

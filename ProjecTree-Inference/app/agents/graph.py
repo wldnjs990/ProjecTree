@@ -1,5 +1,5 @@
 from langgraph.graph import StateGraph, END, START
-from app.agents.states.state import RecommendationState, PlanNodeState
+from app.agents.states.state import PlanNodeState
 from app.agents.nodes.fetch import (
     parent_node_fetch,
     project_spec_fetch,
@@ -18,39 +18,14 @@ from app.agents.nodes.creation import sub_node_info_create
 from app.agents.nodes.feedback import node_feedback, struct_feedback
 from app.agents.nodes.parser import structured_output_parser
 from app.agents.sub_agents.candidate_graph import generate_candidates
-from app.agents.nodes.integrator import tech_stack_integrator
+
 from app.agents.routers import (
-    route_task,
     route_node,
     route_feedback_loop,
     route_struct_feedback,
     loop_condition,
 )
-from app.agents.sub_agents.experts import (
-    frontend_expert,
-    backend_expert,
-    web_search_agent,
-)
-from app.agents.sub_agents.tech import tech_name_agent
-
-# Recommendation Graph Builder
-recommend_graph_builder = StateGraph(RecommendationState)
-
-recommend_graph_builder.add_node("frontend_expert", frontend_expert)
-recommend_graph_builder.add_node("backend_expert", backend_expert)
-recommend_graph_builder.add_node("web_search_agent", web_search_agent)
-recommend_graph_builder.add_node("tech_stack_integrator", tech_stack_integrator)
-
-recommend_graph_builder.add_conditional_edges(
-    START, route_task, ["frontend_expert", "backend_expert", "web_search_agent"]
-)
-recommend_graph_builder.add_edge("frontend_expert", "tech_stack_integrator")
-recommend_graph_builder.add_edge("backend_expert", "tech_stack_integrator")
-recommend_graph_builder.add_edge("web_search_agent", "tech_stack_integrator")
-#recommend_graph_builder.add_edge("tech_name_agent", "tech_stack_integrator")
-recommend_graph_builder.add_edge("tech_stack_integrator", END)
-
-recommend_graph = recommend_graph_builder.compile()
+from app.agents.sub_agents.recommand_graph import recommend_graph
 
 # Main Graph Builder
 builder = StateGraph(PlanNodeState)

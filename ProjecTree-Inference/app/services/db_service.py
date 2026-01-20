@@ -5,20 +5,21 @@ from typing import List, Optional, Dict, Any
 from sqlalchemy import text
 
 
-def fetch_tech_info(db: Session, name: str) -> List[Dict]:
+def fetch_tech_info(db: Session, name: str) -> Dict:
     """Fetch all matching tech vocabularies by name."""
     
     # 대소문자 구분 없이 검색하려면 PostgreSQL의 경우 'ILIKE'를 사용하세요.
     # stmt = text("SELECT id, name FROM public.tech_vocabulary WHERE name ILIKE :name")
-    stmt = text("SELECT id, name FROM public.tech_vocabulary WHERE name LIKE :name")
-    
-    search_pattern = f"%{name}%"
+    stmt = text("SELECT id, name FROM public.tech_vocabulary WHERE name = :name")
     
     # fetchall()을 사용하여 모든 매칭 결과 가져오기
-    results = db.execute(stmt, {"name": search_pattern}).fetchall()
+    result = db.execute(stmt, {"name": name}).fetchone()
+    
+    if result is None:
+        return {}
     
     # 리스트 컴프리헨션으로 결과 변환
-    return [{"id": row.id, "name": row.name} for row in results]
+    return {"id": result.id, "name": result.name}
 
 
 def create_tech_info(db: Session, name: str) -> Dict:

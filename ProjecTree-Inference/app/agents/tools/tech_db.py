@@ -6,6 +6,7 @@ from app.services.db_service import (
     fetch_tech_info,
     create_candidate,
 )
+from contextlib import closing
 
 
 @tool
@@ -18,11 +19,8 @@ def insert_official_tech_name(tech_name: str) -> Dict:
     Args:
         tech_name (str): 삽입할 기술 스택의 공식 명칭 (kebab-case, 예: 'react', 'spring-boot')
     """
-    db = next(get_db())
-    try:
+    with next(get_db()) as db:
         return create_tech_info(db, tech_name)
-    finally:
-        db.close()
 
 
 @tool
@@ -34,19 +32,11 @@ def search_official_tech_name(keyword: str) -> Optional[Dict]:
     
     Args:
         keyword (str): 검색할 기술 스택의 이름 (예: 'react' -> 'react', 'react-native' 등 검색됨)
-        
     Returns:
-        List[Dict]: 검색된 기술들의 id와 name을 포함한 딕셔너리 리스트. 결과가 없으면 빈 리스트를 반환합니다.
+        Optional[Dict]: 검색된 기술의 id와 name을 포함한 딕셔너리. 결과가 없으면 빈 딕셔너리를 반환합니다.
     """
-    db = next(get_db())
-    try:
-        results = fetch_tech_info(db, keyword)
-        if results is None:
-            return []
-            
-        return results
-    finally:
-        db.close()
+    with next(get_db()) as db:
+        return fetch_tech_info(db, keyword)
 
 
 @tool
@@ -59,11 +49,6 @@ def insert_candidate_tool(node_id: int, candidates: List[Dict[str, str]]) -> str
         node_id (int): 현재 노드의 ID (Parent Node ID).
         candidates (List[Dict[str, str]]): 저장할 후보 리스트. 각 후보는 {"name": "...", "description": "...", "type": "..."} 형태여야 합니다.
     """
-    db = next(get_db())
-    try:
+    with next(get_db()) as db:
         create_candidate(db, node_id, candidates)
         return "Candidates inserted successfully."
-    except Exception as e:
-        return f"Error inserting candidates: {e}"
-    finally:
-        db.close()

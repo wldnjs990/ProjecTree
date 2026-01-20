@@ -1,6 +1,7 @@
+from app.agents.prompts.user.expert_prompts import EXPERT_USER_PROMPT
 from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate
-from app.core.llm import mini_llm, large_llm
+from app.core.llm import mini_llm, large_llm, openai_mini_llm, openai_nano_llm
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ToolStrategy, AutoStrategy
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
@@ -8,18 +9,19 @@ from app.agents.states.state import PlanNodeState, RecommendationState
 from app.agents.tools.tavily import search_tool
 from app.agents.schemas.expert import TechList
 from typing import Any
-from app.agents.tools.tech_db import search_official_tech_name
-from app.agents.prompts.expert_prompts import (
+from app.agents.tools.tech_db import search_official_tech_name, insert_official_tech_name
+from app.agents.prompts.system.expert_prompts import (
     FE_SYSTEM_PROMPT,
     BE_SYSTEM_PROMPT,
     SEARCH_SYSTEM_PROMPT,
 )
+from app.agents.prompts.user.expert_prompts import EXPERT_USER_PROMPT
 
 load_dotenv()
 
-llm = mini_llm
+llm = openai_nano_llm
 
-tools = [search_tool, search_official_tech_name]
+tools = [search_tool]
 
 
 def create_expert_agent(system_prompt: str):
@@ -34,6 +36,7 @@ web_search_executor = create_expert_agent(SEARCH_SYSTEM_PROMPT)
 
 
 def run_expert_node(state: RecommendationState, executor: Any):
+    task_type = state.get("task_type")
     user_task = state.get("node_name")
     task_description = state.get("node_description")
     response = executor.invoke(
@@ -41,7 +44,7 @@ def run_expert_node(state: RecommendationState, executor: Any):
             "messages": [
                 (
                     "user",
-                    f"user_task: {user_task}\ntask_description: {task_description}",
+                    EXPERT_USER_PROMPT.format(task_type=task_type, user_task=user_task, task_description=task_description),
                 )
             ]
         }
