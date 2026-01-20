@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('ProjecTree-was') {
+                    sh './gradlew build'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                dir('ProjecTree-was') {
+                    sh './gradlew test'
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            when {
+                branch 'be-dev'
+            }
+            steps {
+                dir('ProjecTree-was') {
+                    sh 'docker build -t projectree-was .'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                branch 'be-dev'
+            }
+            steps {
+                sh '''
+                    docker stop projectree-was || true
+                    docker rm projectree-was || true
+                    docker run -d --name projectree-was -p 8081:8080 projectree-was
+                '''
+            }
+        }
+    }
+}
