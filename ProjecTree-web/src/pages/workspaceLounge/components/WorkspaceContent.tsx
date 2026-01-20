@@ -1,21 +1,29 @@
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { ProjectCard, type ProjectCardProps } from "./ProjectCard";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { ProjectCard, type ProjectCardProps } from './ProjectCard';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Search, Plus, ChevronDown, Clock, Calendar, ArrowDownAZ, Loader2 } from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
+} from '@/components/ui/dropdown-menu';
+import {
+  Search,
+  Plus,
+  ChevronDown,
+  Clock,
+  Calendar,
+  ArrowDownAZ,
+  Loader2,
+} from 'lucide-react';
+import { useMemo, useState, useEffect } from 'react';
 
 // 정렬 옵션 정의
 const sortOptions = [
-  { label: "최근 수정순", value: "recent", icon: Clock },
-  { label: "생성일순", value: "created", icon: Calendar },
-  { label: "이름순", value: "name", icon: ArrowDownAZ },
+  { label: '최근 수정순', value: 'recent', icon: Clock },
+  { label: '생성일순', value: 'created', icon: Calendar },
+  { label: '이름순', value: 'name', icon: ArrowDownAZ },
 ];
 
 /**
@@ -31,16 +39,19 @@ export function WorkspaceContent() {
 
   // 1. 상태 관리
   // (1) 워크스페이스 데이터 및 로딩 상태 (비동기 처리)
-  const [workspaces, setWorkspaces] = useState<ProjectCardProps["project"][]>([]);
+  const [workspaces, setWorkspaces] = useState<ProjectCardProps['project'][]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   // (2) 검색어 상태: 입력 반응성을 위해 로컬 state로 관리
-  const initialQuery = searchParams.get("q") || "";
+  const initialQuery = searchParams.get('q') || '';
   const [inputValue, setInputValue] = useState(initialQuery);
 
   // (3) 정렬 상태: URL에서 바로 조회 (기본값: recent)
-  const sortByValue = searchParams.get("sort") || "recent";
-  const currentSortOption = sortOptions.find(opt => opt.value === sortByValue) || sortOptions[0];
+  const sortByValue = searchParams.get('sort') || 'recent';
+  const currentSortOption =
+    sortOptions.find((opt) => opt.value === sortByValue) || sortOptions[0];
 
   // 2. 데이터 Fetching (API 호출)
   useEffect(() => {
@@ -57,7 +68,7 @@ export function WorkspaceContent() {
         // Q. 실제 서버 API 주소가 '/api/workspaces/my'가 아니라면?
         // A. 백엔드 개발자와 상의하여 결정된 실제 주소로 아래 문자열만 바꾸시면 됩니다.
         //    (예: fetch('http://localhost:8080/v1/workspaces'))
-        // 
+        //
         // Tip: 'vite.config.ts'에서 Proxy 설정을 해두었다면, 도메인 없이 경로만 적어도 됩니다.
         const response = await fetch('/api/workspaces/my');
         const result = await response.json();
@@ -66,7 +77,7 @@ export function WorkspaceContent() {
           setWorkspaces(result.data); // 받아온 데이터로 state 업데이트
         }
       } catch (error) {
-        console.error("워크스페이스 목록을 불러오는데 실패했습니다.", error);
+        console.error('워크스페이스 목록을 불러오는데 실패했습니다.', error);
       } finally {
         setIsLoading(false); // 로딩 끝 (목록 표시)
       }
@@ -78,11 +89,11 @@ export function WorkspaceContent() {
   // 3. Debounce 효과: 사용자가 입력을 멈춘 후 0.3초 뒤에 URL을 업데이트함
   useEffect(() => {
     const timer = setTimeout(() => {
-      setSearchParams(prev => {
+      setSearchParams((prev) => {
         if (inputValue) {
-          prev.set("q", inputValue);
+          prev.set('q', inputValue);
         } else {
-          prev.delete("q");
+          prev.delete('q');
         }
         return prev;
       });
@@ -96,8 +107,8 @@ export function WorkspaceContent() {
   };
 
   const handleSortChange = (value: string) => {
-    setSearchParams(prev => {
-      prev.set("sort", value);
+    setSearchParams((prev) => {
+      prev.set('sort', value);
       return prev;
     });
   };
@@ -112,9 +123,9 @@ export function WorkspaceContent() {
     );
 
     // (2) 정렬 적용
-    if (sortByValue === "name") {
+    if (sortByValue === 'name') {
       result.sort((a, b) => a.title.localeCompare(b.title));
-    } else if (sortByValue === "created") {
+    } else if (sortByValue === 'created') {
       result.sort((a, b) => Number(b.id) - Number(a.id));
     }
 
@@ -128,7 +139,9 @@ export function WorkspaceContent() {
         <nav className="flex items-center gap-2 text-sm">
           <span className="text-zinc-400">홈</span>
           <span className="text-zinc-300">/</span>
-          <span className="font-medium text-zinc-900 tracking-tight">워크스페이스</span>
+          <span className="font-medium text-zinc-900 tracking-tight">
+            워크스페이스
+          </span>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -155,7 +168,10 @@ export function WorkspaceContent() {
                 <ChevronDown className="h-4 w-4 opacity-50" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border-zinc-200">
+            <DropdownMenuContent
+              align="end"
+              className="bg-white border-zinc-200"
+            >
               {sortOptions.map((option) => (
                 <DropdownMenuItem
                   key={option.value}
@@ -171,7 +187,7 @@ export function WorkspaceContent() {
 
           <Button
             className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
-            onClick={() => navigate("/project/new")}
+            onClick={() => navigate('/workspace-onboarding')}
           >
             <Plus className="h-4 w-4" />새 워크스페이스
           </Button>

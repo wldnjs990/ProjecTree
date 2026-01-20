@@ -77,6 +77,7 @@ export default function Step1BasicInfo({
             placeholder="Untitled-1"
             value={data.workspaceName}
             onChange={(e) => onChange({ workspaceName: e.target.value })}
+            maxLength={20}
             style={{
               fontFamily: 'Roboto',
               fontWeight: 100,
@@ -90,6 +91,19 @@ export default function Step1BasicInfo({
               borderRadius: '6px',
             }}
           />
+          <div className="flex justify-end">
+            <span
+              style={{
+                fontFamily: 'Inter',
+                fontWeight: 400,
+                fontSize: '12px',
+                lineHeight: '16px',
+                color: 'var(--figma-text-dove-gray)',
+              }}
+            >
+              {data.workspaceName.length}/20
+            </span>
+          </div>
         </div>
 
         {/* 워크스페이스 키 */}
@@ -110,7 +124,11 @@ export default function Step1BasicInfo({
             id="workspaceKey"
             placeholder="ex) ASDF"
             value={data.workspaceKey}
-            onChange={(e) => onChange({ workspaceKey: e.target.value })}
+            onChange={(e) => {
+              const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+              onChange({ workspaceKey: value });
+            }}
+            maxLength={4}
             style={{
               fontFamily: 'Roboto',
               fontWeight: 100,
@@ -124,6 +142,19 @@ export default function Step1BasicInfo({
               borderRadius: '6px',
             }}
           />
+          <div className="flex justify-end">
+            <span
+              style={{
+                fontFamily: 'Inter',
+                fontWeight: 400,
+                fontSize: '12px',
+                lineHeight: '16px',
+                color: 'var(--figma-text-dove-gray)',
+              }}
+            >
+              {data.workspaceKey.length}/4
+            </span>
+          </div>
         </div>
 
         {/* 도메인 */}
@@ -285,27 +316,6 @@ export default function Step1BasicInfo({
             </div>
           </RadioGroup>
         </div>
-      </div>
-
-      {/* 버튼 영역 */}
-      <div className="mt-4 flex justify-end">
-        <button
-          onClick={onNext}
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.2px',
-            lineHeight: '20px',
-            padding: '8px 32px',
-            background: 'var(--figma-primary-blue)',
-            color: 'var(--figma-white)',
-            borderRadius: '6px',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          다음
-        </button>
       </div>
     </div>
   );

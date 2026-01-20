@@ -26,9 +26,15 @@ export const ONBOARDING_TEXTS = {
     },
     {
       number: 4,
-      label: '팀 및 에픽',
-      title: '팀 및 에픽',
-      description: '팀원을 초대하고 초기 에픽을 설정하세요',
+      label: '팀 초대',
+      title: '팀 초대',
+      description: '팀원을 초대하세요',
+    },
+    {
+      number: 5,
+      label: '초기 에픽',
+      title: '초기 에픽 설정',
+      description: '프로젝트의 초기 에픽을 설정하세요',
     },
   ],
 

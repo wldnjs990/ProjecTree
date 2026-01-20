@@ -213,44 +213,6 @@ export default function Step3TechStack({
           </div>
         )}
       </div>
-
-      {/* 버튼 영역 */}
-      <div className="mt-4 flex justify-between">
-        <button
-          onClick={onPrev}
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.2px',
-            lineHeight: '20px',
-            padding: '8px 32px',
-            background: 'transparent',
-            color: 'var(--figma-text-emperor)',
-            borderRadius: '6px',
-            border: '1px solid var(--figma-border-mercury)',
-            cursor: 'pointer',
-          }}
-        >
-          이전
-        </button>
-        <button
-          onClick={onNext}
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.2px',
-            lineHeight: '20px',
-            padding: '8px 32px',
-            background: 'var(--figma-primary-blue)',
-            color: 'var(--figma-white)',
-            borderRadius: '6px',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          다음
-        </button>
-      </div>
     </div>
   );
 }

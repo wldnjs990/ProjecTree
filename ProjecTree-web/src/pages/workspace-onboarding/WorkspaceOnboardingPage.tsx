@@ -1,12 +1,16 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { ChevronLeft } from 'lucide-react';
 import Stepper from './components/Stepper';
 import Step1BasicInfo from './components/Step1BasicInfo';
 import Step2Schedule from './components/Step2Schedule';
 import Step3TechStack from './components/Step3TechStack';
-import Step4TeamEpic from './components/Step4TeamEpic';
-import Step5Loading from './components/Step5Loading';
+import Step4TeamInvite from './components/Step4TeamInvite';
+import Step5EpicSetup from './components/Step5EpicSetup';
+import Step6Loading from './components/Step6Loading';
 
 export default function WorkspaceOnboardingPage() {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,9 +28,9 @@ export default function WorkspaceOnboardingPage() {
   });
 
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < 5) {
       setCurrentStep((prev) => prev + 1);
-    } else if (currentStep === 4) {
+    } else if (currentStep === 5) {
       setIsLoading(true);
       setTimeout(() => {
         console.log('워크스페이스 생성 완료!', formData);
@@ -41,22 +45,58 @@ export default function WorkspaceOnboardingPage() {
   };
 
   if (isLoading) {
-    return <Step5Loading />;
+    return <Step6Loading />;
   }
 
   return (
     <div
-      className="flex min-h-screen flex-col items-center justify-center px-4 py-24"
+      className="min-h-screen"
       style={{ background: 'var(--figma-bg-alabaster)' }}
     >
-      <div className="w-full" style={{ maxWidth: '512px' }}>
-        {/* Stepper */}
-        <Stepper currentStep={currentStep} />
+      {/* 왼쪽 상단 뒤로가기 버튼 */}
+      <div className="fixed left-4 top-4 z-20">
+        <button
+          onClick={() => navigate('/workspaceLounge')}
+          className="flex items-center gap-1 rounded-lg p-2 transition-colors hover:bg-gray-100"
+          style={{
+            fontFamily: 'Roboto',
+            fontWeight: 100,
+            fontSize: '14px',
+            color: 'var(--figma-text-cod-gray)',
+          }}
+        >
+          <ChevronLeft className="h-5 w-5" />
+          뒤로가기
+        </button>
+      </div>
 
-        {/* 카드 컨테이너 */}
+      {/* Stepper - position: fixed로 완전 고정 */}
+      <div
+        className="fixed top-0 left-0 right-0 z-10 flex justify-center pt-6 pb-2"
+        style={{ background: 'var(--figma-bg-alabaster)' }}
+      >
+        <div
+          style={{
+            maxWidth: '512px',
+            width: '100%',
+            paddingLeft: '16px',
+            paddingRight: '16px',
+          }}
+        >
+          <Stepper currentStep={currentStep} />
+        </div>
+      </div>
+
+      {/* 카드 컨테이너 - 상단 여백 추가 (Stepper 높이만큼) */}
+      <div
+        className="flex justify-center px-4"
+        style={{ paddingTop: '110px', paddingBottom: '100px' }}
+      >
         <div
           className="flex flex-col p-8"
           style={{
+            maxWidth: '512px',
+            width: '100%',
             background: 'var(--figma-white)',
             border: '1px solid var(--figma-border-mercury)',
             boxShadow:
@@ -99,7 +139,7 @@ export default function WorkspaceOnboardingPage() {
           )}
 
           {currentStep === 4 && (
-            <Step4TeamEpic
+            <Step4TeamInvite
               data={formData}
               onChange={(updates) =>
                 setFormData((prev) => ({ ...prev, ...updates }))
@@ -108,6 +148,67 @@ export default function WorkspaceOnboardingPage() {
               onPrev={handlePrev}
             />
           )}
+
+          {currentStep === 5 && (
+            <Step5EpicSetup
+              data={formData}
+              onChange={(updates) =>
+                setFormData((prev) => ({ ...prev, ...updates }))
+              }
+              onNext={handleNext}
+              onPrev={handlePrev}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* 하단 고정 버튼 */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-10 flex justify-center py-4"
+        style={{ background: 'var(--figma-bg-alabaster)' }}
+      >
+        <div
+          className="flex w-full justify-between px-4"
+          style={{ maxWidth: '512px' }}
+        >
+          {currentStep > 1 ? (
+            <button
+              onClick={handlePrev}
+              style={{
+                fontFamily: 'Roboto',
+                fontWeight: 100,
+                fontSize: '13.2px',
+                lineHeight: '20px',
+                padding: '8px 32px',
+                background: 'transparent',
+                color: 'var(--figma-text-emperor)',
+                borderRadius: '6px',
+                border: '1px solid var(--figma-border-mercury)',
+                cursor: 'pointer',
+              }}
+            >
+              이전
+            </button>
+          ) : (
+            <div />
+          )}
+          <button
+            onClick={handleNext}
+            style={{
+              fontFamily: 'Roboto',
+              fontWeight: 100,
+              fontSize: '13.2px',
+              lineHeight: '20px',
+              padding: '8px 32px',
+              background: 'var(--figma-primary-blue)',
+              color: 'var(--figma-white)',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            {currentStep === 5 ? 'AI 분석 시작' : '다음'}
+          </button>
         </div>
       </div>
     </div>

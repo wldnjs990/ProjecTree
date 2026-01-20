@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -10,37 +9,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { X, Plus } from 'lucide-react';
-
-interface Epic {
-  id: string;
-  name: string;
-  description: string;
-}
 
 interface TeamMember {
   email: string;
   role: string;
 }
 
-interface Step4TeamEpicProps {
+interface Step4TeamInviteProps {
   data: {
-    epics: Epic[];
     teamMembers: TeamMember[];
   };
-  onChange: (updates: Partial<Step4TeamEpicProps['data']>) => void;
+  onChange: (updates: Partial<Step4TeamInviteProps['data']>) => void;
   onNext: () => void;
   onPrev: () => void;
 }
 
-export default function Step4TeamEpic({
+export default function Step4TeamInvite({
   data,
   onChange,
   onNext,
   onPrev,
-}: Step4TeamEpicProps) {
-  const [epicName, setEpicName] = useState('');
-  const [epicDescription, setEpicDescription] = useState('');
+}: Step4TeamInviteProps) {
   const [memberEmail, setMemberEmail] = useState('');
   const [memberRole, setMemberRole] = useState('편집자 - 편집 가능');
   const [emailError, setEmailError] = useState('');
@@ -88,25 +77,6 @@ export default function Step4TeamEpic({
     }
   };
 
-  const handleAddEpic = () => {
-    if (epicName.trim()) {
-      const newEpic: Epic = {
-        id: Date.now().toString(),
-        name: epicName,
-        description: epicDescription,
-      };
-      onChange({ epics: [...data.epics, newEpic] });
-      setEpicName('');
-      setEpicDescription('');
-    }
-  };
-
-  const handleRemoveEpic = (id: string) => {
-    onChange({
-      epics: data.epics.filter((epic) => epic.id !== id),
-    });
-  };
-
   const handleInviteMember = () => {
     // 최종 유효성 검사
     if (!validateEmail(memberEmail)) {
@@ -137,7 +107,7 @@ export default function Step4TeamEpic({
             color: 'var(--figma-text-cod-gray)',
           }}
         >
-          팀 및 에픽
+          팀 초대
         </h2>
         <p
           style={{
@@ -148,135 +118,12 @@ export default function Step4TeamEpic({
             color: 'var(--figma-text-emperor)',
           }}
         >
-          팀원을 초대하고 초기 에픽을 설정하세요
+          팀원을 초대하세요
         </p>
       </div>
 
       {/* 폼 필드 */}
       <div className="flex flex-col gap-6">
-        {/* 초기 에픽 설정 */}
-        <div className="flex flex-col gap-4">
-          <h3
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '15px',
-              lineHeight: '20px',
-              color: 'var(--figma-text-cod-gray)',
-            }}
-          >
-            초기 에픽 설정
-          </h3>
-
-          {/* 에픽명과 추가 버튼 */}
-          <div className="flex gap-2">
-            <Input
-              placeholder="에픽명 (20자 이내)"
-              value={epicName}
-              onChange={(e) => setEpicName(e.target.value)}
-              maxLength={20}
-              className="flex-1"
-              style={{
-                fontFamily: 'Roboto',
-                fontWeight: 100,
-                fontSize: '14px',
-                lineHeight: '16px',
-                height: '44px',
-                padding: '12.5px 12px',
-                background: 'rgba(255, 255, 255, 0.002)',
-                border: '1px solid var(--figma-border-mercury)',
-                boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-                borderRadius: '6px',
-              }}
-            />
-            <Button
-              variant="outline"
-              onClick={handleAddEpic}
-              disabled={!epicName.trim()}
-              className="whitespace-nowrap"
-              style={{
-                fontFamily: 'Roboto',
-                fontWeight: 100,
-                fontSize: '13.2px',
-                height: '44px',
-                padding: '8px 16px',
-                background: 'transparent',
-                color: 'var(--figma-text-cod-gray)',
-                border: '1px solid var(--figma-border-mercury)',
-                borderRadius: '6px',
-              }}
-            >
-              <Plus className="mr-1 h-4 w-4" />
-              에픽 추가
-            </Button>
-          </div>
-
-          {/* 에픽 설명 */}
-          <Textarea
-            placeholder="에픽 설명 (선택사항)"
-            value={epicDescription}
-            onChange={(e) => setEpicDescription(e.target.value)}
-            rows={4}
-            className="resize-none"
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '14px',
-              lineHeight: '16px',
-              padding: '12.5px 12px',
-              background: 'rgba(255, 255, 255, 0.002)',
-              border: '1px solid var(--figma-border-mercury)',
-              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-              borderRadius: '6px',
-            }}
-          />
-        </div>
-
-        {/* 에픽 목록 */}
-        {data.epics.length > 0 && (
-          <div className="flex flex-col gap-2">
-            {data.epics.map((epic) => (
-              <div
-                key={epic.id}
-                className="flex items-start justify-between rounded-lg p-3"
-                style={{
-                  background: 'var(--figma-gray-concrete)',
-                  border: '1px solid var(--figma-border-mercury)',
-                }}
-              >
-                <div className="flex-1">
-                  <h4
-                    style={{
-                      fontFamily: 'Roboto',
-                      fontWeight: 400,
-                      fontSize: '14px',
-                      color: 'var(--figma-text-cod-gray)',
-                    }}
-                  >
-                    {epic.name}
-                  </h4>
-                  <p
-                    style={{
-                      fontFamily: 'Roboto',
-                      fontWeight: 100,
-                      fontSize: '13px',
-                      color: 'var(--figma-text-emperor)',
-                    }}
-                  >
-                    {epic.description}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleRemoveEpic(epic.id)}
-                  className="ml-2 rounded-full p-1 hover:bg-gray-200"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* 이메일 초대 */}
         <div className="flex flex-col gap-4">
           <h3
@@ -443,44 +290,6 @@ export default function Step4TeamEpic({
             ))}
           </div>
         )}
-      </div>
-
-      {/* 버튼 영역 */}
-      <div className="mt-4 flex justify-between">
-        <button
-          onClick={onPrev}
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.2px',
-            lineHeight: '20px',
-            padding: '8px 32px',
-            background: 'transparent',
-            color: 'var(--figma-text-emperor)',
-            borderRadius: '6px',
-            border: '1px solid var(--figma-border-mercury)',
-            cursor: 'pointer',
-          }}
-        >
-          이전
-        </button>
-        <button
-          onClick={onNext}
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.2px',
-            lineHeight: '20px',
-            padding: '8px 32px',
-            background: 'var(--figma-primary-blue)',
-            color: 'var(--figma-white)',
-            borderRadius: '6px',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          AI 분석 시작
-        </button>
       </div>
     </div>
   );

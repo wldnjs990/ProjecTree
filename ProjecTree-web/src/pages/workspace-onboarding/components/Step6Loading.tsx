@@ -1,4 +1,4 @@
-export default function Step5Loading() {
+export default function Step6Loading() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
       {/* 스피너 */}

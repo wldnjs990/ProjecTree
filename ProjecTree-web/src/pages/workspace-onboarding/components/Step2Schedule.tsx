@@ -78,7 +78,7 @@ export default function Step2Schedule({
             placeholder="예: AI가 사용자 취향을 분석해 최적의 여행 일정을 추천&#10;자세하게 적을수록 더 정확한 분석이 가능합니다."
             value={data.subject}
             onChange={(e) => onChange({ subject: e.target.value })}
-            maxLength={200}
+            maxLength={50}
             rows={5}
             className="resize-none"
             style={{
@@ -103,7 +103,7 @@ export default function Step2Schedule({
                 color: 'var(--figma-text-dove-gray)',
               }}
             >
-              {data.subject.length}/200
+              {data.subject.length}/50
             </span>
           </div>
         </div>
@@ -202,44 +202,6 @@ export default function Step2Schedule({
             </Popover>
           </div>
         </div>
-      </div>
-
-      {/* 버튼 영역 */}
-      <div className="mt-4 flex justify-between">
-        <button
-          onClick={onPrev}
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.2px',
-            lineHeight: '20px',
-            padding: '8px 32px',
-            background: 'transparent',
-            color: 'var(--figma-text-emperor)',
-            borderRadius: '6px',
-            border: '1px solid var(--figma-border-mercury)',
-            cursor: 'pointer',
-          }}
-        >
-          이전
-        </button>
-        <button
-          onClick={onNext}
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.2px',
-            lineHeight: '20px',
-            padding: '8px 32px',
-            background: 'var(--figma-primary-blue)',
-            color: 'var(--figma-white)',
-            borderRadius: '6px',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          다음
-        </button>
       </div>
     </div>
   );

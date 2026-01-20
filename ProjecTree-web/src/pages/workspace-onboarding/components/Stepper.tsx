@@ -8,7 +8,7 @@ export default function Stepper({ currentStep }: StepperProps) {
   const steps = ONBOARDING_TEXTS.steps;
 
   return (
-    <div className="mb-10 flex justify-center">
+    <div className="mb-4 flex justify-center">
       <div className="flex items-center">
         {steps.map((step, index) => (
           <div key={step.number} className="flex items-center">
@@ -46,6 +46,7 @@ export default function Stepper({ currentStep }: StepperProps) {
                     step.number <= currentStep
                       ? 'var(--figma-text-cod-gray)'
                       : 'var(--figma-text-emperor)',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {step.label}
