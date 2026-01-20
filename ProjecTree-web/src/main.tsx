@@ -21,9 +21,10 @@ import '@/styles/index.css';
  * - 개발 환경(DEV)일 때만 가짜 서버(Worker)를 켜서 API를 모킹합니다.
  */
 async function enableMocking() {
-  // 개발 환경(development)이 아닐 경우(예: 배포 환경)에는 아무런 동작도 하지 않고 종료
+  // 개발 환경(development)이 아닐 경우(예: 배포 환경)에는
+  // 즉시 Promise를 완료시켜서 바로 앱이 렌더링되게 합니다.
   if (!import.meta.env.DEV) {
-    return;
+    return Promise.resolve();
   }
 
   // 모킹 설정 파일 가져오기
@@ -37,7 +38,7 @@ async function enableMocking() {
 }
 
 // 1. 모킹 설정이 끝난 후에 -> 2. React 앱을 렌더링합니다.
-// 이렇게 해야 앱이 켜지자마자 보내는 요청들도 놓치지 않고 모킹할 수 있습니다.
+// enableMocking이 항상 Promise를 반환하므로, 개발/배포 환경 모두 안전하게 렌더링됩니다.
 enableMocking().then(() => {
   createRoot(document.getElementById('root')!).render(<App />);
 });
