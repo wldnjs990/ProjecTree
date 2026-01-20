@@ -27,6 +27,7 @@ export interface ProjectCardProps {
     progressP2: number;
 
     lastModified: string;
+    updatedAt: string;
 
     members: Member[];
   };
@@ -63,41 +64,50 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="pb-4 flex-1">
-        <p className="mb-4 text-sm leading-relaxed text-zinc-500 line-clamp-2 h-[40px]">{project.description}</p>
+      <CardContent className="pb-4 flex-1 flex flex-col gap-4">
+        <p className="text-sm leading-relaxed text-zinc-500 line-clamp-2 h-[46px]">{project.description}</p>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-auto">
           {/* P0 */}
           <div className="flex-1 space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-medium text-red-600">P0</span>
+              <span className="text-[10px] text-zinc-400">{project.progressP0}%</span>
+            </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
               <div
                 className="h-full rounded-full bg-red-500 transition-all"
                 style={{ width: `${project.progressP0}%` }}
               />
             </div>
-            <div className="text-[10px] text-zinc-400 text-right">{project.progressP0}%</div>
           </div>
 
           {/* P1 */}
           <div className="flex-1 space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-medium text-yellow-600">P1</span>
+              <span className="text-[10px] text-zinc-400">{project.progressP1}%</span>
+            </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
               <div
                 className="h-full rounded-full bg-yellow-500 transition-all"
                 style={{ width: `${project.progressP1}%` }}
               />
             </div>
-            <div className="text-[10px] text-zinc-400 text-right">{project.progressP1}%</div>
           </div>
 
           {/* P2 */}
           <div className="flex-1 space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-medium text-green-600">P2</span>
+              <span className="text-[10px] text-zinc-400">{project.progressP2}%</span>
+            </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
               <div
                 className="h-full rounded-full bg-green-500 transition-all"
                 style={{ width: `${project.progressP2}%` }}
               />
             </div>
-            <div className="text-[10px] text-zinc-400 text-right">{project.progressP2}%</div>
           </div>
         </div>
       </CardContent>

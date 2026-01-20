@@ -16,4 +16,20 @@ export const handlers = [
       data: mockWorkspaces // mockData.ts 파일에 있는 더미 데이터를 그대로 반환
     });
   }),
+
+  // [GET] 닉네임 중복 확인
+  http.get('/api/members/check-nickname', ({ request }) => {
+    const url = new URL(request.url);
+    const query = url.searchParams.get('query');
+
+    // 'duplicate'라는 닉네임은 이미 사용 중이라고 가정
+    const isTaken = query === 'duplicate';
+
+    return HttpResponse.json({
+      status: 'success',
+      data: {
+        available: !isTaken
+      }
+    });
+  }),
 ];

@@ -14,6 +14,7 @@ export const workspaces: ProjectCardProps["project"][] = [
     progressP1: 30,
     progressP2: 60,
     lastModified: "2시간 전",
+    updatedAt: "2024-01-03T08:30:00Z",
     members: [
       { name: "김싸피", avatar: "", online: true },
       { name: "이개발", avatar: "", online: false },
@@ -29,6 +30,7 @@ export const workspaces: ProjectCardProps["project"][] = [
     progressP1: 55,
     progressP2: 88,
     lastModified: "5시간 전",
+    updatedAt: "2024-01-03T05:30:00Z",
     members: [
       { name: "최기획", avatar: "", online: false },
       { name: "김싸피", avatar: "", online: true },
@@ -43,6 +45,7 @@ export const workspaces: ProjectCardProps["project"][] = [
     progressP1: 40,
     progressP2: 15,
     lastModified: "1일 전",
+    updatedAt: "2024-01-02T10:00:00Z",
     members: [
       { name: "정백엔드", avatar: "", online: true },
       { name: "한프론트", avatar: "", online: false },
@@ -58,6 +61,7 @@ export const workspaces: ProjectCardProps["project"][] = [
     progressP1: 92,
     progressP2: 75,
     lastModified: "30분 전",
+    updatedAt: "2024-01-03T10:00:00Z",
     members: [
       { name: "김싸피", avatar: "", online: true },
       { name: "송개발", avatar: "", online: true },
@@ -72,6 +76,7 @@ export const workspaces: ProjectCardProps["project"][] = [
     progressP1: 68,
     progressP2: 44,
     lastModified: "3시간 전",
+    updatedAt: "2024-01-03T07:30:00Z",
     members: [
       { name: "박교수", avatar: "", online: false },
       { name: "김싸피", avatar: "", online: true },
@@ -87,6 +92,7 @@ export const workspaces: ProjectCardProps["project"][] = [
     progressP1: 22,
     progressP2: 35,
     lastModified: "2일 전",
+    updatedAt: "2024-01-01T10:00:00Z",
     members: [
       { name: "최하드웨어", avatar: "", online: false },
       { name: "김싸피", avatar: "", online: false },

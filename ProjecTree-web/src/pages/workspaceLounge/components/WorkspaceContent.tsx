@@ -7,17 +7,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Search,
-  Plus,
-  ChevronDown,
-  Clock,
-  Calendar,
-  ArrowDownAZ,
-  Loader2,
-} from 'lucide-react';
-import { useMemo, useState, useEffect } from 'react';
+} from "@/components/ui/dropdown-menu";
+import { Search, Plus, ChevronDown, Clock, Calendar, ArrowDownAZ, Loader2 } from "lucide-react";
+import { useMemo, useState, useEffect } from "react";
+import type { FilterType } from "../types";
 
 // 정렬 옵션 정의
 const sortOptions = [
@@ -26,13 +19,17 @@ const sortOptions = [
   { label: '이름순', value: 'name', icon: ArrowDownAZ },
 ];
 
+interface ContentProps {
+  filterType?: FilterType;
+}
+
 /**
  * [컴포넌트] 워크스페이스 콘텐츠 영역
  * - 기능: 워크스페이스 목록 조회, 검색(이름/설명), 정렬(최근/생성/이름)
  * - 특징: URL 파라미터(?q=..., ?sort=...)를 사용하여 상태를 관리하므로 공유 및 뒤로가기가 가능
  *        검색어 입력 시 잦은 URL 업데이트를 방지하기 위해 Debounce(0.3초)를 적용
  */
-export function WorkspaceContent() {
+export function WorkspaceContent({ filterType = "all" }: ContentProps) {
   const navigate = useNavigate();
   // URL 쿼리 파라미터 관리 훅
   const [searchParams, setSearchParams] = useSearchParams();
@@ -115,22 +112,33 @@ export function WorkspaceContent() {
 
   // 4. 필터링 및 정렬 로직 (클라이언트 사이드 처리)
   const filteredWorkspaces = useMemo(() => {
-    // (1) 검색어로 필터링
-    let result = workspaces.filter(
+    // (1) 1차 필터링: 사이드바 메뉴 (All / Mine / Joined)
+    let result = workspaces.filter(ws => {
+      if (filterType === "all") return true;
+      if (filterType === "mine") return ws.role === "Owner";
+      if (filterType === "joined") return ws.role === "Editor" || ws.role === "Viewer";
+      return true;
+    });
+
+    // (2) 2차 필터링: 검색어
+    result = result.filter(
       (ws) =>
         ws.title.toLowerCase().includes(inputValue.toLowerCase()) ||
         ws.description.toLowerCase().includes(inputValue.toLowerCase())
     );
 
-    // (2) 정렬 적용
-    if (sortByValue === 'name') {
+    // (3) 정렬 적용
+    if (sortByValue === "name") {
       result.sort((a, b) => a.title.localeCompare(b.title));
     } else if (sortByValue === 'created') {
       result.sort((a, b) => Number(b.id) - Number(a.id));
+    } else {
+      // (기본값) 최근 수정순
+      result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
     }
 
     return result;
-  }, [workspaces, inputValue, sortByValue]); // workspaces가 변경되면 다시 계산
+  }, [workspaces, inputValue, sortByValue, filterType]); // filterType 변경 시 재계산
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-zinc-50/50 h-full">
