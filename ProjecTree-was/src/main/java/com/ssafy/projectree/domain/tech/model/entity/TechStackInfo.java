@@ -30,6 +30,9 @@ public class TechStackInfo extends BaseEntity {
 	@Column(columnDefinition = "TEXT")
 	private String disadvantage;
 
+	@Column(columnDefinition = "TEXT")
+	private String ref;
+
 	private int recommendation;
 
 	private boolean isSelected;

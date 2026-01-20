@@ -21,7 +21,7 @@ import java.util.List;
 @Log4j2
 public class DataInitializer {
 
-	//private final TechStackDataLoader techStackDataLoader;
+	private final TechStackDataLoader techStackDataLoader;
 	private final TechVocabularyRepository techVocabularyRepository;
 
 	@PostConstruct
@@ -29,53 +29,52 @@ public class DataInitializer {
 		if (techVocabularyRepository.count() > 0) {
 			log.info("tech vocab already init");
 		} else {
-			//techStackDataLoader.run();
+			techStackDataLoader.init();
 		}
 
 	}
-//
-//	@Component
-//	@RequiredArgsConstructor
-//	public static class TechStackDataLoader implements CommandLineRunner {
-//
-//		private final TechVocabularyRepository techVocabularyRepository;
-//
-//		@Override
-//		@Transactional
-//		public void run(String... args) throws Exception {
-//			ClassPathResource resource = new ClassPathResource("data/QueryResults.csv");
-//
-//			List<TechVocabulary> vocabularies = new ArrayList<>();
-//
-//			try (BufferedReader br = new BufferedReader(
-//					new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-//
-//				String line;
-//				boolean isHeader = true;
-//
-//				while ((line = br.readLine()) != null) {
-//					if (isHeader) {
-//						isHeader = false;
-//						continue;
-//					}
-//
-//					String[] columns = line.split(",");
-//					if (columns.length > 0) {
-//						String tagName = columns[0].replace("\"", "").trim();
-//
+
+	@Component
+	@RequiredArgsConstructor
+	public static class TechStackDataLoader {
+
+		private final TechVocabularyRepository techVocabularyRepository;
+
+		@Transactional
+		public void init() throws Exception {
+			ClassPathResource resource = new ClassPathResource("data/QueryResults.csv");
+
+			List<TechVocabulary> vocabularies = new ArrayList<>();
+
+			try (BufferedReader br = new BufferedReader(
+					new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+
+				String line;
+				boolean isHeader = true;
+
+				while ((line = br.readLine()) != null) {
+					if (isHeader) {
+						isHeader = false;
+						continue;
+					}
+
+					String[] columns = line.split(",");
+					if (columns.length > 0) {
+						String tagName = columns[0].replace("\"", "").trim();
+						TechVocabulary vocab = new TechVocabulary();
+						vocab.setName(tagName);
+						vocabularies.add(vocab);
 //						if (!techVocabularyRepository.existsByName(tagName)) {
-//							TechVocabulary vocab = new TechVocabulary();
-//							vocab.setName(tagName);
-//							vocabularies.add(vocab);
-//						}
-//					}
-//				}
-//			}
 //
-//			if (!vocabularies.isEmpty()) {
-//				techVocabularyRepository.saveAll(vocabularies);
-//				System.out.println("✅ " + vocabularies.size() + "개의 기술 스택이 성공적으로 로드되었습니다.");
-//			}
-//		}
-//	}
+//						}
+					}
+				}
+			}
+
+			if (!vocabularies.isEmpty()) {
+				techVocabularyRepository.saveAll(vocabularies);
+				System.out.println("✅ " + vocabularies.size() + "개의 기술 스택이 성공적으로 로드되었습니다.");
+			}
+		}
+	}
 }
