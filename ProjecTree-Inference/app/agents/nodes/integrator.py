@@ -8,7 +8,7 @@ def tech_stack_integrator(state: RecommendationState) -> RecommendationState:
     tech_list = state.get("tech_list")
     
     for tech in tech_list.techs:
-        tech_name = tech.name
+        tech_name = tech.name.replace(' ', '')
         tech_id = search_official_tech_name.func(tech_name).get("id")
         if tech_id is None:
             tech_id = insert_official_tech_name.func(tech_name).get("id")
