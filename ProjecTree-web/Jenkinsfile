@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install') {
+            steps {
+                dir('ProjecTree-web') {
+                    sh 'pnpm install'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('ProjecTree-web') {
+                    sh 'pnpm build'
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            when {
+                branch 'fe-dev'
+            }
+            steps {
+                dir('ProjecTree-web') {
+                    sh 'docker build -t projectree-web .'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                branch 'fe-dev'
+            }
+            steps {
+                sh '''
+                    docker stop projectree-web || true
+                    docker rm projectree-web || true
+                    docker run -d --name projectree-web -p 3000:80 projectree-web
+                '''
+            }
+        }
+    }
+}
