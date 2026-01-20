@@ -1,0 +1,37 @@
+# 의존성 폴더
+node_modules
+dist
+build
+
+# 빌드 결과물
+*.min.js
+*.min.css
+
+# 환경 설정
+.env
+.env.*
+
+# 패키지 관리자
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 캐시 폴더
+.cache
+.vite
+.next
+.nuxt
+
+# 버전 관리
+.git
+.gitignore
+
+# 생성된 파일들
+coverage
+*.log
+
+# Public 폴더 (정적 파일)
+public
+
+# Shadcn UI 설정 파일 (자동 생성되는 파일)
+components.json
