@@ -1,0 +1,73 @@
+import { cn } from "@/lib/utils";
+
+export type TagType =
+  | "project"
+  | "epic"
+  | "story"
+  | "task"
+  | "advanced"
+  | "frontend"
+  | "backend"
+  | "progress"
+  | "completed"
+  | "pending";
+
+interface StatusTagProps {
+  type: TagType;
+  label?: string;
+  className?: string;
+}
+
+/**
+ * 서버로부터 받는 노드의 태그 타입에 따라 다른 디자인을 보여줍니다.
+ * 현재 노드 태그는 다음과 같습니다.
+ * 노드 타입 project, epic, story, frontend(task), backend(task)
+ */
+const tagStyles: Record<
+  TagType,
+  { bg: string; text: string; defaultLabel: string }
+> = {
+  project: { bg: "bg-[#64748B]", text: "text-white", defaultLabel: "프로젝트" },
+  epic: { bg: "bg-[#8B5CF6]", text: "text-white", defaultLabel: "Epic" },
+  story: { bg: "bg-[#00D492]", text: "text-white", defaultLabel: "Story" },
+  task: {
+    bg: "bg-[#2B7FFF]",
+    text: "text-white",
+    defaultLabel: "Task",
+  },
+  advanced: {
+    bg: "bg-[#0891B2]",
+    text: "text-white",
+    defaultLabel: "Advanced",
+  },
+  frontend: {
+    bg: "bg-[#F97316]",
+    text: "text-white",
+    defaultLabel: "FrontEnd",
+  },
+  backend: {
+    bg: "bg-[#6366F1]",
+    text: "text-white",
+    defaultLabel: "BackEnd",
+  },
+  progress: { bg: "bg-[#2B7FFF]", text: "text-white", defaultLabel: "진행중" },
+  completed: { bg: "bg-[#00C950]", text: "text-white", defaultLabel: "완료" },
+  pending: { bg: "bg-[#64748B]", text: "text-white", defaultLabel: "대기" },
+};
+
+export function StatusTag({ type, label, className }: StatusTagProps) {
+  const style = tagStyles[type];
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2 py-0.5 text-[8px] font-medium",
+        style.bg,
+        style.text,
+        className,
+      )}
+    >
+      {label ?? style.defaultLabel}
+    </span>
+  );
+}
