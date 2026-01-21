@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: projectree
+
+  datasource:
+    # DB 연결 정보 (본인의 환경에 맞게 수정하여 사용하세요)
+    url: YOUR_DB_URL
+    username: YOUR_DB_USER
+    password: YOUR_DB_PASS
+    driver-class-name: YOUR_DB_CLASS
+
+  jpa:
+    # PostgreSQL 방언 설정
+    database-platform: #org.hibernate.dialect.PostgreSQLDialect
+
+    hibernate:
+      # 개발 단계에서는 update, 운영 단계에서는 validate 또는 none 권장
+      ddl-auto: update
+
+    # 쿼리 로그 출력 설정
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true            # SQL을 보기 좋게 포맷팅
+        use_sql_comments: true      # SQL에 설명 주석 추가
+
+# 로깅 레벨 설정 (상세한 쿼리 파라미터 확인용)
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
