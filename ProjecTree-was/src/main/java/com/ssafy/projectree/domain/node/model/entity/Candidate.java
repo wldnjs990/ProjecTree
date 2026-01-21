@@ -36,8 +36,10 @@ public class Candidate extends BaseEntity {
 
 	@Column(columnDefinition = "VARCHAR(30)")
 	private String name;
+
 	@Column(columnDefinition = "TEXT")
 	private String description;
+
 	private boolean isSelected;
 
 }
