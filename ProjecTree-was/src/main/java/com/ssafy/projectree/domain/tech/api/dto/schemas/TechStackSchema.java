@@ -1,4 +1,4 @@
-package com.ssafy.projectree.domain.node.api.dto.schema;
+package com.ssafy.projectree.domain.tech.api.dto.schemas;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,7 +1,7 @@
 package com.ssafy.projectree.domain.node.api.dto;
 
 import com.ssafy.projectree.domain.node.api.dto.schema.CandidateSchema;
-import com.ssafy.projectree.domain.node.api.dto.schema.TechStackSchema;
+import com.ssafy.projectree.domain.tech.api.dto.schemas.TechStackSchema;
 import com.ssafy.projectree.domain.node.enums.NodeStatus;
 import com.ssafy.projectree.domain.node.enums.Priority;
 import com.ssafy.projectree.domain.node.enums.TaskType;
