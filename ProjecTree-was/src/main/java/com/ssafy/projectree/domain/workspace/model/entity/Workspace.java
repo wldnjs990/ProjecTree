@@ -1,12 +1,8 @@
 package com.ssafy.projectree.domain.workspace.model.entity;
 
+import com.ssafy.projectree.domain.workspace.enums.ServiceType;
 import com.ssafy.projectree.global.model.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +22,10 @@ public class Workspace extends BaseEntity {
 
 	@Column(length = 20, nullable = false)
 	private String name;
+
+	//추가할까 말까
+	@Enumerated(value = EnumType.STRING)
+	private ServiceType serviceType;
 
 	@Column(columnDefinition = "TEXT")
 	private String description;
