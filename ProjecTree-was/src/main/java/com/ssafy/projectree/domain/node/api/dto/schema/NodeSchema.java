@@ -38,7 +38,7 @@ public class NodeSchema {
     @Schema(description = "노드 유형 (카테고리/작업 등)")
     private NodeType nodeType;
 
-    @Schema(description = "하위 노드 목록 (재귀 구조)")
+    @Schema(description = "하위 노드 목록 (재귀 구조)", example = )
     @Builder.Default
     private List<NodeSchema> children = new ArrayList<>();
 }
