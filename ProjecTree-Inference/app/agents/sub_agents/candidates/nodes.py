@@ -5,17 +5,15 @@ from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 from app.core.llm import openai_nano_llm
 from app.agents.schemas.candidate import CandidateList
-from app.agents.prompts.system.candidate_prompts import (
+from app.agents.sub_agents.candidates.prompts.system_prompts import (
     EPIC_SYS,
     STORY_SYS,
     TASK_SYS,
     PROJECT_SYS
 )
 
-
 llm = openai_nano_llm
 tools = []
-
 
 def create_candidate_agent(system_prompt: str):
     return create_agent(

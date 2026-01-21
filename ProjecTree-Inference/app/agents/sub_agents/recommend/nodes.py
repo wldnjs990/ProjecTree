@@ -1,4 +1,3 @@
-from app.agents.prompts.user.expert_prompts import EXPERT_USER_PROMPT
 from dotenv import load_dotenv
 from app.core.llm import openai_nano_llm
 from langchain.agents import create_agent
@@ -8,7 +7,8 @@ from app.agents.tools.tavily import search_tool
 from app.agents.schemas.expert import TechList
 from app.agents.tools.tech_db import search_official_tech_name, insert_official_tech_name
 from typing import Any
-from app.agents.prompts.system.expert_prompts import (
+from app.agents.sub_agents.recommend.prompts.user_prompts import EXPERT_USER_PROMPT
+from app.agents.sub_agents.recommend.prompts.system_prompts import (
     FE_SYSTEM_PROMPT,
     BE_SYSTEM_PROMPT,
     ADVANCE_SYSTEM_PROMPT,
