@@ -1,7 +1,7 @@
 package com.ssafy.projectree.domain.workspace.model.entity;
 
 import com.ssafy.projectree.domain.chat.model.entity.ChatRoom;
-import com.ssafy.projectree.domain.user.model.entity.Member;
+import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.global.model.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

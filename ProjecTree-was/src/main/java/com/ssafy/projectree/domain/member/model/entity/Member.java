@@ -1,4 +1,4 @@
-package com.ssafy.projectree.domain.user.model.entity;
+package com.ssafy.projectree.domain.member.model.entity;
 
 import com.ssafy.projectree.global.model.entity.BaseEntity;
 import com.ssafy.projectree.global.model.enums.OAuthProvider;
