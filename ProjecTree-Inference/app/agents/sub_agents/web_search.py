@@ -8,4 +8,3 @@ load_dotenv()
 
 llm = mini_llm
 tools = [TavilySearchResults()]
-web_search_agent = create_agent(model=llm, tools=tools)

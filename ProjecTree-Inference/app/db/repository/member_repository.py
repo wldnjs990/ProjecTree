@@ -1,4 +1,4 @@
-from app.repository.base_repository import BaseRepository
+from app.db.repository.base_repository import BaseRepository
 from app.db.models import Member
 from app.db.schemas.member import MemberCreate, MemberUpdate
 

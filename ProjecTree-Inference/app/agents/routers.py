@@ -1,16 +1,8 @@
-from app.agents.states.state import RecommendationState, PlanNodeState
+from app.agents.states.state import PlanNodeState
 from langgraph.graph import END
 from app.agents.enums import NodeType
 
-def route_task(state: RecommendationState) -> str:
-    """Task 노드일 경우 FE/BE/Search 전문가로 라우팅"""
-    task_type = state.get("task_type", "")
-    if task_type == "frontend":
-        return "frontend_expert"
-    elif task_type == "backend":
-        return "backend_expert"
-    elif task_type == "search":
-        return "web_search_agent"
+# NOTE: route_task는 app.agents.sub_agents.recommend.routers로 이동됨
 
 def route_fetch(state: PlanNodeState) -> str:
     """Fetch 관련 라우팅"""
@@ -33,7 +25,7 @@ def route_node(state: PlanNodeState) -> str:
 
 def route_agent_node(state: PlanNodeState) -> str:
     """Agent 노드 라우팅"""
-    return "web_search_agent"
+    return "advance_expert"
 
 
 def route_teck_stack(state: PlanNodeState) -> str:
