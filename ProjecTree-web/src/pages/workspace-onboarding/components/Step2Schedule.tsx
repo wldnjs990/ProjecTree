@@ -78,7 +78,7 @@ export default function Step2Schedule({
             placeholder="예: AI가 사용자 취향을 분석해 최적의 여행 일정을 추천&#10;자세하게 적을수록 더 정확한 분석이 가능합니다."
             value={data.subject}
             onChange={(e) => onChange({ subject: e.target.value })}
-            maxLength={50}
+            maxLength={200}
             rows={5}
             className="resize-none"
             style={{
@@ -103,7 +103,7 @@ export default function Step2Schedule({
                 color: 'var(--figma-text-dove-gray)',
               }}
             >
-              {data.subject.length}/50
+              {data.subject.length}/200
             </span>
           </div>
         </div>
