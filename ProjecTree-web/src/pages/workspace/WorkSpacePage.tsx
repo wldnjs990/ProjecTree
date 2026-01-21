@@ -1,14 +1,23 @@
-import { useState } from "react";
-import { Header, type ViewTab } from "./components/Header";
-import { Sidebar } from "./components/Sidebar";
-import { TreeCanvas } from "./components/Canvas";
-import { NodeDetailSidebar, type NodeDetailData } from "./components/NodeDetailSidebar";
-import { mockNodes, mockEdges, mockUsers, mockNodeDetails } from "./constants/mockData";
-import { FeatureSpecView } from "./components/FeatureSpec";
+import { useState } from 'react';
+import { Header, type ViewTab } from './components/Header';
+import { Sidebar } from './components/Sidebar';
+import { TreeCanvas } from './components/Canvas';
+import {
+  NodeDetailSidebar,
+  type NodeDetailData,
+} from './components/NodeDetailSidebar';
+import {
+  mockNodes,
+  mockEdges,
+  mockUsers,
+  mockNodeDetails,
+} from './constants/mockData';
+import { FeatureSpecView } from './components/FeatureSpec';
+import { TechStackStatusView } from './components/TechStackStatus';
 
 export default function WorkSpacePage() {
   // Header state
-  const [activeTab, setActiveTab] = useState<ViewTab>("tree-editor");
+  const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');
 
   // Sidebar filter state
   const [nodeTypeFilter, setNodeTypeFilter] = useState<string | null>(null);
@@ -25,19 +34,19 @@ export default function WorkSpacePage() {
 
   // Event handlers
   const handleSettingsClick = () => {
-    console.log("Settings clicked");
+    console.log('Settings clicked');
   };
 
   const handleVoiceCallClick = () => {
-    console.log("Voice call clicked");
+    console.log('Voice call clicked');
   };
 
   const handleInviteClick = () => {
-    console.log("Invite clicked");
+    console.log('Invite clicked');
   };
 
   const handleChatClick = () => {
-    console.log("Chat clicked");
+    console.log('Chat clicked');
   };
 
   const handleNodeClick = (nodeId: string) => {
@@ -50,23 +59,23 @@ export default function WorkSpacePage() {
   };
 
   const handleTechCompare = () => {
-    console.log("Tech compare clicked");
+    console.log('Tech compare clicked');
   };
 
   const handleTechAddManual = () => {
-    console.log("Tech add manual clicked");
+    console.log('Tech add manual clicked');
   };
 
   const handleNodeAdd = () => {
-    console.log("Node add clicked");
+    console.log('Node add clicked');
   };
 
   const handleNodeAddManual = () => {
-    console.log("Node add manual clicked");
+    console.log('Node add manual clicked');
   };
 
   const handleMemoChange = (memo: string) => {
-    console.log("Memo changed:", memo);
+    console.log('Memo changed:', memo);
   };
 
   return (
@@ -94,7 +103,7 @@ export default function WorkSpacePage() {
 
         {/* Canvas */}
         <main className="flex-1 overflow-hidden">
-          {activeTab === "tree-editor" && (
+          {activeTab === 'tree-editor' && (
             <TreeCanvas
               initialNodes={mockNodes}
               initialEdges={mockEdges}
@@ -105,7 +114,7 @@ export default function WorkSpacePage() {
             />
           )}
 
-          {activeTab === "feature-spec" && (
+          {activeTab === 'feature-spec' && (
             <FeatureSpecView
               nodes={mockNodes}
               edges={mockEdges}
@@ -113,12 +122,12 @@ export default function WorkSpacePage() {
             />
           )}
 
-          {activeTab === "tech-selection" && (
-            <div className="flex items-center justify-center h-full bg-canvas">
-              <p className="text-lg text-gray-500">
-                기술 선택 현황 뷰 (개발 예정)
-              </p>
-            </div>
+          {activeTab === 'tech-selection' && (
+            <TechStackStatusView
+              nodes={mockNodes}
+              edges={mockEdges}
+              onNodeClick={handleNodeClick}
+            />
           )}
         </main>
 
