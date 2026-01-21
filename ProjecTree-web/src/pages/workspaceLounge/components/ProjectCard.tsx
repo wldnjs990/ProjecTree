@@ -65,7 +65,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
       </CardHeader>
 
       <CardContent className="pb-4 flex-1 flex flex-col gap-4">
-        <p className="text-sm leading-relaxed text-zinc-500 line-clamp-2 h-[46px]">{project.description}</p>
+        <p className="text-sm leading-relaxed text-zinc-500 truncate">
+          {project.description.length > 50
+            ? `${project.description.slice(0, 50)}...`
+            : project.description}
+        </p>
 
         <div className="flex items-center gap-2 mt-auto">
           {/* P0 */}
