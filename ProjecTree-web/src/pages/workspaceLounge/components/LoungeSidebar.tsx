@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,13 +22,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { FolderOpen, User, Users, Plus, ChevronLeft, ChevronRight, Settings, Pencil } from "lucide-react";
+import { FolderOpen, User, Users, ChevronLeft, ChevronRight, Settings, Pencil } from "lucide-react";
+
+import type { FilterType } from "../types";
 
 interface SidebarProps {
   // 사이드바 접힘 여부
   collapsed: boolean;
   // 접힘 토글 함수
   onToggle: () => void;
+
+  // 현재 선택된 필터
+  currentFilter: FilterType;
+  // 필터 변경 핸들러
+  onFilterChange: (filter: FilterType) => void;
 
   /** 초기 닉네임 (실제로는 API에서 가져온 값 사용) */
   initialNickname?: string;
@@ -42,16 +48,16 @@ interface SidebarProps {
 }
 
 type MenuItem = {
-  to: string;
+  id: FilterType;
   icon: React.ComponentType<{ className?: string }>;
   label: string;
 };
 
 // 사이드바 메뉴 항목 정의
 const MENU_ITEMS: MenuItem[] = [
-  { to: "/projects", icon: FolderOpen, label: "전체 프로젝트" },
-  { to: "/projects/mine", icon: User, label: "내가 만든 것" },
-  { to: "/projects/joined", icon: Users, label: "참여 중인 것" },
+  { id: "all", icon: FolderOpen, label: "전체 프로젝트" },
+  { id: "mine", icon: User, label: "내가 만든 것" },
+  { id: "joined", icon: Users, label: "참여 중인 것" },
 ];
 
 /**
@@ -112,23 +118,90 @@ function ProfileDialog({
   const { open, setOpen, editing, temp, setTemp, startEdit, cancelEdit, setEditing } =
     useProfileDialogState(nickname);
 
-  const handleSave = useCallback(async () => {
-    const next = temp.trim();
+  // 유효성 검사 상태
+  const [isValid, setIsValid] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isChecking, setIsChecking] = useState(false);
 
-    // 최소 검증: 빈 문자열 방지
+  // 1. 유효성 검사 및 중복 체크 로직 (Debounce 적용)
+  useEffect(() => {
+    // 편집 모드가 아니거나 입력이 없으면 초기화
+    if (!editing || !temp) {
+      setIsValid(false);
+      setErrorMessage("");
+      setSuccessMessage("");
+      return;
+    }
+
+    // (1) 길이 및 형식 검사
+    if (temp.length > 16) {
+      setIsValid(false);
+      setErrorMessage("닉네임은 16자 이내여야 합니다.");
+      setSuccessMessage("");
+      return;
+    }
+
+    const regex = /^[a-zA-Z0-9가-힣_]+$/;
+    if (!regex.test(temp)) {
+      setIsValid(false);
+      setErrorMessage("한글, 영문, 숫자, 언더스코어(_)만 사용할 수 있습니다.");
+      setSuccessMessage("");
+      return;
+    }
+
+    // 기존 닉네임과 동일하면 체크 건너뜀
+    if (temp === nickname) {
+      setIsValid(true);
+      setErrorMessage("");
+      setSuccessMessage("");
+      return;
+    }
+
+    // (2) 서버 중복 체크 요청 (Debounce 500ms)
+    const checkDuplicate = async () => {
+      setIsChecking(true);
+      setErrorMessage("");
+      setSuccessMessage("");
+
+      try {
+        const res = await fetch(`/api/members/check-nickname?query=${encodeURIComponent(temp)}`);
+        const result = await res.json();
+
+        if (result.status === 'success' && result.data.available) {
+          setIsValid(true);
+          setSuccessMessage("사용 가능한 닉네임입니다.");
+        } else {
+          setIsValid(false);
+          setErrorMessage("이미 사용 중인 닉네임입니다.");
+        }
+      } catch (error) {
+        console.error("중복 확인 실패", error);
+        setErrorMessage("확인 중 오류가 발생했습니다.");
+        setIsValid(false);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    const timer = setTimeout(checkDuplicate, 500);
+    return () => clearTimeout(timer);
+  }, [temp, editing, nickname]);
+
+  const handleSave = useCallback(async () => {
+    if (!isValid) return; // 유효하지 않으면 저장 불가
+
+    const next = temp.trim();
     if (next.length === 0) return;
 
-    // 서버 저장 훅이 있으면 먼저 호출
     if (onNicknameSave) await onNicknameSave(next);
 
-    // 성공했다고 가정하고 로컬 상태 반영
     setNickname(next);
     setEditing(false);
-  }, [temp, onNicknameSave, setNickname, setEditing]);
+  }, [temp, onNicknameSave, setNickname, setEditing, isValid]);
 
   const handleDeleteAccount = useCallback(async () => {
     if (onDeleteAccount) await onDeleteAccount();
-    // 성공했다고 가정하고 닫기
     setOpen(false);
   }, [onDeleteAccount, setOpen]);
 
@@ -160,28 +233,46 @@ function ProfileDialog({
             </Label>
 
             {editing ? (
-              <div className="flex gap-2">
-                <Input
-                  id="nickname"
-                  value={temp}
-                  onChange={(e) => setTemp(e.target.value)}
-                  className="border-zinc-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
-                  autoFocus
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={cancelEdit}
-                  className="border-zinc-200 text-zinc-600 hover:bg-zinc-50 bg-transparent"
-                >
-                  취소
-                </Button>
-                <Button size="sm" onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                  저장
-                </Button>
+              <div className="flex flex-col gap-2 h-[72px] justify-start">
+                <div className="flex gap-2">
+                  <Input
+                    id="nickname"
+                    value={temp}
+                    onChange={(e) => setTemp(e.target.value)}
+                    className={cn(
+                      "border-zinc-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300",
+                      errorMessage && "border-red-300 focus:border-red-400 focus:ring-red-100",
+                      successMessage && "border-emerald-300 focus:border-emerald-400 focus:ring-emerald-100"
+                    )}
+                    maxLength={16}
+                    autoFocus
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={cancelEdit}
+                    className="border-zinc-200 text-zinc-600 hover:bg-zinc-50 bg-transparent"
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleSave}
+                    disabled={!isValid || isChecking}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50"
+                  >
+                    {isChecking ? "..." : "저장"}
+                  </Button>
+                </div>
+                {/* 메시지 영역을 절대 위치로 두거나, 컨테이너 높이를 고정하여 layout shift 방지 */}
+                <div className="h-4 flex items-center">
+                  {errorMessage && <p className="text-xs text-red-500 font-medium">{errorMessage}</p>}
+                  {successMessage && <p className="text-xs text-emerald-600 font-medium">{successMessage}</p>}
+                </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between rounded-md border border-zinc-200 px-3 py-2">
+              // 편집 모드가 아닐 때도 동일한 높이를 확보하기 위해 h-[72px] 적용
+              <div className="flex items-center justify-between rounded-md border border-zinc-200 px-3 py-2 h-[40px] mb-[32px]">
                 <span className="text-zinc-900">{nickname}</span>
                 <Button
                   variant="ghost"
@@ -247,6 +338,8 @@ function ProfileDialog({
 export function LoungeSidebar({
   collapsed,
   onToggle,
+  currentFilter,
+  onFilterChange,
   initialNickname = "김싸피",
   onNicknameSave,
   onDeleteAccount,
@@ -282,7 +375,7 @@ export function LoungeSidebar({
           </Button>
         ) : (
           <div className="flex flex-1 items-center justify-between">
-            <span className="font-medium text-zinc-900 tracking-tight">{nickname}</span>
+            <span className="font-medium text-zinc-900 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">{nickname}</span>
 
             <div className="flex items-center gap-1">
               <ProfileDialog
@@ -309,49 +402,37 @@ export function LoungeSidebar({
       {/* Navigation */}
       <nav className="flex-1 p-3" aria-label="워크스페이스 메뉴">
         {!collapsed && (
-          <p className="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-zinc-500">워크스페이스</p>
+          <p className="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-zinc-500 whitespace-nowrap overflow-hidden">
+            워크스페이스
+          </p>
         )}
 
         <ul className="space-y-0.5">
           {MENU_ITEMS.map((item) => {
             const Icon = item.icon;
+            const isActive = currentFilter === item.id;
+
             return (
-              <li key={item.to}>
-                <NavLink
-                  to={item.to}
-                  className={({ isActive }) =>
-                    cn(
-                      "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                      isActive ? "bg-indigo-50 text-indigo-700 font-medium" : "text-zinc-600 hover:bg-zinc-100"
-                    )
-                  }
+              <li key={item.id}>
+                <button
+                  onClick={() => onFilterChange(item.id)}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors text-left",
+                    isActive
+                      ? "bg-indigo-50 text-indigo-700 font-medium"
+                      : "text-zinc-600 hover:bg-zinc-100"
+                  )}
                   aria-label={item.label}
-                  end
+                  aria-current={isActive ? "page" : undefined}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
-                  {!collapsed && <span>{item.label}</span>}
-                </NavLink>
+                  {!collapsed && <span className="whitespace-nowrap overflow-hidden text-ellipsis">{item.label}</span>}
+                </button>
               </li>
             );
           })}
         </ul>
       </nav>
-
-      {/* Bottom Action */}
-      <div className="border-t border-zinc-200 p-3">
-        <Button
-          variant="outline"
-          className={cn(
-            "w-full justify-start gap-2 text-zinc-600 border-zinc-200 hover:bg-zinc-50 hover:text-zinc-900",
-            collapsed && "justify-center px-0"
-          )}
-          onClick={onCreateTeam}
-          aria-label="팀 생성"
-        >
-          <Plus className="h-4 w-4 shrink-0" />
-          {!collapsed && <span>팀 생성</span>}
-        </Button>
-      </div>
     </aside>
   );
 }
