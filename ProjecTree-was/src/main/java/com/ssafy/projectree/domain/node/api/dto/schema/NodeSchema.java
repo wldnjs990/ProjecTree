@@ -29,7 +29,7 @@ public class NodeSchema {
     @Schema(description = "작업 유형")
     private TaskType taskType;
 
-    @Schema(description = "노드 상태")
+    @Schema(description = "노드 상태", example = "IN_PROGRESS")
     private NodeStatus nodeStatus;
 
     @Schema(description = "난이도", example = "2")
@@ -38,7 +38,7 @@ public class NodeSchema {
     @Schema(description = "노드 유형 (카테고리/작업 등)")
     private NodeType nodeType;
 
-    @Schema(description = "하위 노드 목록 (재귀 구조)", example = )
+    @Schema(description = "하위 노드 목록 (재귀 구조)")
     @Builder.Default
     private List<NodeSchema> children = new ArrayList<>();
 }
