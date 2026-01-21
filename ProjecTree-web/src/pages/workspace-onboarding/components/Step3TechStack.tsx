@@ -17,8 +17,8 @@ interface Step3TechStackProps {
 export default function Step3TechStack({
   data,
   onChange,
-  onNext,
-  onPrev,
+  // onNext,
+  // onPrev,
 }: Step3TechStackProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -179,7 +179,7 @@ export default function Step3TechStack({
         {/* 선택된 기술 스택 */}
         {data.techStacks.length > 0 && (
           <div
-            className="flex min-h-[60px] flex-wrap gap-2 rounded-lg p-4"
+            className="flex min-h-15 flex-wrap gap-2 rounded-lg p-4"
             style={{
               background: 'var(--figma-gray-concrete)',
               border: '1px solid var(--figma-border-mercury)',

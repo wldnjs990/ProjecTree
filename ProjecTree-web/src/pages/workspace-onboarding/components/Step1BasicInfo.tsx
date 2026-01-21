@@ -1,13 +1,13 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from '@/components/ui/select';
 
 interface Step1BasicInfoProps {
   data: {
@@ -24,8 +24,8 @@ interface Step1BasicInfoProps {
 export default function Step1BasicInfo({
   data,
   onChange,
-  onNext,
-  onPrev,
+  // onNext,
+  // onPrev,
 }: Step1BasicInfoProps) {
   return (
     <div className="flex flex-col gap-6">
