@@ -39,4 +39,10 @@ public class NodeRepositoryImpl implements NodeRepositoryCustom {
 	public void addPath(Node parent, Node child) {
 		addPath(parent.getId(), child.getId());
 	}
+
+	@Override
+	public void saveWithParent(Long parentId, Node child) {
+		em.persist(child);
+		addPath(parentId, child.getId());
+	}
 }
