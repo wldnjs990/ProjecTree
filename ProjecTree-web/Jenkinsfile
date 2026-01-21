@@ -27,6 +27,7 @@ pipeline {
         stage('Docker Build') {
             when {
                 branch 'fe-dev'
+                branch 'origin/fe-dev'
             }
             steps {
                 dir('ProjecTree-web') {
@@ -38,6 +39,7 @@ pipeline {
         stage('Deploy') {
             when {
                 branch 'fe-dev'
+                branch 'origin/fe-dev'
             }
             steps {
                 sh '''
