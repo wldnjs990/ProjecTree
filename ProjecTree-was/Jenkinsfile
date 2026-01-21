@@ -11,7 +11,11 @@ pipeline {
         stage('Build') {
             steps {
                 dir('ProjecTree-was') {
-                    sh './gradlew build'
+                    withCredentials([file(credentialsId: 'application-yml', variable: 'APP_YML')]) {
+                        sh 'cp $APP_YML src/main/resources/application.yml'
+                        sh 'chmod +x gradlew'
+                        sh './gradlew build'
+                    }
                 }
             }
         }
@@ -25,9 +29,6 @@ pipeline {
         }
 
         stage('Docker Build') {
-            when {
-                branch 'be-dev'
-            }
             steps {
                 dir('ProjecTree-was') {
                     sh 'docker build -t projectree-was .'
@@ -36,14 +37,11 @@ pipeline {
         }
 
         stage('Deploy') {
-            when {
-                branch 'be-dev'
-            }
             steps {
                 sh '''
                     docker stop projectree-was || true
                     docker rm projectree-was || true
-                    docker run -d --name projectree-was -p 8081:8080 projectree-was
+                    docker run -d --name projectree-was --network app-network -p 8081:8080 projectree-was
                 '''
             }
         }
