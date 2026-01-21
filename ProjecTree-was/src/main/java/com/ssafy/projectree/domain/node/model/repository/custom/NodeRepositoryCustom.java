@@ -10,4 +10,5 @@ public interface NodeRepositoryCustom {
 	void addPath(Node parent, Node child);
 	//해당 메서드는 계층 관계 저장과 child노드까지 함께 저장
 	void saveWithParent(Long parentId, Node child);
+	void saveRoot(Node root);
 }
