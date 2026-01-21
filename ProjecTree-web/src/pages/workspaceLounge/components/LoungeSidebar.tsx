@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,10 +21,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { FolderOpen, User, Users, ChevronLeft, ChevronRight, Settings, Pencil } from "lucide-react";
+} from '@/components/ui/alert-dialog';
+import {
+  FolderOpen,
+  User,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+  Settings,
+  Pencil,
+} from 'lucide-react';
 
-import type { FilterType } from "../types";
+import type { FilterType } from '../types';
 
 interface SidebarProps {
   // 사이드바 접힘 여부
@@ -55,9 +63,9 @@ type MenuItem = {
 
 // 사이드바 메뉴 항목 정의
 const MENU_ITEMS: MenuItem[] = [
-  { id: "all", icon: FolderOpen, label: "전체 프로젝트" },
-  { id: "mine", icon: User, label: "내가 만든 것" },
-  { id: "joined", icon: Users, label: "참여 중인 것" },
+  { id: 'all', icon: FolderOpen, label: '전체 프로젝트' },
+  { id: 'mine', icon: User, label: '내가 만든 것' },
+  { id: 'joined', icon: Users, label: '참여 중인 것' },
 ];
 
 /**
@@ -115,13 +123,21 @@ function ProfileDialog({
   onNicknameSave?: (nextNickname: string) => void | Promise<void>;
   onDeleteAccount?: () => void | Promise<void>;
 }) {
-  const { open, setOpen, editing, temp, setTemp, startEdit, cancelEdit, setEditing } =
-    useProfileDialogState(nickname);
+  const {
+    open,
+    setOpen,
+    editing,
+    temp,
+    setTemp,
+    startEdit,
+    cancelEdit,
+    setEditing,
+  } = useProfileDialogState(nickname);
 
   // 유효성 검사 상태
   const [isValid, setIsValid] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isChecking, setIsChecking] = useState(false);
 
   // 1. 유효성 검사 및 중복 체크 로직 (Debounce 적용)
@@ -129,55 +145,57 @@ function ProfileDialog({
     // 편집 모드가 아니거나 입력이 없으면 초기화
     if (!editing || !temp) {
       setIsValid(false);
-      setErrorMessage("");
-      setSuccessMessage("");
+      setErrorMessage('');
+      setSuccessMessage('');
       return;
     }
 
     // (1) 길이 및 형식 검사
     if (temp.length > 16) {
       setIsValid(false);
-      setErrorMessage("닉네임은 16자 이내여야 합니다.");
-      setSuccessMessage("");
+      setErrorMessage('닉네임은 16자 이내여야 합니다.');
+      setSuccessMessage('');
       return;
     }
 
     const regex = /^[a-zA-Z0-9가-힣_]+$/;
     if (!regex.test(temp)) {
       setIsValid(false);
-      setErrorMessage("한글, 영문, 숫자, 언더스코어(_)만 사용할 수 있습니다.");
-      setSuccessMessage("");
+      setErrorMessage('한글, 영문, 숫자, 언더스코어(_)만 사용할 수 있습니다.');
+      setSuccessMessage('');
       return;
     }
 
     // 기존 닉네임과 동일하면 체크 건너뜀
     if (temp === nickname) {
       setIsValid(true);
-      setErrorMessage("");
-      setSuccessMessage("");
+      setErrorMessage('');
+      setSuccessMessage('');
       return;
     }
 
     // (2) 서버 중복 체크 요청 (Debounce 500ms)
     const checkDuplicate = async () => {
       setIsChecking(true);
-      setErrorMessage("");
-      setSuccessMessage("");
+      setErrorMessage('');
+      setSuccessMessage('');
 
       try {
-        const res = await fetch(`/api/members/check-nickname?query=${encodeURIComponent(temp)}`);
+        const res = await fetch(
+          `/api/members/check-nickname?query=${encodeURIComponent(temp)}`
+        );
         const result = await res.json();
 
         if (result.status === 'success' && result.data.available) {
           setIsValid(true);
-          setSuccessMessage("사용 가능한 닉네임입니다.");
+          setSuccessMessage('사용 가능한 닉네임입니다.');
         } else {
           setIsValid(false);
-          setErrorMessage("이미 사용 중인 닉네임입니다.");
+          setErrorMessage('이미 사용 중인 닉네임입니다.');
         }
       } catch (error) {
-        console.error("중복 확인 실패", error);
-        setErrorMessage("확인 중 오류가 발생했습니다.");
+        console.error('중복 확인 실패', error);
+        setErrorMessage('확인 중 오류가 발생했습니다.');
         setIsValid(false);
       } finally {
         setIsChecking(false);
@@ -218,7 +236,7 @@ function ProfileDialog({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px] bg-white">
+      <DialogContent className="sm:max-w-106.25 bg-white">
         <DialogHeader>
           <DialogTitle className="text-zinc-900">프로필 정보</DialogTitle>
           <DialogDescription className="text-zinc-500">
@@ -233,16 +251,18 @@ function ProfileDialog({
             </Label>
 
             {editing ? (
-              <div className="flex flex-col gap-2 h-[72px] justify-start">
+              <div className="flex flex-col gap-2 h-18 justify-start">
                 <div className="flex gap-2">
                   <Input
                     id="nickname"
                     value={temp}
                     onChange={(e) => setTemp(e.target.value)}
                     className={cn(
-                      "border-zinc-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300",
-                      errorMessage && "border-red-300 focus:border-red-400 focus:ring-red-100",
-                      successMessage && "border-emerald-300 focus:border-emerald-400 focus:ring-emerald-100"
+                      'border-zinc-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300',
+                      errorMessage &&
+                        'border-red-300 focus:border-red-400 focus:ring-red-100',
+                      successMessage &&
+                        'border-emerald-300 focus:border-emerald-400 focus:ring-emerald-100'
                     )}
                     maxLength={16}
                     autoFocus
@@ -261,18 +281,26 @@ function ProfileDialog({
                     disabled={!isValid || isChecking}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50"
                   >
-                    {isChecking ? "..." : "저장"}
+                    {isChecking ? '...' : '저장'}
                   </Button>
                 </div>
                 {/* 메시지 영역을 절대 위치로 두거나, 컨테이너 높이를 고정하여 layout shift 방지 */}
                 <div className="h-4 flex items-center">
-                  {errorMessage && <p className="text-xs text-red-500 font-medium">{errorMessage}</p>}
-                  {successMessage && <p className="text-xs text-emerald-600 font-medium">{successMessage}</p>}
+                  {errorMessage && (
+                    <p className="text-xs text-red-500 font-medium">
+                      {errorMessage}
+                    </p>
+                  )}
+                  {successMessage && (
+                    <p className="text-xs text-emerald-600 font-medium">
+                      {successMessage}
+                    </p>
+                  )}
                 </div>
               </div>
             ) : (
               // 편집 모드가 아닐 때도 동일한 높이를 확보하기 위해 h-[72px] 적용
-              <div className="flex items-center justify-between rounded-md border border-zinc-200 px-3 py-2 h-[40px] mb-[32px]">
+              <div className="flex items-center justify-between rounded-md border border-zinc-200 px-3 py-2 h-10 mb-8">
                 <span className="text-zinc-900">{nickname}</span>
                 <Button
                   variant="ghost"
@@ -292,7 +320,9 @@ function ProfileDialog({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-zinc-900">회원 탈퇴</p>
-              <p className="text-xs text-zinc-500">계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.</p>
+              <p className="text-xs text-zinc-500">
+                계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
+              </p>
             </div>
 
             <AlertDialog>
@@ -308,16 +338,22 @@ function ProfileDialog({
 
               <AlertDialogContent className="bg-white">
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="text-zinc-900">정말 탈퇴하시겠습니까?</AlertDialogTitle>
+                  <AlertDialogTitle className="text-zinc-900">
+                    정말 탈퇴하시겠습니까?
+                  </AlertDialogTitle>
                   <AlertDialogDescription className="text-zinc-500">
-                    이 작업은 되돌릴 수 없습니다. 계정과 관련된 모든 데이터가 영구적으로 삭제됩니다.
+                    이 작업은 되돌릴 수 없습니다. 계정과 관련된 모든 데이터가
+                    영구적으로 삭제됩니다.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-zinc-50 bg-transparent">
                     취소
                   </AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700 text-white">
+                  <AlertDialogAction
+                    onClick={handleDeleteAccount}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
                     탈퇴하기
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -340,25 +376,33 @@ export function LoungeSidebar({
   onToggle,
   currentFilter,
   onFilterChange,
-  initialNickname = "김싸피",
+  initialNickname = '김싸피',
   onNicknameSave,
   onDeleteAccount,
-  onCreateTeam,
+  // onCreateTeam,
 }: SidebarProps) {
   const [nickname, setNickname] = useState(initialNickname);
 
   // 닉네임 첫 글자로 아바타 이니셜 생성
-  const initialLetter = useMemo(() => nickname.trim().charAt(0) || "?", [nickname]);
+  const initialLetter = useMemo(
+    () => nickname.trim().charAt(0) || '?',
+    [nickname]
+  );
 
   return (
     <aside
       className={cn(
-        "flex flex-col border-r border-zinc-200 bg-white transition-all duration-300",
-        collapsed ? "w-16" : "w-64"
+        'flex flex-col border-r border-zinc-200 bg-white transition-all duration-300',
+        collapsed ? 'w-16' : 'w-64'
       )}
     >
       {/* User Profile */}
-      <div className={cn("flex items-center gap-3 border-b border-zinc-200 p-4", collapsed && "flex-col gap-2 p-2")}>
+      <div
+        className={cn(
+          'flex items-center gap-3 border-b border-zinc-200 p-4',
+          collapsed && 'flex-col gap-2 p-2'
+        )}
+      >
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-700 text-sm font-medium">
           {initialLetter}
         </div>
@@ -375,7 +419,9 @@ export function LoungeSidebar({
           </Button>
         ) : (
           <div className="flex flex-1 items-center justify-between">
-            <span className="font-medium text-zinc-900 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">{nickname}</span>
+            <span className="font-medium text-zinc-900 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
+              {nickname}
+            </span>
 
             <div className="flex items-center gap-1">
               <ProfileDialog
@@ -417,16 +463,20 @@ export function LoungeSidebar({
                 <button
                   onClick={() => onFilterChange(item.id)}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors text-left",
+                    'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors text-left',
                     isActive
-                      ? "bg-indigo-50 text-indigo-700 font-medium"
-                      : "text-zinc-600 hover:bg-zinc-100"
+                      ? 'bg-indigo-50 text-indigo-700 font-medium'
+                      : 'text-zinc-600 hover:bg-zinc-100'
                   )}
                   aria-label={item.label}
-                  aria-current={isActive ? "page" : undefined}
+                  aria-current={isActive ? 'page' : undefined}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
-                  {!collapsed && <span className="whitespace-nowrap overflow-hidden text-ellipsis">{item.label}</span>}
+                  {!collapsed && (
+                    <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                      {item.label}
+                    </span>
+                  )}
                 </button>
               </li>
             );

@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router';
 import { ChevronLeft } from 'lucide-react';
 import Stepper from './components/Stepper';
 import Step1BasicInfo from './components/Step1BasicInfo';
-import Step2Schedule from './components/Step2Schedule';
-import Step3TechStack from './components/Step3TechStack';
-import Step4TeamInvite from './components/Step4TeamInvite';
-import Step5EpicSetup from './components/Step5EpicSetup';
-import Step6Loading from './components/Step6Loading';
+import Step2ProjectType from './components/Step2ProjectType';
+import Step3Schedule from './components/Step2Schedule';
+import Step4TechStack from './components/Step3TechStack';
+import Step5TeamInvite from './components/Step4TeamInvite';
+import Step6EpicSetup from './components/Step5EpicSetup';
+import Step7Loading from './components/Step6Loading';
 
 export default function WorkspaceOnboardingPage() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function WorkspaceOnboardingPage() {
     workspaceKey: '',
     domain: '',
     purpose: '',
+    serviceType: '',
     subject: '',
     startDate: null as Date | null,
     endDate: null as Date | null,
@@ -28,9 +30,9 @@ export default function WorkspaceOnboardingPage() {
   });
 
   const handleNext = () => {
-    if (currentStep < 5) {
+    if (currentStep < 6) {
       setCurrentStep((prev) => prev + 1);
-    } else if (currentStep === 5) {
+    } else if (currentStep === 6) {
       setIsLoading(true);
       setTimeout(() => {
         console.log('워크스페이스 생성 완료!', formData);
@@ -45,7 +47,7 @@ export default function WorkspaceOnboardingPage() {
   };
 
   if (isLoading) {
-    return <Step6Loading />;
+    return <Step7Loading />;
   }
 
   return (
@@ -117,7 +119,7 @@ export default function WorkspaceOnboardingPage() {
           )}
 
           {currentStep === 2 && (
-            <Step2Schedule
+            <Step2ProjectType
               data={formData}
               onChange={(updates) =>
                 setFormData((prev) => ({ ...prev, ...updates }))
@@ -128,7 +130,7 @@ export default function WorkspaceOnboardingPage() {
           )}
 
           {currentStep === 3 && (
-            <Step3TechStack
+            <Step3Schedule
               data={formData}
               onChange={(updates) =>
                 setFormData((prev) => ({ ...prev, ...updates }))
@@ -139,7 +141,7 @@ export default function WorkspaceOnboardingPage() {
           )}
 
           {currentStep === 4 && (
-            <Step4TeamInvite
+            <Step4TechStack
               data={formData}
               onChange={(updates) =>
                 setFormData((prev) => ({ ...prev, ...updates }))
@@ -150,7 +152,18 @@ export default function WorkspaceOnboardingPage() {
           )}
 
           {currentStep === 5 && (
-            <Step5EpicSetup
+            <Step5TeamInvite
+              data={formData}
+              onChange={(updates) =>
+                setFormData((prev) => ({ ...prev, ...updates }))
+              }
+              onNext={handleNext}
+              onPrev={handlePrev}
+            />
+          )}
+
+          {currentStep === 6 && (
+            <Step6EpicSetup
               data={formData}
               onChange={(updates) =>
                 setFormData((prev) => ({ ...prev, ...updates }))
@@ -207,7 +220,7 @@ export default function WorkspaceOnboardingPage() {
               cursor: 'pointer',
             }}
           >
-            {currentStep === 5 ? 'AI 분석 시작' : '다음'}
+            {currentStep === 6 ? 'AI 분석 시작' : '다음'}
           </button>
         </div>
       </div>

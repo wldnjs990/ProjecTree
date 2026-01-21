@@ -27,8 +27,8 @@ interface Step4TeamInviteProps {
 export default function Step4TeamInvite({
   data,
   onChange,
-  onNext,
-  onPrev,
+  // onNext,
+  // onPrev,
 }: Step4TeamInviteProps) {
   const [memberEmail, setMemberEmail] = useState('');
   const [memberRole, setMemberRole] = useState('편집자 - 편집 가능');

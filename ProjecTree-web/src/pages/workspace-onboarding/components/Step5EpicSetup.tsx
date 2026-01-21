@@ -22,8 +22,8 @@ interface Step5EpicSetupProps {
 export default function Step5EpicSetup({
   data,
   onChange,
-  onNext,
-  onPrev,
+  // onNext,
+  // onPrev,
 }: Step5EpicSetupProps) {
   const [epicName, setEpicName] = useState('');
   const [epicDescription, setEpicDescription] = useState('');

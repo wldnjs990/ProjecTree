@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    
+    environment {
+        HOST_WORKSPACE = "/var/lib/docker/volumes/jenkins_home/_data/workspace/frontend-ci"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install & Build') {
+            steps {
+                sh '''
+                    docker run --rm \
+                        -v ${HOST_WORKSPACE}/ProjecTree-web:/app \
+                        -w /app \
+                        node:24-alpine \
+                        sh -c "npm install -g pnpm && pnpm install && pnpm build"
+                '''
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dir('ProjecTree-web') {
+                    sh 'docker build -t projectree-web .'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    docker stop projectree-web || true
+                    docker rm projectree-web || true
+                    docker run -d --name projectree-web --network app-network projectree-web
+                '''
+            }
+        }
+    }
+}
