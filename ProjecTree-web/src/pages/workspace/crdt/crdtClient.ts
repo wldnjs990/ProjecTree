@@ -1,7 +1,7 @@
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import type { Awareness } from 'y-protocols/awareness';
-import { useRoomId, useWorkspaceStore } from '../stores/workspaceStore';
+import { useWorkspaceStore } from '../stores/workspaceStore';
 import { useNodeStore } from '../stores/nodeStore';
 
 // Awareness 상태 타입
@@ -109,7 +109,7 @@ class CrdtClient {
    */
   saveNodePosition(nodeId: string): string | null {
     const requestId = crypto.randomUUID();
-    const workspaceId = useRoomId();
+    const workspaceId = this.roomId;
 
     const ws = this.provider.ws;
     const message = JSON.stringify({

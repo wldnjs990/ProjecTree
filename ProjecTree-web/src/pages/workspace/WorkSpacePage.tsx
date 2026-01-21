@@ -14,12 +14,12 @@ import type { FlowNode } from './types/node';
 import { initCrdtClient, destroyCrdtClient } from './crdt/crdtClient';
 import { useConnectionStatus, useNodeStore } from './stores/nodeStore';
 import { useNodeDetailEdit, useNodeDetailCrdtObservers } from './hooks';
+import { useParams } from 'react-router';
 
 // 임시 Room ID (나중에 워크스페이스 ID로 대체)
-// TODO : 워크스페이스 ID로 대체
-const ROOM_ID = '1';
 
 export default function WorkSpacePage() {
+  const { workspaceId } = useParams<{ workspaceId: string }>();
   // CRDT 연결 상태
   const connectionStatus = useConnectionStatus();
 
@@ -35,7 +35,9 @@ export default function WorkSpacePage() {
 
   // CRDT 클라이언트 초기화 및 초기 데이터 로드
   useEffect(() => {
-    initCrdtClient(ROOM_ID);
+    console.log(workspaceId);
+    // workspaceId params를 받아 crdt 인스턴스 생성
+    if (workspaceId) initCrdtClient(workspaceId);
 
     // 초기 목데이터를 store에 로드
     setNodeDetails(mockNodeDetails);
@@ -53,7 +55,7 @@ export default function WorkSpacePage() {
     return () => {
       destroyCrdtClient();
     };
-  }, [setNodeDetails, setNodeListData]);
+  }, [setNodeDetails, setNodeListData, workspaceId]);
 
   // Header state
   const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');

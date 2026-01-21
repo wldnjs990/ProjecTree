@@ -2,7 +2,7 @@ import { useEffect, useCallback, useRef } from 'react';
 import * as Y from 'yjs';
 import type { Node } from '@xyflow/react';
 import { getCrdtClient, type YNodeValue } from '../crdt/crdtClient';
-import { useNodeStore } from '../stores/nodeStore';
+import { useConnectionStatus, useNodeStore } from '../stores/nodeStore';
 import type { FlowNode, FlowNodeData, YjsNode } from '../types/node';
 import { flowNodeToYjsNode, yjsNodeToFlowNode } from '../utils/nodeTransform';
 
@@ -18,6 +18,9 @@ interface UseNodesCrdtOptions {
 export const useNodesCrdt = ({
   initialNodes = [],
 }: UseNodesCrdtOptions = {}) => {
+  // CRDT 연결 상태
+  const connectionStatus = useConnectionStatus();
+
   // 노드리스트 관리용 ref객체
   const yNodesRef = useRef<Y.Map<Y.Map<YNodeValue>> | null>(null);
 
@@ -103,7 +106,7 @@ export const useNodesCrdt = ({
       yNodes.unobserveDeep(observeHandler);
       yNodesRef.current = null;
     };
-  }, [initialNodes, syncFromYjs]);
+  }, [initialNodes, syncFromYjs, connectionStatus]);
 
   // 노드 드래그 완료 핸들러
   const handleNodeDragStop = useCallback(

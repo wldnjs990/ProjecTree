@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useReactFlow } from '@xyflow/react';
 import { getCrdtClient, type AwarenessState } from '../crdt/crdtClient';
+import { useConnectionStatus } from '../stores/nodeStore';
 
 /**
  * 커서 동기화 훅
@@ -8,6 +9,9 @@ import { getCrdtClient, type AwarenessState } from '../crdt/crdtClient';
  * - CursorPointers 컴포넌트에서만 사용하여 리렌더링 최소화
  */
 export const useCursors = () => {
+  // CRDT 연결 상태
+  const connectionStatus = useConnectionStatus();
+
   const { screenToFlowPosition } = useReactFlow();
   const [cursors, setCursors] = useState<Map<number, AwarenessState>>(
     new Map()
@@ -40,7 +44,7 @@ export const useCursors = () => {
       // change 이벤트 비활성화
       awareness.off('change', handleChange);
     };
-  }, []);
+  }, [connectionStatus]);
 
   /**
    * 마우스 이동 핸들러 - 실시간 유저 마우스 포인터 공유용 함수

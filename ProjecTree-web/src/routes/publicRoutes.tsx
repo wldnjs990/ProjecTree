@@ -17,7 +17,7 @@ export const publicRoutes: RouteObject[] = [
     element: <WorkspaceLoungePage />,
   },
   {
-    path: '/workspace',
+    path: '/workspace/:workspaceId',
     element: <WorkSpacePage />,
   },
   {
