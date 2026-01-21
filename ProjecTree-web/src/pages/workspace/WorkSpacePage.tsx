@@ -4,6 +4,7 @@ import { Sidebar } from "./components/Sidebar";
 import { TreeCanvas } from "./components/Canvas";
 import { NodeDetailSidebar, type NodeDetailData } from "./components/NodeDetailSidebar";
 import { mockNodes, mockEdges, mockUsers, mockNodeDetails } from "./constants/mockData";
+import { FeatureSpecView } from "./components/FeatureSpec";
 
 export default function WorkSpacePage() {
   // Header state
@@ -105,11 +106,11 @@ export default function WorkSpacePage() {
           )}
 
           {activeTab === "feature-spec" && (
-            <div className="flex items-center justify-center h-full bg-canvas">
-              <p className="text-lg text-gray-500">
-                기능 명세서 뷰 (개발 예정)
-              </p>
-            </div>
+            <FeatureSpecView
+              nodes={mockNodes}
+              edges={mockEdges}
+              onNodeClick={handleNodeClick}
+            />
           )}
 
           {activeTab === "tech-selection" && (
