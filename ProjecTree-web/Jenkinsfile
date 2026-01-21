@@ -37,7 +37,7 @@ pipeline {
                 sh '''
                     docker stop projectree-web || true
                     docker rm projectree-web || true
-                    docker run -d --name projectree-web -p 3000:80 projectree-web
+                    docker run -d --name projectree-web -p 80:80 projectree-web
                 '''
             }
         }
