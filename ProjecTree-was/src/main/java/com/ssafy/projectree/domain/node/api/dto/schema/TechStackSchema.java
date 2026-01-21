@@ -15,4 +15,6 @@ public class TechStackSchema {
     private Long id;
     private String advantage;
     private String disAdvantage;
+    private Integer recommendScore;
+    private boolean isRecommended;
 }

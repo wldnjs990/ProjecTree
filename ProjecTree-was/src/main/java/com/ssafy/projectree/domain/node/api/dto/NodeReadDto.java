@@ -21,6 +21,7 @@ public class NodeReadDto {
     @AllArgsConstructor
     public static class Response {
         private Long nodeId;
+        private String identifier;
         private NodeStatus status;
         private Priority priority;
         private TaskType taskType;
