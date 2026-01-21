@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        WORKSPACE_PATH = "/var/jenkins_home/workspace/frontend-ci"
+        HOST_WORKSPACE = "/var/lib/docker/volumes/jenkins_home/_data/workspace/frontend-ci"
     }
 
     stages {
@@ -16,7 +16,7 @@ pipeline {
             steps {
                 sh '''
                     docker run --rm \
-                        -v ${WORKSPACE_PATH}/ProjecTree-web:/app \
+                        -v ${HOST_WORKSPACE}/ProjecTree-web:/app \
                         -w /app \
                         node:24-alpine \
                         sh -c "npm install -g pnpm && pnpm install && pnpm build"
