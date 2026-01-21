@@ -53,6 +53,7 @@ export const mockNodes: Node[] = [
       taskId: "#ASDF-4",
       category: "frontend",
       storyPoints: 4,
+      assignee: { id: "user-1", name: "김철수", initials: "김철", color: "#3b82f6" },
     } as TaskNodeData,
   },
   {
@@ -65,6 +66,7 @@ export const mockNodes: Node[] = [
       taskId: "#ASDF-5",
       category: "backend",
       storyPoints: 3,
+      assignee: { id: "user-2", name: "이영희", initials: "이영", color: "#8b5cf6" },
     } as TaskNodeData,
   },
   {
