@@ -25,8 +25,8 @@ interface Step2ScheduleProps {
 export default function Step2Schedule({
   data,
   onChange,
-  onNext,
-  onPrev,
+  // onNext,
+  // onPrev,
 }: Step2ScheduleProps) {
   return (
     <div className="flex flex-col gap-6">
@@ -127,7 +127,7 @@ export default function Step2Schedule({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-[200px] justify-start text-left font-normal"
+                  className="w-50 justify-start text-left font-normal"
                   style={{
                     fontFamily: 'Roboto',
                     fontWeight: 100,
@@ -166,7 +166,7 @@ export default function Step2Schedule({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-[200px] justify-start text-left font-normal"
+                  className="w-50 justify-start text-left font-normal"
                   style={{
                     fontFamily: 'Roboto',
                     fontWeight: 100,
