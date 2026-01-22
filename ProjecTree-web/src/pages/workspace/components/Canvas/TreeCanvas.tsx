@@ -57,7 +57,7 @@ function TreeCanvasInner({
   onNodeClick,
 }: TreeCanvasProps) {
   // crdt 훅
-  const { cursors, handleMouseMove } = useCrdt();
+  const { cursors, handleMouseMove, handleNodeMove } = useCrdt();
 
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -109,6 +109,7 @@ function TreeCanvasInner({
                   position: 'fixed',
                   left: state.cursor.x,
                   top: state.cursor.y,
+                  zIndex: 50,
                 }}
               >
                 {clientId}🔵

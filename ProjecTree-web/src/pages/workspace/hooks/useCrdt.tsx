@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
+import { mockNodes } from '../constants/mockData';
+import type { Node, NodeChange } from '@xyflow/react';
 
 // 임시 room number
 const ROOM_NUMBER = 'room-1';
@@ -29,7 +31,10 @@ const useCrdt = () => {
     providerRef.current = provider;
 
     // ydoc로 생성한 노드데이터 저장소
-    const yNodes = yDocRef.current.getArray('nodes');
+    const yNodes = yDocRef.current.getArray<Node>('nodes');
+    // yNodes 초기화
+    yNodes.push(mockNodes);
+
     // 노드 상세 페이지도 저장해야할듯
 
     // provider 이벤트 연결 상태
@@ -74,7 +79,14 @@ const useCrdt = () => {
     });
   };
 
-  return { providerRef, yDocRef, cursors, handleMouseMove };
+  // 내 노드 이동 여부
+  const handleNodeMove = (e: NodeChange) => {
+    if (e.type === 'position') {
+      console.log(e.position);
+    }
+  };
+
+  return { providerRef, yDocRef, cursors, handleMouseMove, handleNodeMove };
 };
 
 export default useCrdt;
