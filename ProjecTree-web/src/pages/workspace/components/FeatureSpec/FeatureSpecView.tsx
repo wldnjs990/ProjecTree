@@ -8,10 +8,9 @@ import { TaskGroup } from "./components/TaskGroup";
 import { specGridCols } from "./constants/specConfig";
 import type { NodeData } from "./types";
 import { Accordion } from "@/components/ui/accordion";
+import { useNodes, useEdges } from "../../stores/nodeStore";
 
 interface FeatureSpecViewProps {
-  nodes: Node[];
-  edges?: Edge[];
   onNodeClick?: (nodeId: string) => void;
 }
 
@@ -45,7 +44,11 @@ function groupNodesByHierarchy(nodes: Node[], edges: Edge[] = []) {
   });
 }
 
-export function FeatureSpecView({ nodes, edges = [], onNodeClick }: FeatureSpecViewProps) {
+export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
+  // Zustand 스토어에서 노드/엣지 가져오기
+  const nodes = useNodes();
+  const edges = useEdges();
+
   // 데이터 변환
   const transformedNodes = transformNodesForSpecView(nodes);
   const hierarchy = groupNodesByHierarchy(transformedNodes, edges);

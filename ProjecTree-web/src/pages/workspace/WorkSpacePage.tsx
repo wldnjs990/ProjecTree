@@ -8,12 +8,15 @@ import {
 } from './components/NodeDetailSidebar';
 import {
   mockNodes,
-  mockEdges,
   mockUsers,
   mockNodeDetails,
 } from './constants/mockData';
 import { FeatureSpecView } from './components/FeatureSpec';
 import { TechStackStatusView } from './components/TechStackStatus';
+import type { FlowNode } from './types/node';
+
+// 임시 Room ID (나중에 워크스페이스 ID로 대체)
+const ROOM_ID = 'workspace-1';
 
 export default function WorkSpacePage() {
   // Header state
@@ -105,8 +108,8 @@ export default function WorkSpacePage() {
         <main className="flex-1 overflow-hidden">
           {activeTab === 'tree-editor' && (
             <TreeCanvas
-              initialNodes={mockNodes}
-              initialEdges={mockEdges}
+              roomId={ROOM_ID}
+              initialNodes={mockNodes as FlowNode[]}
               onlineUsers={mockUsers}
               unreadMessages={2}
               onChatClick={handleChatClick}
@@ -115,19 +118,11 @@ export default function WorkSpacePage() {
           )}
 
           {activeTab === 'feature-spec' && (
-            <FeatureSpecView
-              nodes={mockNodes}
-              edges={mockEdges}
-              onNodeClick={handleNodeClick}
-            />
+            <FeatureSpecView onNodeClick={handleNodeClick} />
           )}
 
           {activeTab === 'tech-selection' && (
-            <TechStackStatusView
-              nodes={mockNodes}
-              edges={mockEdges}
-              onNodeClick={handleNodeClick}
-            />
+            <TechStackStatusView onNodeClick={handleNodeClick} />
           )}
         </main>
 

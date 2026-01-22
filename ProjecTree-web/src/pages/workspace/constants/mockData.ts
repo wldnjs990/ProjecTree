@@ -5,17 +5,19 @@ import type { StoryNodeData } from '../components/Canvas/nodes/StoryNode';
 import type { AvatarColor } from '@/components/custom/UserAvatar';
 import type { AdvancedNodeData, TaskNodeData } from '../components';
 
-// Mock nodes for the tree
+// Mock nodes for the tree (with parentId for CRDT)
 export const mockNodes: Node[] = [
-  // Project Node
+  // Project Node (루트)
   {
     id: 'project-1',
     type: 'project',
     position: { x: 400, y: 50 },
+    parentId: undefined, // 루트 노드
     data: {
       title: 'AI 여행 추천 서비스',
       status: 'progress',
       priority: 'P0',
+      taskId: '#ASDF-1',
     } as ProjectNodeData,
   },
   // Epic Node
@@ -23,6 +25,7 @@ export const mockNodes: Node[] = [
     id: 'epic-1',
     type: 'epic',
     position: { x: 400, y: 180 },
+    parentId: 'project-1',
     data: {
       title: '사용자 인증',
       status: 'completed',
@@ -36,6 +39,7 @@ export const mockNodes: Node[] = [
     id: 'story-1',
     type: 'story',
     position: { x: 250, y: 340 },
+    parentId: 'epic-1',
     data: {
       title: '사용자가 로그인한다.',
       status: 'progress',
@@ -49,6 +53,7 @@ export const mockNodes: Node[] = [
     id: 'task-1',
     type: 'task',
     position: { x: 200, y: 470 },
+    parentId: 'story-1',
     data: {
       title: '프론트엔드 로그인',
       status: 'progress',
@@ -67,6 +72,7 @@ export const mockNodes: Node[] = [
     id: 'task-2',
     type: 'task',
     position: { x: 400, y: 470 },
+    parentId: 'story-1',
     data: {
       title: '백엔드 로그인',
       status: 'pending',
@@ -85,6 +91,7 @@ export const mockNodes: Node[] = [
     id: 'advanced-4',
     type: 'advanced',
     position: { x: 150, y: 600 },
+    parentId: 'task-1',
     data: {
       title: '프론트엔드 Form 렌더링 최적화',
       status: 'pending',
@@ -98,6 +105,7 @@ export const mockNodes: Node[] = [
     id: 'advanced-5',
     type: 'advanced',
     position: { x: 450, y: 600 },
+    parentId: 'task-2',
     data: {
       title: '백엔드 블랙리스트 관리',
       status: 'pending',
