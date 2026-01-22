@@ -2,20 +2,39 @@ import { useEffect, useRef, useState } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { mockNodes } from '../constants/mockData';
-import type { Node, NodeChange } from '@xyflow/react';
+import { useReactFlow, type Node, type NodeChange } from '@xyflow/react';
+
+// 내가 사용할 awareness 상태들
+// 유저 정보도 실시간으로 받을거니깐 미리 추가
+interface AwarenessState {
+  cursor?: {
+    x: number;
+    y: number;
+  };
+  user?: {
+    name: string;
+    color: string;
+  };
+}
 
 // 임시 room number
 const ROOM_NUMBER = 'room-1';
 
 const useCrdt = () => {
+  // useReactFlow 유틸 함수 screenToFlowPosition
+  // react-flow의 줌, 이동 여부 등을 계산한 좌표를 제공해줌
+  const { screenToFlowPosition } = useReactFlow();
+
   // websocket 클라이언트 생성
   const yDocRef = useRef<Y.Doc | null>(null);
   const providerRef = useRef<WebsocketProvider | null>(null);
 
-  const [nodeState, setNodeState] = useState();
+  // const [nodeState, setNodeState] = useState();
 
   // 다른 사용자들의 커서 상태
-  const [cursors, setCursors] = useState<Map<number, any>>(new Map());
+  const [cursors, setCursors] = useState<Map<number, AwarenessState>>(
+    new Map()
+  );
 
   useEffect(() => {
     // yjs 동시편집 관리 클라이언트
@@ -73,9 +92,15 @@ const useCrdt = () => {
     const awareness = providerRef.current?.awareness;
     if (!awareness) return;
 
-    awareness.setLocalStateField('cursor', {
+    // 화면 좌표 → flow 캔버스 좌표로 변환 (줌/패닝 자동 반영)
+    const position = screenToFlowPosition({
       x: e.clientX,
       y: e.clientY,
+    });
+
+    awareness.setLocalStateField('cursor', {
+      x: position.x,
+      y: position.y,
     });
   };
 

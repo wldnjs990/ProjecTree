@@ -10,6 +10,7 @@ import {
   type Node,
   type Edge,
   ReactFlowProvider,
+  useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -56,8 +57,11 @@ function TreeCanvasInner({
   onChatClick,
   onNodeClick,
 }: TreeCanvasProps) {
+  // useReactFlow 유틸 함수 flowToScreenPosition
+  const { flowToScreenPosition } = useReactFlow();
+
   // crdt 훅
-  const { cursors, handleMouseMove, handleNodeMove } = useCrdt();
+  const { cursors, handleMouseMove } = useCrdt();
 
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -99,24 +103,35 @@ function TreeCanvasInner({
           size={1}
           color="#DEDEDE"
         />
-        {/* 참여자 마우스 포인터 */}
-        {[...cursors.entries()].map(
-          ([clientId, state]) =>
-            state.cursor && (
-              <div
-                key={clientId}
-                style={{
-                  position: 'fixed',
-                  left: state.cursor.x,
-                  top: state.cursor.y,
-                  zIndex: 50,
-                }}
-              >
-                {clientId}🔵
-              </div>
-            )
-        )}
       </ReactFlow>
+      {/* 참여자 마우스 포인터 */}
+      {[...cursors.entries()].map(([clientId, state]) => {
+        if (!state.cursor) return;
+        // flow 좌표 → 화면 좌표로 변환
+        const screenPos = flowToScreenPosition({
+          x: state.cursor.x,
+          y: state.cursor.y,
+        });
+        return (
+          state.cursor && (
+            <div
+              key={clientId}
+              style={{
+                position: 'fixed',
+                left: screenPos.x,
+                top: screenPos.y,
+                zIndex: 10,
+                transform: 'translate(-50%, -50%)',
+                transformOrigin: 'center',
+                pointerEvents: 'none', // 클릭 방해 안 하도록
+              }}
+            >
+              🔵
+              <span className="absolute right-full">{clientId}</span>
+            </div>
+          )
+        );
+      })}
 
       {/* Collaboration Panel - Top Left */}
       <CollabPanel users={onlineUsers} className="absolute top-6 left-6 z-10" />
