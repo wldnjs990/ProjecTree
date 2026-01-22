@@ -4,11 +4,11 @@ import { ChevronLeft } from 'lucide-react';
 import Stepper from './components/Stepper';
 import Step1BasicInfo from './components/Step1BasicInfo';
 import Step2ProjectType from './components/Step2ProjectType';
-import Step3Schedule from './components/Step2Schedule';
-import Step4TechStack from './components/Step3TechStack';
-import Step5TeamInvite from './components/Step4TeamInvite';
-import Step6EpicSetup from './components/Step5EpicSetup';
-import Step7Loading from './components/Step6Loading';
+import Step3Schedule from './components/Step3Schedule';
+import Step4TechStack from './components/Step4TechStack';
+import Step5TeamInvite from './components/Step5TeamInvite';
+import Step6EpicSetup from './components/Step6EpicSetup';
+import Step7Loading from './components/Step7Loading';
 
 export default function WorkspaceOnboardingPage() {
   const navigate = useNavigate();
@@ -24,6 +24,7 @@ export default function WorkspaceOnboardingPage() {
     subject: '',
     startDate: null as Date | null,
     endDate: null as Date | null,
+    specFile: null as File | null,
     techStacks: [] as string[],
     epics: [] as Array<{ id: string; name: string; description: string }>,
     teamMembers: [] as Array<{ email: string; role: string }>,

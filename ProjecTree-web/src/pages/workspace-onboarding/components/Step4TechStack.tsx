@@ -5,21 +5,21 @@ import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import { TECH_STACK_OPTIONS } from '../techStackData';
 
-interface Step3TechStackProps {
+interface Step4TechStackProps {
   data: {
     techStacks: string[];
   };
-  onChange: (updates: Partial<Step3TechStackProps['data']>) => void;
+  onChange: (updates: Partial<Step4TechStackProps['data']>) => void;
   onNext: () => void;
   onPrev: () => void;
 }
 
-export default function Step3TechStack({
+export default function Step4TechStack({
   data,
   onChange,
   // onNext,
   // onPrev,
-}: Step3TechStackProps) {
+}: Step4TechStackProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
