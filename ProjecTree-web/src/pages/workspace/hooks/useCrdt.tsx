@@ -63,7 +63,18 @@ const useCrdt = () => {
     };
   }, []);
 
-  return { providerRef, yDocRef, cursors };
+  // 내 마우스 이동 여부
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const awareness = providerRef.current?.awareness;
+    if (!awareness) return;
+
+    awareness.setLocalStateField('cursor', {
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  return { providerRef, yDocRef, cursors, handleMouseMove };
 };
 
 export default useCrdt;

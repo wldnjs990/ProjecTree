@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -10,18 +10,19 @@ import {
   type Node,
   type Edge,
   ReactFlowProvider,
-} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 
-import { ProjectNode } from "./nodes/ProjectNode";
-import { EpicNode } from "./nodes/EpicNode";
-import { StoryNode } from "./nodes/StoryNode";
-import { CollabPanel } from "./CollabPanel";
-import { MinimapPanel } from "./MinimapPanel";
-import { ZoomControls } from "./ZoomControls";
-import type { AvatarColor } from "@/components/custom/UserAvatar";
-import ChatButton from "./ChatButton";
-import { AdvancedNode, TaskNode } from "./nodes";
+import { ProjectNode } from './nodes/ProjectNode';
+import { EpicNode } from './nodes/EpicNode';
+import { StoryNode } from './nodes/StoryNode';
+import { CollabPanel } from './CollabPanel';
+import { MinimapPanel } from './MinimapPanel';
+import { ZoomControls } from './ZoomControls';
+import type { AvatarColor } from '@/components/custom/UserAvatar';
+import ChatButton from './ChatButton';
+import { AdvancedNode, TaskNode } from './nodes';
+import useCrdt from '../../hooks/useCrdt';
 
 interface OnlineUser {
   id: string;
@@ -55,19 +56,22 @@ function TreeCanvasInner({
   onChatClick,
   onNodeClick,
 }: TreeCanvasProps) {
+  // crdt 훅
+  const { cursors, handleMouseMove } = useCrdt();
+
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
+    [setEdges]
   );
 
   const handleNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
       onNodeClick?.(node.id);
     },
-    [onNodeClick],
+    [onNodeClick]
   );
 
   const proOptions = useMemo(() => ({ hideAttribution: true }), []);
@@ -77,6 +81,7 @@ function TreeCanvasInner({
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        onMouseMove={handleMouseMove}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
@@ -85,7 +90,7 @@ function TreeCanvasInner({
         fitView
         fitViewOptions={{ padding: 0.2 }}
         proOptions={proOptions}
-        className="bg-canvas"
+        className="bg-canvas relative"
       >
         {/* 도트 배경 깔아주기 */}
         <Background
@@ -94,6 +99,22 @@ function TreeCanvasInner({
           size={1}
           color="#DEDEDE"
         />
+        {/* 참여자 마우스 포인터 */}
+        {[...cursors.entries()].map(
+          ([clientId, state]) =>
+            state.cursor && (
+              <div
+                key={clientId}
+                style={{
+                  position: 'fixed',
+                  left: state.cursor.x,
+                  top: state.cursor.y,
+                }}
+              >
+                {clientId}🔵
+              </div>
+            )
+        )}
       </ReactFlow>
 
       {/* Collaboration Panel - Top Left */}
