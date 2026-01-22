@@ -1,11 +1,5 @@
 from app.agents.states.state import PlanNodeState
-from app.services.db_service import (
-    create_epic_node,
-    create_story_node,
-    create_task_node,
-    create_subtask_node,
-    get_db,
-)
+
 from app.core.llm import mini_llm
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
@@ -26,30 +20,10 @@ analyzer_agent = create_agent(
 
 
 def epic_node_process(state: PlanNodeState) -> PlanNodeState:
-    """Create Epic Node in DB."""
-    node_data = state.get("node_data", {})
-    # Assuming node_data has 'name', 'description', 'parent_id'
-
-    db = _get_db_session()
-    try:
-        node_id = create_epic_node(db, node_data)
-    finally:
-        db.close()
-
-    return {"node_data": {**node_data, "id": node_id}}  # Update with ID
-
+    pass
 
 def story_node_process(state: PlanNodeState) -> PlanNodeState:
-    """Create Story Node in DB."""
-    node_data = state.get("node_data", {})
-
-    db = _get_db_session()
-    try:
-        node_id = create_story_node(db, node_data)
-    finally:
-        db.close()
-
-    return {"node_data": {**node_data, "id": node_id}}
+    pass
 
 def fe_task_node_process(state: PlanNodeState) -> PlanNodeState:
     pass
@@ -58,50 +32,8 @@ def be_task_node_process(state: PlanNodeState) -> PlanNodeState:
     pass
 
 def task_node_process(state: PlanNodeState) -> PlanNodeState:
-    """Create Task Node in DB with analysis."""
-    node_data = state.get("node_data", {})
-
-    # Analyze Task
-    try:
-        msg = f"Task: {node_data.get('name')}\nDescription: {node_data.get('description')}\nType: {node_data.get('type', 'BE')}"
-        result = analyzer_agent.invoke({"messages": [HumanMessage(content=msg)]})
-        analysis = result.get("structured_response")
-
-        node_data["comparison"] = analysis.comparison if analysis else ""
-        node_data["difficult"] = analysis.difficult if analysis else 1
-    except Exception as e:
-        print(f"Task Analysis failed: {e}")
-
-    db = _get_db_session()
-    try:
-        # Map 'type' to 'task_type' if needed by db_service
-        node_data["task_type"] = node_data.get("type", "BE")
-        node_id = create_task_node(db, node_data)
-    finally:
-        db.close()
-
-    return {"node_data": {**node_data, "id": node_id}}
+    pass 
 
 
 def advance_node_process(state: PlanNodeState) -> PlanNodeState:
-    """Create SubTask Node in DB."""
-    node_data = state.get("node_data", {})
-
-    # Reuse Task Analyzer or simple logic
-    try:
-        msg = f"Task: {node_data.get('name')}\nDescription: {node_data.get('description')}\nType: SubTask"
-        result = analyzer_agent.invoke({"messages": [HumanMessage(content=msg)]})
-        analysis = result.get("structured_response")
-
-        node_data["comparison"] = analysis.comparison if analysis else ""
-        node_data["difficult"] = analysis.difficult if analysis else 1
-    except:
-        pass
-
-    db = _get_db_session()
-    try:
-        node_id = create_subtask_node(db, node_data)
-    finally:
-        db.close()
-
-    return {"node_data": {**node_data, "id": node_id}}
+    pass

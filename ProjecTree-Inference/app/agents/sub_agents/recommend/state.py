@@ -1,9 +1,9 @@
 from app.agents.enums import NodeType
 from typing import TypedDict, Optional
 from app.agents.schemas.expert import TechList
+from app.agents.states.state import GlobalState
 
-
-class RecommendationState(TypedDict):
+class RecommendationState(GlobalState):
     """기술 스택 추천을 위한 State"""
     current_node_type: NodeType
     task_type: str

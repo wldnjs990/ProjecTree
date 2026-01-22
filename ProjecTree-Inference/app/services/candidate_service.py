@@ -1,29 +1,36 @@
 from app.api.schemas.candidates import CandidateGenerateRequest, CandidateGenerateResponse
-
+from app.agents.sub_agents.candidates.graph import candidate_graph
+from app.db.repository.node_repository import NodeRepository
+from sqlalchemy.orm import Session
+from app.core.log import langfuse_handler
 
 class CandidateService:
     """후보 노드 생성 서비스 클래스
     
-    실제 구현은 향후 추가 예정입니다.
     candidate_graph를 호출하여 후보 노드를 생성합니다.
     """
     
+    def __init__(self, node_repository: NodeRepository):
+        self.node_repository = node_repository
+    
     async def generate_candidates(
         self, 
+        db: Session,
         request: CandidateGenerateRequest
     ) -> CandidateGenerateResponse:
-        """후보 노드 생성
+        # 노드 정보 조회
+        node = self.node_repository.get_by_id(db, request.node_id)
         
-        Args:
-            request: 후보 노드 생성 요청 정보
-            
-        Returns:
-            생성된 후보 노드 목록
-            
-        Raises:
-            NotImplementedError: 서비스 미구현 상태
-        """
         # TODO: candidate_graph를 호출하여 실제 후보 노드 생성 로직 구현
-        # from app.agents.sub_agents.candidates.graph import candidate_graph
-        # result = await candidate_graph.ainvoke({...})
-        raise NotImplementedError("CandidateService.generate_candidates is not implemented yet")
+        result = await candidate_graph.ainvoke({
+            "current_node_id": node.id,
+            "candidate_count": request.candidate_count,
+            "current_node_type": node.node_type,
+            "current_node_name": node.name,
+            "current_node_description": node.description,
+        }, config={
+            "callbacks": [langfuse_handler]
+        })
+        result = result['candidates']
+        print(result)
+        return CandidateGenerateResponse(candidates=result["candidates"])
