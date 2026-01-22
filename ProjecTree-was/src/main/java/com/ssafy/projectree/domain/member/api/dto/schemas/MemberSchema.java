@@ -1,4 +1,4 @@
-package com.ssafy.projectree.domain.user.api.dto.schemas;
+package com.ssafy.projectree.domain.member.api.dto.schemas;
 
 public class MemberSchema {
     private Long id;
