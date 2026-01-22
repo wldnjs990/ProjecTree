@@ -5,7 +5,9 @@ FastAPI 기반 추론 서버 메인 진입점
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+import sys
+import os
+import uvicorn
 from app.api.v1 import api_router
 from app.core.config import settings
 
@@ -60,3 +62,17 @@ async def root():
 async def health_check():
     """헬스 체크 엔드포인트"""
     return {"status": "ok"}
+
+
+if __name__ == "__main__":
+    
+    # 부모 디렉토리를 Python 경로에 추가
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        log_level="info"
+    )

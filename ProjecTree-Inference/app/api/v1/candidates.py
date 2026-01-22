@@ -1,10 +1,11 @@
 """후보 노드 생성 API 엔드포인트"""
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
 from app.api.schemas.candidates import CandidateGenerateRequest, CandidateGenerateResponse
 from app.services.candidate_service import CandidateService
-from app.core.dependencies import get_candidate_service
+from app.core.dependencies import get_candidate_service, get_db
 
 router = APIRouter(prefix="/candidates", tags=["Candidates"])
 
@@ -22,6 +23,7 @@ router = APIRouter(prefix="/candidates", tags=["Candidates"])
 )
 async def generate_candidates(
     request: CandidateGenerateRequest,
+    db: Session = Depends(get_db),
     service: CandidateService = Depends(get_candidate_service)
 ) -> CandidateGenerateResponse:
     """후보 노드 생성 엔드포인트
@@ -30,7 +32,7 @@ async def generate_candidates(
     candidate_graph를 활용하여 LLM 기반 추천을 수행합니다.
     """
     try:
-        return await service.generate_candidates(request)
+        return await service.generate_candidates(db=db, request=request)
     except NotImplementedError as e:
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
@@ -41,3 +43,4 @@ async def generate_candidates(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"후보 노드 생성 중 오류 발생: {str(e)}"
         )
+

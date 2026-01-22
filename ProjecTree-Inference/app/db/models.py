@@ -259,7 +259,7 @@ class AdvanceNode(Node):
     comparison = Column(Text)
 
     __mapper_args__ = {
-        "polymorphic_identity": "ADVANCE_NODE", # Guessing discriminator value
+        "polymorphic_identity": "ADVANCE", # Guessing discriminator value
     }
 
 
@@ -269,7 +269,7 @@ class EpicNode(Node):
     node_id = Column(BigInteger, ForeignKey("node.id"), primary_key=True)
 
     __mapper_args__ = {
-        "polymorphic_identity": "EPIC_NODE",
+        "polymorphic_identity": "EPIC",
     }
 
 
@@ -289,7 +289,7 @@ class StoryNode(Node):
     node_id = Column(BigInteger, ForeignKey("node.id"), primary_key=True)
 
     __mapper_args__ = {
-        "polymorphic_identity": "STORY_NODE",
+        "polymorphic_identity": "STORY",
     }
 
 
@@ -302,7 +302,7 @@ class TaskNode(Node):
     type = Column(String(255)) # BE, FE
 
     __mapper_args__ = {
-        "polymorphic_identity": "TASK_NODE",
+        "polymorphic_identity": "TASK",
     }
 
 

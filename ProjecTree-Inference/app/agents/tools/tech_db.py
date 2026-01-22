@@ -1,12 +1,8 @@
 from typing import List, Dict, Optional
 from langchain_core.tools import tool
-from app.services.db_service import (
-    get_db,
-    create_tech_info,
-    fetch_tech_info,
-    create_candidate,
-)
-from contextlib import closing
+from app.db.session import get_db
+from app.db.repository.tech_repository import tech_vocabulary_repository
+from app.db.repository.candidate_repository import candidate_repository
 
 
 @tool
@@ -20,7 +16,7 @@ def insert_official_tech_name(tech_name: str) -> Dict:
         tech_name (str): 삽입할 기술 스택의 공식 명칭 (kebab-case, 예: 'react', 'spring-boot')
     """
     with next(get_db()) as db:
-        return create_tech_info(db, tech_name)
+        return tech_vocabulary_repository.create_with_duplicate_check(db, tech_name)
 
 
 @tool
@@ -36,7 +32,7 @@ def search_official_tech_name(keyword: str) -> Optional[Dict]:
         Optional[Dict]: 검색된 기술의 id와 name을 포함한 딕셔너리. 결과가 없으면 빈 딕셔너리를 반환합니다.
     """
     with next(get_db()) as db:
-        return fetch_tech_info(db, keyword)
+        return tech_vocabulary_repository.search_by_keyword(db, keyword)
 
 
 @tool
@@ -50,5 +46,5 @@ def insert_candidate_tool(node_id: int, candidates: List[Dict[str, str]]) -> str
         candidates (List[Dict[str, str]]): 저장할 후보 리스트. 각 후보는 {"name": "...", "description": "...", "type": "..."} 형태여야 합니다.
     """
     with next(get_db()) as db:
-        create_candidate(db, node_id, candidates)
+        candidate_repository.create_multiple(db, node_id, candidates)
         return "Candidates inserted successfully."
