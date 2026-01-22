@@ -35,46 +35,48 @@ public interface NodeDocsController {
                     description = "조회 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = CommonResponse.class),
+                            schema = @Schema(implementation = NodeTreeReadDto.class),
                             examples = @ExampleObject(
+                                    name = "노드 리스트 예시",
                                     value = """
                 {
                   "status": "SUCCESS",
                   "code": 200,
                   "message": "요청에 성공하였습니다.",
-                  "data": {
-                    "tree": {
+                  "data": [
+                    {
                       "id": 1,
                       "name": "루트 프로젝트",
-                      "identifier": "PRJ-001",
-                      "taskType": "CATEGORY",
-                      "nodeStatus": "IN_PROGRESS",
-                      "difficult": 1,
                       "nodeType": "PROJECT",
-                      "children": [
-                        {
-                          "id": 2,
-                          "name": "로그인 모듈 개발",
-                          "identifier": "TSK-010",
-                          "taskType": "TASK",
-                          "nodeStatus": "TODO",
-                          "difficult": 3,
-                          "nodeType": "EPIC",
-                          "children": []
-                        },
-                        {
-                          "id": 3,
-                          "name": "DB 스키마 설계",
-                          "identifier": "TSK-011",
-                          "taskType": "TASK",
-                          "nodeStatus": "DONE",
-                          "difficult": 2,
-                          "nodeType": "EPIC",
-                          "children": []
-                        }
-                      ]
+                      "position": {
+                        "xPos": 100.0,
+                        "yPos": 200.0
+                      },
+                      "parentId": null,
+                      "data": {
+                        "identifier": "NODE-001",
+                        "taskType": "CATEGORY",
+                        "nodeStatus": "IN_PROGRESS",
+                        "difficult": 3
+                      }
+                    },
+                    {
+                      "id": 2,
+                      "name": "하위 작업 노드",
+                      "nodeType": "EPIC",
+                      "position": {
+                        "xPos": 150.5,
+                        "yPos": 300.0
+                      },
+                      "parentId": 1,
+                      "data": {
+                        "identifier": "NODE-002",
+                        "taskType": "TASK",
+                        "nodeStatus": "TODO",
+                        "difficult": 1
+                      }
                     }
-                  }
+                  ]
                 }
                 """
                             )

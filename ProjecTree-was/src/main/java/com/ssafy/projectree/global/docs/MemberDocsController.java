@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@Tag(name = "Node", description = "노드 및 워크스페이스 트리 관련 API")
+@Tag(name = "Member", description = "Member 관련 API")
 public interface MemberDocsController {
 
     @Operation(

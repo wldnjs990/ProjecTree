@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+
 public class NodeTreeReadDto {
     @Data
     @Builder
@@ -14,6 +17,6 @@ public class NodeTreeReadDto {
     @Schema(name = "NodeTreeReadDto.Response", description = "노드 트리 구조 조회 응답")
     public static class Response {
         @Schema(description = "최상위 노드부터 시작되는 트리 구조")
-        private NodeSchema tree;
+        private List<NodeSchema> tree;
     }
 }
