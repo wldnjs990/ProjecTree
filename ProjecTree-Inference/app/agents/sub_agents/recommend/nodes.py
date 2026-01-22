@@ -46,7 +46,7 @@ def run_expert_node(state: RecommendationState, executor: Any):
                 "messages": [
                     (
                         "user",
-                        EXPERT_USER_PROMPT.format(task_type=task_type, user_task=user_task, task_description=task_description),
+                        EXPERT_USER_PROMPT.format(task_type=task_type.value, user_task=user_task, task_description=task_description),
                     )
                 ]
             }
