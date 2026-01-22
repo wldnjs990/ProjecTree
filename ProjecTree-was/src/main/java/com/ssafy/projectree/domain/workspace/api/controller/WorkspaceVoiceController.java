@@ -1,47 +1,49 @@
 package com.ssafy.projectree.domain.workspace.api.controller;
 
+import com.ssafy.projectree.domain.workspace.api.dto.VoiceTokenCreateDto;
+import com.ssafy.projectree.global.api.code.ErrorCode;
+import com.ssafy.projectree.global.api.code.SuccessCode;
+import com.ssafy.projectree.global.api.response.CommonResponse;
+import com.ssafy.projectree.global.exception.CustomException;
 import io.livekit.server.AccessToken;
 import io.livekit.server.RoomJoin;
 import io.livekit.server.RoomName;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 
 @Slf4j
 @RestController
 public class WorkspaceVoiceController {
 
-    //TODO: 키 관리 필요
-//    @Value("${livekit.api.key}")
-    private String LIVEKIT_API_KEY = "devkey";
+    @Value("${livekit.api.key}")
+    private String LIVEKIT_API_KEY;
 
-//    @Value("${livekit.api.secret}")
-    private String LIVEKIT_API_SECRET = "this_is_my_very_long_secret_key_32chars";
+    @Value("${livekit.api.secret}")
+    private String LIVEKIT_API_SECRET;
 
     /**
      * @param params JSON object with roomName and participantName
      * @return JSON object with the JWT token
      */
     @PostMapping("/token")
-    public ResponseEntity<Map<String, String>> createToken(@RequestBody Map<String, String> params) {
-        String roomName = params.get("roomName");
-        String participantName = params.get("participantName");
+    public CommonResponse<VoiceTokenCreateDto.Response> createToken(@RequestBody VoiceTokenCreateDto.Request params) {
 
-        if (roomName == null || participantName == null) {
-            return ResponseEntity.badRequest().body(Map.of("errorMessage", "roomName and participantName are required"));
+        if (params.getRoomName() == null || params.getParticipantName() == null) {
+            throw new CustomException(ErrorCode.WORKSPACE_VOICE_TOKEN_INVALID_REQUEST);
         }
 
         AccessToken token = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET);
-        token.setName(participantName);
-        token.setIdentity(participantName);
-        token.addGrants(new RoomJoin(true), new RoomName(roomName));
-        log.info("join: Room: {}, name: {}", roomName, participantName);
+        token.setName(params.getParticipantName());
+        token.setIdentity(params.getParticipantName());
+        token.addGrants(new RoomJoin(true), new RoomName(params.getRoomName()));
 
-        return ResponseEntity.ok(Map.of("token", token.toJwt()));
+        VoiceTokenCreateDto.Response response = VoiceTokenCreateDto.Response.builder().token(token.toJwt()).build();
+
+        return CommonResponse.success(SuccessCode.CREATED, response);
     }
 
 }
