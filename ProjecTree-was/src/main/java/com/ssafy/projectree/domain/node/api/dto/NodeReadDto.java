@@ -5,7 +5,7 @@ import com.ssafy.projectree.domain.tech.api.dto.schemas.TechStackSchema;
 import com.ssafy.projectree.domain.node.enums.NodeStatus;
 import com.ssafy.projectree.domain.node.enums.Priority;
 import com.ssafy.projectree.domain.node.enums.TaskType;
-import com.ssafy.projectree.domain.user.api.dto.schemas.MemberSchema;
+import com.ssafy.projectree.domain.member.api.dto.schemas.MemberSchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
