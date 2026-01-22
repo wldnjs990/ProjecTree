@@ -15,21 +15,21 @@ interface TeamMember {
   role: string;
 }
 
-interface Step4TeamInviteProps {
+interface Step5TeamInviteProps {
   data: {
     teamMembers: TeamMember[];
   };
-  onChange: (updates: Partial<Step4TeamInviteProps['data']>) => void;
+  onChange: (updates: Partial<Step5TeamInviteProps['data']>) => void;
   onNext: () => void;
   onPrev: () => void;
 }
 
-export default function Step4TeamInvite({
+export default function Step5TeamInvite({
   data,
   onChange,
   // onNext,
   // onPrev,
-}: Step4TeamInviteProps) {
+}: Step5TeamInviteProps) {
   const [memberEmail, setMemberEmail] = useState('');
   const [memberRole, setMemberRole] = useState('편집자 - 편집 가능');
   const [emailError, setEmailError] = useState('');
