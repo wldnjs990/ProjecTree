@@ -10,8 +10,9 @@ class CandidateService:
     candidate_graph를 호출하여 후보 노드를 생성합니다.
     """
     
-    def __init__(self, node_repository: NodeRepository):
+    def __init__(self, node_repository: NodeRepository, candidate_repository: CandidateRepository):
         self.node_repository = node_repository
+        self.candidate_repository = candidate_repository
     
     async def generate_candidates(
         self, 
@@ -32,5 +33,5 @@ class CandidateService:
             "callbacks": [langfuse_handler]
         })
         result = result['candidates']
-        print(result)
+        self.candidate_repository.create_multiple(db, result)
         return CandidateGenerateResponse(candidates=result["candidates"])
