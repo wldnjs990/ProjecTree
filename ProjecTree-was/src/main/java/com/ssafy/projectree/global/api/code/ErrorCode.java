@@ -3,11 +3,12 @@ package com.ssafy.projectree.global.api.code;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 public enum ErrorCode {
     USER_NOT_FOUND_ERROR(DomainCode.USER, ExceptionCode.NOT_FOUND, "USER_NOT_FOUND_ERROR"),
+    WORKSPACE_VOICE_TOKEN_INVALID_REQUEST(DomainCode.WORKSPACE, ExceptionCode.INVALID,
+            "roomName and participantName are required"),
     SERVER_ERROR(DomainCode.NORMAL, ExceptionCode.INTERNAL_SERVER_ERROR, "SERVER_ERROR"),
     ;
     private DomainCode domainCode;
