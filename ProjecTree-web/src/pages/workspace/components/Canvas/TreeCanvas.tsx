@@ -24,6 +24,7 @@ import type { AvatarColor } from '@/components/custom/UserAvatar';
 import ChatButton from './ChatButton';
 import { AdvancedNode, TaskNode } from './nodes';
 import useCrdt from '../../hooks/useCrdt';
+import { MousePointer2 } from 'lucide-react';
 
 interface OnlineUser {
   id: string;
@@ -126,8 +127,8 @@ function TreeCanvasInner({
                 pointerEvents: 'none', // 클릭 방해 안 하도록
               }}
             >
-              🔵
-              <span className="absolute right-full">{clientId}</span>
+              <MousePointer2 className="text-primary" />
+              <span className="absolute left-full text-xs">{clientId}</span>
             </div>
           )
         );
