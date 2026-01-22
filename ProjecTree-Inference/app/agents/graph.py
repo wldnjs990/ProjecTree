@@ -6,7 +6,6 @@ from app.agents.nodes.fetch import (
     contributor_info_fetch,
     candidate_node_fetch,
     sibiling_node_fetch,
-    ReturnNodeValue,
 )
 from app.agents.nodes.process import (
     epic_node_process,
@@ -18,7 +17,7 @@ from app.agents.nodes.process import (
 from app.agents.nodes.creation import sub_node_info_create
 from app.agents.nodes.feedback import node_feedback, struct_feedback
 from app.agents.nodes.parser import structured_output_parser
-from app.agents.sub_agents.candidate_graph import generate_candidates
+from app.agents.sub_agents.candidates.nodes import generate_candidates
 
 from app.agents.routers import (
     route_node,
@@ -26,14 +25,14 @@ from app.agents.routers import (
     route_struct_feedback,
     loop_condition,
 )
-from app.agents.sub_agents.recommand_graph import recommend_graph
+from app.agents.sub_agents.recommend import recommend_graph
 
 # Main Graph Builder
 builder = StateGraph(PlanNodeState)
-builder.add_node("parent_node_fetch", "parent_node_fetch")
-builder.add_node("project_spec_fetch", "project_spec_fetch")
-builder.add_node("contributor_info_fetch", "contributor_info_fetch")
-builder.add_node("candidate_node_fetch", "candidate_node_fetch")
+builder.add_node("parent_node_fetch", parent_node_fetch)
+builder.add_node("project_spec_fetch", project_spec_fetch)
+builder.add_node("contributor_info_fetch", contributor_info_fetch)
+builder.add_node("candidate_node_fetch", candidate_node_fetch)
 builder.add_node("epic_node_process", epic_node_process)
 builder.add_node("story_node_process", story_node_process)
 builder.add_node("sub_node_info_create", sub_node_info_create)

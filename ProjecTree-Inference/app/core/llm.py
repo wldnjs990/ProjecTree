@@ -10,7 +10,8 @@ name="gpt-5-mini",
 temperature=0, 
 max_retries=3, 
 base_url=settings.OPENAI_BASE_URL, 
-api_key=settings.OPENAI_API_KEY
+api_key=settings.OPENAI_API_KEY,
+reasoning_effort="minimal",  # 추론 토큰 생성을 억제하여 속도 향상
 )
 
 openai_nano_llm = ChatOpenAI(model="gpt-5-nano", 
@@ -19,6 +20,5 @@ temperature=0,
 max_retries=3, 
 base_url=settings.OPENAI_BASE_URL, 
 reasoning_effort="minimal",  # 추론 토큰 생성을 억제하여 속도 향상
-verbosity="low",             # 출력의 군더더기를 줄임
 api_key=settings.OPENAI_API_KEY
 )

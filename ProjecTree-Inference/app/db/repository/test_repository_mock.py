@@ -7,7 +7,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, "../../"))
 sys.path.append(project_root)
 
-from app.repository.member_repository import member_repository
+from app.db.repository.member_repository import member_repository
 from app.db.schemas.member import MemberCreate
 
 def test_repository_mock():
