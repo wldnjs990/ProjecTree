@@ -50,6 +50,5 @@ public class NodeRepositoryImpl implements NodeRepositoryCustom {
 	public void saveRoot(Node root) {
 		em.persist(root);
 		em.persist(new NodeTree(root, root, 0));
-
 	}
 }

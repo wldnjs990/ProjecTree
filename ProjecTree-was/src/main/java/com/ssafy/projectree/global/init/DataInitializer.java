@@ -29,7 +29,7 @@ public class DataInitializer {
 		if (techVocabularyRepository.count() > 0) {
 			log.info("tech vocab already init");
 		} else {
-			techStackDataLoader.init();
+		//	techStackDataLoader.init();
 		}
 
 	}

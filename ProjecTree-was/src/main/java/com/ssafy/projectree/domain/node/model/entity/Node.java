@@ -29,7 +29,7 @@ public abstract class Node extends BaseEntity {
     @JoinColumn(name = "user_id")
     private Member member;
 
-    @Column(columnDefinition = "VARCHAR(30)")
+    @Column(columnDefinition = "VARCHAR(100)")
     private String name;
     @Column(columnDefinition = "TEXT")
     private String description;
