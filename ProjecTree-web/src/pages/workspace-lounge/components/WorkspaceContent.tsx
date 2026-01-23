@@ -211,7 +211,12 @@ export function WorkspaceContent({ filterType = "all" }: ContentProps) {
         ) : filteredWorkspaces.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredWorkspaces.map((workspace) => (
-              <ProjectCard key={workspace.id} project={workspace} />
+              <div
+                key={workspace.id}
+                onClick={() => navigate(`/workspace/${workspace.id}`)}
+              >
+                <ProjectCard project={workspace} />
+              </div>
             ))}
           </div>
         ) : (
