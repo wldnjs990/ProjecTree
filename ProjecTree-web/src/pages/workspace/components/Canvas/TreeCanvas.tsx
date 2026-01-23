@@ -10,7 +10,6 @@ import {
   type Node,
   type NodeChange,
   ReactFlowProvider,
-  useReactFlow,
   applyNodeChanges,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -24,10 +23,11 @@ import { ZoomControls } from './ZoomControls';
 import type { AvatarColor } from '@/components/custom/UserAvatar';
 import ChatButton from './ChatButton';
 import { AdvancedNode, TaskNode } from './nodes';
-import useCrdt from '../../hooks/useCrdt';
-import { MousePointer2 } from 'lucide-react';
+import { useNodesCrdt } from '../../hooks/useNodesCrdt';
+import { useCursors } from '../../hooks/useCursors';
 import { useNodes, useEdges } from '../../stores/nodeStore';
 import type { FlowNode } from '../../types/node';
+import CursorPointers from './CursorPointers';
 
 interface OnlineUser {
   id: string;
@@ -37,7 +37,6 @@ interface OnlineUser {
 }
 
 interface TreeCanvasProps {
-  roomId: string;
   initialNodes?: FlowNode[];
   onlineUsers: OnlineUser[];
   unreadMessages?: number;
@@ -54,20 +53,17 @@ const nodeTypes = {
 };
 
 function TreeCanvasInner({
-  roomId,
   initialNodes = [],
   onlineUsers,
   unreadMessages = 0,
   onChatClick,
   onNodeClick,
 }: TreeCanvasProps) {
-  const { flowToScreenPosition } = useReactFlow();
+  // 노드 CRDT 훅 (Y.js 노드 동기화)
+  const { handleNodeDragStop } = useNodesCrdt({ initialNodes });
 
-  // CRDT 훅 (Y.js + 스토어 연동)
-  const { cursors, handleMouseMove, handleNodeDragStop } = useCrdt({
-    roomId,
-    initialNodes,
-  });
+  // 커서 CRDT 훅 (Awareness 커서 동기화)
+  const { cursors, handleMouseMove } = useCursors();
 
   // Zustand 스토어에서 노드/엣지 가져오기
   const storeNodes = useNodes();
@@ -147,30 +143,7 @@ function TreeCanvasInner({
       </ReactFlow>
 
       {/* 참여자 마우스 포인터 */}
-      {[...cursors.entries()].map(([clientId, state]) => {
-        if (!state.cursor) return null;
-        const screenPos = flowToScreenPosition({
-          x: state.cursor.x,
-          y: state.cursor.y,
-        });
-        return (
-          <div
-            key={clientId}
-            style={{
-              position: 'fixed',
-              left: screenPos.x,
-              top: screenPos.y,
-              zIndex: 10,
-              transform: 'translate(-50%, -50%)',
-              transformOrigin: 'center',
-              pointerEvents: 'none',
-            }}
-          >
-            <MousePointer2 className="text-primary" />
-            <span className="absolute left-full text-xs">{clientId}</span>
-          </div>
-        );
-      })}
+      <CursorPointers cursors={cursors} />
 
       {/* Collaboration Panel - Top Left */}
       <CollabPanel users={onlineUsers} className="absolute top-6 left-6 z-10" />

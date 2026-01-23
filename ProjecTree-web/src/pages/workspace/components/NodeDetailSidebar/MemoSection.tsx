@@ -1,14 +1,17 @@
-import { useState } from "react";
-import { StickyNote, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from 'react';
+import { StickyNote, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface MemoSectionProps {
   memo?: string;
   onMemoChange?: (memo: string) => void;
 }
 
-export function MemoSection({ memo = "", onMemoChange }: MemoSectionProps) {
+export function MemoSection({ memo = '', onMemoChange }: MemoSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [localMemo, setLocalMemo] = useState(memo);
+
+  // // 사이드바 메모 작성 이벤트 따로 분리해둘게요!
+  // const {} = useCrdt()
 
   const handleMemoChange = (value: string) => {
     setLocalMemo(value);

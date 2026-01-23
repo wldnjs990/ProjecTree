@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header, type ViewTab } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { TreeCanvas } from './components/Canvas';
@@ -14,11 +14,25 @@ import {
 import { FeatureSpecView } from './components/FeatureSpec';
 import { TechStackStatusView } from './components/TechStackStatus';
 import type { FlowNode } from './types/node';
+import { initCrdtClient, destroyCrdtClient } from './crdt/crdtClient';
+import { useConnectionStatus } from './stores/nodeStore';
 
 // 임시 Room ID (나중에 워크스페이스 ID로 대체)
 const ROOM_ID = 'workspace-1';
 
 export default function WorkSpacePage() {
+  // CRDT 연결 상태
+  const connectionStatus = useConnectionStatus();
+
+  // CRDT 클라이언트 초기화
+  useEffect(() => {
+    initCrdtClient(ROOM_ID);
+
+    return () => {
+      destroyCrdtClient();
+    };
+  }, []);
+
   // Header state
   const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');
 
@@ -95,7 +109,7 @@ export default function WorkSpacePage() {
       />
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Sidebar */}
         <Sidebar
           nodeTypeFilter={nodeTypeFilter}
@@ -105,17 +119,21 @@ export default function WorkSpacePage() {
         />
 
         {/* Canvas */}
-        <main className="flex-1 overflow-hidden">
-          {activeTab === 'tree-editor' && (
-            <TreeCanvas
-              roomId={ROOM_ID}
-              initialNodes={mockNodes as FlowNode[]}
-              onlineUsers={mockUsers}
-              unreadMessages={2}
-              onChatClick={handleChatClick}
-              onNodeClick={handleNodeClick}
-            />
-          )}
+        <main className="flex-1 min-h-0 overflow-hidden">
+          {activeTab === 'tree-editor' &&
+            (connectionStatus === 'connected' ? (
+              <TreeCanvas
+                initialNodes={mockNodes as FlowNode[]}
+                onlineUsers={mockUsers}
+                unreadMessages={2}
+                onChatClick={handleChatClick}
+                onNodeClick={handleNodeClick}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                CRDT 서버 연결 중...
+              </div>
+            ))}
 
           {activeTab === 'feature-spec' && (
             <FeatureSpecView onNodeClick={handleNodeClick} />
