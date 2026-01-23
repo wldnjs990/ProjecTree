@@ -24,7 +24,7 @@ export default function WorkspaceOnboardingPage() {
     subject: '',
     startDate: null as Date | null,
     endDate: null as Date | null,
-    specFile: null as File | null,
+    specFiles: [] as File[],
     techStacks: [] as string[],
     epics: [] as Array<{ id: string; name: string; description: string }>,
     teamMembers: [] as Array<{ email: string; role: string }>,
