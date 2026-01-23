@@ -46,10 +46,10 @@ public abstract class Node extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(50)")
     private String identifier;
 
-    @Column(name = "x_pos", columnDefinition = "double default 0.0")
+    @Column(name = "x_pos")
     private Double xPos;
 
-    @Column(name = "y_pos", columnDefinition = "double default 0.0")
+    @Column(name = "y_pos")
     private Double yPos;
 
     public abstract NodeType getNodeType();
