@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { workspaces as mockWorkspaces } from '../pages/workspaceLounge/data/mockData';
+import { workspaces as mockWorkspaces } from '../pages/workspace-lounge/data/mockData';
 
 /**
  * [MSW] API 모킹 핸들러 정의
