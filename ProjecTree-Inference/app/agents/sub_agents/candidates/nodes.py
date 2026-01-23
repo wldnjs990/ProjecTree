@@ -141,8 +141,13 @@ def validate_candidates(state: CandidateNodeState) -> CandidateNodeState:
         CANDIDATE_VALIDATION_USER_PROMPT
     )
     
-    candidates = state.get("candidates", {})
-    candidate_list = candidates.get("candidates", []) if candidates else []
+    candidates_obj = state.get("candidates", {})
+    # LangGraph State serialization results in a dict, so we handle both dict and object cases
+    if isinstance(candidates_obj, dict):
+        candidate_list = candidates_obj.get("candidates", [])
+    else:
+        candidate_list = candidates_obj.candidates if candidates_obj else []
+
     node_type = state.get("current_node_type", "")
     node_name = state.get("current_node_name", "")
     node_description = state.get("current_node_description", "")
@@ -166,12 +171,20 @@ def validate_candidates(state: CandidateNodeState) -> CandidateNodeState:
             f"[규칙] 후보 개수가 부족합니다. 요청: {expected_count}개, 생성: {len(candidate_list)}개."
         )
     
+    # Helper for safe access
+    def _get(item, field_name):
+        if isinstance(item, dict):
+            return item.get(field_name)
+        return getattr(item, field_name, None)
+
     # 2. 빈 이름/설명 검증
     empty_items = []
     for i, cand in enumerate(candidate_list):
-        if not cand.get("name") or not cand.get("name").strip():
+        name = _get(cand, "name")
+        desc = _get(cand, "description")
+        if not name or not name.strip():
             empty_items.append(f"후보 {i+1}: 이름 누락")
-        if not cand.get("description") or not cand.get("description").strip():
+        if not desc or not desc.strip():
             empty_items.append(f"후보 {i+1}: 설명 누락")
     
     if empty_items:
@@ -179,8 +192,8 @@ def validate_candidates(state: CandidateNodeState) -> CandidateNodeState:
     
     # 3. STORY->TASK의 경우 [FE]/[BE] 접두사 검증
     if node_type == NodeType.STORY and candidate_list:
-        fe_count = sum(1 for c in candidate_list if c.get("name", "").startswith("[FE]"))
-        be_count = sum(1 for c in candidate_list if c.get("name", "").startswith("[BE]"))
+        fe_count = sum(1 for c in candidate_list if (_get(c, "name") or "").startswith("[FE]"))
+        be_count = sum(1 for c in candidate_list if (_get(c, "name") or "").startswith("[BE]"))
         
         if fe_count < candidate_count:
             feedback_parts.append(f"[규칙] [FE] 태스크 부족: {fe_count}/{candidate_count}개")
@@ -188,7 +201,7 @@ def validate_candidates(state: CandidateNodeState) -> CandidateNodeState:
             feedback_parts.append(f"[규칙] [BE] 태스크 부족: {be_count}/{candidate_count}개")
     
     # 4. 중복 이름 검증
-    names = [c.get("name", "") for c in candidate_list]
+    names = [_get(c, "name") for c in candidate_list]
     duplicates = set([name for name in names if names.count(name) > 1])
     if duplicates:
         feedback_parts.append(f"[규칙] 중복된 이름: {', '.join(duplicates)}")
@@ -221,7 +234,7 @@ def validate_candidates(state: CandidateNodeState) -> CandidateNodeState:
     try:
         # 후보 목록을 문자열로 변환
         candidates_str = "\n".join([
-            f"- {c.get('name', '')}: {c.get('description', '')}"
+            f"- {_get(c, 'name')}: {_get(c, 'description')}"
             for c in candidate_list
         ])
         

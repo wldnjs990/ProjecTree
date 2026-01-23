@@ -12,3 +12,4 @@ class RecommendationState(GlobalState):
     tech_list: TechList
     retry_count: int  # 재시도 횟수
     last_error: Optional[str]  # 마지막 에러 메시지
+    feedback: Optional[str]  # 검증 피드백

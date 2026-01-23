@@ -15,13 +15,17 @@ from app.db.repository.candidate_repository import (
     CandidateRepository,
     candidate_repository,
 )
-from app.db.repository.tech_stack_repository import (
-    TechStackRepository,
-    tech_stack_repository,
+from app.db.repository.tech_repository import (
+    TechVocabularyRepository,
+    tech_vocabulary_repository,
 )
 from app.db.repository.tech_stack_info_repository import (
     TechStackInfoRepository,
     tech_stack_info_repository,
+)
+from app.db.repository.node_tech_stack_repository import (
+    NodeTechStackRepository,
+    node_tech_stack_repository,
 )
 from app.services.candidate_service import CandidateService
 from app.services.recommendation_service import RecommendationService
@@ -59,14 +63,19 @@ def get_candidate_repository() -> CandidateRepository:
     return candidate_repository
 
 
-def get_tech_stack_repository() -> TechStackRepository:
-    """TechStackRepository 인스턴스 제공"""
-    return tech_stack_repository
+def get_tech_vocabulary_repository() -> TechVocabularyRepository:
+    """TechVocabularyRepository 인스턴스 제공"""
+    return tech_vocabulary_repository
 
 
 def get_tech_stack_info_repository() -> TechStackInfoRepository:
     """TechStackInfoRepository 인스턴스 제공"""
     return tech_stack_info_repository
+
+
+def get_node_tech_stack_repository() -> NodeTechStackRepository:
+    """NodeTechStackRepository 인스턴스 제공"""
+    return node_tech_stack_repository
 
 
 # ==================== Service Dependencies ====================
@@ -85,8 +94,9 @@ def get_recommendation_service() -> RecommendationService:
     """RecommendationService 싱글톤 인스턴스 제공"""
     return RecommendationService(
         node_repository=node_repository,
-        tech_stack_repository=tech_stack_repository,
+        tech_vocabulary_repository=tech_vocabulary_repository,
         tech_stack_info_repository=tech_stack_info_repository,
+        node_tech_stack_repository=node_tech_stack_repository,
     )
 
 

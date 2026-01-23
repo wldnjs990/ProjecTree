@@ -11,6 +11,7 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     Table,
     Enum,
+    Identity,
 )
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
@@ -18,7 +19,7 @@ from sqlalchemy.sql import func
 import uuid
 
 from app.db.base_class import Base, TimestampMixin
-from app.agents.enums import NodeType
+from app.agents.enums import NodeType, TaskType
 
 # ----------------------------------------------------------------------
 # Enums
@@ -174,7 +175,7 @@ class FunctionSpecification(Base, TimestampMixin):
 class TechVocabulary(Base, TimestampMixin):
     __tablename__ = "tech_vocabulary"
 
-    id = Column(BigInteger, primary_key=True, index=True)
+    id = Column(BigInteger, Identity(), primary_key=True, index=True)
     name = Column(String(100), nullable=False, unique=True)
 
     # Relationships
@@ -190,11 +191,12 @@ class TechVocabulary(Base, TimestampMixin):
 class TechStackInfo(Base, TimestampMixin):
     __tablename__ = "tech_stack_info"
 
-    id = Column(BigInteger, primary_key=True, index=True)
+    id = Column(BigInteger, Identity(), primary_key=True, index=True)
     is_selected = Column(Boolean, nullable=False)
     recommendation = Column(Integer, nullable=False)
     advantage = Column(Text)
     description = Column(Text)
+    ref = Column(Text)
     disadvantage = Column(Text)
 
     # Relationships
@@ -206,7 +208,7 @@ class TechStackInfo(Base, TimestampMixin):
 class WorkspaceTechStack(Base, TimestampMixin):
     __tablename__ = "workspace_tech_stack"
 
-    id = Column(BigInteger, primary_key=True, index=True)
+    id = Column(BigInteger, Identity(), primary_key=True, index=True)
     tech_vocab_id = Column(
         BigInteger, ForeignKey("tech_vocabulary.id"), nullable=False, unique=True
     )
@@ -222,10 +224,10 @@ class WorkspaceTechStack(Base, TimestampMixin):
 class NodeTechStack(Base, TimestampMixin):
     __tablename__ = "node_tech_stack"
 
-    id = Column(BigInteger, primary_key=True, index=True)
+    id = Column(BigInteger, Identity(), primary_key=True, index=True)
     is_recommended = Column(Boolean, nullable=False)
     node_id = Column(BigInteger, ForeignKey("node.id"))
-    tech_vocab_id = Column(BigInteger, ForeignKey("tech_vocabulary.id"), unique=True)
+    tech_vocab_id = Column(BigInteger, ForeignKey("tech_vocabulary.id"))
     tech_stack_info_id = Column(
         BigInteger, ForeignKey("tech_stack_info.id"), unique=True
     )
@@ -261,10 +263,7 @@ class Node(Base, TimestampMixin):
     owner = relationship("Member", back_populates="nodes")
     tech_stacks = relationship(
         "NodeTechStack", back_populates="node"
-    )  # Assuming one-to-many or many-to-one? Schema says node_tech_stack has node_id
-
-    # Self-referential Many-to-Many for Tree Structure
-    # node_tree table: ancestor_id, descendant_id
+    )  
     ancestors = relationship(
         "Node",
         secondary="node_tree",
@@ -331,13 +330,17 @@ class StoryNode(Node):
     }
 
 
+from app.agents.enums import NodeType, TaskType
+
+# ... (omitted code) ...
+
 class TaskNode(Node):
     __tablename__ = "task_node"
 
     node_id = Column(BigInteger, ForeignKey("node.id"), primary_key=True)
     difficult = Column(Integer)
     comparison = Column(Text)
-    type = Column(String(255))  # BE, FE
+    type = Column(Enum(TaskType, values_callable=lambda x: [e.value for e in x], native_enum=False), nullable=True)  # BE, FE
 
     __mapper_args__ = {
         "polymorphic_identity": NodeType.TASK,

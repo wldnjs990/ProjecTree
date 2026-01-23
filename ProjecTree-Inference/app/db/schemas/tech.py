@@ -40,3 +40,27 @@ class TechStackInfoUpdate(BaseSchema):
 
 class TechStackInfoResponse(TechStackInfoBase, TimestampSchema):
     id: int
+
+
+class NodeTechStackBase(BaseSchema):
+    is_recommended: bool
+    node_id: Optional[int] = None
+    tech_vocab_id: Optional[int] = None
+    tech_stack_info_id: Optional[int] = None
+
+
+class NodeTechStackCreate(NodeTechStackBase):
+    node_id: int
+    tech_vocab_id: int
+    tech_stack_info_id: int
+
+
+class NodeTechStackUpdate(BaseSchema):
+    is_recommended: Optional[bool] = None
+    node_id: Optional[int] = None
+    tech_vocab_id: Optional[int] = None
+    tech_stack_info_id: Optional[int] = None
+
+
+class NodeTechStackResponse(NodeTechStackBase, TimestampSchema):
+    id: int

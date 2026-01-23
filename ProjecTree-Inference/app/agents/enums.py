@@ -12,9 +12,9 @@ class NodeType(str, Enum):
 
 class TaskType(str, Enum):
     """Task 타입 정의"""
-    FRONTEND = "FrontEnd"
-    BACKEND = "BackEnd"
-    ADVANCE = "Advance"
+    FRONTEND = "FE"
+    BACKEND = "BE"
+    ADVANCE = "ADVANCE"
 
 # 계층 구조 매핑: 부모 타입 -> 자식 타입
 NODE_HIERARCHY = {
