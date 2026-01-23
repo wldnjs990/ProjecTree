@@ -25,7 +25,7 @@ public class FileController {
         return CommonResponse.success(SuccessCode.SUCCESS, fileService.upload(multipartFiles));
     }
 
-    @GetMapping("/workspace/{id}")
+    @GetMapping("/workspaces/{id}")
     public CommonResponse<List<FileReadDto.Response>> read(@PathVariable Long id) {
         return CommonResponse.success(SuccessCode.SUCCESS, fileService.read(id));
     }
