@@ -17,7 +17,7 @@ interface Step3ScheduleProps {
     subject: string;
     startDate: Date | null;
     endDate: Date | null;
-    specFile: File | null;
+    specFiles: File[];
   };
   onChange: (updates: Partial<Step3ScheduleProps['data']>) => void;
   onNext: () => void;
@@ -33,21 +33,15 @@ export default function Step3Schedule({
   const [isDragging, setIsDragging] = useState(false);
   const [fileError, setFileError] = useState<string>('');
 
-  // 허용된 파일 형식
-  const ALLOWED_FILE_TYPES = [
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'text/markdown',
-    'text/plain',
-  ];
+  // PDF만 허용
+  const ALLOWED_FILE_TYPES = ['application/pdf'];
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
   // 파일 검증 함수
   const validateFile = (file: File): string | null => {
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      return '지원하지 않는 파일 형식입니다. PDF, DOC, DOCX, MD, TXT 파일만 업로드 가능합니다.';
+      return '지원하지 않는 파일 형식입니다. PDF 파일만 업로드 가능합니다.';
     }
     if (file.size > MAX_FILE_SIZE) {
       return '파일 크기는 10MB 이하여야 합니다.';
@@ -55,22 +49,35 @@ export default function Step3Schedule({
     return null;
   };
 
-  // 파일 처리 함수
-  const handleFile = (file: File) => {
-    const error = validateFile(file);
-    if (error) {
-      setFileError(error);
+  // 파일 처리 함수 (다중 파일 지원)
+  const handleFiles = (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    const validFiles: File[] = [];
+    let errorMsg = '';
+
+    for (const file of fileArray) {
+      const error = validateFile(file);
+      if (error) {
+        errorMsg = error;
+        break;
+      }
+      validFiles.push(file);
+    }
+
+    if (errorMsg) {
+      setFileError(errorMsg);
       return;
     }
+
     setFileError('');
-    onChange({ specFile: file });
+    onChange({ specFiles: [...data.specFiles, ...validFiles] });
   };
 
   // 파일 선택 핸들러
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFile(file);
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      handleFiles(files);
     }
   };
 
@@ -88,15 +95,16 @@ export default function Step3Schedule({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      handleFile(file);
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleFiles(files);
     }
   };
 
-  // 파일 삭제 핸들러
-  const handleRemoveFile = () => {
-    onChange({ specFile: null });
+  // 개별 파일 삭제 핸들러
+  const handleRemoveFile = (index: number) => {
+    const newFiles = data.specFiles.filter((_, i) => i !== index);
+    onChange({ specFiles: newFiles });
     setFileError('');
   };
   return (
@@ -203,148 +211,152 @@ export default function Step3Schedule({
             }}
           ></p>
 
-          {/* 파일이 업로드되지 않은 경우 */}
-          {!data.specFile && (
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              style={{
-                border: isDragging
-                  ? '2px dashed var(--figma-primary-blue)'
-                  : '2px dashed var(--figma-border-mercury)',
-                borderRadius: '8px',
-                padding: '32px',
-                textAlign: 'center',
-                background: isDragging
-                  ? 'rgba(59, 130, 246, 0.05)'
-                  : 'rgba(255, 255, 255, 0.002)',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <div className="flex flex-col items-center gap-3">
-                <Upload
-                  className="h-10 w-10"
-                  style={{ color: 'var(--figma-text-emperor)' }}
-                />
-                <p
-                  style={{
-                    fontFamily: 'Roboto',
-                    fontWeight: 100,
-                    fontSize: '14px',
-                    color: 'var(--figma-text-cod-gray)',
-                  }}
-                >
-                  Drag & drop files here
-                </p>
-                <p
-                  style={{
-                    fontFamily: 'Roboto',
-                    fontWeight: 100,
-                    fontSize: '12px',
-                    color: 'var(--figma-text-dove-gray)',
-                  }}
-                >
-                  Allowed types: image/png, image/jpeg, application/pdf
-                </p>
-                <label>
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    accept=".pdf,.doc,.docx,.md,.txt"
-                    style={{ display: 'none' }}
-                  />
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      const input = document.querySelector(
-                        'input[type="file"]'
-                      ) as HTMLInputElement;
-                      input?.click();
-                    }}
-                    style={{
-                      fontFamily: 'Roboto',
-                      fontWeight: 100,
-                      fontSize: '13.2px',
-                      padding: '8px 16px',
-                      background: 'var(--figma-text-cod-gray)',
-                      color: 'var(--figma-white)',
-                      borderRadius: '6px',
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    파일 업로드
-                  </Button>
-                </label>
-              </div>
-            </div>
-          )}
-
-          {/* 파일이 업로드된 경우 */}
-          {data.specFile && (
-            <div
-              style={{
-                border: '1px solid var(--figma-border-mercury)',
-                borderRadius: '8px',
-                padding: '12px 16px',
-                background: 'rgba(255, 255, 255, 0.002)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '6px',
-                    background: 'var(--figma-gray-concrete)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Upload className="h-5 w-5" style={{ color: '#666' }} />
-                </div>
-                <div>
-                  <p
-                    style={{
-                      fontFamily: 'Roboto',
-                      fontWeight: 100,
-                      fontSize: '14px',
-                      color: 'var(--figma-text-cod-gray)',
-                    }}
-                  >
-                    {data.specFile.name}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: 'Roboto',
-                      fontWeight: 100,
-                      fontSize: '12px',
-                      color: 'var(--figma-text-dove-gray)',
-                    }}
-                  >
-                    {(data.specFile.size / 1024).toFixed(2)} KB
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={handleRemoveFile}
+          {/* 파일 업로드 영역 (항상 표시) */}
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            style={{
+              border: isDragging
+                ? '2px dashed var(--figma-primary-blue)'
+                : '2px dashed var(--figma-border-mercury)',
+              borderRadius: '8px',
+              padding: '32px',
+              textAlign: 'center',
+              background: isDragging
+                ? 'rgba(59, 130, 246, 0.05)'
+                : 'rgba(255, 255, 255, 0.002)',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <div className="flex flex-col items-center gap-3">
+              <Upload
+                className="h-10 w-10"
+                style={{ color: 'var(--figma-text-emperor)' }}
+              />
+              <p
                 style={{
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px',
+                  fontFamily: 'Roboto',
+                  fontWeight: 100,
+                  fontSize: '14px',
+                  color: 'var(--figma-text-cod-gray)',
                 }}
               >
-                <X
-                  className="h-5 w-5"
-                  style={{ color: 'var(--figma-text-emperor)' }}
+                Drag & drop PDF files here
+              </p>
+              <p
+                style={{
+                  fontFamily: 'Roboto',
+                  fontWeight: 100,
+                  fontSize: '12px',
+                  color: 'var(--figma-text-dove-gray)',
+                }}
+              >
+                Allowed types: application/pdf (최대 10MB)
+              </p>
+              <label>
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  accept=".pdf"
+                  multiple
+                  style={{ display: 'none' }}
                 />
-              </button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    const input = document.querySelector(
+                      'input[type="file"]'
+                    ) as HTMLInputElement;
+                    input?.click();
+                  }}
+                  style={{
+                    fontFamily: 'Roboto',
+                    fontWeight: 100,
+                    fontSize: '13.2px',
+                    padding: '8px 16px',
+                    background: 'var(--figma-text-cod-gray)',
+                    color: 'var(--figma-white)',
+                    borderRadius: '6px',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  파일 업로드
+                </Button>
+              </label>
+            </div>
+          </div>
+
+          {/* 업로드된 파일 목록 */}
+          {data.specFiles.length > 0 && (
+            <div className="flex flex-col gap-2 mt-3">
+              {data.specFiles.map((file, index) => (
+                <div
+                  key={`${file.name}-${index}`}
+                  style={{
+                    border: '1px solid var(--figma-border-mercury)',
+                    borderRadius: '8px',
+                    padding: '12px 16px',
+                    background: 'rgba(255, 255, 255, 0.002)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '6px',
+                        background: 'var(--figma-gray-concrete)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Upload className="h-5 w-5" style={{ color: '#666' }} />
+                    </div>
+                    <div>
+                      <p
+                        style={{
+                          fontFamily: 'Roboto',
+                          fontWeight: 100,
+                          fontSize: '14px',
+                          color: 'var(--figma-text-cod-gray)',
+                        }}
+                      >
+                        {file.name}
+                      </p>
+                      <p
+                        style={{
+                          fontFamily: 'Roboto',
+                          fontWeight: 100,
+                          fontSize: '12px',
+                          color: 'var(--figma-text-dove-gray)',
+                        }}
+                      >
+                        {(file.size / 1024).toFixed(2)} KB
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveFile(index)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px',
+                    }}
+                  >
+                    <X
+                      className="h-5 w-5"
+                      style={{ color: 'var(--figma-text-emperor)' }}
+                    />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
 
