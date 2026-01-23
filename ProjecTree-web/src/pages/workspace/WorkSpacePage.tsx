@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Header, type ViewTab } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { TreeCanvas } from './components/Canvas';
@@ -16,6 +17,8 @@ import { FeatureSpecView } from './components/FeatureSpec';
 import { TechStackStatusView } from './components/TechStackStatus';
 
 export default function WorkSpacePage() {
+  const { workspaceId } = useParams<{ workspaceId: string }>();
+
   // Header state
   const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');
 

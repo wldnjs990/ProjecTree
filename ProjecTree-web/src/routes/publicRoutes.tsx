@@ -3,7 +3,7 @@ import WorkspaceOnboardingPage from '@/pages/workspace-onboarding/WorkspaceOnboa
 import UserOnboardingPage from '@/pages/user-onboarding/UserOnboardingPage';
 import LoginPage from '@/pages/LoginPage';
 import WorkSpacePage from '@/pages/workspace/WorkSpacePage';
-import WorkspaceLoungePage from '@/pages/workspaceLounge/WorkspaceLoungePage';
+import WorkspaceLoungePage from '@/pages/workspace-lounge/WorkspaceLoungePage';
 import type { RouteObject } from 'react-router';
 
 export const publicRoutes: RouteObject[] = [
@@ -13,11 +13,11 @@ export const publicRoutes: RouteObject[] = [
     loader: async () => {},
   },
   {
-    path: '/workspaceLounge',
+    path: '/workspace-lounge',
     element: <WorkspaceLoungePage />,
   },
   {
-    path: '/workspace',
+    path: '/workspace/:workspaceId',
     element: <WorkSpacePage />,
   },
   {
