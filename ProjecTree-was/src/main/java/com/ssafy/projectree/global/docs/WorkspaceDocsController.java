@@ -4,6 +4,8 @@ import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/workspaces")
+@RequestMapping("/workspaces")
 @Tag(name = "Workspace", description = "워크 스페이스 관련 API")
 public interface WorkspaceDocsController {
 
@@ -28,7 +30,39 @@ public interface WorkspaceDocsController {
             @ApiResponse(
                     responseCode = "200",
                     description = "Successfully Completed",
-                    content = @Content
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = WorkspaceDto.Response.class),
+                            examples = @ExampleObject(
+                                    name = "(워크 스페이스 라운지 내) 워크 스페이스 조회 API 응답 예시",
+                                    value = """
+                                            {
+                                              "workspaceId": 1,
+                                              "name": "프로젝트A",
+                                              "description": "설명...",
+                                              "totalNodes": 45,
+                                              "totalCompletedNodes": 22,
+                                              "totalMembers": 5,
+                                              "role": "OWNER",
+                                              "progress": {
+                                                "p0": {
+                                                  "total": 10,
+                                                  "completed": 7
+                                                },
+                                                "p1": {
+                                                  "total": 15,
+                                                  "completed": 10
+                                                },
+                                                "p2": {
+                                                  "total": 20,
+                                                  "completed": 5
+                                                }
+                                              },
+                                              "updatedAt": "2024-01-22T16:30:00"
+                                            }
+                                            """
+                            )
+                    )
             )
     })
     @GetMapping("/{id}/my")

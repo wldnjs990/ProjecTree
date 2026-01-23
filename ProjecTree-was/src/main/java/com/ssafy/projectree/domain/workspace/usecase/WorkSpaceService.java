@@ -18,6 +18,8 @@ import java.util.List;
 public class WorkspaceService {
 
     private final TeamService teamService;
+    // TODO: 노드별 progress 파악을 위해 추후에 필요.
+//    private final NodeService nodeService;
     private final WorkspaceRepository workspaceRepository;
 
     public List<WorkspaceDto.Response> read() {

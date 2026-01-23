@@ -15,11 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @Slf4j
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/workspaces")
 public class WorkspaceController implements WorkspaceDocsController {
 
     private final WorkspaceService workspaceService;
 
+    @Override
     public CommonResponse<List<WorkspaceDto.Response>> getMyWorkspaces(Long id) {
 
         return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.read());
