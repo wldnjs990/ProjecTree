@@ -10,21 +10,21 @@ interface Epic {
   description: string;
 }
 
-interface Step5EpicSetupProps {
+interface Step6EpicSetupProps {
   data: {
     epics: Epic[];
   };
-  onChange: (updates: Partial<Step5EpicSetupProps['data']>) => void;
+  onChange: (updates: Partial<Step6EpicSetupProps['data']>) => void;
   onNext: () => void;
   onPrev: () => void;
 }
 
-export default function Step5EpicSetup({
+export default function Step6EpicSetup({
   data,
   onChange,
   // onNext,
   // onPrev,
-}: Step5EpicSetupProps) {
+}: Step6EpicSetupProps) {
   const [epicName, setEpicName] = useState('');
   const [epicDescription, setEpicDescription] = useState('');
 
