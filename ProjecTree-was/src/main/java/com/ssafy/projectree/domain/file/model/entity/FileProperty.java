@@ -1,11 +1,8 @@
 package com.ssafy.projectree.domain.file.model.entity;
 
+import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.global.model.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @SuperBuilder
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class FileProperty extends BaseEntity {
+public class FileProperty extends BaseEntity {
 
 	@Id
 	@GeneratedValue
@@ -33,5 +30,9 @@ public abstract class FileProperty extends BaseEntity {
 	private Long uploaderId;
 	private long size;
 
-	public abstract void clear();
+	@ManyToOne
+	@JoinColumn(name = "workspace_id", nullable = false)
+	private Workspace workspace;
+
+	public void clear() {};
 }
