@@ -35,27 +35,10 @@ export default function Step2ProjectType({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '18.8px',
-            lineHeight: '28px',
-            letterSpacing: '-0.5px',
-            color: 'var(--figma-text-cod-gray)',
-          }}
-        >
+        <h2 className="font-['Roboto'] font-thin text-[18.8px] leading-7 tracking-[-0.5px] text-[var(--figma-text-cod-gray)]">
           프로젝트 유형 설정
         </h2>
-        <p
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.3px',
-            lineHeight: '20px',
-            color: 'var(--figma-text-emperor)',
-          }}
-        >
+        <p className="font-['Roboto'] font-thin text-[13.3px] leading-5 text-[var(--figma-text-emperor)]">
           도메인, 목적, 서비스 유형을 선택하세요
         </p>
       </div>
@@ -67,25 +50,11 @@ export default function Step2ProjectType({
           <div className="flex items-center gap-2">
             <Label
               htmlFor="domain"
-              style={{
-                fontFamily: 'Roboto',
-                fontWeight: 100,
-                fontSize: '13.1px',
-                lineHeight: '14px',
-                color: 'var(--figma-text-cod-gray)',
-              }}
+              className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]"
             >
               도메인
             </Label>
-            <span
-              style={{
-                fontFamily: 'Inter',
-                fontWeight: 500,
-                fontSize: '14px',
-                lineHeight: '20px',
-                color: 'var(--figma-required-crimson)',
-              }}
-            >
+            <span className="font-['Inter'] font-medium text-[14px] leading-5 text-[var(--figma-required-crimson)]">
               *
             </span>
           </div>
@@ -103,18 +72,7 @@ export default function Step2ProjectType({
           >
             <SelectTrigger
               id="domain"
-              style={{
-                fontFamily: 'Roboto',
-                fontWeight: 100,
-                fontSize: '14px',
-                lineHeight: '16px',
-                height: '36px',
-                padding: '8.25px 12px',
-                background: 'rgba(255, 255, 255, 0.002)',
-                border: '1px solid var(--figma-border-mercury-alt)',
-                boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-                borderRadius: '8px',
-              }}
+              className="font-['Roboto'] font-thin text-[14px] leading-4 h-9 px-3 py-[8.25px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury-alt)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-lg"
             >
               <SelectValue placeholder="도메인을 선택하세요" />
             </SelectTrigger>
@@ -139,18 +97,7 @@ export default function Step2ProjectType({
                   onChange({ domain: value || '기타' });
                 }}
                 maxLength={10}
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '14px',
-                  lineHeight: '16px',
-                  height: '36px',
-                  padding: '8.25px 12px',
-                  background: 'rgba(255, 255, 255, 0.002)',
-                  border: '1px solid var(--figma-border-mercury-alt)',
-                  boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-                  borderRadius: '8px',
-                }}
+                className="font-['Roboto'] font-thin text-[14px] leading-4 h-9 px-3 py-[8.25px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury-alt)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-lg"
               />
               <div className="flex justify-end">
                 <span
@@ -189,29 +136,10 @@ export default function Step2ProjectType({
             value={data.purpose}
             onChange={(e) => onChange({ purpose: e.target.value })}
             maxLength={20}
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '14px',
-              lineHeight: '16px',
-              height: '44px',
-              padding: '12.5px 12px',
-              background: 'rgba(255, 255, 255, 0.002)',
-              border: '1px solid var(--figma-border-mercury)',
-              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-              borderRadius: '6px',
-            }}
+            className="font-['Roboto'] font-thin text-[14px] leading-4 h-[44px] px-3 py-[12.5px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
           />
           <div className="flex justify-end">
-            <span
-              style={{
-                fontFamily: 'Inter',
-                fontWeight: 400,
-                fontSize: '12px',
-                lineHeight: '16px',
-                color: 'var(--figma-text-dove-gray)',
-              }}
-            >
+            <span className="font-['Inter'] font-normal text-[12px] leading-4 text-[var(--figma-text-dove-gray)]">
               {data.purpose.length}/20
             </span>
           </div>
@@ -219,15 +147,7 @@ export default function Step2ProjectType({
 
         {/* 서비스 유형 */}
         <div className="flex flex-col gap-3">
-          <Label
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '13.2px',
-              lineHeight: '14px',
-              color: 'var(--figma-text-cod-gray)',
-            }}
-          >
+          <Label className="font-['Roboto'] font-thin text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]">
             서비스 유형
           </Label>
           <div className="flex gap-4">
@@ -239,22 +159,11 @@ export default function Step2ProjectType({
                 name="serviceType"
                 checked={data.serviceType === 'web'}
                 onChange={(e) => onChange({ serviceType: e.target.value })}
-                style={{
-                  width: '16px',
-                  height: '16px',
-                  cursor: 'pointer',
-                }}
+                className="w-4 h-4 cursor-pointer"
               />
               <Label
                 htmlFor="web"
-                className="cursor-pointer"
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '13.2px',
-                  lineHeight: '14px',
-                  color: 'var(--figma-text-cod-gray)',
-                }}
+                className="cursor-pointer font-['Roboto'] font-thin text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
               >
                 Web
               </Label>
@@ -267,22 +176,11 @@ export default function Step2ProjectType({
                 name="serviceType"
                 checked={data.serviceType === 'mobile'}
                 onChange={(e) => onChange({ serviceType: e.target.value })}
-                style={{
-                  width: '16px',
-                  height: '16px',
-                  cursor: 'pointer',
-                }}
+                className="w-4 h-4 cursor-pointer"
               />
               <Label
                 htmlFor="mobile"
-                className="cursor-pointer"
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '13.2px',
-                  lineHeight: '14px',
-                  color: 'var(--figma-text-cod-gray)',
-                }}
+                className="cursor-pointer font-['Roboto'] font-thin text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
               >
                 Mobile App
               </Label>
@@ -295,22 +193,11 @@ export default function Step2ProjectType({
                 name="serviceType"
                 checked={data.serviceType === 'desktop'}
                 onChange={(e) => onChange({ serviceType: e.target.value })}
-                style={{
-                  width: '16px',
-                  height: '16px',
-                  cursor: 'pointer',
-                }}
+                className="w-4 h-4 cursor-pointer"
               />
               <Label
                 htmlFor="desktop"
-                className="cursor-pointer"
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '13.2px',
-                  lineHeight: '14px',
-                  color: 'var(--figma-text-cod-gray)',
-                }}
+                className="cursor-pointer font-['Roboto'] font-thin text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
               >
                 Desktop App
               </Label>
@@ -323,22 +210,11 @@ export default function Step2ProjectType({
                 name="serviceType"
                 checked={data.serviceType === 'other'}
                 onChange={(e) => onChange({ serviceType: e.target.value })}
-                style={{
-                  width: '16px',
-                  height: '16px',
-                  cursor: 'pointer',
-                }}
+                className="w-4 h-4 cursor-pointer"
               />
               <Label
                 htmlFor="serviceOther"
-                className="cursor-pointer"
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '13.2px',
-                  lineHeight: '14px',
-                  color: 'var(--figma-text-cod-gray)',
-                }}
+                className="cursor-pointer font-['Roboto'] font-thin text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
               >
                 기타
               </Label>

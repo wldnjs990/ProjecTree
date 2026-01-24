@@ -111,27 +111,10 @@ export default function Step3Schedule({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '18.8px',
-            lineHeight: '28px',
-            letterSpacing: '-0.5px',
-            color: 'var(--figma-text-cod-gray)',
-          }}
-        >
+        <h2 className="font-['Roboto'] font-thin text-[18.8px] leading-7 tracking-[-0.5px] text-[var(--figma-text-cod-gray)]">
           주제 및 일정
         </h2>
-        <p
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.3px',
-            lineHeight: '20px',
-            color: 'var(--figma-text-emperor)',
-          }}
-        >
+        <p className="font-['Roboto'] font-thin text-[13.3px] leading-5 text-[var(--figma-text-emperor)]">
           프로젝트 주제와 예상 기간을 입력하세요
         </p>
       </div>
@@ -142,13 +125,7 @@ export default function Step3Schedule({
         <div className="flex flex-col gap-2">
           <Label
             htmlFor="subject"
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '13.1px',
-              lineHeight: '14px',
-              color: 'var(--figma-text-cod-gray)',
-            }}
+            className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]"
           >
             프로젝트 주제
           </Label>
@@ -159,29 +136,10 @@ export default function Step3Schedule({
             onChange={(e) => onChange({ subject: e.target.value })}
             maxLength={50}
             rows={5}
-            className="resize-none"
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '14px',
-              lineHeight: '16px',
-              padding: '12.5px 12px',
-              background: 'rgba(255, 255, 255, 0.002)',
-              border: '1px solid var(--figma-border-mercury)',
-              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-              borderRadius: '6px',
-            }}
+            className="resize-none font-['Roboto'] font-thin text-[14px] leading-4 px-3 py-[12.5px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
           />
           <div className="flex justify-end">
-            <span
-              style={{
-                fontFamily: 'Inter',
-                fontWeight: 400,
-                fontSize: '12px',
-                lineHeight: '16px',
-                color: 'var(--figma-text-dove-gray)',
-              }}
-            >
+            <span className="font-['Inter'] font-normal text-[12px] leading-4 text-[var(--figma-text-dove-gray)]">
               {data.subject.length}/50
             </span>
           </div>
@@ -189,69 +147,29 @@ export default function Step3Schedule({
 
         {/* 파일 업로드 */}
         <div className="flex flex-col gap-2">
-          <Label
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '13.1px',
-              lineHeight: '14px',
-              color: 'var(--figma-text-cod-gray)',
-            }}
-          >
+          <Label className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
             프로젝트 문서 업로드
           </Label>
-          <p
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '12px',
-              lineHeight: '16px',
-              color: 'var(--figma-text-emperor)',
-              marginBottom: '8px',
-            }}
-          ></p>
+          <p className="font-['Roboto'] font-thin text-[12px] leading-4 text-[var(--figma-text-emperor)] mb-2"></p>
 
           {/* 파일 업로드 영역 (항상 표시) */}
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            style={{
-              border: isDragging
-                ? '2px dashed var(--figma-primary-blue)'
-                : '2px dashed var(--figma-border-mercury)',
-              borderRadius: '8px',
-              padding: '32px',
-              textAlign: 'center',
-              background: isDragging
-                ? 'rgba(59, 130, 246, 0.05)'
-                : 'rgba(255, 255, 255, 0.002)',
-              transition: 'all 0.2s ease',
-            }}
+            className={`border-2 dashed rounded-lg p-8 text-center transition-all duration-200 ${isDragging
+              ? 'border-[var(--figma-primary-blue)] bg-[rgba(59,130,246,0.05)]'
+              : 'border-[var(--figma-border-mercury)] bg-[rgba(255,255,255,0.002)]'
+              }`}
           >
             <div className="flex flex-col items-center gap-3">
               <Upload
-                className="h-10 w-10"
-                style={{ color: 'var(--figma-text-emperor)' }}
+                className="h-10 w-10 text-[var(--figma-text-emperor)]"
               />
-              <p
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '14px',
-                  color: 'var(--figma-text-cod-gray)',
-                }}
-              >
+              <p className="font-['Roboto'] font-thin text-[14px] text-[var(--figma-text-cod-gray)]">
                 Drag & drop PDF files here
               </p>
-              <p
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '12px',
-                  color: 'var(--figma-text-dove-gray)',
-                }}
-              >
+              <p className="font-['Roboto'] font-thin text-[12px] text-[var(--figma-text-dove-gray)]">
                 Allowed types: application/pdf (최대 10MB)
               </p>
               <label>
@@ -260,7 +178,7 @@ export default function Step3Schedule({
                   onChange={handleFileChange}
                   accept=".pdf"
                   multiple
-                  style={{ display: 'none' }}
+                  className="hidden"
                 />
                 <Button
                   type="button"
@@ -270,17 +188,7 @@ export default function Step3Schedule({
                     ) as HTMLInputElement;
                     input?.click();
                   }}
-                  style={{
-                    fontFamily: 'Roboto',
-                    fontWeight: 100,
-                    fontSize: '13.2px',
-                    padding: '8px 16px',
-                    background: 'var(--figma-text-cod-gray)',
-                    color: 'var(--figma-white)',
-                    borderRadius: '6px',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
+                  className="font-['Roboto'] font-thin text-[13.2px] px-4 py-2 bg-[var(--figma-text-cod-gray)] text-[var(--figma-white)] rounded-md border-none cursor-pointer"
                 >
                   파일 업로드
                 </Button>
@@ -294,65 +202,29 @@ export default function Step3Schedule({
               {data.specFiles.map((file, index) => (
                 <div
                   key={`${file.name}-${index}`}
-                  style={{
-                    border: '1px solid var(--figma-border-mercury)',
-                    borderRadius: '8px',
-                    padding: '12px 16px',
-                    background: 'rgba(255, 255, 255, 0.002)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
+                  className="border border-[var(--figma-border-mercury)] rounded-lg px-4 py-3 bg-[rgba(255,255,255,0.002)] flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '6px',
-                        background: 'var(--figma-gray-concrete)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
+                      className="w-10 h-10 rounded-md bg-[var(--figma-gray-concrete)] flex items-center justify-center"
                     >
-                      <Upload className="h-5 w-5" style={{ color: '#666' }} />
+                      <Upload className="h-5 w-5 text-[#666]" />
                     </div>
                     <div>
-                      <p
-                        style={{
-                          fontFamily: 'Roboto',
-                          fontWeight: 100,
-                          fontSize: '14px',
-                          color: 'var(--figma-text-cod-gray)',
-                        }}
-                      >
+                      <p className="font-['Roboto'] font-thin text-[14px] text-[var(--figma-text-cod-gray)]">
                         {file.name}
                       </p>
-                      <p
-                        style={{
-                          fontFamily: 'Roboto',
-                          fontWeight: 100,
-                          fontSize: '12px',
-                          color: 'var(--figma-text-dove-gray)',
-                        }}
-                      >
+                      <p className="font-['Roboto'] font-thin text-[12px] text-[var(--figma-text-dove-gray)]">
                         {(file.size / 1024).toFixed(2)} KB
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => handleRemoveFile(index)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '4px',
-                    }}
+                    className="bg-transparent border-none cursor-pointer p-1"
                   >
                     <X
-                      className="h-5 w-5"
-                      style={{ color: 'var(--figma-text-emperor)' }}
+                      className="h-5 w-5 text-[var(--figma-text-emperor)]"
                     />
                   </button>
                 </div>
@@ -362,15 +234,7 @@ export default function Step3Schedule({
 
           {/* 에러 메시지 */}
           {fileError && (
-            <p
-              style={{
-                fontFamily: 'Roboto',
-                fontWeight: 100,
-                fontSize: '12px',
-                color: 'var(--figma-required-crimson)',
-                marginTop: '4px',
-              }}
-            >
+            <p className="font-['Roboto'] font-thin text-[12px] text-[var(--figma-required-crimson)] mt-1">
               {fileError}
             </p>
           )}
@@ -378,15 +242,7 @@ export default function Step3Schedule({
 
         {/* 예상 기간 */}
         <div className="flex flex-col gap-2">
-          <Label
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '13.1px',
-              lineHeight: '14px',
-              color: 'var(--figma-text-cod-gray)',
-            }}
-          >
+          <Label className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
             예상 기간
           </Label>
           <div className="flex items-center gap-4">
@@ -395,23 +251,13 @@ export default function Step3Schedule({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-50 justify-start text-left font-normal"
-                  style={{
-                    fontFamily: 'Roboto',
-                    fontWeight: 100,
-                    fontSize: '14px',
-                    height: '44px',
-                    background: 'rgba(255, 255, 255, 0.002)',
-                    border: '1px solid var(--figma-border-mercury)',
-                    boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-                    borderRadius: '6px',
-                  }}
+                  className="w-50 justify-start text-left font-normal font-['Roboto'] font-thin text-[14px] h-[44px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {data.startDate ? (
                     format(data.startDate, 'PPP', { locale: ko })
                   ) : (
-                    <span style={{ color: 'var(--figma-text-emperor)' }}>
+                    <span className="text-[var(--figma-text-emperor)]">
                       시작일
                     </span>
                   )}
@@ -427,30 +273,20 @@ export default function Step3Schedule({
               </PopoverContent>
             </Popover>
 
-            <span style={{ color: 'var(--figma-text-emperor)' }}>~</span>
+            <span className="text-[var(--figma-text-emperor)]">~</span>
 
             {/* 종료일 */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-50 justify-start text-left font-normal"
-                  style={{
-                    fontFamily: 'Roboto',
-                    fontWeight: 100,
-                    fontSize: '14px',
-                    height: '44px',
-                    background: 'rgba(255, 255, 255, 0.002)',
-                    border: '1px solid var(--figma-border-mercury)',
-                    boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-                    borderRadius: '6px',
-                  }}
+                  className="w-50 justify-start text-left font-normal font-['Roboto'] font-thin text-[14px] h-[44px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {data.endDate ? (
                     format(data.endDate, 'PPP', { locale: ko })
                   ) : (
-                    <span style={{ color: 'var(--figma-text-emperor)' }}>
+                    <span className="text-[var(--figma-text-emperor)]">
                       종료일
                     </span>
                   )}
