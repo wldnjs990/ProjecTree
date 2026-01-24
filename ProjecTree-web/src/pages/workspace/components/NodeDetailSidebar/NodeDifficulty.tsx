@@ -63,7 +63,11 @@ interface NodeDifficultyProps {
   onChange?: (value: number) => void;
 }
 
-export function NodeDifficultyField({ value, isEdit, onChange }: NodeDifficultyProps) {
+export function NodeDifficultyField({
+  value,
+  isEdit,
+  onChange,
+}: NodeDifficultyProps) {
   if (isEdit && onChange) {
     return <DifficultySelect value={value} onChange={onChange} />;
   }

@@ -76,7 +76,11 @@ interface NodePriorityProps {
   onChange?: (value: Priority) => void;
 }
 
-export function NodePriorityField({ value, isEdit, onChange }: NodePriorityProps) {
+export function NodePriorityField({
+  value,
+  isEdit,
+  onChange,
+}: NodePriorityProps) {
   if (isEdit && onChange) {
     return <PrioritySelect value={value} onChange={onChange} />;
   }
