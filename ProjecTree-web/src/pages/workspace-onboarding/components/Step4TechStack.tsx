@@ -76,27 +76,10 @@ export default function Step4TechStack({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '18.8px',
-            lineHeight: '28px',
-            letterSpacing: '-0.5px',
-            color: 'var(--figma-text-cod-gray)',
-          }}
-        >
+        <h2 className="font-['Roboto'] font-thin text-[18.8px] leading-7 tracking-[-0.5px] text-[var(--figma-text-cod-gray)]">
           사용할 기술 스택
         </h2>
-        <p
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.3px',
-            lineHeight: '20px',
-            color: 'var(--figma-text-emperor)',
-          }}
-        >
+        <p className="font-['Roboto'] font-thin text-[13.3px] leading-5 text-[var(--figma-text-emperor)]">
           사용 예정인 기술을 선택해주세요 (다중 선택 가능)
         </p>
       </div>
@@ -107,13 +90,7 @@ export default function Step4TechStack({
         <div className="relative flex flex-col gap-2">
           <Label
             htmlFor="techSearch"
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '13.1px',
-              lineHeight: '14px',
-              color: 'var(--figma-text-cod-gray)',
-            }}
+            className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]"
           >
             사용할 기술스택 검색
           </Label>
@@ -129,43 +106,20 @@ export default function Step4TechStack({
             onKeyDown={handleKeyDown}
             onFocus={() => setShowSuggestions(searchTerm.length > 0)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '14px',
-              lineHeight: '16px',
-              height: '44px',
-              padding: '12.5px 12px',
-              background: 'rgba(255, 255, 255, 0.002)',
-              border: '1px solid var(--figma-border-mercury)',
-              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-              borderRadius: '6px',
-            }}
+            style={{}}
+            className="font-['Roboto'] font-thin text-[14px] leading-4 h-[44px] px-3 py-[12.5px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
           />
 
           {/* 검색 자동완성 드롭다운 */}
           {showSuggestions && filteredTechs.length > 0 && (
             <div
-              className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-lg shadow-lg"
-              style={{
-                background: 'var(--figma-white)',
-                border: '1px solid var(--figma-border-mercury)',
-              }}
+              className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-lg shadow-lg bg-[var(--figma-white)] border border-[var(--figma-border-mercury)]"
             >
               {filteredTechs.map((tech, index) => (
                 <div
                   key={tech}
-                  className="cursor-pointer px-4 py-2"
-                  style={{
-                    backgroundColor:
-                      index === selectedIndex
-                        ? 'var(--figma-gray-concrete)'
-                        : 'transparent',
-                    fontFamily: 'Roboto',
-                    fontWeight: 100,
-                    fontSize: '14px',
-                    color: 'var(--figma-text-cod-gray)',
-                  }}
+                  className={`cursor-pointer px-4 py-2 font-['Roboto'] font-thin text-[14px] text-[var(--figma-text-cod-gray)] ${index === selectedIndex ? 'bg-[var(--figma-gray-concrete)]' : 'bg-transparent'
+                    }`}
                   onClick={() => handleAdd(tech)}
                   onMouseEnter={() => setSelectedIndex(index)}
                 >
@@ -179,24 +133,13 @@ export default function Step4TechStack({
         {/* 선택된 기술 스택 */}
         {data.techStacks.length > 0 && (
           <div
-            className="flex min-h-15 flex-wrap gap-2 rounded-lg p-4"
-            style={{
-              background: 'var(--figma-gray-concrete)',
-              border: '1px solid var(--figma-border-mercury)',
-            }}
+            className="flex min-h-15 flex-wrap gap-2 rounded-lg p-4 bg-[var(--figma-gray-concrete)] border border-[var(--figma-border-mercury)]"
           >
             {data.techStacks.map((tech) => (
               <Badge
                 key={tech}
                 variant="secondary"
-                className="flex items-center gap-2 px-3 py-1.5 text-sm"
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  background: 'var(--figma-white)',
-                  color: 'var(--figma-text-cod-gray)',
-                  border: '1px solid var(--figma-border-mercury)',
-                }}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-['Roboto'] font-thin bg-[var(--figma-white)] text-[var(--figma-text-cod-gray)] border border-[var(--figma-border-mercury)]"
               >
                 {tech}
                 <button

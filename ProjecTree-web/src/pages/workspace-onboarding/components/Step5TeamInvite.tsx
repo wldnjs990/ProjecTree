@@ -97,27 +97,10 @@ export default function Step5TeamInvite({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '18.8px',
-            lineHeight: '28px',
-            letterSpacing: '-0.5px',
-            color: 'var(--figma-text-cod-gray)',
-          }}
-        >
+        <h2 className="font-['Roboto'] font-thin text-[18.8px] leading-7 tracking-[-0.5px] text-[var(--figma-text-cod-gray)]">
           팀 초대
         </h2>
-        <p
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.3px',
-            lineHeight: '20px',
-            color: 'var(--figma-text-emperor)',
-          }}
-        >
+        <p className="font-['Roboto'] font-thin text-[13.3px] leading-5 text-[var(--figma-text-emperor)]">
           팀원을 초대하세요
         </p>
       </div>
@@ -126,15 +109,7 @@ export default function Step5TeamInvite({
       <div className="flex flex-col gap-6">
         {/* 이메일 초대 */}
         <div className="flex flex-col gap-4">
-          <h3
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '15px',
-              lineHeight: '20px',
-              color: 'var(--figma-text-cod-gray)',
-            }}
-          >
+          <h3 className="font-['Roboto'] font-thin text-[15px] leading-5 text-[var(--figma-text-cod-gray)]">
             이메일 초대
           </h3>
 
@@ -144,60 +119,23 @@ export default function Step5TeamInvite({
               placeholder="name@company.com"
               value={memberEmail}
               onChange={handleEmailChange}
-              style={{
-                fontFamily: 'Roboto',
-                fontWeight: 100,
-                fontSize: '14px',
-                lineHeight: '16px',
-                height: '44px',
-                padding: '12.5px 12px',
-                background: 'rgba(255, 255, 255, 0.002)',
-                border: emailError
-                  ? '1px solid var(--figma-required-crimson)'
-                  : '1px solid var(--figma-border-mercury)',
-                boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-                borderRadius: '6px',
-              }}
+              className={`font-['Roboto'] font-thin text-[14px] leading-4 h-[44px] px-3 py-[12.5px] bg-[rgba(255,255,255,0.002)] border shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md ${emailError ? 'border-[var(--figma-required-crimson)]' : 'border-[var(--figma-border-mercury)]'
+                }`}
             />
             {emailError && (
-              <span
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '12px',
-                  lineHeight: '16px',
-                  color: 'var(--figma-required-crimson)',
-                }}
-              >
+              <span className="font-['Roboto'] font-thin text-[12px] leading-4 text-[var(--figma-required-crimson)]">
                 {emailError}
               </span>
             )}
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label
-              style={{
-                fontFamily: 'Roboto',
-                fontWeight: 100,
-                fontSize: '13.1px',
-                lineHeight: '14px',
-                color: 'var(--figma-text-cod-gray)',
-              }}
-            >
+            <Label className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
               권한
             </Label>
             <Select value={memberRole} onValueChange={setMemberRole}>
               <SelectTrigger
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '14px',
-                  height: '44px',
-                  background: 'rgba(255, 255, 255, 0.002)',
-                  border: '1px solid var(--figma-border-mercury)',
-                  boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-                  borderRadius: '6px',
-                }}
+                className="font-['Roboto'] font-thin text-[14px] h-[44px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -216,28 +154,12 @@ export default function Step5TeamInvite({
           </div>
 
           <Button
-            className="w-full"
             onClick={handleInviteMember}
             disabled={!memberEmail.trim() || !!emailError}
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '13.2px',
-              lineHeight: '20px',
-              height: '44px',
-              background:
-                !memberEmail.trim() || !!emailError
-                  ? 'var(--figma-gray-concrete)'
-                  : 'var(--figma-primary-blue)',
-              color:
-                !memberEmail.trim() || !!emailError
-                  ? 'var(--figma-text-emperor)'
-                  : 'var(--figma-white)',
-              borderRadius: '6px',
-              border: 'none',
-              cursor:
-                !memberEmail.trim() || !!emailError ? 'not-allowed' : 'pointer',
-            }}
+            className={`w-full font-['Roboto'] font-thin text-[13.2px] leading-5 h-[44px] rounded-md border-none ${!memberEmail.trim() || !!emailError
+              ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-emperor)] cursor-not-allowed'
+              : 'bg-[var(--figma-primary-blue)] text-[var(--figma-white)] cursor-pointer'
+              }`}
           >
             초대 메일 보내기
           </Button>
@@ -246,44 +168,18 @@ export default function Step5TeamInvite({
         {/* 초대된 팀원 목록 */}
         {data.teamMembers.length > 0 && (
           <div className="flex flex-col gap-2">
-            <Label
-              style={{
-                fontFamily: 'Roboto',
-                fontWeight: 100,
-                fontSize: '13.1px',
-                lineHeight: '14px',
-                color: 'var(--figma-text-cod-gray)',
-              }}
-            >
+            <Label className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
               초대된 팀원
             </Label>
             {data.teamMembers.map((member, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between rounded p-2"
-                style={{
-                  background: 'var(--figma-gray-concrete)',
-                  border: '1px solid var(--figma-border-mercury)',
-                }}
+                className="flex items-center justify-between rounded p-2 bg-[var(--figma-gray-concrete)] border border-[var(--figma-border-mercury)]"
               >
-                <span
-                  style={{
-                    fontFamily: 'Roboto',
-                    fontWeight: 100,
-                    fontSize: '13px',
-                    color: 'var(--figma-text-cod-gray)',
-                  }}
-                >
+                <span className="font-['Roboto'] font-thin text-[13px] text-[var(--figma-text-cod-gray)]">
                   {member.email}
                 </span>
-                <span
-                  style={{
-                    fontFamily: 'Roboto',
-                    fontWeight: 100,
-                    fontSize: '13px',
-                    color: 'var(--figma-text-emperor)',
-                  }}
-                >
+                <span className="font-['Roboto'] font-thin text-[13px] text-[var(--figma-text-emperor)]">
                   {member.role}
                 </span>
               </div>

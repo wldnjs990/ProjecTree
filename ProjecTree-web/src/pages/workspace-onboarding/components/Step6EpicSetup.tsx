@@ -51,27 +51,10 @@ export default function Step6EpicSetup({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '18.8px',
-            lineHeight: '28px',
-            letterSpacing: '-0.5px',
-            color: 'var(--figma-text-cod-gray)',
-          }}
-        >
+        <h2 className="font-['Roboto'] font-thin text-[18.8px] leading-7 tracking-[-0.5px] text-[var(--figma-text-cod-gray)]">
           초기 에픽 설정
         </h2>
-        <p
-          style={{
-            fontFamily: 'Roboto',
-            fontWeight: 100,
-            fontSize: '13.3px',
-            lineHeight: '20px',
-            color: 'var(--figma-text-emperor)',
-          }}
-        >
+        <p className="font-['Roboto'] font-thin text-[13.3px] leading-5 text-[var(--figma-text-emperor)]">
           프로젝트의 초기 에픽을 설정하세요
         </p>
       </div>
@@ -80,15 +63,7 @@ export default function Step6EpicSetup({
       <div className="flex flex-col gap-6">
         {/* 초기 에픽 설정 */}
         <div className="flex flex-col gap-4">
-          <h3
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '15px',
-              lineHeight: '20px',
-              color: 'var(--figma-text-cod-gray)',
-            }}
-          >
+          <h3 className="font-['Roboto'] font-thin text-[15px] leading-5 text-[var(--figma-text-cod-gray)]">
             초기 에픽 설정
           </h3>
 
@@ -99,36 +74,13 @@ export default function Step6EpicSetup({
               value={epicName}
               onChange={(e) => setEpicName(e.target.value)}
               maxLength={20}
-              className="flex-1"
-              style={{
-                fontFamily: 'Roboto',
-                fontWeight: 100,
-                fontSize: '14px',
-                lineHeight: '16px',
-                height: '44px',
-                padding: '12.5px 12px',
-                background: 'rgba(255, 255, 255, 0.002)',
-                border: '1px solid var(--figma-border-mercury)',
-                boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-                borderRadius: '6px',
-              }}
+              className="flex-1 font-['Roboto'] font-thin text-[14px] leading-4 h-[44px] px-3 py-[12.5px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
             />
             <Button
               variant="outline"
               onClick={handleAddEpic}
               disabled={!epicName.trim()}
-              className="whitespace-nowrap"
-              style={{
-                fontFamily: 'Roboto',
-                fontWeight: 100,
-                fontSize: '13.2px',
-                height: '44px',
-                padding: '8px 16px',
-                background: 'transparent',
-                color: 'var(--figma-text-cod-gray)',
-                border: '1px solid var(--figma-border-mercury)',
-                borderRadius: '6px',
-              }}
+              className="whitespace-nowrap font-['Roboto'] font-thin text-[13.2px] h-[44px] px-4 py-2 bg-transparent text-[var(--figma-text-cod-gray)] border border-[var(--figma-border-mercury)] rounded-md"
             >
               <Plus className="mr-1 h-4 w-4" />
               에픽 추가
@@ -142,29 +94,10 @@ export default function Step6EpicSetup({
             onChange={(e) => setEpicDescription(e.target.value)}
             maxLength={50}
             rows={4}
-            className="resize-none"
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '14px',
-              lineHeight: '16px',
-              padding: '12.5px 12px',
-              background: 'rgba(255, 255, 255, 0.002)',
-              border: '1px solid var(--figma-border-mercury)',
-              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-              borderRadius: '6px',
-            }}
+            className="resize-none font-['Roboto'] font-thin text-[14px] leading-4 px-3 py-[12.5px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
           />
           <div className="flex justify-end">
-            <span
-              style={{
-                fontFamily: 'Inter',
-                fontWeight: 400,
-                fontSize: '12px',
-                lineHeight: '16px',
-                color: 'var(--figma-text-dove-gray',
-              }}
-            >
+            <span className="font-['Inter'] font-normal text-[12px] leading-4 text-[var(--figma-text-dove-gray)]">
               {epicDescription.length}/50
             </span>
           </div>
@@ -176,31 +109,13 @@ export default function Step6EpicSetup({
             {data.epics.map((epic) => (
               <div
                 key={epic.id}
-                className="flex items-start justify-between rounded-lg p-3"
-                style={{
-                  background: 'var(--figma-gray-concrete)',
-                  border: '1px solid var(--figma-border-mercury)',
-                }}
+                className="flex items-start justify-between rounded-lg p-3 bg-[var(--figma-gray-concrete)] border border-[var(--figma-border-mercury)]"
               >
                 <div className="flex-1">
-                  <h4
-                    style={{
-                      fontFamily: 'Roboto',
-                      fontWeight: 400,
-                      fontSize: '14px',
-                      color: 'var(--figma-text-cod-gray)',
-                    }}
-                  >
+                  <h4 className="font-['Roboto'] font-normal text-[14px] text-[var(--figma-text-cod-gray)]">
                     {epic.name}
                   </h4>
-                  <p
-                    style={{
-                      fontFamily: 'Roboto',
-                      fontWeight: 100,
-                      fontSize: '13px',
-                      color: 'var(--figma-text-emperor)',
-                    }}
-                  >
+                  <p className="font-['Roboto'] font-thin text-[13px] text-[var(--figma-text-emperor)]">
                     {epic.description}
                   </p>
                 </div>
