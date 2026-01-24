@@ -35,7 +35,6 @@ export default function WorkSpacePage() {
 
   // CRDT 클라이언트 초기화 및 초기 데이터 로드
   useEffect(() => {
-    console.log(workspaceId);
     // workspaceId params를 받아 crdt 인스턴스 생성
     if (workspaceId) initCrdtClient(workspaceId);
 
