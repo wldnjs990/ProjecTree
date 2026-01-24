@@ -2,9 +2,6 @@ package com.ssafy.projectree.domain.node.api.dto;
 
 import com.ssafy.projectree.domain.node.api.dto.schema.CandidateSchema;
 import com.ssafy.projectree.domain.tech.api.dto.schemas.TechStackSchema;
-import com.ssafy.projectree.domain.node.enums.NodeStatus;
-import com.ssafy.projectree.domain.node.enums.Priority;
-import com.ssafy.projectree.domain.node.enums.TaskType;
 import com.ssafy.projectree.domain.member.api.dto.schemas.MemberSchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -39,6 +36,9 @@ public class NodeReadDto {
 
         @Schema(description = "기술 스택 목록")
         @Builder.Default
-        private List<TechStackSchema> techStackList = new ArrayList<>();
+        private List<TechStackSchema> techs = new ArrayList<>();
+
+        @Schema(description = "비교 분석 결과를 Markdown 형식으로 작성한 문서")
+        private String comparison;
     }
 }

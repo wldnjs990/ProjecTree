@@ -40,44 +40,65 @@ public interface NodeDocsController {
                                     name = "노드 리스트 예시",
                                     value = """
                 {
-                  "status": "SUCCESS",
-                  "code": 200,
-                  "message": "요청에 성공하였습니다.",
-                  "data": [
-                    {
-                      "id": 1,
-                      "name": "루트 프로젝트",
-                      "nodeType": "PROJECT",
-                      "position": {
-                        "xPos": 100.0,
-                        "yPos": 200.0
-                      },
-                      "parentId": null,
-                      "data": {
-                        "identifier": "NODE-001",
-                        "taskType": "CATEGORY",
-                        "nodeStatus": "IN_PROGRESS",
-                        "difficult": 3
-                      }
-                    },
-                    {
-                      "id": 2,
-                      "name": "하위 작업 노드",
-                      "nodeType": "EPIC",
-                      "position": {
-                        "xPos": 150.5,
-                        "yPos": 300.0
-                      },
-                      "parentId": 1,
-                      "data": {
-                        "identifier": "NODE-002",
-                        "taskType": "TASK",
-                        "nodeStatus": "TODO",
-                        "difficult": 1
-                      }
-                    }
-                  ]
-                }
+                   "message": "Successfully Completed",
+                   "isSuccess": true,
+                   "code": 200,
+                   "data": {
+                     "tree": [
+                       {
+                         "id": 1,
+                         "name": "Projectree 루트",
+                         "nodeType": "PROJECT",
+                         "position": {
+                           "xPos": 0.0,
+                           "yPos": 0.0
+                         },
+                         "parentId": null,
+                         "data": {
+                           "priority": "P0",
+                           "identifier": "NODE-001",
+                           "taskType": "BE",
+                           "status": "IN_PROGRESS",
+                           "difficult": 2
+                         }
+                       },
+                       {
+                         "id": 2,
+                         "name": "인증 서버 설계",
+                         "nodeType": "EPIC",
+                         "position": {
+                           "xPos": 120.5,
+                           "yPos": 80.0
+                         },
+                         "parentId": 1,
+                         "data": {
+                           "priority": "P1",
+                           "identifier": "NODE-002",
+                           "taskType": "BE",
+                           "status": "TODO",
+                           "difficult": 3
+                         }
+                       },
+                       {
+                         "id": 3,
+                         "name": "로그인 UI 구현",
+                         "nodeType": "EPIC",
+                         "position": {
+                           "xPos": 120.5,
+                           "yPos": 180.0
+                         },
+                         "parentId": 1,
+                         "data": {
+                           "priority": "P2",
+                           "identifier": "NODE-003",
+                           "taskType": "FE",
+                           "status": "DONE",
+                           "difficult": 1
+                         }
+                       }
+                     ]
+                   }
+                 }
                 """
                             )
                     )

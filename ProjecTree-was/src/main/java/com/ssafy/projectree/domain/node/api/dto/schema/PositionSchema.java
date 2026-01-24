@@ -1,5 +1,6 @@
 package com.ssafy.projectree.domain.node.api.dto.schema;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PositionSchema {
-    private Double x_pos;
-    private Double y_pos;
+    @Schema(description = "노드 x좌표", example = "100.0")
+    private Double xPos;
+
+    @Schema(description = "노드 y좌표", example = "100.0")
+    private Double yPos;
 }
