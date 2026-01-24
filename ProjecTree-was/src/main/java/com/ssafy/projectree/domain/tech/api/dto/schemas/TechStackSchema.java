@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class TechStackSchema {
-    private String name;
-    private String description;
     private Long id;
+    private String name;
     private String advantage;
     private String disAdvantage;
+    private String description;
+    private String ref;
     private Integer recommendScore;
-    private boolean isRecommended;
 }
