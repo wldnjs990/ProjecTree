@@ -44,6 +44,8 @@ dependencies {
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
 
+    // WebRTC livekit
+    implementation("io.livekit:livekit-server:0.12.0")
 }
 
 tasks.named('test') {
