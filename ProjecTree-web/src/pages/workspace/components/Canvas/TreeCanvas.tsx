@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -11,6 +11,7 @@ import {
   type NodeChange,
   ReactFlowProvider,
   applyNodeChanges,
+  type EdgeChange,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -44,6 +45,7 @@ interface TreeCanvasProps {
   onNodeClick?: (nodeId: string) => void;
 }
 
+// 노드 컴포넌트 커스텀용 객체
 const nodeTypes = {
   project: ProjectNode,
   epic: EpicNode,
@@ -51,6 +53,12 @@ const nodeTypes = {
   task: TaskNode,
   advanced: AdvancedNode,
 };
+
+// hideAttribution: reactflow 워터마크가 기본적으로 표시되는데, 그걸 끄는 설정
+const proOptions = { hideAttribution: true };
+// fitview : 캔버스 화면이 처음 로드될때, 노드가 한눈에 보이게 화면 줌과 포커스를 맞춰주는 기능
+// padding: 딱 맞춘 화면의 20% 넓게 잡아줌
+const fitviewOptions = { padding: 0.2 };
 
 function TreeCanvasInner({
   initialNodes = [],
@@ -87,18 +95,14 @@ function TreeCanvasInner({
   }, [storeEdges, setEdges]);
 
   // 노드 변경 핸들러 (드래그 중 로컬 즉시 반영)
-  const onNodesChange = useCallback(
+  const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
       setNodes((nds) => applyNodeChanges(changes, nds) as FlowNode[]);
     },
     [setNodes]
   );
 
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
-
+  // 노드 클릭 핸들러
   const handleNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
       onNodeClick?.(node.id);
@@ -106,7 +110,22 @@ function TreeCanvasInner({
     [onNodeClick]
   );
 
-  const proOptions = useMemo(() => ({ hideAttribution: true }), []);
+  // 간선 변경 핸들러
+  const handleEdgesChange = (changes: EdgeChange[]) => {
+    setEdges((eds) =>
+      changes.reduce((acc, change) => {
+        if (change.type === 'remove') {
+          return acc.filter((e) => e.id !== change.id);
+        }
+        return acc;
+      }, eds)
+    );
+  };
+
+  const handleConnect = useCallback(
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
 
   return (
     <div className="relative w-full h-full bg-canvas">
@@ -114,23 +133,14 @@ function TreeCanvasInner({
         nodes={nodes}
         edges={edges}
         onMouseMove={handleMouseMove}
-        onNodesChange={onNodesChange}
-        onEdgesChange={(changes) =>
-          setEdges((eds) =>
-            changes.reduce((acc, change) => {
-              if (change.type === 'remove') {
-                return acc.filter((e) => e.id !== change.id);
-              }
-              return acc;
-            }, eds)
-          )
-        }
-        onConnect={onConnect}
+        onNodesChange={handleNodesChange}
+        onEdgesChange={handleEdgesChange}
+        onConnect={handleConnect}
         onNodeClick={handleNodeClick}
         onNodeDragStop={handleNodeDragStop}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
+        fitViewOptions={fitviewOptions}
         proOptions={proOptions}
         className="bg-canvas relative"
       >
@@ -138,7 +148,7 @@ function TreeCanvasInner({
           variant={BackgroundVariant.Dots}
           gap={20}
           size={1}
-          color="#DEDEDE"
+          color="#ababab"
         />
       </ReactFlow>
 

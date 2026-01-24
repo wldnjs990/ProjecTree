@@ -277,11 +277,10 @@ const nodeTypeMap: Record<string, string> = {
   TASK: 'task',
 };
 
-// 백엔드 상태 → 프론트엔드 상태 변환
-const statusMap: Record<string, string> = {
-  TODO: 'pending',
-  IN_PROGRESS: 'progress',
-  DONE: 'completed',
+// 백엔드 taskType → frontend/backend 변환
+const taskTypeMap: Record<string, 'frontend' | 'backend'> = {
+  FE: 'frontend',
+  BE: 'backend',
 };
 
 // 백엔드 API 응답을 React Flow 노드로 변환
@@ -292,10 +291,10 @@ export const mockNodes: Node[] = mockNodesApiResponse.data.map((node) => ({
   parentId: node.parentId ? String(node.parentId) : undefined,
   data: {
     title: node.name,
-    status: statusMap[node.data.status] || 'pending',
+    status: node.data.status,
     priority: node.data.priority,
     taskId: `#${node.data.identifier}`,
-    category: node.data.taskType?.toLowerCase() || undefined,
+    category: node.data.taskType ? taskTypeMap[node.data.taskType] : undefined,
     difficult: node.data.difficult,
   },
 }));

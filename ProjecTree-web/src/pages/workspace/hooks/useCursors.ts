@@ -29,27 +29,35 @@ export const useCursors = () => {
       setCursors(states as Map<number, AwarenessState>);
     };
 
+    // change 이벤트리스너 활성화
+    // 서버로부터 change 이벤트 수신시, 마우스 커서 변경사항 로컬에 적용
     awareness.on('change', handleChange);
 
     // 초기 상태 로드
     handleChange();
 
     return () => {
+      // change 이벤트 비활성화
       awareness.off('change', handleChange);
     };
   }, []);
 
-  // 마우스 이동 핸들러
+  /**
+   * 마우스 이동 핸들러 - 실시간 유저 마우스 포인터 공유용 함수
+   */
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
       const client = getCrdtClient();
       if (!client) return;
 
+      // screenToFlowPosition: reactflow에서 제공해주는 클라이언트 캔버스 좌표 계산 함수
+      // 캔버스 좌표를 고려한 유저 마우스포인터 좌표 생성 가능
       const position = screenToFlowPosition({
         x: e.clientX,
         y: e.clientY,
       });
 
+      // ydoc awareness에 유저 커서 위치 업데이트
       client.awareness.setLocalStateField('cursor', {
         x: position.x,
         y: position.y,

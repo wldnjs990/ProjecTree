@@ -41,6 +41,7 @@ class CrdtClient {
 
     const serverUrl =
       import.meta.env.VITE_CRDT_SERVER_URL || 'ws://localhost:1234';
+    // yDoc 자료구조에 호환되는 websocket 클라이언트로 변환
     this.provider = new WebsocketProvider(serverUrl, roomId, this.yDoc);
     this.awareness = this.provider.awareness;
 

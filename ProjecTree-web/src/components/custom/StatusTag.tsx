@@ -8,9 +8,10 @@ export type TagType =
   | "advanced"
   | "frontend"
   | "backend"
-  | "progress"
-  | "completed"
-  | "pending";
+  // 노드 상태 (types2 NodeStatus)
+  | "TODO"
+  | "IN_PROGRESS"
+  | "DONE";
 
 interface StatusTagProps {
   type: TagType;
@@ -50,9 +51,10 @@ const tagStyles: Record<
     text: "text-white",
     defaultLabel: "BackEnd",
   },
-  progress: { bg: "bg-[#2B7FFF]", text: "text-white", defaultLabel: "진행중" },
-  completed: { bg: "bg-[#00C950]", text: "text-white", defaultLabel: "완료" },
-  pending: { bg: "bg-[#64748B]", text: "text-white", defaultLabel: "대기" },
+  // 노드 상태 (types2 NodeStatus)
+  TODO: { bg: "bg-[#64748B]", text: "text-white", defaultLabel: "대기" },
+  IN_PROGRESS: { bg: "bg-[#2B7FFF]", text: "text-white", defaultLabel: "진행중" },
+  DONE: { bg: "bg-[#00C950]", text: "text-white", defaultLabel: "완료" },
 };
 
 export function StatusTag({ type, label, className }: StatusTagProps) {
