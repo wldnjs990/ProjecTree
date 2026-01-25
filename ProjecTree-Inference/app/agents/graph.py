@@ -1,5 +1,5 @@
 from langgraph.graph import StateGraph, END, START
-from app.agents.states.state import PlanNodeState
+from app.agents.states.state import NodeState
 from app.agents.nodes.fetch import (
     parent_node_fetch,
     project_spec_fetch,
@@ -28,7 +28,7 @@ from app.agents.routers import (
 from app.agents.sub_agents.recommend import recommend_graph
 
 # Main Graph Builder
-builder = StateGraph(PlanNodeState)
+builder = StateGraph(NodeState)
 builder.add_node("parent_node_fetch", parent_node_fetch)
 builder.add_node("project_spec_fetch", project_spec_fetch)
 builder.add_node("contributor_info_fetch", contributor_info_fetch)
@@ -39,22 +39,20 @@ builder.add_node("sub_node_info_create", sub_node_info_create)
 builder.add_node("fe_task_node_process", fe_task_node_process)
 builder.add_node("be_task_node_process", be_task_node_process)
 builder.add_node("advance_node_process", advance_node_process)
-builder.add_node("tech_stack_recommendation", recommend_graph)
 builder.add_node("structured_output_parser", structured_output_parser)
 builder.add_node("node_feedback", node_feedback)
 builder.add_node("struct_feedback", struct_feedback)
-builder.add_node("sibiling_node_fetch", sibiling_node_fetch)
+builder.add_node("struct_feedback", struct_feedback)
 builder.add_node("generate_candidates", generate_candidates)
+builder.add_node("tech_stack_recommendation", recommend_graph)
 
 builder.add_edge(START, "parent_node_fetch")
 builder.add_edge(START, "project_spec_fetch")
 builder.add_edge(START, "contributor_info_fetch")
-builder.add_edge(START, "sibiling_node_fetch")
 builder.add_edge(START, "candidate_node_fetch")
 builder.add_edge("parent_node_fetch", "sub_node_info_create")
 builder.add_edge("project_spec_fetch", "sub_node_info_create")
 builder.add_edge("contributor_info_fetch", "sub_node_info_create")
-builder.add_edge("sibiling_node_fetch", "sub_node_info_create")
 builder.add_edge("candidate_node_fetch", "sub_node_info_create")
 
 builder.add_conditional_edges(

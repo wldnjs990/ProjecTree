@@ -35,7 +35,7 @@ NODE_PARENT_MAP = {
 }
 
 
-def get_child_node_type(parent_node_type: str) -> Optional[str]:
+def get_child_node_type(parent_node_type: NodeType) -> Optional[NodeType]:
     """부모 노드 타입을 기반으로 자식 노드 타입을 반환합니다.
     
     Args:
@@ -55,14 +55,13 @@ def get_child_node_type(parent_node_type: str) -> Optional[str]:
         None
     """
     try:
-        parent_type = NodeType(parent_node_type.upper())
-        child_type = NODE_HIERARCHY.get(parent_type)
+        child_type = NODE_HIERARCHY.get(parent_node_type)
         return child_type.value if child_type else None
     except ValueError:
         raise ValueError(f"알 수 없는 노드 타입입니다: {parent_node_type}")
 
 
-def get_parent_node_type(node_type: str) -> Optional[str]:
+def get_parent_node_type(node_type: NodeType) -> Optional[NodeType]:
     """현재 노드 타입을 기반으로 부모 노드 타입을 반환합니다.
     
     Args:
@@ -80,8 +79,7 @@ def get_parent_node_type(node_type: str) -> Optional[str]:
         None
     """
     try:
-        current_type = NodeType(node_type.upper())
-        parent_type = NODE_PARENT_MAP.get(current_type)
+        parent_type = NODE_PARENT_MAP.get(node_type)
         return parent_type.value if parent_type else None
     except ValueError:
         raise ValueError(f"알 수 없는 노드 타입입니다: {node_type}")

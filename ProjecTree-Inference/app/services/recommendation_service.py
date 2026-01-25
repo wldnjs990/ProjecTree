@@ -56,11 +56,6 @@ class RecommendationService:
 
         # NodeType이 TASK인 경우 TaskType 추가
         if node.node_type == NodeType.TASK:
-            # Node 객체로 조회되었을 가능성이 있으므로 TaskNode 테이블에서 명시적으로 조회
-
-
-            # ORM 세션을 이용해 TaskNode 조회 (node_id가 PK)
-            # node가 이미 TaskNode 인스턴스라면 바로 접근 가능하지만, 안전하게 DB 조회
             task_node = db.query(TaskNode).filter(TaskNode.node_id == node.id).first()
             if task_node and task_node.type:
                 input_data["task_type"] = task_node.type
