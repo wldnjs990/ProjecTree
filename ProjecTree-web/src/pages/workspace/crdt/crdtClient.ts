@@ -1,6 +1,5 @@
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-// TODO : awareness 라이브러리 타입 찾아야함
 import type { Awareness } from 'y-protocols/awareness';
 import { useWorkspaceStore } from '../stores/workspaceStore';
 import { useNodeStore } from '../stores/nodeStore';
@@ -77,6 +76,33 @@ class CrdtClient {
    */
   getYMap<T>(name: string): Y.Map<T> {
     return this.yDoc.getMap(name) as Y.Map<T>;
+  }
+
+  /**
+   * 노드 상세정보 편집 데이터 저장 요청을 CRDT 서버로 전송
+   * CRDT 서버가 REST API를 통해 스프링 서버로 전송
+   * 스프링 서버에서 DB에 저장
+   */
+  saveNodeDetail(workspaceId: number): string | null {
+    const requestId = crypto.randomUUID();
+    const message = JSON.stringify({
+      type: 'save_node_detail',
+      workspaceId,
+      requestId,
+    });
+
+    const ws = this.provider.ws;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(message);
+      console.log('[CRDT] 워크스페이스 저장 요청 전송:', {
+        workspaceId,
+        requestId,
+      });
+      return requestId;
+    }
+
+    console.warn('[CRDT] WebSocket이 연결되지 않아 저장 요청 실패');
+    return null;
   }
 
   /**

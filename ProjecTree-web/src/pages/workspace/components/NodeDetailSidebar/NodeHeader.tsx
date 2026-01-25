@@ -87,7 +87,8 @@ export function NodeHeader({
 
   return (
     <div className="relative pb-4">
-      <div className="flex justify-between">
+      {/* 헤더 */}
+      <div className="flex px-4 py-2 justify-between fixed top-0 left-0 w-full bg-white z-10">
         {/* 태그 영역 */}
         <div className="flex items-center gap-3 mb-3">
           {/* 노드 타입 태그 */}
@@ -119,7 +120,9 @@ export function NodeHeader({
 
           {/* Task ID */}
           {nodeInfo.identifier && (
-            <span className="text-xs text-[#64748B]">#{nodeInfo.identifier}</span>
+            <span className="text-xs text-[#64748B]">
+              #{nodeInfo.identifier}
+            </span>
           )}
         </div>
         {/* 버튼 영역 */}
@@ -140,15 +143,20 @@ export function NodeHeader({
         </div>
       </div>
 
-      {/* 제목 */}
-      <h2 className="text-base font-medium text-[#14151F] mb-2 pr-8">
-        {nodeInfo.name}
-      </h2>
+      {/* TODO : 제목, 설명 동시편집 구현 */}
+      <div className="mt-10">
+        {/* 제목 */}
+        <h2 className="text-base font-medium text-[#14151F] mb-2 pr-8">
+          {nodeInfo.name}
+        </h2>
 
-      {/* 설명 */}
-      {description && (
-        <p className="text-sm text-[#61626F] leading-relaxed">{description}</p>
-      )}
+        {/* 설명 */}
+        {description && (
+          <p className="text-sm text-[#61626F] leading-relaxed">
+            {description}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

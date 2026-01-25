@@ -11,20 +11,22 @@ interface AINodeRecommendSectionProps {
 // 하위 노드 카드 컴포넌트
 function SubNodeCard({ node, onAdd }: { node: Candidate; onAdd: () => void }) {
   return (
-    <div className="flex items-start justify-between p-2.5 border border-[#DEDEDE] rounded-lg">
-      <div className="flex-1 min-w-0">
+    <button
+      className="flex flex-col w-full items-start justify-between p-2.5 border border-[#DEDEDE] hover:bg-[#1c69e30d] rounded-lg"
+      onClick={onAdd}
+    >
+      <div className="flex-1 min-w-0 w-full flex items-center justify-between">
         <p className="text-xs font-medium text-[#0B0B0B] truncate">
           {node.name}
         </p>
+        <div className="ml-2 p-1 text-[#636363]">
+          <Plus className="w-3.5 h-3.5" />
+        </div>
+      </div>
+      <div className="text-left mt-1.5">
         <p className="text-[10px] text-[#636363] mt-0.5">{node.description}</p>
       </div>
-      <button
-        onClick={onAdd}
-        className="ml-2 p-1 text-[#636363] hover:text-[#0B0B0B] hover:bg-gray-100 rounded transition-colors"
-      >
-        <Plus className="w-3.5 h-3.5" />
-      </button>
-    </div>
+    </button>
   );
 }
 

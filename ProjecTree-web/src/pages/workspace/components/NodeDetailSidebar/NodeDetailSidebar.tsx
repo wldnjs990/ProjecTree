@@ -121,6 +121,13 @@ export function NodeDetailSidebar({
             onAssigneeChange={onAssigneeChange}
           />
 
+          {/* 메모 섹션 */}
+          <MemoSection
+            note={displayData.note}
+            isEdit={isEdit}
+            onNoteChange={onNoteChange}
+          />
+
           {/* AI 기술 추천 섹션 */}
           {nodeDetail.techs && nodeDetail.techs.length > 0 && (
             <AITechRecommendSection
@@ -140,13 +147,6 @@ export function NodeDetailSidebar({
               onAddManual={onNodeAddManual}
             />
           )}
-
-          {/* 메모 섹션 */}
-          <MemoSection
-            note={displayData.note}
-            isEdit={isEdit}
-            onNoteChange={onNoteChange}
-          />
         </div>
       </div>
     </div>

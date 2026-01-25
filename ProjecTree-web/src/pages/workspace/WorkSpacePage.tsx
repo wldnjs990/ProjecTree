@@ -12,7 +12,11 @@ import {
 import { FeatureSpecView } from './components/FeatureSpec';
 import { TechStackStatusView } from './components/TechStackStatus';
 import type { FlowNode } from './types/node';
-import { initCrdtClient, destroyCrdtClient } from './crdt/crdtClient';
+import {
+  initCrdtClient,
+  destroyCrdtClient,
+  getCrdtClient,
+} from './crdt/crdtClient';
 import {
   useConnectionStatus,
   useNodeStore,
@@ -99,12 +103,23 @@ export default function WorkSpacePage() {
     };
   }, [selectedNodeListData, selectedNodeDetail]);
 
-  // 서버 저장 핸들러
-  const handleSaveToServer = useCallback(
+  // 서버 저장 핸들러 - CRDT 서버를 통해 DB에 저장
+  const handleSaveNodeDetailToServer = useCallback(
     async (nodeId: string, data: EditableNodeDetail) => {
-      console.log('[WorkSpacePage] 서버에 저장:', nodeId, data);
-      // TODO: 실제 API 호출로 대체
-      // await api.updateNodeDetail(nodeId, data);
+      console.log('[WorkSpacePage] CRDT 서버로 저장 요청:', nodeId, data);
+
+      const client = getCrdtClient();
+      if (client) {
+        // TODO: 실제 workspaceId, userId로 대체
+        const workspaceId = 1;
+
+        const requestId = client.saveNodeDetail(workspaceId);
+        if (requestId) {
+          console.log('[WorkSpacePage] 저장 요청 성공, requestId:', requestId);
+        }
+      } else {
+        console.warn('[WorkSpacePage] CRDT 클라이언트가 초기화되지 않음');
+      }
     },
     []
   );
@@ -120,7 +135,7 @@ export default function WorkSpacePage() {
   } = useNodeDetailCrdt({
     nodeId: selectedNodeId,
     initialData: initialEditData,
-    onSave: handleSaveToServer,
+    onSave: handleSaveNodeDetailToServer,
   });
 
   // Event handlers
