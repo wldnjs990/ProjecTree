@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Header, type ViewTab } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { TreeCanvas } from './components/Canvas';
-import { NodeDetailSidebar } from './components/NodeDetailSidebar';
 import {
   mockNodes,
   mockUsers,
