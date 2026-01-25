@@ -1,9 +1,7 @@
 import { WebSocket, WebSocketServer } from "ws";
 import * as Y from "yjs";
+import { setupWSConnection, getYDoc } from "y-websocket/bin/utils";
 import type { IncomingMessage } from "http";
-
-// yjs 본체 ydoc(얘가 동시편집 알고리즘을 처리해줌)
-const doc = new Y.Doc();
 
 // y-websocket의 서버 포트번호는 1234
 const PORT = Number(process.env.PORT) || 1234;
@@ -22,6 +20,7 @@ const rooms = new Map<string, Set<WebSocket>>();
 wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
   // URL에서 room 이름 추출 (예: ws://localhost:1234/room-1)
   const room = req.url?.slice(1) || "default";
+  setupWSConnection(ws, req, { docName: room });
 
   // room이 없으면 생성
   if (!rooms.has(room)) {
@@ -31,18 +30,36 @@ wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
 
   // 이 room의 클라이언트 목록
   const clients = rooms.get(room)!;
-  const doc = docs.get(room)!;
-
+  const doc = getYDoc(room);
   // 현재 클라이언트 추가
   clients.add(ws);
 
   ws.on("message", (data: Buffer) => {
-    // 다른 클라이언트들에게 브로드캐스트
-    clients.forEach((c) => {
-      if (c !== ws && c.readyState === WebSocket.OPEN) {
-        c.send(data);
-      }
-    });
+    // console.log(`[메시지 수신] ${data}`);
+    // JSON 메시지만 처리
+    let parsed: any = null;
+    try {
+      parsed = JSON.parse(data.toString());
+    } catch {
+      return; // Y.js 바이너리 메시지는 setupWSConnection이 처리
+    }
+
+    if (parsed?.type === "save_node_detail") {
+      const doc = getYDoc(room);
+      const nodeDetails = doc.getMap<any>("nodeDetails");
+      const nodeData = nodeDetails.get(parsed.nodeId);
+      console.log("node detail:", nodeData?.toJSON?.() ?? nodeData);
+    }
+
+    if (!parsed) {
+      // broadcast
+      clients.forEach((c) => {
+        if (c !== ws && c.readyState === WebSocket.OPEN) {
+          c.send(data);
+        }
+      });
+      return;
+    }
   });
 
   ws.on("close", () => {
