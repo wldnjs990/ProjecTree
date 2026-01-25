@@ -5,10 +5,11 @@ from app.agents.states.state import GlobalState
 
 class RecommendationState(GlobalState):
     """기술 스택 추천을 위한 State"""
-    current_node_type: NodeType
+    node_type: NodeType
     task_type: str
     node_name: str
     node_description: str
     tech_list: TechList
     retry_count: int  # 재시도 횟수
     last_error: Optional[str]  # 마지막 에러 메시지
+    feedback: Optional[str]  # 검증 피드백

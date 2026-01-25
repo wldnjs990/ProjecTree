@@ -1,6 +1,7 @@
 from app.api.schemas.candidates import CandidateGenerateRequest, CandidateGenerateResponse
 from app.agents.sub_agents.candidates.graph import candidate_graph
 from app.db.repository.node_repository import NodeRepository
+from app.db.repository.candidate_repository import CandidateRepository
 from sqlalchemy.orm import Session
 from app.core.log import langfuse_handler
 
@@ -10,8 +11,9 @@ class CandidateService:
     candidate_graph를 호출하여 후보 노드를 생성합니다.
     """
     
-    def __init__(self, node_repository: NodeRepository):
+    def __init__(self, node_repository: NodeRepository, candidate_repository: CandidateRepository):
         self.node_repository = node_repository
+        self.candidate_repository = candidate_repository
     
     async def generate_candidates(
         self, 
@@ -31,6 +33,6 @@ class CandidateService:
         }, config={
             "callbacks": [langfuse_handler]
         })
-        result = result['candidates']
-        print(result)
-        return CandidateGenerateResponse(candidates=result["candidates"])
+        candidates_data = result['candidates']['candidates']
+        self.candidate_repository.create_multiple(db, node.id, candidates_data)
+        return CandidateGenerateResponse(candidates=candidates_data)
