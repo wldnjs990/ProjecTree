@@ -110,10 +110,7 @@ export default function WorkSpacePage() {
 
       const client = getCrdtClient();
       if (client) {
-        // TODO: 실제 workspaceId, userId로 대체
-        const workspaceId = 1;
-
-        const requestId = client.saveNodeDetail(workspaceId);
+        const requestId = client.saveNodeDetail();
         if (requestId) {
           console.log('[WorkSpacePage] 저장 요청 성공, requestId:', requestId);
         }

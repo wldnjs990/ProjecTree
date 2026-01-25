@@ -83,11 +83,10 @@ class CrdtClient {
    * CRDT 서버가 REST API를 통해 스프링 서버로 전송
    * 스프링 서버에서 DB에 저장
    */
-  saveNodeDetail(workspaceId: number): string | null {
+  saveNodeDetail(): string | null {
     const requestId = crypto.randomUUID();
     const message = JSON.stringify({
       type: 'save_node_detail',
-      workspaceId,
       requestId,
     });
 
@@ -95,7 +94,6 @@ class CrdtClient {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
       console.log('[CRDT] 워크스페이스 저장 요청 전송:', {
-        workspaceId,
         requestId,
       });
       return requestId;
