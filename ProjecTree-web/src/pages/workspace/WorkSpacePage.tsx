@@ -104,22 +104,19 @@ export default function WorkSpacePage() {
   }, [selectedNodeListData, selectedNodeDetail]);
 
   // 서버 저장 핸들러 - CRDT 서버를 통해 DB에 저장
-  const handleSaveNodeDetailToServer = useCallback(
-    async (nodeId: string, data: EditableNodeDetail) => {
-      console.log('[WorkSpacePage] CRDT 서버로 저장 요청:', nodeId, data);
+  const handleSaveNodeDetailToServer = useCallback(async (nodeId: string) => {
+    console.log('[WorkSpacePage] CRDT 서버로 저장 요청:', nodeId);
 
-      const client = getCrdtClient();
-      if (client) {
-        const requestId = client.saveNodeDetail();
-        if (requestId) {
-          console.log('[WorkSpacePage] 저장 요청 성공, requestId:', requestId);
-        }
-      } else {
-        console.warn('[WorkSpacePage] CRDT 클라이언트가 초기화되지 않음');
+    const client = getCrdtClient();
+    if (client) {
+      const requestId = client.saveNodeDetail(nodeId);
+      if (requestId) {
+        console.log('[WorkSpacePage] 저장 요청 성공, requestId:', requestId);
       }
-    },
-    []
-  );
+    } else {
+      console.warn('[WorkSpacePage] CRDT 클라이언트가 초기화되지 않음');
+    }
+  }, []);
 
   // CRDT 훅 사용
   const {

@@ -83,10 +83,11 @@ class CrdtClient {
    * CRDT 서버가 REST API를 통해 스프링 서버로 전송
    * 스프링 서버에서 DB에 저장
    */
-  saveNodeDetail(): string | null {
+  saveNodeDetail(nodeId: string): string | null {
     const requestId = crypto.randomUUID();
     const message = JSON.stringify({
       type: 'save_node_detail',
+      nodeId,
       requestId,
     });
 

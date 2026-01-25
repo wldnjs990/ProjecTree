@@ -25,7 +25,7 @@ type YNodeDetailValue = string | number | Assignee | null | undefined;
 interface UseNodeDetailCrdtOptions {
   nodeId: string | null;
   initialData: EditableNodeDetail | null;
-  onSave?: (nodeId: string, data: EditableNodeDetail) => Promise<void>;
+  onSave?: (nodeId: string) => Promise<void>;
 }
 
 /**
@@ -184,7 +184,7 @@ export const useNodeDetailCrdt = ({
     try {
       // 1. 서버에 저장
       if (onSave) {
-        await onSave(nodeId, editData);
+        await onSave(nodeId);
       }
 
       const client = getCrdtClient();
