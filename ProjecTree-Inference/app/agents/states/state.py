@@ -27,4 +27,7 @@ class NodeState(GlobalState):
     parent_info: Node
     candidate_id: int
     current_candidate_info: Candidate
+    candidate_id: int
+    current_candidate_info: Candidate
     task_type: TaskType
+    generated_node_detail: Optional[Dict[str, Any]]

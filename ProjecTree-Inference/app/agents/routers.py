@@ -14,10 +14,7 @@ def route_node(state: NodeState) -> str:
     elif node_type == NodeType.STORY:
         return "story_node_process"
     elif node_type == NodeType.TASK:
-        if candidate_info.task_type == TaskType.FRONTEND:
-            return "fe_task_node_process"
-        elif candidate_info.task_type == TaskType.BACKEND:
-            return "be_task_node_process"
+        return "task_node_process"
     elif node_type == NodeType.ADVANCE:
         return "advance_node_process"
     return "epic_node_process"
