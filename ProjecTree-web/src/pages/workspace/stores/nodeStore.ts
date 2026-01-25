@@ -8,7 +8,7 @@ import type {
   NodeStatus,
   Priority,
   Assignee,
-} from '../components/NodeDetailSidebar/types2';
+} from '../components/NodeDetailSidebar/types';
 
 // 확정된 노드 데이터 (편집 완료 후 브로드캐스트되는 데이터)
 export interface ConfirmedNodeData {
@@ -200,7 +200,8 @@ export const useNodeDetail = (nodeId: number | null) =>
   useNodeStore((state) => (nodeId ? state.nodeDetails[nodeId] : null));
 
 /** 노드 목록 데이터 선택 */
-export const useNodeListData = () => useNodeStore((state) => state.nodeListData);
+export const useNodeListData = () =>
+  useNodeStore((state) => state.nodeListData);
 
 /** 특정 노드 목록 데이터 선택 */
 export const useNodeListItem = (nodeId: number | null) =>

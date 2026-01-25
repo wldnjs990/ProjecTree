@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Assignee } from './types2';
+import type { Assignee } from './types';
 
 // 임시 팀원 목록 (나중에 API에서 가져올 예정)
 const teamMembers: Assignee[] = [
@@ -14,20 +14,19 @@ const teamMembers: Assignee[] = [
   { id: '3', name: '박현우' },
 ];
 
+// 담당자 선택 컴포넌트 (편집 모드)
 interface AssigneeSelectProps {
   value: Assignee | null;
-  onChange: (value: Assignee | null) => void;
+  onChange?: (value: Assignee | null) => void;
 }
-
-// 담당자 선택 컴포넌트 (편집 모드)
-export function AssigneeSelect({ value, onChange }: AssigneeSelectProps) {
+function AssigneeSelect({ value, onChange }: AssigneeSelectProps) {
   const handleChange = (selectedId: string) => {
     if (selectedId === 'none') {
-      onChange(null);
+      onChange?.(null);
     } else {
       const member = teamMembers.find((m) => m.id === selectedId);
       if (member) {
-        onChange(member);
+        onChange?.(member);
       }
     }
   };
@@ -56,12 +55,11 @@ export function AssigneeSelect({ value, onChange }: AssigneeSelectProps) {
   );
 }
 
+// 선택된 담당자 표시 컴포넌트 (조회 모드)
 interface SelectedAssigneeProps {
   assignee: Assignee | null;
 }
-
-// 선택된 담당자 표시 컴포넌트 (조회 모드)
-export function SelectedAssignee({ assignee }: SelectedAssigneeProps) {
+function SelectedAssignee({ assignee }: SelectedAssigneeProps) {
   if (!assignee) {
     return <span className="text-sm text-muted-foreground">미지정</span>;
   }
@@ -75,3 +73,18 @@ export function SelectedAssignee({ assignee }: SelectedAssigneeProps) {
     </div>
   );
 }
+
+// 병합 =========================================================
+interface NodeAssigneeProps {
+  value: Assignee | null;
+  onChange?: (value: Assignee | null) => void;
+  isEdit: boolean;
+}
+export const NodeAssignee = ({
+  value,
+  onChange,
+  isEdit,
+}: NodeAssigneeProps) => {
+  if (isEdit) return <AssigneeSelect value={value} onChange={onChange} />;
+  else return <SelectedAssignee assignee={value} />;
+};

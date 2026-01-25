@@ -2,13 +2,13 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Header, type ViewTab } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { TreeCanvas } from './components/Canvas';
-import { NodeDetailSidebar } from './components/NodeDetailSidebar/index2';
+import { NodeDetailSidebar } from './components/NodeDetailSidebar';
 import {
   mockNodes,
   mockUsers,
   mockNodeDetails,
   mockNodesApiResponse,
-} from './constants/mockData2';
+} from './constants/mockData';
 import { FeatureSpecView } from './components/FeatureSpec';
 import { TechStackStatusView } from './components/TechStackStatus';
 import type { FlowNode } from './types/node';
@@ -43,7 +43,10 @@ export default function WorkSpacePage() {
     setNodeDetails(mockNodeDetails);
 
     // 노드 목록 데이터를 store에 로드 (id -> NodeData 매핑)
-    const nodeListDataMap: Record<number, typeof mockNodesApiResponse.data[0]['data']> = {};
+    const nodeListDataMap: Record<
+      number,
+      (typeof mockNodesApiResponse.data)[0]['data']
+    > = {};
     mockNodesApiResponse.data.forEach((node) => {
       nodeListDataMap[node.id] = node.data;
     });

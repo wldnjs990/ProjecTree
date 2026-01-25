@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import type { Priority } from './types2';
+import type { Priority } from './types';
 
 // 우선순위별 스타일
 const priorityStyles: Record<Priority, { bg: string; text: string }> = {
@@ -67,4 +67,21 @@ export function SelectedPriority({ priority }: SelectedPriorityProps) {
       {priority}
     </span>
   );
+}
+
+// 통합 컴포넌트
+interface NodePriorityProps {
+  value: Priority | undefined;
+  isEdit: boolean;
+  onChange?: (value: Priority) => void;
+}
+
+export function NodePriorityField({ value, isEdit, onChange }: NodePriorityProps) {
+  if (isEdit && onChange) {
+    return <PrioritySelect value={value} onChange={onChange} />;
+  }
+  if (value) {
+    return <SelectedPriority priority={value} />;
+  }
+  return <span className="text-sm text-muted-foreground">미지정</span>;
 }

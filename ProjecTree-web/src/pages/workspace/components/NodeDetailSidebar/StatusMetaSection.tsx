@@ -1,8 +1,8 @@
-import type { NodeStatus, Priority, Assignee } from './types2';
-import { StatusSelect, SelectedStatus } from './NodeStatus';
-import { PrioritySelect, SelectedPriority } from './NodePriority';
-import { DifficultySelect, SelectedDifficulty } from './NodeDifficulty';
-import { AssigneeSelect, SelectedAssignee } from './NodeAssignee';
+import type { NodeStatus, Priority, Assignee } from './types';
+import { NodeStatusField } from './NodeStatus';
+import { NodePriorityField } from './NodePriority';
+import { NodeDifficultyField } from './NodeDifficulty';
+import { NodeAssignee } from './NodeAssignee';
 
 interface StatusMetaSectionData {
   status: NodeStatus;
@@ -40,23 +40,21 @@ export function StatusMetaSection({
         {/* 상태 */}
         <div className="flex items-center gap-2">
           <span className="text-xs text-[#61626F]">상태</span>
-          {isEdit && onStatusChange ? (
-            <StatusSelect value={data.status} onChange={onStatusChange} />
-          ) : (
-            <SelectedStatus status={data.status} />
-          )}
+          <NodeStatusField
+            value={data.status}
+            isEdit={isEdit}
+            onChange={onStatusChange}
+          />
         </div>
 
         {/* 우선순위 */}
         <div className="flex items-center gap-2">
           <span className="text-xs text-[#61626F]">우선순위</span>
-          {isEdit && onPriorityChange ? (
-            <PrioritySelect value={data.priority} onChange={onPriorityChange} />
-          ) : data.priority ? (
-            <SelectedPriority priority={data.priority} />
-          ) : (
-            <span className="text-sm text-muted-foreground">미지정</span>
-          )}
+          <NodePriorityField
+            value={data.priority}
+            isEdit={isEdit}
+            onChange={onPriorityChange}
+          />
         </div>
       </div>
 
@@ -65,21 +63,21 @@ export function StatusMetaSection({
         {/* 담당자 */}
         <div className="space-y-1">
           <span className="text-xs text-[#61626F]">담당자</span>
-          {isEdit && onAssigneeChange ? (
-            <AssigneeSelect value={data.assignee} onChange={onAssigneeChange} />
-          ) : (
-            <SelectedAssignee assignee={data.assignee} />
-          )}
+          <NodeAssignee
+            isEdit={isEdit}
+            onChange={onAssigneeChange}
+            value={data.assignee}
+          />
         </div>
 
         {/* 난이도 */}
         <div className="space-y-1">
           <span className="text-xs text-[#61626F]">난이도</span>
-          {isEdit && onDifficultyChange ? (
-            <DifficultySelect value={data.difficult} onChange={onDifficultyChange} />
-          ) : (
-            <SelectedDifficulty difficulty={data.difficult} />
-          )}
+          <NodeDifficultyField
+            value={data.difficult}
+            isEdit={isEdit}
+            onChange={onDifficultyChange}
+          />
         </div>
       </div>
     </div>

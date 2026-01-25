@@ -55,3 +55,17 @@ export function SelectedDifficulty({ difficulty }: SelectedDifficultyProps) {
     </div>
   );
 }
+
+// 통합 컴포넌트
+interface NodeDifficultyProps {
+  value: number;
+  isEdit: boolean;
+  onChange?: (value: number) => void;
+}
+
+export function NodeDifficultyField({ value, isEdit, onChange }: NodeDifficultyProps) {
+  if (isEdit && onChange) {
+    return <DifficultySelect value={value} onChange={onChange} />;
+  }
+  return <SelectedDifficulty difficulty={value} />;
+}

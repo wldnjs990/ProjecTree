@@ -22,9 +22,7 @@ interface TechStackStatusViewProps {
  * 2. Filter Section (레벨 토글 + 정렬/조건 드롭다운)
  * 3. Node Mapping List (노드 리스트 테이블)
  */
-export function TechStackStatusView({
-  onNodeClick,
-}: TechStackStatusViewProps) {
+export function TechStackStatusView({ onNodeClick }: TechStackStatusViewProps) {
   // Zustand 스토어에서 노드 가져오기
   const nodes = useNodes();
 

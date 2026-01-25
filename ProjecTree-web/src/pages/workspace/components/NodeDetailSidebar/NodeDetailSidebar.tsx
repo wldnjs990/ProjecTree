@@ -5,7 +5,7 @@ import type {
   Assignee,
   Candidate,
   NodeData,
-} from './types2';
+} from './types';
 import { NodeHeader } from './NodeHeader';
 import { StatusMetaSection } from './StatusMetaSection';
 import { AITechRecommendSection } from './AITechRecommendSection';

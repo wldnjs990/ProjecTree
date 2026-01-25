@@ -6,7 +6,7 @@ import type {
   NodeStatus,
   Priority,
   Assignee,
-} from '../components/NodeDetailSidebar/types2';
+} from '../components/NodeDetailSidebar/types';
 
 // 편집 가능한 노드 상세 필드 타입
 export interface EditableNodeDetail {
@@ -101,7 +101,11 @@ export const useNodeDetailCrdt = ({
       event.keysChanged.forEach((key) => {
         const confirmedData = yConfirmed.get(key);
         if (confirmedData) {
-          console.log('[useNodeDetailCrdt] 확정 데이터 수신:', key, confirmedData);
+          console.log(
+            '[useNodeDetailCrdt] 확정 데이터 수신:',
+            key,
+            confirmedData
+          );
           applyConfirmedData(Number(key), confirmedData);
         }
       });
@@ -186,7 +190,8 @@ export const useNodeDetailCrdt = ({
       const client = getCrdtClient();
       if (client) {
         // 2. 확정 데이터를 Y.Map에 저장 (다른 클라이언트에 브로드캐스트)
-        const yConfirmed = client.getYMap<ConfirmedNodeData>('confirmedNodeData');
+        const yConfirmed =
+          client.getYMap<ConfirmedNodeData>('confirmedNodeData');
         const confirmedData: ConfirmedNodeData = {
           status: editData.status,
           priority: editData.priority,
@@ -195,7 +200,11 @@ export const useNodeDetailCrdt = ({
           note: editData.note,
         };
         yConfirmed.set(nodeId, confirmedData);
-        console.log('[useNodeDetailCrdt] 확정 데이터 브로드캐스트:', nodeId, confirmedData);
+        console.log(
+          '[useNodeDetailCrdt] 확정 데이터 브로드캐스트:',
+          nodeId,
+          confirmedData
+        );
 
         // 3. 로컬 store에도 즉시 반영
         applyConfirmedData(Number(nodeId), confirmedData);

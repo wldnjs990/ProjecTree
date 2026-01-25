@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import type { NodeStatus } from './types2';
+import type { NodeStatus } from './types';
 
 // 상태별 스타일 및 라벨
 const statusStyles: Record<
@@ -81,4 +81,18 @@ export function SelectedStatus({ status }: SelectedStatusProps) {
       {style.label}
     </span>
   );
+}
+
+// 통합 컴포넌트
+interface NodeStatusProps {
+  value: NodeStatus;
+  isEdit: boolean;
+  onChange?: (value: NodeStatus) => void;
+}
+
+export function NodeStatusField({ value, isEdit, onChange }: NodeStatusProps) {
+  if (isEdit && onChange) {
+    return <StatusSelect value={value} onChange={onChange} />;
+  }
+  return <SelectedStatus status={value} />;
 }

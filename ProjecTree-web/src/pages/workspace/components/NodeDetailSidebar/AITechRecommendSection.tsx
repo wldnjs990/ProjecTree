@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import type { TechRecommendation } from './types2';
+import type { TechRecommendation } from './types';
 import { cn } from '@/lib/utils';
 
 interface AITechRecommendSectionProps {

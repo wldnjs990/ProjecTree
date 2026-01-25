@@ -1,168 +1,338 @@
 import type { Node, Edge } from '@xyflow/react';
-import type { ProjectNodeData } from '../components/Canvas/nodes/ProjectNode';
-import type { EpicNodeData } from '../components/Canvas/nodes/EpicNode';
-import type { StoryNodeData } from '../components/Canvas/nodes/StoryNode';
 import type { AvatarColor } from '@/components/custom/UserAvatar';
-import type { AdvancedNodeData, TaskNodeData } from '../components';
+import type {
+  NodesApiResponse,
+  NodeDetailApiResponse,
+  NodeDetailData,
+} from '../components/NodeDetailSidebar';
 
-// Mock nodes for the tree (with parentId for CRDT)
-export const mockNodes: Node[] = [
-  // Project Node (루트)
-  {
-    id: 'project-1',
-    type: 'project',
-    position: { x: 400, y: 50 },
-    parentId: undefined, // 루트 노드
-    data: {
-      title: 'AI 여행 추천 서비스',
-      status: 'progress',
-      priority: 'P0',
-      taskId: '#ASDF-1',
-    } as ProjectNodeData,
-  },
-  // Epic Node
-  {
-    id: 'epic-1',
-    type: 'epic',
-    position: { x: 400, y: 180 },
-    parentId: 'project-1',
-    data: {
-      title: '사용자 인증',
-      status: 'completed',
-      taskId: '#ASDF-2',
-      storyPoints: 5,
-      priority: 'P0',
-    } as EpicNodeData,
-  },
-  // Story Nodes
-  {
-    id: 'story-1',
-    type: 'story',
-    position: { x: 250, y: 340 },
-    parentId: 'epic-1',
-    data: {
-      title: '사용자가 로그인한다.',
-      status: 'progress',
-      taskId: '#ASDF-3',
-      category: 'frontend',
-      storyPoints: 3,
-      priority: 'P1',
-    } as StoryNodeData,
-  },
-  {
-    id: 'task-1',
-    type: 'task',
-    position: { x: 200, y: 470 },
-    parentId: 'story-1',
-    data: {
-      title: '프론트엔드 로그인',
-      status: 'progress',
-      taskId: '#ASDF-4',
-      category: 'frontend',
-      storyPoints: 4,
-      assignee: {
-        id: 'user-1',
-        name: '김철수',
-        initials: '김철',
-        color: '#3b82f6',
+// ===== 백엔드 API 목데이터 =====
+
+// 노드 목록 API 응답 목데이터
+export const mockNodesApiResponse: NodesApiResponse = {
+  status: 'SUCCESS',
+  code: 200,
+  message: '요청에 성공하였습니다.',
+  data: [
+    {
+      id: 1,
+      name: 'AI 여행 추천 서비스',
+      nodeType: 'PROJECT',
+      position: { xPos: 400, yPos: 50 },
+      parentId: null,
+      data: {
+        priority: 'P0',
+        identifier: 'PROJ-001',
+        taskType: null,
+        status: 'IN_PROGRESS',
+        difficult: 3,
       },
-    } as TaskNodeData,
-  },
-  {
-    id: 'task-2',
-    type: 'task',
-    position: { x: 400, y: 470 },
-    parentId: 'story-1',
-    data: {
-      title: '백엔드 로그인',
-      status: 'pending',
-      taskId: '#ASDF-5',
-      category: 'backend',
-      storyPoints: 3,
-      assignee: {
-        id: 'user-2',
-        name: '이영희',
-        initials: '이영',
-        color: '#8b5cf6',
+    },
+    {
+      id: 2,
+      name: '사용자 인증',
+      nodeType: 'EPIC',
+      position: { xPos: 400, yPos: 180 },
+      parentId: 1,
+      data: {
+        priority: 'P0',
+        identifier: 'EPIC-001',
+        taskType: null,
+        status: 'DONE',
+        difficult: 5,
       },
-    } as TaskNodeData,
-  },
+    },
+    {
+      id: 3,
+      name: '사용자가 로그인한다.',
+      nodeType: 'STORY',
+      position: { xPos: 250, yPos: 340 },
+      parentId: 2,
+      data: {
+        priority: 'P1',
+        identifier: 'STORY-001',
+        taskType: null,
+        status: 'IN_PROGRESS',
+        difficult: 3,
+      },
+    },
+    {
+      id: 4,
+      name: '프론트엔드 로그인',
+      nodeType: 'TASK',
+      position: { xPos: 200, yPos: 470 },
+      parentId: 3,
+      data: {
+        priority: 'P0',
+        identifier: 'TASK-001',
+        taskType: 'FE',
+        status: 'IN_PROGRESS',
+        difficult: 4,
+      },
+    },
+    {
+      id: 5,
+      name: '백엔드 로그인',
+      nodeType: 'TASK',
+      position: { xPos: 400, yPos: 470 },
+      parentId: 3,
+      data: {
+        priority: 'P1',
+        identifier: 'TASK-002',
+        taskType: 'BE',
+        status: 'TODO',
+        difficult: 3,
+      },
+    },
+  ],
+};
+
+// 노드 상세 API 응답 목데이터
+export const mockNodeDetailApiResponses: Record<number, NodeDetailApiResponse> =
   {
-    id: 'advanced-4',
-    type: 'advanced',
-    position: { x: 150, y: 600 },
-    parentId: 'task-1',
-    data: {
-      title: '프론트엔드 Form 렌더링 최적화',
-      status: 'pending',
-      taskId: '#ASDF-6',
-      category: 'frontend',
-      priority: 'P1',
-      storyPoints: 2,
-    } as AdvancedNodeData,
+    4: {
+      status: 'SUCCESS',
+      code: 200,
+      message: '요청에 성공하였습니다.',
+      data: {
+        id: 4,
+        assignee: {
+          id: '2',
+          name: '이지은',
+        },
+        description:
+          '로그인, 회원가입, 비밀번호 재설정, 소셜 로그인 연동을 포함한 종합 인증 시스템을 구현합니다.',
+        note: '기한 엄수 요망',
+        candidates: [
+          {
+            id: 101,
+            name: '[FE] 현재 위치 기반 추천 화면 및 즉시표시 UX 구현',
+            description:
+              "사용자의 위치 권한을 요청하고 현재 좌표(위도/경도)를 가져와 추천 UI를 초기화한다. 화면에는 '지금 바로 입장 가능' 배너, 근처(500m) 식당 목록, 각 항목에 거리, 예상 혼잡도 상태(아이콘), '즉시 입장 가능' 태그를 표시한다.",
+            taskType: 'FE',
+          },
+          {
+            id: 102,
+            name: '[FE] 소셜 로그인 버튼 컴포넌트 구현',
+            description:
+              'OAuth2 기반 소셜 로그인(Google, Kakao, Naver) 버튼 및 인증 플로우를 구현합니다.',
+            taskType: 'FE',
+          },
+        ],
+        techs: [
+          {
+            id: 7555,
+            name: 'react-hook-form',
+            advantage:
+              '성능에 최적화된 폼 라이브러리로 비제어 컴포넌트 방식을 사용하여 리렌더링을 최소화합니다. 간단한 API와 작은 번들 사이즈가 장점입니다.',
+            disadvantage:
+              '비제어 방식에 익숙하지 않은 개발자에게는 학습 곡선이 있을 수 있습니다.',
+            description:
+              'React를 위한 폼 상태 관리 라이브러리로, 유효성 검사와 폼 제출을 효율적으로 처리합니다.',
+            ref: 'https://react-hook-form.com/',
+            recommendationScore: 5,
+          },
+          {
+            id: 50139,
+            name: 'SWR',
+            advantage:
+              'Stale-While-Revalidate 전략으로 빠른 UX를 제공하며, 자동 캐싱과 실시간 동기화를 지원합니다.',
+            disadvantage:
+              'React 전용 라이브러리이며, 복잡한 서버 상태 관리에는 React Query가 더 적합할 수 있습니다.',
+            description:
+              'React를 위한 데이터 페칭 라이브러리로, 캐싱과 재검증을 자동으로 처리합니다.',
+            ref: 'https://swr.vercel.app/',
+            recommendationScore: 4,
+          },
+          {
+            id: 71996,
+            name: 'React Query',
+            advantage:
+              '강력한 서버 상태 관리 기능과 DevTools를 제공하며, 캐싱, 동기화, 백그라운드 업데이트를 자동으로 처리합니다.',
+            disadvantage:
+              '학습 곡선이 있으며, 작은 프로젝트에는 오버엔지니어링일 수 있습니다.',
+            description:
+              '서버 상태 관리를 위한 라이브러리로, 데이터 페칭, 캐싱, 동기화를 효율적으로 처리합니다.',
+            ref: 'https://tanstack.com/query/',
+            recommendationScore: 4,
+          },
+        ],
+        comparison:
+          '# 기술 비교 분석\n\n| 비교 항목 | react-hook-form | SWR | React Query |\n|---|---|---|---|\n| 주요 용도 | 폼 상태 관리 | 데이터 페칭/캐싱 | 서버 상태 관리 |\n| 번들 크기 | 작음 (~9KB) | 작음 (~4KB) | 중간 (~13KB) |\n| 학습 곡선 | 낮음 | 낮음 | 중간 |\n| DevTools | 없음 | 없음 | 있음 |\n| 캐싱 전략 | N/A | SWR | 다양한 옵션 |\n\n# 요약\n- 폼 처리에는 react-hook-form을 사용합니다.\n- 간단한 데이터 페칭에는 SWR이 적합합니다.\n- 복잡한 서버 상태 관리가 필요하면 React Query를 고려합니다.',
+      },
+    },
+    5: {
+      status: 'SUCCESS',
+      code: 200,
+      message: '요청에 성공하였습니다.',
+      data: {
+        id: 5,
+        assignee: {
+          id: '1',
+          name: '김민수',
+        },
+        description: 'JWT 기반 인증 API와 세션 관리를 구현합니다.',
+        note: '',
+        candidates: [
+          {
+            id: 201,
+            name: '[BE] 토큰 검증 미들웨어 구현',
+            description:
+              'JWT 토큰의 유효성을 검사하는 미들웨어를 구현합니다. 만료 시간, 서명 검증 등을 처리합니다.',
+            taskType: 'BE',
+          },
+          {
+            id: 202,
+            name: '[BE] 리프레시 토큰 로직 구현',
+            description:
+              'Access Token 만료 시 Refresh Token을 이용한 토큰 갱신 메커니즘을 구현합니다.',
+            taskType: 'BE',
+          },
+        ],
+        techs: [
+          {
+            id: 8001,
+            name: 'JWT',
+            advantage:
+              'Stateless 인증 방식으로 확장성이 좋으며, 서버 세션 저장소가 필요 없습니다.',
+            disadvantage:
+              '토큰 크기가 크고, 토큰 탈취 시 만료 전까지 무효화하기 어렵습니다.',
+            description:
+              'JSON Web Token 기반의 인증 방식으로, 토큰에 사용자 정보를 담아 전달합니다.',
+            ref: 'https://jwt.io/',
+            recommendationScore: 5,
+          },
+        ],
+        comparison:
+          '# JWT 인증 전략\n\nJWT는 stateless 인증의 표준으로, 마이크로서비스 아키텍처��� 적합합니다. 토큰 만료 시간을 짧게 설정하고 Refresh Token을 활용하여 보안을 강화하는 것이 권장됩니다.',
+      },
+    },
+    3: {
+      status: 'SUCCESS',
+      code: 200,
+      message: '요청에 성공하였습니다.',
+      data: {
+        id: 3,
+        assignee: null,
+        description: '사용자 스토리: 로그인 기능 전체 흐름',
+        note: '',
+        candidates: [
+          {
+            id: 301,
+            name: '소셜 로그인 기능',
+            description: 'OAuth2 기반 소셜 로그인 (Google, Kakao, Naver)',
+            taskType: null,
+          },
+        ],
+        techs: [],
+        comparison: '',
+      },
+    },
+    2: {
+      status: 'SUCCESS',
+      code: 200,
+      message: '요청에 성공하였습니다.',
+      data: {
+        id: 2,
+        assignee: null,
+        description: '전체 인증 시스템 에픽',
+        note: '',
+        candidates: [],
+        techs: [],
+        comparison: '',
+      },
+    },
+    1: {
+      status: 'SUCCESS',
+      code: 200,
+      message: '요청에 성공하였습니다.',
+      data: {
+        id: 1,
+        assignee: null,
+        description: 'AI 기반 맞춤형 여행 추천 플랫폼',
+        note: '',
+        candidates: [],
+        techs: [],
+        comparison: '',
+      },
+    },
+  };
+
+// 노드 상세 데이터만 추출 (사이드바에서 사용)
+export const mockNodeDetails: Record<number, NodeDetailData> =
+  Object.fromEntries(
+    Object.entries(mockNodeDetailApiResponses).map(([key, value]) => [
+      Number(key),
+      value.data,
+    ])
+  );
+
+// ===== React Flow 변환용 유틸리티 =====
+
+// 백엔드 노드 타입 → React Flow 노드 타입 변환
+const nodeTypeMap: Record<string, string> = {
+  PROJECT: 'project',
+  EPIC: 'epic',
+  STORY: 'story',
+  TASK: 'task',
+};
+
+// 백엔드 taskType → frontend/backend 변환
+const taskTypeMap: Record<string, 'frontend' | 'backend'> = {
+  FE: 'frontend',
+  BE: 'backend',
+};
+
+// 백엔드 API 응답을 React Flow 노드로 변환
+export const mockNodes: Node[] = mockNodesApiResponse.data.map((node) => ({
+  id: String(node.id),
+  type: nodeTypeMap[node.nodeType] || 'task',
+  position: { x: node.position.xPos, y: node.position.yPos },
+  parentId: node.parentId ? String(node.parentId) : undefined,
+  data: {
+    title: node.name,
+    status: node.data.status,
+    priority: node.data.priority,
+    taskId: `#${node.data.identifier}`,
+    category: node.data.taskType ? taskTypeMap[node.data.taskType] : undefined,
+    difficult: node.data.difficult,
   },
-  {
-    id: 'advanced-5',
-    type: 'advanced',
-    position: { x: 450, y: 600 },
-    parentId: 'task-2',
-    data: {
-      title: '백엔드 블랙리스트 관리',
-      status: 'pending',
-      taskId: '#ASDF-7',
-      category: 'backend',
-      priority: 'P2',
-      storyPoints: 3,
-    } as AdvancedNodeData,
-  },
-];
+}));
 
 // Mock edges connecting nodes
 export const mockEdges: Edge[] = [
   {
-    id: 'e-project-epic',
-    source: 'project-1',
-    target: 'epic-1',
+    id: 'e-1-2',
+    source: '1',
+    target: '2',
     type: 'smoothstep',
     animated: true,
     style: { stroke: '#8B5CF6', strokeWidth: 2 },
   },
   {
-    id: 'e-epic-story1',
-    source: 'epic-1',
-    target: 'story-1',
+    id: 'e-2-3',
+    source: '2',
+    target: '3',
     type: 'smoothstep',
     style: { stroke: '#2B7FFF', strokeWidth: 2 },
   },
   {
-    id: 'e-story1-task1',
-    source: 'story-1',
-    target: 'task-1',
+    id: 'e-3-4',
+    source: '3',
+    target: '4',
     type: 'smoothstep',
     style: { stroke: '#00D492', strokeWidth: 2 },
   },
   {
-    id: 'e-story1-task2',
-    source: 'story-1',
-    target: 'task-2',
+    id: 'e-3-5',
+    source: '3',
+    target: '5',
     type: 'smoothstep',
     style: { stroke: '#06B6D4', strokeWidth: 2 },
   },
-  {
-    id: 'e-task1-advanced4',
-    source: 'task-1',
-    target: 'advanced-4',
-    type: 'smoothstep',
-    style: { stroke: '#00D492', strokeWidth: 2 },
-  },
-  {
-    id: 'e-task2-advanced5',
-    source: 'task-2',
-    target: 'advanced-5',
-    type: 'smoothstep',
-    style: { stroke: '#0891B2', strokeWidth: 2 },
-  },
 ];
+
+// ===== 기타 목데이터 =====
 
 // Mock online users
 export interface MockUser {
@@ -178,251 +348,6 @@ export const mockUsers: MockUser[] = [
   { id: '3', initials: 'PH', color: 'orange', isOnline: false },
 ];
 
-// Mock node detail data for sidebar
-import type { NodeDetailData } from '../components/NodeDetailSidebar';
-
-export const mockNodeDetails: Record<string, NodeDetailData> = {
-  'task-1': {
-    id: 'task-1',
-    type: 'task',
-    category: 'frontend',
-    taskId: 'ASDF-2',
-    title: '사용자 인증 시스템',
-    description:
-      '로그인, 회원가입, 비밀번호 재설정, 소셜 로그인 연동을 포함한 종합 인증 시스템을 구현합니다.',
-    status: 'progress',
-    priority: 'P0',
-    assignee: {
-      id: '2',
-      name: '이지은',
-      initials: 'LJ',
-      color: '#1C69E3',
-    },
-    difficulty: 4,
-    techRecommendations: [
-      {
-        id: 'swr',
-        name: 'SWR',
-        category: '데이터 페칭/캐싱',
-        description:
-          'React를 위한 데이터 페칭 라이브러리. Stale-While-Revalidate 전략으로 빠른 UX를 제공합니다.',
-        tags: [
-          { label: '자동 캐싱', type: 'positive' },
-          { label: '실시간 동기화', type: 'positive' },
-          { label: 'React 전용', type: 'negative' },
-        ],
-        isAIRecommended: true,
-      },
-      {
-        id: 'react-query',
-        name: 'React Query',
-        category: '서버 상태 관리',
-        description:
-          '강력한 서버 상태 관리 라이브러리. 캐싱, 동기화, 백그라운드 업데이트를 자동으로 처리합니다.',
-        tags: [
-          { label: '강력한 캐싱', type: 'positive' },
-          { label: 'DevTools', type: 'positive' },
-          { label: '학습 곡선', type: 'negative' },
-        ],
-      },
-      {
-        id: 'react-hook-form',
-        name: 'React Hook Form',
-        category: '폼 관리',
-        description:
-          '성능에 최적화된 폼 라이브러리. 비제어 컴포넌트로 리렌더링을 최소화합니다.',
-        tags: [
-          { label: '고성능', type: 'positive' },
-          { label: '간단한 API', type: 'positive' },
-          { label: '비제어 방식', type: 'negative' },
-        ],
-      },
-    ],
-    techComparison: {
-      id: 'comparison-swr-react-query',
-      comparedTechs: ['swr', 'react-query'],
-      comparisonTable:
-        '# 기술 비교 분석\n\n| 요소 | infinite-scroll-with-auto-scroll-api | reactive-scroll-manager | observable-scroll-behavior |\n|---|---|---|---|\n| 생산성 | 중간-상 | 중상 | 중상-높음 |\n| 번들 크기 | 중간 | 중간 | 중상(추가 라이브러리 시 증가) |\n| 상태 관리 효율성 | 메시지 흐름과 스크롤 제어를 분리 어려움 | 상태 관리와 스크롤 제어를 함께 다루며 일관성 좋음 | Observable로 흐름 분리, 확장성은 좋지만 학습 필요 |\n| 생태계 지원 | 일반적 방법론, 재사용성 좋음 | React 기반으로 생태계 친화적 | RxJS 등 Observable 생태계 의존성 |\n| 구현 난이도 | 중-상 | 중 | 중-상 |\n| 핵심 보완 포인트 | 스크롤 위치 유지 로직의 경계 설정 필요 | 스크롤 타이밍과 버퍼 관리 중요 | 추상화 레벨 높아 초기 학습 필요 |\n\n요약: 세 옵션은 모두 실시간 채팅의 자동 스크롤 요구를 충족하지만, 실제로는 사용자의 스크롤 의도(읽고 있는지 여부)에 따라 자동 스크롤 정책을 다르게 적용하는 것이 중요합니다. 주니어 개발자라면 reactive-scroll-manager가 React 친화적이며 관리 포인트가 명확해 시작하기 좋고, infinite-scroll-with-auto-scroll-api는 로직 경계와 복합 케이스에 강합니다. observable-scroll-behavior는 확장성은 크지만 학습부담이 큽니다.',
-    },
-    subNodeRecommendations: [
-      {
-        id: 'sub-1',
-        title: '하위 기능 1',
-        description: '세부 기능 구현',
-      },
-      {
-        id: 'sub-2',
-        title: '하위 기능 2',
-        description: '세부 기능 구현',
-      },
-      {
-        id: 'sub-3',
-        title: '하위 기능 3',
-        description: '세부 기능 구현',
-      },
-    ],
-    memo: '',
-  },
-  'task-2': {
-    id: 'task-2',
-    type: 'task',
-    category: 'backend',
-    taskId: 'ASDF-5',
-    title: '백엔드 로그인',
-    description: 'JWT 기반 인증 API와 세션 관리를 구현합니다.',
-    status: 'pending',
-    priority: 'P1',
-    assignee: {
-      id: '1',
-      name: '김민수',
-      initials: 'KM',
-      color: '#8B5CF6',
-    },
-    difficulty: 3,
-    techRecommendations: [
-      {
-        id: 'jwt',
-        name: 'JWT',
-        category: '인증',
-        description: 'JSON Web Token 기반 stateless 인증 방식입니다.',
-        tags: [
-          { label: '확장성', type: 'positive' },
-          { label: '무상태', type: 'positive' },
-          { label: '토큰 크기', type: 'negative' },
-        ],
-        isAIRecommended: true,
-      },
-    ],
-    subNodeRecommendations: [
-      {
-        id: 'sub-1',
-        title: '토큰 검증 로직',
-        description: 'JWT 토큰 유효성 검사',
-      },
-      {
-        id: 'sub-2',
-        title: '리프레시 토큰',
-        description: '토큰 갱신 메커니즘',
-      },
-    ],
-  },
-  'advanced-4': {
-    id: 'advanced-4',
-    type: 'advanced',
-    category: 'frontend',
-    taskId: 'ASDF-6',
-    title: '프론트엔드 Form 렌더링 최적화',
-    description: '복잡한 폼의 렌더링 성능을 개선합니다.',
-    status: 'pending',
-    priority: 'P1',
-    difficulty: 2,
-    techRecommendations: [
-      {
-        id: 'memo',
-        name: 'React.memo',
-        category: '최적화',
-        description:
-          '컴포넌트 메모이제이션으로 불필요한 리렌더링을 방지합니다.',
-        tags: [
-          { label: '성능 향상', type: 'positive' },
-          { label: '간단함', type: 'positive' },
-        ],
-        isAIRecommended: true,
-      },
-      {
-        id: 'usememo',
-        name: 'useMemo',
-        category: '최적화',
-        description: '값 메모이제이션으로 비용이 큰 계산을 최적화합니다.',
-        tags: [
-          { label: '계산 최적화', type: 'positive' },
-          { label: '과도한 사용 주의', type: 'negative' },
-        ],
-      },
-      {
-        id: 'use-callback',
-        name: 'useCallback',
-        category: '최적화',
-        description:
-          '함수 메모이제이션으로 자식 컴포넌트 리렌더링을 방지합니다.',
-        tags: [
-          { label: '함수 안정화', type: 'positive' },
-          { label: '의존성 관리', type: 'negative' },
-        ],
-      },
-    ],
-    techComparison: {
-      id: 'comparison-react-optimization',
-      comparedTechs: ['memo', 'usememo', 'use-callback'],
-      comparisonTable:
-        '# 기술 비교 분석\n\n| 요소 | infinite-scroll-with-auto-scroll-api | reactive-scroll-manager | observable-scroll-behavior |\n|---|---|---|---|\n| 생산성 | 중간-상 | 중상 | 중상-높음 |\n| 번들 크기 | 중간 | 중간 | 중상(추가 라이브러리 시 증가) |\n| 상태 관리 효율성 | 메시지 흐름과 스크롤 제어를 분리 어려움 | 상태 관리와 스크롤 제어를 함께 다루며 일관성 좋음 | Observable로 흐름 분리, 확장성은 좋지만 학습 필요 |\n| 생태계 지원 | 일반적 방법론, 재사용성 좋음 | React 기반으로 생태계 친화적 | RxJS 등 Observable 생태계 의존성 |\n| 구현 난이도 | 중-상 | 중 | 중-상 |\n| 핵심 보완 포인트 | 스크롤 위치 유지 로직의 경계 설정 필요 | 스크롤 타이밍과 버퍼 관리 중요 | 추상화 레벨 높아 초기 학습 필요 |\n\n요약: 세 옵션은 모두 실시간 채팅의 자동 스크롤 요구를 충족하지만, 실제로는 사용자의 스크롤 의도(읽고 있는지 여부)에 따라 자동 스크롤 정책을 다르게 적용하는 것이 중요합니다. 주니어 개발자라면 reactive-scroll-manager가 React 친화적이며 관리 포인트가 명확해 시작하기 좋고, infinite-scroll-with-auto-scroll-api는 로직 경계와 복합 케이스에 강합니다. observable-scroll-behavior는 확장성은 크지만 학습부담이 큽니다.',
-    },
-    subNodeRecommendations: [],
-  },
-  'advanced-5': {
-    id: 'advanced-5',
-    type: 'advanced',
-    category: 'backend',
-    taskId: 'ASDF-7',
-    title: '백엔드 블랙리스트 관리',
-    description: '토큰 블랙리스트를 효율적으로 관리합니다.',
-    status: 'pending',
-    priority: 'P2',
-    difficulty: 3,
-    techRecommendations: [
-      {
-        id: 'redis',
-        name: 'Redis',
-        category: '캐시/DB',
-        description:
-          '인메모리 데이터 저장소로 빠른 블랙리스트 조회가 가능합니다.',
-        tags: [
-          { label: '고성능', type: 'positive' },
-          { label: 'TTL 지원', type: 'positive' },
-        ],
-        isAIRecommended: true,
-      },
-    ],
-    subNodeRecommendations: [],
-  },
-  'story-1': {
-    id: 'story-1',
-    type: 'story',
-    taskId: 'ASDF-3',
-    title: '사용자가 로그인한다.',
-    description: '사용자 스토리: 로그인 기능 전체 흐름',
-    status: 'progress',
-    priority: 'P0',
-    difficulty: 3,
-    subNodeRecommendations: [
-      {
-        id: 'sub-1',
-        title: '소셜 로그인',
-        description: 'OAuth2 기반 소셜 로그인',
-      },
-    ],
-  },
-  'epic-1': {
-    id: 'epic-1',
-    type: 'epic',
-    taskId: 'ASDF-2',
-    title: '사용자 인증',
-    description: '전체 인증 시스템 에픽',
-    status: 'completed',
-    difficulty: 5,
-    subNodeRecommendations: [],
-  },
-  'project-1': {
-    id: 'project-1',
-    type: 'project',
-    title: 'AI 여행 추천 서비스',
-    description: 'AI 기반 맞춤형 여행 추천 플랫폼',
-    status: 'progress',
-    priority: 'P0',
-    subNodeRecommendations: [],
-  },
-};
-
 // Tech Stack Mappings
 export interface TechStackMapping {
   nodeId: string;
@@ -432,24 +357,14 @@ export interface TechStackMapping {
 
 export const mockTechStackMappings: TechStackMapping[] = [
   {
-    nodeId: 'task-1',
+    nodeId: '4',
     confirmedTechs: ['React', 'TypeScript', 'SWR'],
-    lastUpdated: new Date(Date.now() - 15 * 60 * 1000).toISOString(), // 15분 전
+    lastUpdated: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
   },
   {
-    nodeId: 'task-2',
+    nodeId: '5',
     confirmedTechs: ['Node.js', 'PostgreSQL', 'JWT'],
-    lastUpdated: new Date(Date.now() - 60 * 60 * 1000).toISOString(), // 1시간 전
-  },
-  {
-    nodeId: 'advanced-4',
-    confirmedTechs: ['React.memo', 'useMemo'],
-    lastUpdated: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3시간 전
-  },
-  {
-    nodeId: 'advanced-5',
-    confirmedTechs: ['Redis'],
-    lastUpdated: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6시간 전
+    lastUpdated: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
   },
 ];
 

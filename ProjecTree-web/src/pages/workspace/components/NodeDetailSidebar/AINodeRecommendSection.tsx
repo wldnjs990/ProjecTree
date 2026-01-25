@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Lightbulb, ChevronDown, ChevronUp, Plus } from 'lucide-react';
-import type { Candidate } from './types2';
+import type { Candidate } from './types';
 
 interface AINodeRecommendSectionProps {
   recommendations: Candidate[];
@@ -9,17 +9,13 @@ interface AINodeRecommendSectionProps {
 }
 
 // 하위 노드 카드 컴포넌트
-function SubNodeCard({
-  node,
-  onAdd,
-}: {
-  node: Candidate;
-  onAdd: () => void;
-}) {
+function SubNodeCard({ node, onAdd }: { node: Candidate; onAdd: () => void }) {
   return (
     <div className="flex items-start justify-between p-2.5 border border-[#DEDEDE] rounded-lg">
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-[#0B0B0B] truncate">{node.name}</p>
+        <p className="text-xs font-medium text-[#0B0B0B] truncate">
+          {node.name}
+        </p>
         <p className="text-[10px] text-[#636363] mt-0.5">{node.description}</p>
       </div>
       <button
