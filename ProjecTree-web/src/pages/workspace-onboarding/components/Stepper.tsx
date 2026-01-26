@@ -1,4 +1,5 @@
 import { ONBOARDING_TEXTS } from '../constants';
+import { Check } from 'lucide-react';
 
 interface StepperProps {
   currentStep: number;
@@ -8,65 +9,51 @@ export default function Stepper({ currentStep }: StepperProps) {
   const steps = ONBOARDING_TEXTS.steps;
 
   return (
-    <div className="mb-4 flex justify-center">
-      <div className="flex items-center">
-        {steps.map((step, index) => (
-          <div key={step.number} className="flex items-center">
-            {/* 단계 원과 라벨 */}
-            <div className="flex flex-col items-center">
-              {/* 원형 배경 */}
-              <div
-                className="flex h-8 w-8 items-center justify-center rounded-full text-sm"
-                style={{
-                  backgroundColor:
-                    step.number <= currentStep
-                      ? 'var(--figma-primary-blue)'
-                      : 'var(--figma-gray-concrete)',
-                  color:
-                    step.number <= currentStep
-                      ? 'var(--figma-white)'
-                      : 'var(--figma-text-emperor)',
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '14px',
-                  lineHeight: '20px',
-                }}
-              >
-                {step.number}
-              </div>
-              {/* 라벨 */}
+    <div className="flex flex-col gap-0 relative">
+      {/* Connecting Line */}
+      <div className="absolute left-[15px] top-[15px] bottom-[15px] w-[2px] bg-white/10 z-0" />
+
+      {steps.map((step) => {
+        const isActive = step.number === currentStep;
+        const isCompleted = step.number < currentStep;
+
+        return (
+          <div key={step.number} className="flex items-center gap-4 relative z-10 py-3">
+            {/* Step Circle */}
+            <div
+              className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-all duration-300
+                ${isActive
+                  ? 'bg-white text-[var(--figma-forest-deep)] ring-4 ring-white/20 scale-110 shadow-[0_0_20px_rgba(255,255,255,0.4)]'
+                  : isCompleted
+                    ? 'bg-[var(--figma-forest-accent)] text-[var(--figma-forest-deep)]'
+                    : 'bg-transparent border-2 border-white/20 text-white/40' // Inactive
+                }`}
+            >
+              {isCompleted ? <Check className="h-4 w-4" /> : step.number}
+            </div>
+
+            {/* Step Label */}
+            <div className="flex flex-col">
               <span
-                className="mt-2 text-center"
-                style={{
-                  fontFamily: 'Roboto',
-                  fontWeight: 100,
-                  fontSize: '11.4px',
-                  lineHeight: '16px',
-                  color:
-                    step.number <= currentStep
-                      ? 'var(--figma-text-cod-gray)'
-                      : 'var(--figma-text-emperor)',
-                  whiteSpace: 'nowrap',
-                }}
+                className={`text-sm font-medium transition-colors duration-300
+                  ${isActive
+                    ? 'text-white font-bold'
+                    : isCompleted
+                      ? 'text-white/90'
+                      : 'text-white/40'
+                  }`}
               >
                 {step.label}
               </span>
+              {isActive && (
+                <span className="text-xs text-[var(--figma-forest-accent)] animate-fade-in-up mt-0.5">
+                  현재 진행 중
+                </span>
+              )}
             </div>
-
-            {/* 연결선 (마지막 단계가 아닐 때만) */}
-            {index < steps.length - 1 && (
-              <div
-                className="mx-2 mb-6"
-                style={{
-                  width: '48px',
-                  height: '2px',
-                  backgroundColor: 'var(--figma-gray-concrete)',
-                }}
-              />
-            )}
           </div>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }

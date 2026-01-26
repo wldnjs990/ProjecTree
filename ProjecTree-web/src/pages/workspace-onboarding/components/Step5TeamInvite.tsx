@@ -97,10 +97,10 @@ export default function Step5TeamInvite({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2 className="font-['Roboto'] font-thin text-[18.8px] leading-7 tracking-[-0.5px] text-[var(--figma-text-cod-gray)]">
+        <h2 className="font-['Pretendard'] font-bold text-[24px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
           팀 초대
         </h2>
-        <p className="font-['Roboto'] font-thin text-[13.3px] leading-5 text-[var(--figma-text-emperor)]">
+        <p className="font-['Pretendard'] font-medium text-[15px] text-[#757575]">
           팀원을 초대하세요
         </p>
       </div>
@@ -109,7 +109,7 @@ export default function Step5TeamInvite({
       <div className="flex flex-col gap-6">
         {/* 이메일 초대 */}
         <div className="flex flex-col gap-4">
-          <h3 className="font-['Roboto'] font-thin text-[15px] leading-5 text-[var(--figma-text-cod-gray)]">
+          <h3 className="font-['Pretendard'] font-medium text-[15px] leading-5 text-[var(--figma-text-cod-gray)]">
             이메일 초대
           </h3>
 
@@ -119,23 +119,23 @@ export default function Step5TeamInvite({
               placeholder="name@company.com"
               value={memberEmail}
               onChange={handleEmailChange}
-              className={`font-['Roboto'] font-thin text-[14px] leading-4 h-[44px] px-3 py-[12.5px] bg-[rgba(255,255,255,0.002)] border shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md ${emailError ? 'border-[var(--figma-required-crimson)]' : 'border-[var(--figma-border-mercury)]'
-                }`}
+              className={`h-[44px] px-3 py-[12.5px] bg-white shadow-sm rounded-md font-['Pretendard'] font-normal text-[14px] leading-4 focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] transition-all
+                ${emailError ? 'border-[var(--figma-required-crimson)]' : 'border-[var(--figma-border-mercury)] hover:border-[var(--figma-forest-accent)]'}`}
             />
             {emailError && (
-              <span className="font-['Roboto'] font-thin text-[12px] leading-4 text-[var(--figma-required-crimson)]">
+              <span className="font-['Pretendard'] font-normal text-xs leading-4 text-[var(--figma-required-crimson)]">
                 {emailError}
               </span>
             )}
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
+            <Label className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
               권한
             </Label>
             <Select value={memberRole} onValueChange={setMemberRole}>
               <SelectTrigger
-                className="font-['Roboto'] font-thin text-[14px] h-[44px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
+                className="h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md font-['Pretendard'] font-normal text-[14px] hover:border-[var(--figma-forest-accent)] transition-colors"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -154,12 +154,13 @@ export default function Step5TeamInvite({
           </div>
 
           <Button
+            className={`w-full h-[44px] font-['Pretendard'] font-normal text-[13.2px] leading-5 rounded-md border-none transition-colors
+              ${!memberEmail.trim() || !!emailError
+                ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-emperor)] cursor-not-allowed'
+                : 'bg-[var(--figma-forest-primary)] text-[var(--figma-white)] hover:bg-[#1B5E20]'
+              }`}
             onClick={handleInviteMember}
             disabled={!memberEmail.trim() || !!emailError}
-            className={`w-full font-['Roboto'] font-thin text-[13.2px] leading-5 h-[44px] rounded-md border-none ${!memberEmail.trim() || !!emailError
-              ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-emperor)] cursor-not-allowed'
-              : 'bg-[var(--figma-primary-blue)] text-[var(--figma-white)] cursor-pointer'
-              }`}
           >
             초대 메일 보내기
           </Button>
@@ -168,18 +169,18 @@ export default function Step5TeamInvite({
         {/* 초대된 팀원 목록 */}
         {data.teamMembers.length > 0 && (
           <div className="flex flex-col gap-2">
-            <Label className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
+            <Label className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
               초대된 팀원
             </Label>
             {data.teamMembers.map((member, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between rounded p-2 bg-[var(--figma-gray-concrete)] border border-[var(--figma-border-mercury)]"
+                className="flex items-center justify-between rounded p-2 bg-white border border-[var(--figma-border-mercury)] shadow-sm"
               >
-                <span className="font-['Roboto'] font-thin text-[13px] text-[var(--figma-text-cod-gray)]">
+                <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-cod-gray)]">
                   {member.email}
                 </span>
-                <span className="font-['Roboto'] font-thin text-[13px] text-[var(--figma-text-emperor)]">
+                <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-emperor)]">
                   {member.role}
                 </span>
               </div>

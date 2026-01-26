@@ -47,124 +47,159 @@ export default function WorkspaceOnboardingPage() {
     }
   };
 
-  if (isLoading) {
-    return <Step7Loading />;
-  }
+
 
   return (
-    <div
-      className="min-h-screen bg-[var(--figma-bg-alabaster)]"
-    >
-      {/* 왼쪽 상단 뒤로가기 버튼 */}
-      <div className="fixed left-4 top-4 z-20">
-        <button
-          onClick={() => navigate('/workspaceLounge')}
-          className="flex items-center gap-1 rounded-lg p-2 transition-colors hover:bg-gray-100 font-['Roboto'] font-thin text-[14px] text-[var(--figma-text-cod-gray)]"
-        >
-          <ChevronLeft className="h-5 w-5" />
-          뒤로가기
-        </button>
-      </div>
+    <div className="flex min-h-screen w-full bg-[var(--figma-tech-green)] font-['Pretendard'] overflow-hidden">
 
-      {/* Stepper - position: fixed로 완전 고정 */}
-      <div className="fixed top-0 left-0 right-0 z-10 flex justify-center pt-6 pb-2 bg-[var(--figma-bg-alabaster)]">
-        <div className="w-full max-w-[512px] px-4">
+      {/* Left Side (Marketing/Vision) */}
+      <div className="hidden lg:flex flex-1 relative flex-col justify-between p-12 overflow-hidden">
+        {/* Abstract Geometric Lines Pattern */}
+        <div
+          className="absolute inset-0 opacity-20 pointer-events-none"
+          style={{
+            backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(-45deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px'
+          }}
+        />
+
+        {/* Brand */}
+        <div className="relative z-10">
+          <h1 className="text-xl font-bold text-[var(--figma-neon-green)] tracking-widest">PROJECTREE</h1>
+        </div>
+
+        {/* Stepper (Minimalist Overlay) */}
+        <div className="absolute top-1/2 left-12 -translate-y-1/2 z-10">
           <Stepper currentStep={currentStep} />
         </div>
       </div>
 
-      {/* 카드 컨테이너 - 상단 여백 추가 (Stepper 높이만큼) */}
-      <div className="flex justify-center px-4 pt-[110px] pb-[100px]">
-        <div className="flex flex-col p-8 w-full max-w-[512px] bg-[var(--figma-white)] border border-[var(--figma-border-mercury)] shadow-[0_1px_3px_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] rounded-xl">
-          {/* 현재 단계 컴포넌트 */}
-          {currentStep === 1 && (
-            <Step1BasicInfo
-              data={formData}
-              onChange={(updates) =>
-                setFormData((prev) => ({ ...prev, ...updates }))
-              }
-              onNext={handleNext}
-              onPrev={handlePrev}
-            />
-          )}
-
-          {currentStep === 2 && (
-            <Step2ProjectType
-              data={formData}
-              onChange={(updates) =>
-                setFormData((prev) => ({ ...prev, ...updates }))
-              }
-              onNext={handleNext}
-              onPrev={handlePrev}
-            />
-          )}
-
-          {currentStep === 3 && (
-            <Step3Schedule
-              data={formData}
-              onChange={(updates) =>
-                setFormData((prev) => ({ ...prev, ...updates }))
-              }
-              onNext={handleNext}
-              onPrev={handlePrev}
-            />
-          )}
-
-          {currentStep === 4 && (
-            <Step4TechStack
-              data={formData}
-              onChange={(updates) =>
-                setFormData((prev) => ({ ...prev, ...updates }))
-              }
-              onNext={handleNext}
-              onPrev={handlePrev}
-            />
-          )}
-
-          {currentStep === 5 && (
-            <Step5TeamInvite
-              data={formData}
-              onChange={(updates) =>
-                setFormData((prev) => ({ ...prev, ...updates }))
-              }
-              onNext={handleNext}
-              onPrev={handlePrev}
-            />
-          )}
-
-          {currentStep === 6 && (
-            <Step6EpicSetup
-              data={formData}
-              onChange={(updates) =>
-                setFormData((prev) => ({ ...prev, ...updates }))
-              }
-              onNext={handleNext}
-              onPrev={handlePrev}
-            />
-          )}
+      {/* Right Side (Content) with Diagonal Split */}
+      <div
+        className="w-full lg:w-[60%] bg-white relative flex flex-col items-center justify-center p-8 lg:p-24 shadow-2xl"
+        style={{ clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0% 100%)' }}
+      >
+        {/* Mobile Header */}
+        <div className="lg:hidden w-full absolute top-0 left-0 p-4 bg-[var(--figma-tech-green)] text-white flex justify-between z-50">
+          <span className="font-bold">ProjecTree</span>
+          <span>{currentStep}/6</span>
         </div>
-      </div>
 
-      <div className="fixed bottom-0 left-0 right-0 z-10 flex justify-center py-4 bg-[var(--figma-bg-alabaster)]">
-        <div className="flex w-full justify-between px-4 max-w-[512px]">
-          {currentStep > 1 ? (
-            <button
-              onClick={handlePrev}
-              className="font-['Roboto'] font-thin text-[13.2px] leading-5 px-8 py-2 bg-transparent text-[var(--figma-text-emperor)] rounded-md border border-[var(--figma-border-mercury)] cursor-pointer"
-            >
-              이전
-            </button>
+        <div className="w-full max-w-[500px] flex flex-col gap-10 relative z-20">
+          {isLoading ? (
+            <div className="h-full w-full flex items-center justify-center">
+              <Step7Loading />
+            </div>
           ) : (
-            <div />
+            <>
+              {/* Step Indicator */}
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-[var(--figma-tech-green)] font-bold text-lg">0{currentStep}</span>
+                <div className="h-[2px] w-12 bg-gray-200">
+                  <div
+                    className="h-full bg-[var(--figma-neon-green)] transition-all duration-300"
+                    style={{ width: `${(currentStep / 6) * 100}%` }}
+                  />
+                </div>
+                <span className="text-gray-300 font-medium text-lg">06</span>
+              </div>
+
+              {/* Form Container with Input Override */}
+              <div className="onboarding-input-override animate-fade-in-up">
+                {currentStep === 1 && (
+                  <Step1BasicInfo
+                    data={formData}
+                    onChange={(updates) =>
+                      setFormData((prev) => ({ ...prev, ...updates }))
+                    }
+                    onNext={handleNext}
+                    onPrev={handlePrev}
+                  />
+                )}
+                {currentStep === 2 && (
+                  <Step2ProjectType
+                    data={formData}
+                    onChange={(updates) =>
+                      setFormData((prev) => ({ ...prev, ...updates }))
+                    }
+                    onNext={handleNext}
+                    onPrev={handlePrev}
+                  />
+                )}
+                {currentStep === 3 && (
+                  <Step3Schedule
+                    data={formData}
+                    onChange={(updates) =>
+                      setFormData((prev) => ({ ...prev, ...updates }))
+                    }
+                    onNext={handleNext}
+                    onPrev={handlePrev}
+                  />
+                )}
+                {currentStep === 4 && (
+                  <Step4TechStack
+                    data={formData}
+                    onChange={(updates) =>
+                      setFormData((prev) => ({ ...prev, ...updates }))
+                    }
+                    onNext={handleNext}
+                    onPrev={handlePrev}
+                  />
+                )}
+                {currentStep === 5 && (
+                  <Step5TeamInvite
+                    data={formData}
+                    onChange={(updates) =>
+                      setFormData((prev) => ({ ...prev, ...updates }))
+                    }
+                    onNext={handleNext}
+                    onPrev={handlePrev}
+                  />
+                )}
+                {currentStep === 6 && (
+                  <Step6EpicSetup
+                    data={formData}
+                    onChange={(updates) =>
+                      setFormData((prev) => ({ ...prev, ...updates }))
+                    }
+                    onNext={handleNext}
+                    onPrev={handlePrev}
+                  />
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col gap-4 mt-8">
+                <button
+                  onClick={handleNext}
+                  id="next-step-btn"
+                  className="w-full h-[60px] rounded-full text-[18px] font-bold text-[var(--figma-tech-green)] bg-[var(--figma-neon-green)] hover:shadow-[0_0_30px_rgba(74,222,128,0.6)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2"
+                >
+                  {currentStep === 6 ? '워크스페이스 생성' : '다음 단계'}
+                  <ChevronLeft className="rotate-180 h-5 w-5" />
+                </button>
+
+                {currentStep > 1 && (
+                  <button
+                    onClick={handlePrev}
+                    className="text-gray-400 hover:text-[var(--figma-tech-green)] font-medium text-sm py-2 transition-colors"
+                  >
+                    이전 단계
+                  </button>
+                )}
+              </div>
+            </>
           )}
-          <button
-            onClick={handleNext}
-            className="font-['Roboto'] font-thin text-[13.2px] leading-5 px-8 py-2 bg-[var(--figma-primary-blue)] text-[var(--figma-white)] rounded-md border-none cursor-pointer"
-          >
-            {currentStep === 6 ? 'AI 분석 시작' : '다음'}
-          </button>
         </div>
       </div>
+
+      {/* Back Button (Absolute) */}
+      <button
+        onClick={() => navigate('/workspace-lounge')}
+        className="absolute bottom-8 right-8 z-50 text-gray-300 hover:text-[var(--figma-tech-green)] transition-colors"
+      >
+        나가기
+      </button>
     </div>
   );
 }

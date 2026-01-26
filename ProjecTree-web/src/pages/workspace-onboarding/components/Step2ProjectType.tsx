@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { DOMAIN_OPTIONS } from '../domainOptions';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface Step2ProjectTypeProps {
   data: {
@@ -29,16 +30,16 @@ export default function Step2ProjectType({
 }: Step2ProjectTypeProps) {
   const [customDomain, setCustomDomain] = useState('');
   const isCustomDomain =
-    data.domain === '기타' || !DOMAIN_OPTIONS.includes(data.domain as any);
+    data.domain === '기타' || (!!data.domain && !DOMAIN_OPTIONS.includes(data.domain as any));
 
   return (
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2 className="font-['Roboto'] font-thin text-[18.8px] leading-7 tracking-[-0.5px] text-[var(--figma-text-cod-gray)]">
+        <h2 className="font-['Pretendard'] font-bold text-[24px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
           프로젝트 유형 설정
         </h2>
-        <p className="font-['Roboto'] font-thin text-[13.3px] leading-5 text-[var(--figma-text-emperor)]">
+        <p className="font-['Pretendard'] font-medium text-[15px] text-[#757575]">
           도메인, 목적, 서비스 유형을 선택하세요
         </p>
       </div>
@@ -50,11 +51,11 @@ export default function Step2ProjectType({
           <div className="flex items-center gap-2">
             <Label
               htmlFor="domain"
-              className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]"
+              className="font-[Roboto] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]"
             >
               도메인
             </Label>
-            <span className="font-['Inter'] font-medium text-[14px] leading-5 text-[var(--figma-required-crimson)]">
+            <span className="font-[Inter] font-medium text-[14px] leading-5 text-[var(--figma-required-crimson)]">
               *
             </span>
           </div>
@@ -72,13 +73,13 @@ export default function Step2ProjectType({
           >
             <SelectTrigger
               id="domain"
-              className="font-['Roboto'] font-thin text-[14px] leading-4 h-9 px-3 py-[8.25px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury-alt)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-lg"
+              className="h-[36px] px-3 py-[8.25px] bg-white border-[var(--figma-border-mercury-alt)] shadow-sm rounded-lg font-['Pretendard'] font-normal text-[14px] leading-4 focus-visible:ring-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors"
             >
               <SelectValue placeholder="도메인을 선택하세요" />
             </SelectTrigger>
             <SelectContent>
               {DOMAIN_OPTIONS.map((option) => (
-                <SelectItem key={option} value={option}>
+                <SelectItem key={option} value={option} className="font-['Pretendard']">
                   {option}
                 </SelectItem>
               ))}
@@ -97,18 +98,10 @@ export default function Step2ProjectType({
                   onChange({ domain: value || '기타' });
                 }}
                 maxLength={10}
-                className="font-['Roboto'] font-thin text-[14px] leading-4 h-9 px-3 py-[8.25px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury-alt)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-lg"
+                className="h-[36px] px-3 py-[8.25px] bg-white border-[var(--figma-border-mercury-alt)] shadow-sm rounded-lg font-['Pretendard'] font-normal text-[14px] leading-4 focus-visible:ring-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors"
               />
               <div className="flex justify-end">
-                <span
-                  style={{
-                    fontFamily: 'Inter',
-                    fontWeight: 400,
-                    fontSize: '12px',
-                    lineHeight: '16px',
-                    color: 'var(--figma-text-dove-gray)',
-                  }}
-                >
+                <span className="font-['Pretendard'] font-normal text-xs leading-4 text-[var(--figma-text-dove-gray)]">
                   {customDomain.length}/10
                 </span>
               </div>
@@ -120,13 +113,7 @@ export default function Step2ProjectType({
         <div className="flex flex-col gap-2">
           <Label
             htmlFor="purpose"
-            style={{
-              fontFamily: 'Roboto',
-              fontWeight: 100,
-              fontSize: '13.1px',
-              lineHeight: '14px',
-              color: 'var(--figma-text-cod-gray)',
-            }}
+            className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]"
           >
             워크스페이스 목적
           </Label>
@@ -136,10 +123,10 @@ export default function Step2ProjectType({
             value={data.purpose}
             onChange={(e) => onChange({ purpose: e.target.value })}
             maxLength={20}
-            className="font-['Roboto'] font-thin text-[14px] leading-4 h-[44px] px-3 py-[12.5px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
+            className="h-[44px] px-3 py-[12.5px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md font-['Pretendard'] font-normal text-[14px] leading-4 focus-visible:ring-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors"
           />
           <div className="flex justify-end">
-            <span className="font-['Inter'] font-normal text-[12px] leading-4 text-[var(--figma-text-dove-gray)]">
+            <span className="font-['Pretendard'] font-normal text-xs leading-4 text-[var(--figma-text-dove-gray)]">
               {data.purpose.length}/20
             </span>
           </div>
@@ -147,79 +134,51 @@ export default function Step2ProjectType({
 
         {/* 서비스 유형 */}
         <div className="flex flex-col gap-3">
-          <Label className="font-['Roboto'] font-thin text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]">
+          <Label className="font-['Pretendard'] font-medium text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]">
             서비스 유형
           </Label>
-          <div className="flex gap-4">
+          <RadioGroup
+            value={data.serviceType}
+            onValueChange={(value) => onChange({ serviceType: value })}
+            className="flex gap-4"
+          >
             <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                value="web"
-                id="web"
-                name="serviceType"
-                checked={data.serviceType === 'web'}
-                onChange={(e) => onChange({ serviceType: e.target.value })}
-                className="w-4 h-4 cursor-pointer"
-              />
+              <RadioGroupItem value="web" id="web" className="text-[var(--figma-forest-primary)]" />
               <Label
                 htmlFor="web"
-                className="cursor-pointer font-['Roboto'] font-thin text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
+                className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
               >
                 Web
               </Label>
             </div>
             <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                value="mobile"
-                id="mobile"
-                name="serviceType"
-                checked={data.serviceType === 'mobile'}
-                onChange={(e) => onChange({ serviceType: e.target.value })}
-                className="w-4 h-4 cursor-pointer"
-              />
+              <RadioGroupItem value="mobile" id="mobile" className="text-[var(--figma-forest-primary)]" />
               <Label
                 htmlFor="mobile"
-                className="cursor-pointer font-['Roboto'] font-thin text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
+                className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
               >
                 Mobile App
               </Label>
             </div>
             <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                value="desktop"
-                id="desktop"
-                name="serviceType"
-                checked={data.serviceType === 'desktop'}
-                onChange={(e) => onChange({ serviceType: e.target.value })}
-                className="w-4 h-4 cursor-pointer"
-              />
+              <RadioGroupItem value="desktop" id="desktop" className="text-[var(--figma-forest-primary)]" />
               <Label
                 htmlFor="desktop"
-                className="cursor-pointer font-['Roboto'] font-thin text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
+                className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
               >
                 Desktop App
               </Label>
             </div>
             <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                value="other"
-                id="serviceOther"
-                name="serviceType"
-                checked={data.serviceType === 'other'}
-                onChange={(e) => onChange({ serviceType: e.target.value })}
-                className="w-4 h-4 cursor-pointer"
-              />
+              <RadioGroupItem value="other" id="serviceOther" className="text-[var(--figma-forest-primary)]" />
               <Label
                 htmlFor="serviceOther"
-                className="cursor-pointer font-['Roboto'] font-thin text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
+                className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
               >
                 기타
               </Label>
             </div>
-          </div>
+          </RadioGroup>
         </div>
       </div>
     </div>
