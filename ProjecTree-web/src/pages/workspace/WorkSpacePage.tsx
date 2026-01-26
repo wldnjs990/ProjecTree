@@ -117,7 +117,6 @@ export default function WorkSpacePage() {
               <TreeCanvas
                 initialNodes={mockNodes as FlowNode[]}
                 onlineUsers={mockUsers}
-                unreadMessages={2}
                 onChatClick={handleChatClick}
                 onNodeClick={handleNodeClick}
               />
