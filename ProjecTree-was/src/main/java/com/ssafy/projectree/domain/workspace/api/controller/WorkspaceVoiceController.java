@@ -29,7 +29,7 @@ public class WorkspaceVoiceController {
      * @param params JSON object with roomName and participantName
      * @return JSON object with the JWT token
      */
-    @PostMapping("/token")
+    @PostMapping("/voice/token")
     public CommonResponse<VoiceTokenCreateDto.Response> createToken(@RequestBody VoiceTokenCreateDto.Request params) {
 
         if (params.getRoomName() == null || params.getParticipantName() == null) {

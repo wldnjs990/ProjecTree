@@ -11,6 +11,7 @@ public class VoiceTokenCreateDto {
         private String participantName;
     }
 
+    @Getter
     @Builder
     public static class Response {
         private String token;
