@@ -1,11 +1,11 @@
 from app.agents.states.state import NodeState
-from app.core.llm import mini_llm
+from app.core.llm import openai_mini_llm
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ProviderStrategy
 from langchain_core.messages import HumanMessage
 from app.agents.schemas.analysis import TaskAnalysis
-
-llm = mini_llm
+from app.agents.prompts.system.global_context import GLOBAL_CONTEXT
+llm = openai_mini_llm
 
 
 from app.agents.prompts.system.process_prompts import (
@@ -56,15 +56,34 @@ def _process_node(state: NodeState, user_prompt: str, agent: Runnable) -> NodeSt
     workspace_info = state.get("workspace_info")
     parent_info = state.get("parent_info")
     candidate_info = state.get("current_candidate_info")
-
+    headcount = state.get("headcount")
     if not candidate_info:
         raise ValueError("current_candidate_info가 없습니다.")
+    parent_context = f"""[부모 노드의 정보]
+    Name:{parent_info.name}, Description:{parent_info.description}
+    """
+    candidate_context = f"""[현재 구현해야할 후보 노드의 정보]
+    이번 작업에서 실제로 구체화 해야할 후보 노드의 정보입니다. 노드의 이름과 설명을 보고 설명을 구체화 해주세요.
+    Name:{candidate_info.name}, Description:{candidate_info.description}
+    """
+
+    if workspace_info:
+        workspace_context = GLOBAL_CONTEXT.format(
+            project_tech_stack=workspace_info.tech_stack,
+            project_headcount=headcount,
+            project_purpose=workspace_info.purpose,
+            start_date=workspace_info.start_date,
+            end_date=workspace_info.end_date,
+            project_description=workspace_info.description,
+        )
+    else:
+        workspace_context = "[프로젝트 정보가 없습니다.]"
 
     # User Prompt 포맷팅
     formatted_user_prompt = user_prompt.format(
-        workspace_info=workspace_info,
-        parent_info=parent_info,
-        candidate_info=candidate_info,
+        workspace_info=workspace_context,
+        parent_info=parent_context,
+        candidate_info=candidate_context,
     )
 
     try:
@@ -76,17 +95,17 @@ def _process_node(state: NodeState, user_prompt: str, agent: Runnable) -> NodeSt
 
         if result:
             # 결과 반환
-            return {"generated_node_detail": result.model_dump()}
+            return {"generated_node": result.model_dump()}
         else:
             print("Node processing returned no structured response")
             return {
-                "generated_node_detail": None,
+                "generated_node": None,
                 "last_error": "No structured response",
             }
 
     except Exception as e:
         print(f"Node processing failed: {e}")
-        return {"generated_node_detail": None, "last_error": str(e)}
+        return {"generated_node": None, "last_error": str(e)}
 
 
 def epic_node_process(state: NodeState) -> NodeState:

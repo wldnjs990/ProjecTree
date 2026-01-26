@@ -3,6 +3,7 @@ from app.db.session import get_db
 from app.db.repository.workspace_repository import workspace_repository
 from app.db.repository.candidate_repository import candidate_repository
 from typing import Any
+from app.db.repository.team_repository import team_repository
 
 
 def _get_db_session():
@@ -41,19 +42,19 @@ def project_spec_fetch(state: NodeState) -> NodeState:
     """
     workspace_id = state.get("workspace_id")
 
-    if workspace_id is None:
-        raise ValueError("workspace_id가 state에 존재하지 않습니다.")
-
     db = _get_db_session()
     try:
         workspace = workspace_repository.get_by_id(db, workspace_id)
+        
+        if workspace:
+            # [핵심] 단순히 멤버 변수에 접근만 해도 DB에서 데이터를 긁어옵니다.
+            # list()로 감싸면 확실하게 데이터를 메모리에 로딩합니다.
+            # 이렇게 하면 세션이 닫혀도 데이터가 객체 안에 남아있게 됩니다.
+            _ = list(workspace.workspace_tech_stacks)
+            head_count = team_repository.get_headcount_by_workspace_id(db, workspace_id)
+            return {"workspace_info": workspace, "headcount": head_count}
 
-        if workspace is None:
-            raise ValueError(
-                f"workspace_id {workspace_id}에 해당하는 Workspace를 찾을 수 없습니다."
-            )
-
-        return {"workspace_info": workspace}
+        return {"workspace_info": None, "headcount": None}
     finally:
         db.close()
 

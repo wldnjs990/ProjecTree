@@ -1,5 +1,3 @@
-# Validation Prompts for Candidate Validation
-
 CANDIDATE_VALIDATION_SYSTEM_PROMPT = """당신은 프로젝트 기획 검토 전문가입니다.
 생성된 후보 노드들의 품질을 평가하고 피드백을 제공합니다.
 
@@ -34,6 +32,8 @@ CANDIDATE_VALIDATION_SYSTEM_PROMPT = """당신은 프로젝트 기획 검토 전
 
 is_valid는 score가 7 이상이면 true, 미만이면 false입니다.
 """
+
+
 
 CANDIDATE_VALIDATION_USER_PROMPT = """## 부모 노드 정보
 - 이름: {node_name}

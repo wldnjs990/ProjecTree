@@ -3,9 +3,7 @@ from app.agents.states.state import NodeState
 from app.agents.nodes.fetch import (
     parent_node_fetch,
     project_spec_fetch,
-    contributor_info_fetch,
     candidate_node_fetch,
-    sibiling_node_fetch,
 )
 from app.agents.nodes.process import (
     epic_node_process,
@@ -16,7 +14,6 @@ from app.agents.nodes.process import (
 from app.agents.nodes.creation import sub_node_info_create
 from app.agents.nodes.feedback import node_feedback, struct_feedback
 from app.agents.nodes.parser import structured_output_parser
-from app.agents.sub_agents.candidates.nodes import generate_candidates
 
 from app.agents.routers import (
     route_node,
@@ -24,13 +21,11 @@ from app.agents.routers import (
     route_struct_feedback,
     loop_condition,
 )
-from app.agents.sub_agents.recommend import recommend_graph
 
 # Main Graph Builder
 builder = StateGraph(NodeState)
 builder.add_node("parent_node_fetch", parent_node_fetch)
 builder.add_node("project_spec_fetch", project_spec_fetch)
-builder.add_node("contributor_info_fetch", contributor_info_fetch)
 builder.add_node("candidate_node_fetch", candidate_node_fetch)
 builder.add_node("epic_node_process", epic_node_process)
 builder.add_node("story_node_process", story_node_process)
@@ -43,11 +38,9 @@ builder.add_node("struct_feedback", struct_feedback)
 
 builder.add_edge(START, "parent_node_fetch")
 builder.add_edge(START, "project_spec_fetch")
-builder.add_edge(START, "contributor_info_fetch")
 builder.add_edge(START, "candidate_node_fetch")
 builder.add_edge("parent_node_fetch", "sub_node_info_create")
 builder.add_edge("project_spec_fetch", "sub_node_info_create")
-builder.add_edge("contributor_info_fetch", "sub_node_info_create")
 builder.add_edge("candidate_node_fetch", "sub_node_info_create")
 
 builder.add_conditional_edges(
@@ -62,7 +55,8 @@ builder.add_conditional_edges(
 )
 builder.add_edge("epic_node_process", "node_feedback")
 builder.add_edge("story_node_process", "node_feedback")
-builder.add_edge("tech_stack_recommendation", "node_feedback")
+builder.add_edge("task_node_process", "node_feedback")
+builder.add_edge("advance_node_process", "node_feedback")
 
 builder.add_conditional_edges(
     "node_feedback",
@@ -74,6 +68,6 @@ builder.add_conditional_edges(
     "struct_feedback", route_struct_feedback, 
     ["structured_output_parser", END]
 )
-builder.add_conditional_edges(
-    "struct_feedback", loop_condition, ["sub_node_info_create", END]
+builder.add_edge(
+    "struct_feedback", END
 )

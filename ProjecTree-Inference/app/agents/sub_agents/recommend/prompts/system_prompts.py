@@ -17,7 +17,7 @@ TASK_SYSTEM_PROMPT = """
    - 비교 분석에서 사용하는 용어는 kebab-case가 아닌 CamelCase를 사용하세요.
 
 4. 최종 출력 (Structured Output):
-   - 공식 명칭(kebab-case)을 `name` 필드에 사용하세요.
+   - 공식 명칭(kebab-case, stackoverflow에서 사용하는 태그명)을 `name` 필드에 사용하세요.
    - 비교 분석 내용(`comparison`)은 반드시 포함되어야 합니다.
    - 각 기술의 `description`(설명), `advantage`(장점), `disadvantage`(단점), `ref`(참고 자료) 필드를 빠짐없이 작성하세요.
    - 모든 기술 정보는 반드시 한국어로 작성하며, 최종 답변은 오직 `TechList` 도구 호출을 통해서만 제출합니다.

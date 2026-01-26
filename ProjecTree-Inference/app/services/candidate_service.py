@@ -1,6 +1,7 @@
 from app.api.schemas.candidates import CandidateGenerateRequest, CandidateGenerateResponse
 from app.agents.sub_agents.candidates.graph import candidate_graph
 from app.db.repository.node_repository import NodeRepository
+from app.agents.enums import NodeType
 from app.db.repository.candidate_repository import CandidateRepository
 from sqlalchemy.orm import Session
 from app.core.log import langfuse_handler
@@ -33,6 +34,10 @@ class CandidateService:
         }, config={
             "callbacks": [langfuse_handler]
         })
+        
+        if node.node_type == NodeType.TASK:
+            candidates_data = result['candidates']['candidates']
+            
         candidates_data = result['candidates']['candidates']
         self.candidate_repository.create_multiple(db, node.id, candidates_data)
         return CandidateGenerateResponse(candidates=candidates_data)

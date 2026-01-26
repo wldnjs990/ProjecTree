@@ -6,9 +6,6 @@ from app.agents.enums import TaskType
 class BaseNodeProcessResult(BaseModel):
     name: str = Field(description="정제된 노드 이름 (명확하고 간결하게)")
     description: str = Field(description="노드에 대한 상세 설명 및 구현 가이드")
-    acceptance_criteria: List[str] = Field(
-        description="완료 조건 (Acceptance Criteria)"
-    )
 
 
 class EpicProcessResult(BaseNodeProcessResult):
@@ -21,10 +18,8 @@ class StoryProcessResult(BaseNodeProcessResult):
 
 class TaskProcessResult(BaseNodeProcessResult):
     difficulty: int = Field(default=3, description="구현 난이도 (1-5)")
-    technical_analysis: str = Field(description="기술적 분석 및 고려사항")
     task_type: TaskType = Field(description="태스크 타입 (FE/BE)")
 
 
 class AdvanceProcessResult(BaseNodeProcessResult):
     difficulty: int = Field(default=3, description="구현 난이도 (1-5)")
-    technical_analysis: str = Field(description="기술적 분석 및 고려사항")
