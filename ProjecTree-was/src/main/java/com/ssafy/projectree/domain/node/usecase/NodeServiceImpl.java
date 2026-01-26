@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Transactional
 public class NodeServiceImpl implements NodeService {
+    private final
     @Override
     public NodeReadDto.Response getNodeDetails(Long nodeId) {
         return null;

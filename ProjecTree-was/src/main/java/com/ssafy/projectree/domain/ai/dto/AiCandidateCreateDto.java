@@ -1,10 +1,14 @@
 package com.ssafy.projectree.domain.ai.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ssafy.projectree.domain.ai.dto.schemas.CandidateSchema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AiCandidateCreateDto {
     @Data
@@ -26,6 +30,7 @@ public class AiCandidateCreateDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Response{
-
+        @Builder.Default
+        private List<CandidateSchema> candidates = new ArrayList<>();
     }
 }
