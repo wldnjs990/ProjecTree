@@ -104,12 +104,10 @@ export default function WorkSpacePage() {
   }, [selectedNodeListData, selectedNodeDetail]);
 
   // 서버 저장 핸들러 - CRDT 서버를 통해 DB에 저장
-  const handleSaveNodeDetailToServer = useCallback(async (nodeId: string) => {
-    console.log('[WorkSpacePage] CRDT 서버로 저장 요청:', nodeId);
-
+  const handleSaveNodeDetailToServer = useCallback(async () => {
     const client = getCrdtClient();
     if (client) {
-      const requestId = client.saveNodeDetail(nodeId);
+      const requestId = client.saveNodeDetail();
       if (requestId) {
         console.log('[WorkSpacePage] 저장 요청 성공, requestId:', requestId);
       }
