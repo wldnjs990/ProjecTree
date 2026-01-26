@@ -18,6 +18,6 @@ export function handleConnection(ws: WebSocket, req: IncomingMessage) {
 
   ws.on("close", () => {
     clients.delete(ws);
-    console.log(`❌ 연결 종료 : ${room}`);
+    console.log(`연결 종료 : ${room} : `);
   });
 }

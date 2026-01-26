@@ -21,9 +21,7 @@ export interface SendNodeDetail {
   note: string;
 }
 
-export function toSendNodeDetail(
-  detail: EditableNodeDetail
-): SendNodeDetail {
+export function toSendNodeDetail(detail: EditableNodeDetail): SendNodeDetail {
   return {
     status: detail.status,
     ...(detail.priority !== undefined && { priority: detail.priority }),
