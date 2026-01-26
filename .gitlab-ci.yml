@@ -28,15 +28,22 @@ build_push_dockerhub:
     - docker push $DOCKER_IMAGE_FULL_NAME
   extends: .ai-dev-rules
 
+
 deploy_to_aws:
   stage: deploy
-  image: alpine:latest
+  image: docker:latest  
+  
   script:
-    - echo "🚀 AWS 서버에 배포를 시작합니다."
-    - ssh $AWS_USER@$AWS_IP "echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin"
-    - ssh $AWS_USER@$AWS_IP "docker pull $DOCKER_IMAGE_FULL_NAME"
-    - ssh $AWS_USER@$AWS_IP "docker stop inference-app || true"
-    - ssh $AWS_USER@$AWS_IP "docker rm inference-app || true"
-    - ssh $AWS_USER@$AWS_IP "docker run -d --name inference-app --env-file ./ai.env -p 8000:8000 $DOCKER_IMAGE_FULL_NAME"
-    - ssh $AWS_USER@$AWS_IP "docker image prune -f"
+    - echo "🚀 AWS 서버 내부에서 직접 배포를 시작합니다."
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+    
+    - docker pull $DOCKER_IMAGE_FULL_NAME
+    
+    - docker stop inference-app || true
+    - docker rm inference-app || true
+    
+    - docker run -d --name inference-app --env-file ./ai.env -p 8000:8000 $DOCKER_IMAGE_FULL_NAME
+    
+    - docker image prune -f
+    
   extends: .ai-dev-rules
