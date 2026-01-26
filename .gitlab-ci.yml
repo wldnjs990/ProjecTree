@@ -24,7 +24,7 @@ build_push_dockerhub:
   script:
     - echo "📂 projectree-inference 폴더로 이동합니다."
     - cd projectree-inference
-    - echo "🐳 Docker Hub 이미지를 빌드합니다: $DOCKER_IMAGE_FULL_NAME"
+    - echo "🐳 Docker Hub 이미지를 빌드합니다 $DOCKER_IMAGE_FULL_NAME"
     - docker build -t $DOCKER_IMAGE_FULL_NAME .
     - docker push $DOCKER_IMAGE_FULL_NAME
   extends: .ai-dev-rules
@@ -43,19 +43,19 @@ deploy_to_aws:
     - ssh-keyscan $AWS_IP >> ~/.ssh/known_hosts
   script:
     - echo "🚀 AWS 서버에 배포를 시작합니다."
-    # 1. AWS 서버에서 Docker Hub 로그인 (Private Repo일 경우 필수)
+    # 1. AWS 서버에서 Docker Hub 로그인
     - ssh $AWS_USER@$AWS_IP "echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin"
     
     # 2. 최신 이미지 Pull
     - ssh $AWS_USER@$AWS_IP "docker pull $DOCKER_IMAGE_FULL_NAME"
     
-    # 3. 기존 컨테이너 정리 (inference-app 이름 기준)
+    # 3. 기존 컨테이너 정리
     - ssh $AWS_USER@$AWS_IP "docker stop inference-app || true"
     - ssh $AWS_USER@$AWS_IP "docker rm inference-app || true"
     
-    # 4. 새 컨테이너 실행
-    # -p 8080:8080 부분은 실제 사용 포트에 맞춰 수정하세요.
-    - ssh $AWS_USER@$AWS_IP "docker run -d --name inference-app --env-file ./ai.env -p 8000:8000 $DOCKER_IMAGE_FULL_NAME"    
-    # 5. 공간 절약을 위해 사용하지 않는 구버전 이미지 정리 (선택 사항)
+    # 4. 새 컨테이너 실행 (환경변수 파일 포함)
+    - ssh $AWS_USER@$AWS_IP "docker run -d --name inference-app --env-file ./ai.env -p 8000:8000 $DOCKER_IMAGE_FULL_NAME"
+    
+    # 5. 공간 절약 (선택 사항)
     - ssh $AWS_USER@$AWS_IP "docker image prune -f"
   extends: .ai-dev-rules
