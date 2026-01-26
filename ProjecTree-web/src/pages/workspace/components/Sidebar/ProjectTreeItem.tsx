@@ -66,12 +66,12 @@ export function ProjectTreeItem({
     <div className="select-none">
       <div
         className={cn(
-          'flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors text-sm group',
+          'flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors text-xs group',
           isSelected
             ? 'bg-accent text-accent-foreground'
             : 'hover:bg-accent/50 text-muted-foreground'
         )}
-        style={{ paddingLeft: `${level * 12 + 8}px` }}
+        style={{ paddingLeft: `${level * 8 + 8}px` }}
         onClick={handleClick}
       >
         <div
@@ -90,18 +90,6 @@ export function ProjectTreeItem({
 
         <Icon className={cn('h-4 w-4', IconConfig.color)} />
         <span className="truncate flex-1">{item.title}</span>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('Add child to', item.id);
-          }}
-        >
-          <Plus className="h-3 w-3" />
-        </Button>
       </div>
 
       {isOpen && hasChildren && (

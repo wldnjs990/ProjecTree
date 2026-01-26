@@ -39,7 +39,7 @@ export function LeftSidebar({
         className="flex flex-col h-full w-full rounded-none border-r bg-white"
       >
         {/* Top Panel: Project Explorer */}
-        <ResizablePanel defaultSize={60} minSize={30}>
+        <ResizablePanel defaultSize={50} minSize={20}>
           <div className="flex h-full flex-col">
             <div className="flex items-center justify-between px-4 py-2 border-b">
               <h2 className="text-sm font-semibold tracking-tight">
@@ -67,7 +67,7 @@ export function LeftSidebar({
         />
 
         {/* Bottom Panel: Team Chat */}
-        <ResizablePanel defaultSize={40} minSize={20}>
+        <ResizablePanel defaultSize={70} minSize={20}>
           <div className="h-full">
             {/* ChatPanel already has its own layout, so we just stick it here */}
             {/* Passing "Team Chat" as workspace name to match requirements */}

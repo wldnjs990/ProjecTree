@@ -85,11 +85,7 @@ class ChatSocketService {
   /**
    * 메시지 전송
    */
-  sendMessage(
-    workspaceId: string,
-    content: string,
-    type: 'text' | 'image' | 'file' = 'text'
-  ): void {
+  sendMessage(workspaceId: string, content: string): void {
     // 백엔드가 연결되지 않았을 때 시뮬레이션
     if (!this.socket || !this.socket.connected) {
       console.log('🔄 [Mock] Simulating message send:', content);
@@ -104,9 +100,7 @@ class ChatSocketService {
             senderName: '나',
             content,
             timestamp: new Date().toISOString(),
-            type,
-            isRead: true,
-            readBy: [],
+            type: 'text',
           },
         });
       }, 100);
@@ -132,8 +126,6 @@ class ChatSocketService {
               content: `[Mock 응답] "${content.slice(0, 10)}..." 잘 확인했습니다!`,
               timestamp: new Date().toISOString(),
               type: 'text',
-              isRead: false,
-              readBy: [],
             },
           });
         }, 3000);
@@ -144,7 +136,7 @@ class ChatSocketService {
     this.socket.emit('message:send', {
       workspaceId,
       content,
-      type,
+      type: 'text',
     });
   }
 

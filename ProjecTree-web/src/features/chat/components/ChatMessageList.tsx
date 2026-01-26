@@ -20,13 +20,13 @@ export const ChatMessageList = ({
   }, [messages]);
 
   return (
-    <div className="flex-1 flex flex-col justify-end min-h-0 overflow-y-auto px-4 py-4">
+    <div className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 py-4">
       {messages.length === 0 ? (
         <div className="flex h-full items-center justify-center text-gray-400">
           <p>메시지가 없습니다. 첫 메시지를 보내보세요!</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-2 mt-auto">
           {messages.map((message) => (
             <ChatMessageItem key={message.id} message={message} />
           ))}
