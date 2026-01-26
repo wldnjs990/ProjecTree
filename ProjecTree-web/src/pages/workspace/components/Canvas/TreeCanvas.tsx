@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -10,18 +10,18 @@ import {
   type Node,
   type Edge,
   ReactFlowProvider,
-} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 
-import { ProjectNode } from "./nodes/ProjectNode";
-import { EpicNode } from "./nodes/EpicNode";
-import { StoryNode } from "./nodes/StoryNode";
-import { CollabPanel } from "./CollabPanel";
-import { MinimapPanel } from "./MinimapPanel";
-import { ZoomControls } from "./ZoomControls";
-import type { AvatarColor } from "@/components/custom/UserAvatar";
-import ChatButton from "./ChatButton";
-import { AdvancedNode, TaskNode } from "./nodes";
+import { ProjectNode } from './nodes/ProjectNode';
+import { EpicNode } from './nodes/EpicNode';
+import { StoryNode } from './nodes/StoryNode';
+import { CollabPanel } from './CollabPanel';
+import { MinimapPanel } from './MinimapPanel';
+import { ZoomControls } from './ZoomControls';
+import type { AvatarColor } from '@/components/custom/UserAvatar';
+
+import { AdvancedNode, TaskNode } from './nodes';
 
 interface OnlineUser {
   id: string;
@@ -34,8 +34,6 @@ interface TreeCanvasProps {
   initialNodes: Node[];
   initialEdges: Edge[];
   onlineUsers: OnlineUser[];
-  unreadMessages?: number;
-  onChatClick?: () => void;
   onNodeClick?: (nodeId: string) => void;
 }
 
@@ -51,8 +49,6 @@ function TreeCanvasInner({
   initialNodes,
   initialEdges,
   onlineUsers,
-  unreadMessages = 0,
-  onChatClick,
   onNodeClick,
 }: TreeCanvasProps) {
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
@@ -60,14 +56,14 @@ function TreeCanvasInner({
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
+    [setEdges]
   );
 
   const handleNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
       onNodeClick?.(node.id);
     },
-    [onNodeClick],
+    [onNodeClick]
   );
 
   const proOptions = useMemo(() => ({ hideAttribution: true }), []);
@@ -104,13 +100,6 @@ function TreeCanvasInner({
 
       {/* ReactFlow 캔버스 컨트롤 버튼 - Bottom Left */}
       <ZoomControls className="absolute bottom-6 left-6 z-10" />
-
-      {/* chat button - 마우스 드래그로 이동 */}
-      <ChatButton
-        className="absolute bottom-6 left-16 z-10"
-        unreadMessages={unreadMessages}
-        onChatClick={onChatClick}
-      />
     </div>
   );
 }

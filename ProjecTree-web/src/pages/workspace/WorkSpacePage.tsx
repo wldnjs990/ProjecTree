@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { ChatPanel } from '@/features/chat/components/ChatPanel';
 import { Header, type ViewTab } from './components/Header';
-import { Sidebar } from './components/Sidebar';
+import { LeftSidebar } from './components/Sidebar/LeftSidebar';
 import { TreeCanvas } from './components/Canvas';
 import {
   NodeDetailSidebar,
@@ -24,16 +23,9 @@ export default function WorkSpacePage() {
   // Header state
   const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');
 
-  // Sidebar filter state
-  const [nodeTypeFilter, setNodeTypeFilter] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
-
   // Node detail sidebar state
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [isNodeDetailOpen, setIsNodeDetailOpen] = useState(false);
-
-  // Chat state
-  const [showChat, setShowChat] = useState(false);
 
   // Get selected node detail data
   const selectedNodeDetail: NodeDetailData | null = selectedNodeId
@@ -51,10 +43,6 @@ export default function WorkSpacePage() {
 
   const handleInviteClick = () => {
     console.log('Invite clicked');
-  };
-
-  const handleChatClick = () => {
-    setShowChat((prev) => !prev);
   };
 
   const handleNodeClick = (nodeId: string) => {
@@ -101,12 +89,13 @@ export default function WorkSpacePage() {
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <Sidebar
-          nodeTypeFilter={nodeTypeFilter}
-          statusFilter={statusFilter}
-          onNodeTypeChange={setNodeTypeFilter}
-          onStatusChange={setStatusFilter}
+        {/* Left Sidebar (Resizable) */}
+        <LeftSidebar
+          workspaceId={workspaceId!}
+          workspaceName="AI 여행 추천 서비스"
+          className="h-full border-r border-[#EEEEEE] w-[350px] flex-none"
+          nodes={mockNodes}
+          edges={mockEdges}
         />
 
         {/* Canvas */}
@@ -116,8 +105,6 @@ export default function WorkSpacePage() {
               initialNodes={mockNodes}
               initialEdges={mockEdges}
               onlineUsers={mockUsers}
-              unreadMessages={2}
-              onChatClick={handleChatClick}
               onNodeClick={handleNodeClick}
             />
           )}
@@ -150,17 +137,6 @@ export default function WorkSpacePage() {
           onNodeAddManual={handleNodeAddManual}
           onMemoChange={handleMemoChange}
         />
-        {/* Chat Panel */}
-        {showChat && (
-          <div className="w-[400px] border-l border-gray-200 bg-white shadow-xl z-20">
-            <ChatPanel
-              workspaceId={workspaceId!}
-              workspaceName="AI 여행 추천 서비스" // TODO: 실제 워크스페이스 이름 사용
-            />
-          </div>
-        )}
-
-
       </div>
     </div>
   );
