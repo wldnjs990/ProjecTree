@@ -4,6 +4,7 @@ import com.ssafy.projectree.domain.workspace.api.dto.VoiceTokenCreateDto;
 import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
+import com.ssafy.projectree.global.exception.BusinessLogicException;
 import com.ssafy.projectree.global.exception.CustomException;
 import io.livekit.server.AccessToken;
 import io.livekit.server.RoomJoin;
@@ -33,7 +34,7 @@ public class WorkspaceVoiceController {
     public CommonResponse<VoiceTokenCreateDto.Response> createToken(@RequestBody VoiceTokenCreateDto.Request params) {
 
         if (params.getRoomName() == null || params.getParticipantName() == null) {
-            throw new CustomException(ErrorCode.WORKSPACE_VOICE_TOKEN_INVALID_REQUEST);
+            throw new BusinessLogicException(ErrorCode.WORKSPACE_VOICE_TOKEN_INVALID_REQUEST);
         }
 
         AccessToken token = new AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET);

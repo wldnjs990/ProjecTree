@@ -10,7 +10,9 @@ public enum ErrorCode {
     WORKSPACE_VOICE_TOKEN_INVALID_REQUEST(DomainCode.WORKSPACE, ExceptionCode.INVALID,
             "roomName and participantName are required"),
     SERVER_ERROR(DomainCode.NORMAL, ExceptionCode.INTERNAL_SERVER_ERROR, "SERVER_ERROR"),
-    ;
+    CANDIDATE_GENERATE_ERROR(DomainCode.CANDIDATE,ExceptionCode.FAILURE ,"CANDIDATE_GENERATE_ERROR" ),
+    NODE_GENERATE_ERROR(DomainCode.NODE, ExceptionCode.FAILURE, "NODE_GENERATE_ERROR"),
+    TECH_RECOMMEND_ERROR(DomainCode.TECH, ExceptionCode.FAILURE, "TECH_FAILURE");
     private DomainCode domainCode;
     private ExceptionCode exceptionCode;
     @Getter
