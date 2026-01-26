@@ -1,33 +1,39 @@
-import type { NodeStatus, Priority, Assignee } from './types';
 import { NodeStatusField } from './NodeStatus';
 import { NodePriorityField } from './NodePriority';
 import { NodeDifficultyField } from './NodeDifficulty';
 import { NodeAssignee } from './NodeAssignee';
+import {
+  useDisplayData,
+  useIsEditing,
+  useNodeDetailEditStore,
+} from '../../stores/nodeDetailEditStore';
+import type { NodeStatus, Priority, Assignee } from './types';
 
-interface StatusMetaSectionData {
-  status: NodeStatus;
-  priority?: Priority;
-  difficult: number;
-  assignee: Assignee | null;
-}
+export function StatusMetaSection() {
+  // Store에서 상태 구독
+  const displayData = useDisplayData();
+  const isEdit = useIsEditing();
+  const updateField = useNodeDetailEditStore((state) => state.updateField);
 
-interface StatusMetaSectionProps {
-  data: StatusMetaSectionData;
-  isEdit: boolean;
-  onStatusChange?: (value: NodeStatus) => void;
-  onPriorityChange?: (value: Priority) => void;
-  onDifficultyChange?: (value: number) => void;
-  onAssigneeChange?: (value: Assignee | null) => void;
-}
+  if (!displayData) return null;
 
-export function StatusMetaSection({
-  data,
-  isEdit,
-  onStatusChange,
-  onPriorityChange,
-  onDifficultyChange,
-  onAssigneeChange,
-}: StatusMetaSectionProps) {
+  // 필드 변경 핸들러
+  const handleStatusChange = (value: NodeStatus) => {
+    updateField('status', value);
+  };
+
+  const handlePriorityChange = (value: Priority) => {
+    updateField('priority', value);
+  };
+
+  const handleDifficultyChange = (value: number) => {
+    updateField('difficult', value);
+  };
+
+  const handleAssigneeChange = (value: Assignee | null) => {
+    updateField('assignee', value);
+  };
+
   return (
     <div className="rounded-[14px] border border-[rgba(227,228,235,0.5)] bg-[rgba(251,251,255,0.6)] backdrop-blur-sm p-4 space-y-4">
       {/* 섹션 헤더 */}
@@ -41,9 +47,9 @@ export function StatusMetaSection({
         <div className="flex items-center gap-2">
           <span className="text-xs text-[#61626F]">상태</span>
           <NodeStatusField
-            value={data.status}
+            value={displayData.status}
             isEdit={isEdit}
-            onChange={onStatusChange}
+            onChange={handleStatusChange}
           />
         </div>
 
@@ -51,9 +57,9 @@ export function StatusMetaSection({
         <div className="flex items-center gap-2">
           <span className="text-xs text-[#61626F]">우선순위</span>
           <NodePriorityField
-            value={data.priority}
+            value={displayData.priority}
             isEdit={isEdit}
-            onChange={onPriorityChange}
+            onChange={handlePriorityChange}
           />
         </div>
       </div>
@@ -65,8 +71,8 @@ export function StatusMetaSection({
           <span className="text-xs text-[#61626F]">담당자</span>
           <NodeAssignee
             isEdit={isEdit}
-            onChange={onAssigneeChange}
-            value={data.assignee}
+            onChange={handleAssigneeChange}
+            value={displayData.assignee}
           />
         </div>
 
@@ -74,9 +80,9 @@ export function StatusMetaSection({
         <div className="space-y-1">
           <span className="text-xs text-[#61626F]">난이도</span>
           <NodeDifficultyField
-            value={data.difficult}
+            value={displayData.difficult}
             isEdit={isEdit}
-            onChange={onDifficultyChange}
+            onChange={handleDifficultyChange}
           />
         </div>
       </div>

@@ -1,65 +1,64 @@
-import type { NodeDetailData, NodeStatus, Priority, Assignee, Candidate } from './types';
 import { NodeHeaderSection } from './NodeHeaderSection';
 import { StatusMetaSection } from './StatusMetaSection';
 import { AITechRecommendSection } from './AITechRecommendSection';
 import { AINodeCandidateSection } from './AINodeCandidateSection';
 import { MemoSection } from './MemoSection';
-
-interface DisplayData {
-  status: NodeStatus;
-  priority?: Priority;
-  difficult: number;
-  assignee: Assignee | null;
-  note: string;
-}
-
-interface NodeDetailHandlers {
-  onClose: () => void;
-  toggleEdit: () => void;
-  onStatusChange?: (value: NodeStatus) => void;
-  onPriorityChange?: (value: Priority) => void;
-  onDifficultyChange?: (value: number) => void;
-  onAssigneeChange?: (value: Assignee | null) => void;
-  onNoteChange?: (value: string) => void;
-  onTechCompare?: () => void;
-  onTechAddManual?: () => void;
-  onCandidateClick?: (node: Candidate) => void;
-  onCandidateAddManual?: () => void;
-}
+import {
+  useSelectedNodeDetail,
+  useNodeDetailEditStore,
+} from '../../stores/nodeDetailEditStore';
 
 interface NodeDetailContainerProps {
-  nodeDetail: NodeDetailData;
   nodeInfo?: {
     name: string;
     nodeType: string;
     identifier: string;
     taskType: string | null;
   };
-  isEdit: boolean;
-  displayData: DisplayData;
-  handlers: NodeDetailHandlers;
 }
 
 export default function NodeDetailContainer({
-  nodeDetail,
   nodeInfo,
-  isEdit,
-  displayData,
-  handlers,
 }: NodeDetailContainerProps) {
-  const {
-    onClose,
-    toggleEdit,
-    onStatusChange,
-    onPriorityChange,
-    onDifficultyChange,
-    onAssigneeChange,
-    onNoteChange,
-    onTechCompare,
-    onTechAddManual,
-    onCandidateClick,
-    onCandidateAddManual,
-  } = handlers;
+  // Store에서 상태 및 액션 구독
+  const nodeDetail = useSelectedNodeDetail();
+  const isEditing = useNodeDetailEditStore((state) => state.isEditing);
+  const closeSidebar = useNodeDetailEditStore((state) => state.closeSidebar);
+  const startEdit = useNodeDetailEditStore((state) => state.startEdit);
+  const finishEdit = useNodeDetailEditStore((state) => state.finishEdit);
+
+  if (!nodeDetail) return null;
+
+  // 편집 토글 핸들러
+  const handleToggleEdit = async () => {
+    if (!isEditing) {
+      startEdit();
+    } else {
+      try {
+        await finishEdit();
+      } catch (error) {
+        console.error('저장 실패:', error);
+      }
+    }
+  };
+
+  // 기술 비교/추가 핸들러 (추후 구현)
+  const handleTechCompare = () => {
+    console.log('Tech compare clicked');
+  };
+
+  const handleTechAddManual = () => {
+    console.log('Tech add manual clicked');
+  };
+
+  // 노드 후보 클릭/추가 핸들러 (추후 구현)
+  const handleCandidateClick = () => {
+    console.log('Candidate clicked');
+  };
+
+  const handleCandidateAddManual = () => {
+    console.log('Candidate add manual clicked');
+  };
 
   return (
     <div className="p-4 space-y-4">
@@ -67,36 +66,25 @@ export default function NodeDetailContainer({
       <NodeHeaderSection
         nodeInfo={nodeInfo}
         description={nodeDetail.description}
-        onClose={onClose}
-        toggleEdit={toggleEdit}
-        isEdit={isEdit}
+        onClose={closeSidebar}
+        toggleEdit={handleToggleEdit}
+        isEdit={isEditing}
       />
 
-      {/* Status & Meta 섹션 */}
-      <StatusMetaSection
-        data={displayData}
-        isEdit={isEdit}
-        onStatusChange={onStatusChange}
-        onPriorityChange={onPriorityChange}
-        onDifficultyChange={onDifficultyChange}
-        onAssigneeChange={onAssigneeChange}
-      />
+      {/* Status & Meta 섹션 - store 직접 구독 */}
+      <StatusMetaSection />
 
-      {/* 메모 섹션 */}
-      <MemoSection
-        note={displayData.note}
-        isEdit={isEdit}
-        onNoteChange={onNoteChange}
-      />
+      {/* 메모 섹션 - store 직접 구독 */}
+      <MemoSection />
 
       {/* AI 기술 추천 섹션 */}
       {nodeDetail.techs && nodeDetail.techs.length > 0 && (
         <AITechRecommendSection
-          isEdit={isEdit}
+          isEdit={isEditing}
           recommendations={nodeDetail.techs}
           comparison={nodeDetail.comparison}
-          onCompare={onTechCompare}
-          onAddManual={onTechAddManual}
+          onCompare={handleTechCompare}
+          onAddManual={handleTechAddManual}
         />
       )}
 
@@ -104,8 +92,8 @@ export default function NodeDetailContainer({
       {nodeDetail.candidates && nodeDetail.candidates.length > 0 && (
         <AINodeCandidateSection
           candidates={nodeDetail.candidates}
-          onCandidateClick={onCandidateClick}
-          onAddManual={onCandidateAddManual}
+          onCandidateClick={handleCandidateClick}
+          onAddManual={handleCandidateAddManual}
         />
       )}
     </div>
