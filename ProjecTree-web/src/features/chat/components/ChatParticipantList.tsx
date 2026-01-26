@@ -33,22 +33,24 @@ export const ChatParticipantList = ({
         {participants.map((participant) => (
           <div
             key={participant.id}
-            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-gray-50"
+            className="flex items-center gap-2 rounded-lg px-3 py-1.5 hover:bg-gray-50"
           >
             <div className="relative">
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-6 w-6">
                 <AvatarImage src={participant.avatar} alt={participant.name} />
-                <AvatarFallback>{participant.name[0]}</AvatarFallback>
+                <AvatarFallback className="text-[10px]">
+                  {participant.name[0]}
+                </AvatarFallback>
               </Avatar>
               {participant.isOnline && (
-                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-500" />
+                <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-white bg-green-500" />
               )}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-xs font-medium text-gray-900">
                 {participant.name}
               </p>
-              <p className="text-xs text-gray-500">{participant.role}</p>
+              <p className="text-[10px] text-gray-500">{participant.role}</p>
             </div>
           </div>
         ))}

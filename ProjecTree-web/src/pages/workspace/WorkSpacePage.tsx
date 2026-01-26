@@ -93,7 +93,7 @@ export default function WorkSpacePage() {
         <LeftSidebar
           workspaceId={workspaceId!}
           workspaceName="AI 여행 추천 서비스"
-          className="h-full border-r border-[#EEEEEE] w-[350px] flex-none"
+          className="h-full border-r border-[#EEEEEE] w-[300px] flex-none"
           nodes={mockNodes}
           edges={mockEdges}
         />

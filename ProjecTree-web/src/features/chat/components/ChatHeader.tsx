@@ -12,7 +12,7 @@ export const ChatHeader = ({
   isConnected,
 }: ChatHeaderProps) => {
   return (
-    <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+    <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2">
       <div className="flex items-center gap-2">
         <h2 className="text-lg font-semibold text-gray-900">{workspaceName}</h2>
         {isConnected ? (
