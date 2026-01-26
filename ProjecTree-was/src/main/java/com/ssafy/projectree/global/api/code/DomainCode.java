@@ -9,6 +9,10 @@ import lombok.Getter;
 public enum DomainCode {
     USER(1),
     WORKSPACE(2),
-    NORMAL(99);
+    NORMAL(99),
+    CANDIDATE(3),
+    NODE(4),
+    TECH(5)
+    ;
     private int value;
 }
