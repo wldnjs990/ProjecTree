@@ -3,12 +3,14 @@ import { getRoomDoc } from "../yjs/yjsManager";
 import { saveNodeDetailToSpring } from "../services/springSync";
 import type { EditableNodeDetail } from "../domain/node/node.detail";
 import { toSendNodeDetail } from "../domain/node/node.detail";
+import { addPendingPosition } from "../sync/pending-store";
+import { scheduleFlush } from "../sync/debounce";
 
 export async function handleMessage(
   ws: WebSocket,
   data: Buffer,
   room: string,
-  clients: Set<WebSocket>
+  clients: Set<WebSocket>,
 ) {
   let parsed: any;
 
@@ -32,6 +34,30 @@ export async function handleMessage(
       nodeId: parsed.nodeId,
       detail: sendPayload,
     });
+  } else if (parsed?.type === "save_node_position") {
+    const { nodeId, requestId } = parsed;
+    if (!nodeId) return;
+
+    const doc = getRoomDoc(room);
+    const nodes = doc.getMap<any>("nodes");
+    const nodeData = nodes.get(nodeId);
+
+    if (!nodeData) return;
+
+    const position = nodeData.get("position");
+    const x = position.x;
+    const y = position.y;
+
+    // console.log("[handleMessage] 위치 저장 예약", { room, nodeId, x, y });
+    if (typeof x !== "number" || typeof y !== "number") return;
+
+    addPendingPosition(room, {
+      nodeId,
+      position,
+      requestId,
+    });
+
+    scheduleFlush(room);
   }
 
   clients.forEach((c) => {
