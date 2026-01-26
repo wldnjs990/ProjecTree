@@ -31,14 +31,6 @@ export function StatusMetaSection() {
     updateField('assignee', value);
   };
 
-export function StatusMetaSection({
-  data,
-  isEdit,
-  onStatusChange,
-  onPriorityChange,
-  onDifficultyChange,
-  onAssigneeChange,
-}: StatusMetaSectionProps) {
   return (
     <div className="rounded-[14px] border border-[rgba(227,228,235,0.5)] bg-[rgba(251,251,255,0.6)] backdrop-blur-sm p-4 space-y-4">
       {/* 섹션 헤더 */}
