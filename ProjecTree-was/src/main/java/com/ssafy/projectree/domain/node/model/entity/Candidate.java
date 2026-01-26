@@ -3,6 +3,7 @@ package com.ssafy.projectree.domain.node.model.entity;
 import com.ssafy.projectree.global.model.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,15 +27,15 @@ public class Candidate extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "node_id", nullable = false)
-	private Node node;
+	private Node parent;
 
 	@OneToOne
 	@JoinColumn(name = "derivation_node_id", nullable = true)
 	private Node derivationNode;
 
-	@Column(columnDefinition = "VARCHAR(30)")
+	@Column(columnDefinition = "VARCHAR(100)")
 	private String name;
 
 	@Column(columnDefinition = "TEXT")

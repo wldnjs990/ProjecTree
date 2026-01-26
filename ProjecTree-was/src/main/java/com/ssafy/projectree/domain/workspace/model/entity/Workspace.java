@@ -6,13 +6,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
+@SuperBuilder
 @Table(name = "workspace")
 public class Workspace extends BaseEntity {
 
@@ -34,10 +37,10 @@ public class Workspace extends BaseEntity {
 	private String domain;
 
 	@Column(name = "start_date")
-	private LocalDateTime startDate;
+	private LocalDate startDate;
 
 	@Column(name = "end_date")
-	private LocalDateTime endDate;
+	private LocalDate endDate;
 
 	@Column(columnDefinition = "VARCHAR(20)")
 	private String purpose;

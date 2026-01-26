@@ -4,7 +4,9 @@ import com.ssafy.projectree.domain.node.model.entity.Node;
 import com.ssafy.projectree.domain.node.model.entity.NodeTree;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class NodeRepositoryImpl implements NodeRepositoryCustom {
 
 	@PersistenceContext

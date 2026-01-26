@@ -10,4 +10,8 @@ public class BusinessLogicException extends CustomException{
     public BusinessLogicException(ErrorCode errorCode, Throwable cause) {
         super(errorCode, cause);
     }
+
+    public BusinessLogicException(ErrorCode errorCode, String message){
+        super(errorCode, message);
+    }
 }

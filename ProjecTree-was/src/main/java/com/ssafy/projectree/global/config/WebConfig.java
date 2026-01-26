@@ -10,17 +10,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.Duration;
 
-@EnableWebMvc
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Bean
-    public RestClient restClient() {
-// 1. 타임아웃 설정을 위한 팩토리 생성
+    public RestClient restClient(RestClient.Builder builder) {
         JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory();
-        factory.setReadTimeout(Duration.ofMinutes(5));    // 읽기 타임아웃 (5분)
-        // 2. RestClient 빌더에 팩토리 적용
-        return RestClient.builder()
-                .requestFactory(factory)
+        factory.setReadTimeout(Duration.ofMinutes(5));     // 읽기 타임아웃
+
+        return builder
+                .requestFactory(factory) // 팩토리 교체
                 .build();
     }
 
