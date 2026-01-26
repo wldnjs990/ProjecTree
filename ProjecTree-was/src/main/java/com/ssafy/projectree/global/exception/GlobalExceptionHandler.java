@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CustomException.class)
-    public ResponseEntity<CommonResponse<?>> handleCustomException(CustomException e) {
+    @ExceptionHandler(BusinessLogicException.class)
+    public ResponseEntity<CommonResponse<?>> handleCustomException(BusinessLogicException e) {
 
         ErrorCode code = e.getErrorCode();
 

@@ -4,7 +4,7 @@ import com.ssafy.projectree.global.api.code.ErrorCode;
 import lombok.Getter;
 
 @Getter
-public class CustomException extends RuntimeException {
+public abstract class CustomException extends RuntimeException {
 
     ErrorCode errorCode;
 
