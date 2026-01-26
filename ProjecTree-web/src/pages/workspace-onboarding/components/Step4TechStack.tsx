@@ -76,10 +76,10 @@ export default function Step4TechStack({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2 className="font-['Roboto'] font-thin text-[18.8px] leading-7 tracking-[-0.5px] text-[var(--figma-text-cod-gray)]">
+        <h2 className="font-['Pretendard'] font-bold text-[24px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
           사용할 기술 스택
         </h2>
-        <p className="font-['Roboto'] font-thin text-[13.3px] leading-5 text-[var(--figma-text-emperor)]">
+        <p className="font-['Pretendard'] font-medium text-[15px] text-[#757575]">
           사용 예정인 기술을 선택해주세요 (다중 선택 가능)
         </p>
       </div>
@@ -87,12 +87,12 @@ export default function Step4TechStack({
       {/* 폼 필드 */}
       <div className="flex flex-col gap-5">
         {/* 검색 입력 */}
-        <div className="relative flex flex-col gap-2">
+        <div className="relative flex flex-col gap-2 z-50">
           <Label
             htmlFor="techSearch"
-            className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]"
+            className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]"
           >
-            사용할 기술스택 검색
+            {/* 사용할 기술스택 검색 */}
           </Label>
           <Input
             id="techSearch"
@@ -106,19 +106,19 @@ export default function Step4TechStack({
             onKeyDown={handleKeyDown}
             onFocus={() => setShowSuggestions(searchTerm.length > 0)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-            style={{}}
-            className="font-['Roboto'] font-thin text-[14px] leading-4 h-[44px] px-3 py-[12.5px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
+            className="h-[44px] px-3 py-[12.5px] bg-transparent border-[var(--figma-border-mercury)] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] rounded-md font-['Pretendard'] font-normal text-[14px] leading-4 focus-visible:ring-[var(--figma-primary-blue)]"
           />
 
           {/* 검색 자동완성 드롭다운 */}
           {showSuggestions && filteredTechs.length > 0 && (
-            <div
-              className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-lg shadow-lg bg-[var(--figma-white)] border border-[var(--figma-border-mercury)]"
-            >
+            <div className="absolute top-full mt-1 max-h-60 w-full overflow-y-auto rounded-lg shadow-xl bg-white border border-[var(--figma-border-mercury)] z-50 ring-1 ring-black/5">
               {filteredTechs.map((tech, index) => (
                 <div
                   key={tech}
-                  className={`cursor-pointer px-4 py-2 font-['Roboto'] font-thin text-[14px] text-[var(--figma-text-cod-gray)] ${index === selectedIndex ? 'bg-[var(--figma-gray-concrete)]' : 'bg-transparent'
+                  className={`cursor-pointer px-4 py-2.5 font-['Pretendard'] font-normal text-[14px] transition-colors
+                    ${index === selectedIndex
+                      ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-cod-gray)]'
+                      : 'bg-transparent text-[var(--figma-text-cod-gray)] hover:bg-[var(--figma-gray-concrete)]'
                     }`}
                   onClick={() => handleAdd(tech)}
                   onMouseEnter={() => setSelectedIndex(index)}
@@ -132,14 +132,12 @@ export default function Step4TechStack({
 
         {/* 선택된 기술 스택 */}
         {data.techStacks.length > 0 && (
-          <div
-            className="flex min-h-15 flex-wrap gap-2 rounded-lg p-4 bg-[var(--figma-gray-concrete)] border border-[var(--figma-border-mercury)]"
-          >
+          <div className="flex min-h-15 flex-wrap gap-2 rounded-lg p-4 bg-[var(--figma-gray-concrete)] border border-[var(--figma-border-mercury)]">
             {data.techStacks.map((tech) => (
               <Badge
                 key={tech}
                 variant="secondary"
-                className="flex items-center gap-2 px-3 py-1.5 text-sm font-['Roboto'] font-thin bg-[var(--figma-white)] text-[var(--figma-text-cod-gray)] border border-[var(--figma-border-mercury)]"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-['Pretendard'] font-normal bg-white text-[var(--figma-text-cod-gray)] border border-[var(--figma-border-mercury)] shadow-sm hover:bg-gray-50"
               >
                 {tech}
                 <button
@@ -147,7 +145,7 @@ export default function Step4TechStack({
                     e.stopPropagation();
                     handleRemove(tech);
                   }}
-                  className="rounded-full p-0.5 hover:bg-gray-300"
+                  className="rounded-full p-0.5 hover:bg-gray-200 transition-colors"
                 >
                   <X className="h-3 w-3" />
                 </button>

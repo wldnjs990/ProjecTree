@@ -108,69 +108,68 @@ export default function Step3Schedule({
     setFileError('');
   };
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-2">
       {/* 헤더 */}
-      <div className="flex flex-col items-center gap-2">
-        <h2 className="font-['Roboto'] font-thin text-[18.8px] leading-7 tracking-[-0.5px] text-[var(--figma-text-cod-gray)]">
+      <div className="flex flex-col items-center gap-1">
+        <h2 className="font-['Pretendard'] font-bold text-[22px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
           주제 및 일정
         </h2>
-        <p className="font-['Roboto'] font-thin text-[13.3px] leading-5 text-[var(--figma-text-emperor)]">
+        <p className="font-['Pretendard'] font-medium text-[13px] text-[#757575]">
           프로젝트 주제와 예상 기간을 입력하세요
         </p>
       </div>
 
       {/* 폼 필드 */}
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-3">
         {/* 프로젝트 주제 */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           <Label
             htmlFor="subject"
-            className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]"
+            className="font-['Pretendard'] font-medium text-[13px] leading-[14px] text-[var(--figma-text-cod-gray)]"
           >
             프로젝트 주제
           </Label>
           <Textarea
             id="subject"
-            placeholder="예: AI가 사용자 취향을 분석해 최적의 여행 일정을 추천&#10;자세하게 적을수록 더 정확한 분석이 가능합니다."
+            placeholder="예: AI가 사용자 취향을 분석해 최적의 여행 일정을 추천"
             value={data.subject}
             onChange={(e) => onChange({ subject: e.target.value })}
             maxLength={50}
-            rows={5}
-            className="resize-none font-['Roboto'] font-thin text-[14px] leading-4 px-3 py-[12.5px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
+            rows={2}
+            className="resize-none font-['Pretendard'] font-normal text-[13.5px] leading-relaxed p-[10px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors"
           />
           <div className="flex justify-end">
-            <span className="font-['Inter'] font-normal text-[12px] leading-4 text-[var(--figma-text-dove-gray)]">
+            <span className="font-['Pretendard'] font-normal text-[11px] leading-3 text-[var(--figma-text-dove-gray)]">
               {data.subject.length}/50
             </span>
           </div>
         </div>
 
         {/* 파일 업로드 */}
-        <div className="flex flex-col gap-2">
-          <Label className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
+        <div className="flex flex-col gap-1.5">
+          <Label className="font-['Pretendard'] font-medium text-[13px] leading-[14px] text-[var(--figma-text-cod-gray)]">
             프로젝트 문서 업로드
           </Label>
-          <p className="font-['Roboto'] font-thin text-[12px] leading-4 text-[var(--figma-text-emperor)] mb-2"></p>
 
-          {/* 파일 업로드 영역 (항상 표시) */}
+          {/* 파일 업로드 영역 */}
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`border-2 dashed rounded-lg p-8 text-center transition-all duration-200 ${isDragging
-              ? 'border-[var(--figma-primary-blue)] bg-[rgba(59,130,246,0.05)]'
-              : 'border-[var(--figma-border-mercury)] bg-[rgba(255,255,255,0.002)]'
-              }`}
+            className={`
+              p-3 text-center rounded-lg transition-all duration-200 border-2 border-dashed
+              ${isDragging
+                ? 'border-[var(--figma-forest-accent)] bg-green-50'
+                : 'border-[var(--figma-border-mercury)] bg-transparent hover:border-[var(--figma-forest-accent)] hover:bg-green-50/30'
+              }
+            `}
           >
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-1.5">
               <Upload
-                className="h-10 w-10 text-[var(--figma-text-emperor)]"
+                className="h-6 w-6 text-[var(--figma-text-emperor)]"
               />
-              <p className="font-['Roboto'] font-thin text-[14px] text-[var(--figma-text-cod-gray)]">
+              <p className="font-['Pretendard'] font-normal text-[12.5px] text-[var(--figma-text-cod-gray)]">
                 Drag & drop PDF files here
-              </p>
-              <p className="font-['Roboto'] font-thin text-[12px] text-[var(--figma-text-dove-gray)]">
-                Allowed types: application/pdf (최대 10MB)
               </p>
               <label>
                 <input
@@ -188,9 +187,9 @@ export default function Step3Schedule({
                     ) as HTMLInputElement;
                     input?.click();
                   }}
-                  className="font-['Roboto'] font-thin text-[13.2px] px-4 py-2 bg-[var(--figma-text-cod-gray)] text-[var(--figma-white)] rounded-md border-none cursor-pointer"
+                  className="font-['Pretendard'] font-normal text-[11px] h-[28px] px-2.5 bg-[var(--figma-forest-primary)] text-[var(--figma-white)] rounded-md hover:bg-[#1B5E20] transition-colors mt-0.5"
                 >
-                  파일 업로드
+                  파일 업로드 (Max 10MB)
                 </Button>
               </label>
             </div>
@@ -202,30 +201,26 @@ export default function Step3Schedule({
               {data.specFiles.map((file, index) => (
                 <div
                   key={`${file.name}-${index}`}
-                  className="border border-[var(--figma-border-mercury)] rounded-lg px-4 py-3 bg-[rgba(255,255,255,0.002)] flex items-center justify-between"
+                  className="flex items-center justify-between p-3 border border-[var(--figma-border-mercury)] rounded-lg bg-white shadow-sm"
                 >
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-md bg-[var(--figma-gray-concrete)] flex items-center justify-center"
-                    >
-                      <Upload className="h-5 w-5 text-[#666]" />
+                    <div className="flex items-center justify-center w-10 h-10 rounded-md bg-[var(--figma-forest-bg)] text-[var(--figma-forest-primary)]">
+                      <Upload className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-['Roboto'] font-thin text-[14px] text-[var(--figma-text-cod-gray)]">
+                      <p className="font-['Pretendard'] font-normal text-[14px] text-[var(--figma-text-cod-gray)]">
                         {file.name}
                       </p>
-                      <p className="font-['Roboto'] font-thin text-[12px] text-[var(--figma-text-dove-gray)]">
+                      <p className="font-['Pretendard'] font-normal text-xs text-[var(--figma-text-dove-gray)]">
                         {(file.size / 1024).toFixed(2)} KB
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => handleRemoveFile(index)}
-                    className="bg-transparent border-none cursor-pointer p-1"
+                    className="p-1 hover:bg-black/5 rounded-full transition-colors"
                   >
-                    <X
-                      className="h-5 w-5 text-[var(--figma-text-emperor)]"
-                    />
+                    <X className="h-5 w-5 text-[var(--figma-text-emperor)]" />
                   </button>
                 </div>
               ))}
@@ -234,7 +229,7 @@ export default function Step3Schedule({
 
           {/* 에러 메시지 */}
           {fileError && (
-            <p className="font-['Roboto'] font-thin text-[12px] text-[var(--figma-required-crimson)] mt-1">
+            <p className="font-['Pretendard'] font-normal text-xs text-red-500 mt-1">
               {fileError}
             </p>
           )}
@@ -242,7 +237,7 @@ export default function Step3Schedule({
 
         {/* 예상 기간 */}
         <div className="flex flex-col gap-2">
-          <Label className="font-['Roboto'] font-thin text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
+          <Label className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
             예상 기간
           </Label>
           <div className="flex items-center gap-4">
@@ -251,7 +246,7 @@ export default function Step3Schedule({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-50 justify-start text-left font-normal font-['Roboto'] font-thin text-[14px] h-[44px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
+                  className={`flex-1 justify-start text-left font-normal font-['Pretendard'] h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md hover:border-[var(--figma-forest-accent)] ${!data.startDate && "text-muted-foreground"}`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {data.startDate ? (
@@ -269,18 +264,19 @@ export default function Step3Schedule({
                   selected={data.startDate || undefined}
                   onSelect={(date) => onChange({ startDate: date || null })}
                   initialFocus
+                  className="rounded-md border border-[var(--figma-border-mercury)] shadow-lg"
                 />
               </PopoverContent>
             </Popover>
 
-            <span className="text-[var(--figma-text-emperor)]">~</span>
+            <span className="text-[var(--figma-text-emperor)] shrink-0">~</span>
 
             {/* 종료일 */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-50 justify-start text-left font-normal font-['Roboto'] font-thin text-[14px] h-[44px] bg-[rgba(255,255,255,0.002)] border border-[var(--figma-border-mercury)] shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-md"
+                  className={`flex-1 justify-start text-left font-normal font-[Roboto] h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md hover:border-[var(--figma-forest-accent)] ${!data.endDate && "text-muted-foreground"}`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {data.endDate ? (
@@ -301,6 +297,7 @@ export default function Step3Schedule({
                   disabled={(date) =>
                     data.startDate ? date < data.startDate : false
                   }
+                  className="rounded-md border border-[var(--figma-border-mercury)] shadow-lg"
                 />
               </PopoverContent>
             </Popover>
