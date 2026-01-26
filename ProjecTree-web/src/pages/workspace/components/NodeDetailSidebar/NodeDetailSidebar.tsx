@@ -6,12 +6,9 @@ import type {
   Candidate,
   NodeData,
 } from './types';
-import { NodeHeader } from './NodeHeader';
-import { StatusMetaSection } from './StatusMetaSection';
-import { AITechRecommendSection } from './AITechRecommendSection';
-import { AINodeRecommendSection } from './AINodeRecommendSection';
-import { MemoSection } from './MemoSection';
 import { cn } from '@/lib/utils';
+import CandidateNodeContainer from './CandidateNodeContainer';
+import NodeDetailContainer from './NodeDetailContainer';
 
 // 편집 가능한 데이터 타입
 export interface EditableNodeDetail {
@@ -20,6 +17,21 @@ export interface EditableNodeDetail {
   difficult: number;
   assignee: Assignee | null;
   note: string;
+}
+
+// 핸들러 타입 정의
+export interface NodeDetailHandlers {
+  onClose: () => void;
+  toggleEdit: () => void;
+  onStatusChange?: (value: NodeStatus) => void;
+  onPriorityChange?: (value: Priority) => void;
+  onDifficultyChange?: (value: number) => void;
+  onAssigneeChange?: (value: Assignee | null) => void;
+  onNoteChange?: (value: string) => void;
+  onTechCompare?: () => void;
+  onTechAddManual?: () => void;
+  onCandidateClick?: (node: Candidate) => void;
+  onCandidateAddManual?: () => void;
 }
 
 interface NodeDetailSidebarProps {
@@ -39,20 +51,8 @@ interface NodeDetailSidebarProps {
   isEdit: boolean;
   // 편집 중인 데이터 (CRDT에서 관리)
   editData?: EditableNodeDetail | null;
-  // 이벤트 핸들러
-  onClose: () => void;
-  toggleEdit: () => void;
-  // 편집 핸들러
-  onStatusChange?: (value: NodeStatus) => void;
-  onPriorityChange?: (value: Priority) => void;
-  onDifficultyChange?: (value: number) => void;
-  onAssigneeChange?: (value: Assignee | null) => void;
-  onNoteChange?: (value: string) => void;
-  // 기타 핸들러
-  onTechCompare?: () => void;
-  onTechAddManual?: () => void;
-  onNodeAdd?: (node: Candidate) => void;
-  onNodeAddManual?: () => void;
+  // 핸들러 (그룹화)
+  handlers: NodeDetailHandlers;
   className?: string;
 }
 
@@ -63,17 +63,7 @@ export function NodeDetailSidebar({
   isOpen,
   isEdit,
   editData,
-  onClose,
-  toggleEdit,
-  onStatusChange,
-  onPriorityChange,
-  onDifficultyChange,
-  onAssigneeChange,
-  onNoteChange,
-  onTechCompare,
-  onTechAddManual,
-  onNodeAdd,
-  onNodeAddManual,
+  handlers,
   className,
 }: NodeDetailSidebarProps) {
   if (!nodeDetail || !nodeListData) return null;
@@ -101,53 +91,17 @@ export function NodeDetailSidebar({
     >
       {/* 스크롤 영역 */}
       <div className="h-full overflow-y-auto">
-        <div className="p-4 space-y-4">
-          {/* 노드 헤더 */}
-          <NodeHeader
-            nodeInfo={nodeInfo}
-            description={nodeDetail.description}
-            onClose={onClose}
-            toggleEdit={toggleEdit}
-            isEdit={isEdit}
-          />
-
-          {/* Status & Meta 섹션 */}
-          <StatusMetaSection
-            data={displayData}
-            isEdit={isEdit}
-            onStatusChange={onStatusChange}
-            onPriorityChange={onPriorityChange}
-            onDifficultyChange={onDifficultyChange}
-            onAssigneeChange={onAssigneeChange}
-          />
-
-          {/* 메모 섹션 */}
-          <MemoSection
-            note={displayData.note}
-            isEdit={isEdit}
-            onNoteChange={onNoteChange}
-          />
-
-          {/* AI 기술 추천 섹션 */}
-          {nodeDetail.techs && nodeDetail.techs.length > 0 && (
-            <AITechRecommendSection
-              isEdit={isEdit}
-              recommendations={nodeDetail.techs}
-              comparison={nodeDetail.comparison}
-              onCompare={onTechCompare}
-              onAddManual={onTechAddManual}
-            />
-          )}
-
-          {/* AI 다음 노드 추천 섹션 */}
-          {nodeDetail.candidates && nodeDetail.candidates.length > 0 && (
-            <AINodeRecommendSection
-              recommendations={nodeDetail.candidates}
-              onAddNode={onNodeAdd}
-              onAddManual={onNodeAddManual}
-            />
-          )}
-        </div>
+        <NodeDetailContainer
+          nodeDetail={nodeDetail}
+          nodeInfo={nodeInfo}
+          isEdit={isEdit}
+          displayData={displayData}
+          handlers={handlers}
+        />
+        <CandidateNodeContainer
+          nodeInfo={nodeInfo}
+          description={nodeDetail.description}
+        />
       </div>
     </div>
   );

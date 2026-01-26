@@ -252,17 +252,19 @@ export default function WorkSpacePage() {
           isOpen={isNodeDetailOpen}
           isEdit={isNodeDetailEdit}
           editData={editData}
-          onClose={handleNodeDetailClose}
-          toggleEdit={handleToggleEdit}
-          onStatusChange={(value) => updateField('status', value)}
-          onPriorityChange={(value) => updateField('priority', value)}
-          onDifficultyChange={(value) => updateField('difficult', value)}
-          onAssigneeChange={(value) => updateField('assignee', value)}
-          onNoteChange={(value) => updateField('note', value)}
-          onTechCompare={handleTechCompare}
-          onTechAddManual={handleTechAddManual}
-          onNodeAdd={handleNodeAdd}
-          onNodeAddManual={handleNodeAddManual}
+          handlers={{
+            onClose: handleNodeDetailClose,
+            toggleEdit: handleToggleEdit,
+            onStatusChange: (value) => updateField('status', value),
+            onPriorityChange: (value) => updateField('priority', value),
+            onDifficultyChange: (value) => updateField('difficult', value),
+            onAssigneeChange: (value) => updateField('assignee', value),
+            onNoteChange: (value) => updateField('note', value),
+            onTechCompare: handleTechCompare,
+            onTechAddManual: handleTechAddManual,
+            onCandidateClick: handleNodeAdd,
+            onCandidateAddManual: handleNodeAddManual,
+          }}
         />
       </div>
     </div>

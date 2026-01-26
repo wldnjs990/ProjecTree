@@ -10,6 +10,10 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { TechRecommendation } from './types';
 import { cn } from '@/lib/utils';
+import { Confirm } from '@/components/custom/Confirm';
+import { ConfirmTrigger } from '@/components/custom/ConfirmTrigger';
+import TechDetailContent from './TechDetailContent';
+import TechDetailTitle from './TechDetailTitle';
 
 interface AITechRecommendSectionProps {
   isEdit: boolean;
@@ -23,19 +27,17 @@ interface AITechRecommendSectionProps {
 function TechCard({
   tech,
   isSelected,
-  onClick,
 }: {
   tech: TechRecommendation;
   isSelected: boolean;
-  onClick: () => void;
 }) {
+  // 추천 점수가 4점 이상이면 AI 추천 태그 붙여줌
   const isHighRecommended = tech.recommendationScore >= 4;
 
   return (
-    <button
-      onClick={onClick}
+    <div
       className={cn(
-        'w-full p-3 rounded-lg border text-left transition-all',
+        'w-full p-3 rounded-lg border text-left transition-all cursor-pointer',
         isSelected
           ? 'bg-[rgba(28,105,227,0.05)] border-[rgba(28,105,227,0.5)]'
           : 'bg-white border-[#DEDEDE] hover:border-[rgba(28,105,227,0.3)]'
@@ -70,7 +72,7 @@ function TechCard({
           </span>
         )}
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -182,16 +184,30 @@ function TechCardList({
   );
 
   return (
-    <div className="space-y-2">
-      {recommendations.map((tech) => (
-        <TechCard
-          key={tech.id}
-          tech={tech}
-          isSelected={selectedTechId === tech.id}
-          onClick={() => setSelectedTechId(tech.id)}
-        />
-      ))}
-    </div>
+    <>
+      <div className="space-y-2">
+        {recommendations.map((tech) => (
+          <Confirm
+            key={tech.id}
+            trigger={
+              <ConfirmTrigger>
+                <TechCard tech={tech} isSelected={selectedTechId === tech.id} />
+              </ConfirmTrigger>
+            }
+            title={
+              <TechDetailTitle
+                name={tech.name}
+                recommendationScore={tech.recommendationScore}
+              />
+            }
+            content={<TechDetailContent tech={tech} />}
+            description="선택한 기술을 확정하시겠습니까? (수정 불가)"
+            cancelText="취소"
+            actionText="확정"
+          />
+        ))}
+      </div>
+    </>
   );
 }
 

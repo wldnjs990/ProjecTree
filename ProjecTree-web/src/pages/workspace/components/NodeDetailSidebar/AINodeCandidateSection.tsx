@@ -2,18 +2,22 @@ import { useState } from 'react';
 import { Lightbulb, ChevronDown, ChevronUp, Plus } from 'lucide-react';
 import type { Candidate } from './types';
 
-interface AINodeRecommendSectionProps {
-  recommendations: Candidate[];
-  onAddNode?: (node: Candidate) => void;
+interface AINodeCandidateSectionProps {
+  candidates: Candidate[];
+  onCandidateClick?: (node: Candidate) => void;
   onAddManual?: () => void;
 }
 
 // 하위 노드 카드 컴포넌트
-function SubNodeCard({ node, onAdd }: { node: Candidate; onAdd: () => void }) {
+interface SubNodeCardProps extends React.HTMLAttributes<HTMLButtonElement> {
+  node: Candidate;
+  onClick: () => void;
+}
+const SubNodeCard = ({ node, onClick }: SubNodeCardProps) => {
   return (
     <button
+      onClick={onClick}
       className="flex flex-col w-full items-start justify-between p-2.5 border border-[#DEDEDE] hover:bg-[#1c69e30d] rounded-lg"
-      onClick={onAdd}
     >
       <div className="flex-1 min-w-0 w-full flex items-center justify-between">
         <p className="text-xs font-medium text-[#0B0B0B] truncate">
@@ -28,13 +32,13 @@ function SubNodeCard({ node, onAdd }: { node: Candidate; onAdd: () => void }) {
       </div>
     </button>
   );
-}
+};
 
-export function AINodeRecommendSection({
-  recommendations,
-  onAddNode,
+export function AINodeCandidateSection({
+  candidates,
+  onCandidateClick,
   onAddManual,
-}: AINodeRecommendSectionProps) {
+}: AINodeCandidateSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
@@ -62,11 +66,11 @@ export function AINodeRecommendSection({
         <div className="px-4 pb-4 space-y-4">
           {/* 추천 노드 목록 */}
           <div className="space-y-2">
-            {recommendations.map((node) => (
+            {candidates.map((node) => (
               <SubNodeCard
                 key={node.id}
                 node={node}
-                onAdd={() => onAddNode?.(node)}
+                onClick={() => onCandidateClick?.(node)}
               />
             ))}
           </div>
@@ -83,4 +87,20 @@ export function AINodeRecommendSection({
       )}
     </div>
   );
+}
+
+{
+  /* <Confirm
+  key={node.id}
+  trigger={
+    <ConfirmTrigger className="flex flex-col w-full items-start justify-between p-2.5 border border-[#DEDEDE] hover:bg-[#1c69e30d] rounded-lg">
+      <SubNodeCard node={node} onAdd={() => onAddNode?.(node)} />
+    </ConfirmTrigger>
+  }
+  title={`선택한 노드: ${node.name}`}
+  content={<div>{node.description}</div>}
+  description="선택한 노드를 확정하시겠습니까? (수정 불가)"
+  cancelText="취소"
+  actionText="확정"
+/>; */
 }

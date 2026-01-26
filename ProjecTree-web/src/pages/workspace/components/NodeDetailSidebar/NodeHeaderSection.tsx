@@ -1,8 +1,10 @@
 import { X, Sprout, SquarePen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import NodeHeaderButton from './NodeHeaderButton';
+import NodeHeaderInfo from './NodeHeaderInfo';
+import { categoryTagStyles, typeTagStyles } from '../../constants/nodeStyle';
 
-interface NodeHeaderProps {
+interface NodeHeaderSectionProps {
   nodeInfo?: {
     name: string;
     nodeType: string;
@@ -15,69 +17,13 @@ interface NodeHeaderProps {
   isEdit: boolean;
 }
 
-// 노드 타입별 태그 스타일
-const typeTagStyles: Record<
-  string,
-  { bg: string; border: string; text: string; label: string }
-> = {
-  TASK: {
-    bg: 'bg-[rgba(47,88,200,0.1)]',
-    border: 'border-[rgba(47,88,200,0.5)]',
-    text: 'text-[#6363C6]',
-    label: 'Task',
-  },
-  ADVANCED: {
-    bg: 'bg-[rgba(8,145,178,0.1)]',
-    border: 'border-[rgba(8,145,178,0.5)]',
-    text: 'text-[#0891B2]',
-    label: 'Advanced',
-  },
-  STORY: {
-    bg: 'bg-[rgba(0,212,146,0.1)]',
-    border: 'border-[rgba(0,212,146,0.5)]',
-    text: 'text-[#00D492]',
-    label: 'Story',
-  },
-  EPIC: {
-    bg: 'bg-[rgba(139,92,246,0.1)]',
-    border: 'border-[rgba(139,92,246,0.5)]',
-    text: 'text-[#8B5CF6]',
-    label: 'Epic',
-  },
-  PROJECT: {
-    bg: 'bg-[rgba(100,116,139,0.1)]',
-    border: 'border-[rgba(100,116,139,0.5)]',
-    text: 'text-[#64748B]',
-    label: 'Project',
-  },
-};
-
-// 카테고리별 태그 스타일
-const categoryTagStyles: Record<
-  string,
-  { bg: string; border: string; text: string; label: string }
-> = {
-  FE: {
-    bg: 'bg-[#FFF7ED]',
-    border: 'border-[#F97316]',
-    text: 'text-[#F97316]',
-    label: 'Frontend',
-  },
-  BE: {
-    bg: 'bg-[#EEF2FF]',
-    border: 'border-[#6366F1]',
-    text: 'text-[#6366F1]',
-    label: 'Backend',
-  },
-};
-
-export function NodeHeader({
+export function NodeHeaderSection({
   nodeInfo,
   description,
   onClose,
   toggleEdit,
   isEdit,
-}: NodeHeaderProps) {
+}: NodeHeaderSectionProps) {
   if (!nodeInfo) return null;
 
   const typeStyle = typeTagStyles[nodeInfo.nodeType] || typeTagStyles.TASK;
@@ -144,19 +90,7 @@ export function NodeHeader({
       </div>
 
       {/* TODO : 제목, 설명 동시편집 구현 */}
-      <div className="mt-10">
-        {/* 제목 */}
-        <h2 className="text-base font-medium text-[#14151F] mb-2 pr-8">
-          {nodeInfo.name}
-        </h2>
-
-        {/* 설명 */}
-        {description && (
-          <p className="text-sm text-[#61626F] leading-relaxed">
-            {description}
-          </p>
-        )}
-      </div>
+      <NodeHeaderInfo name={nodeInfo.name} description={description} />
     </div>
   );
 }
