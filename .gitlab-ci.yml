@@ -42,7 +42,7 @@ deploy_to_aws:
     - docker stop inference-app || true
     - docker rm inference-app || true
     
-    - docker run -d --name inference-app --env-file ./ai.env -p 8000:8000 $DOCKER_IMAGE_FULL_NAME
+    - docker run -d --name inference-app --env-file $AI_ENV -p 8000:8000 $DOCKER_IMAGE_FULL_NAME
     
     - docker image prune -f
     
