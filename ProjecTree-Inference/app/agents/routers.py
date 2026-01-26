@@ -14,10 +14,7 @@ def route_node(state: NodeState) -> str:
     elif node_type == NodeType.STORY:
         return "story_node_process"
     elif node_type == NodeType.TASK:
-        if candidate_info.task_type == TaskType.FRONTEND:
-            return "fe_task_node_process"
-        elif candidate_info.task_type == TaskType.BACKEND:
-            return "be_task_node_process"
+        return "task_node_process"
     elif node_type == NodeType.ADVANCE:
         return "advance_node_process"
     return "epic_node_process"
@@ -41,12 +38,12 @@ def route_advance_tech_stack(state: NodeState) -> str:
 def route_feedback_loop(state: NodeState) -> str:
     """피드백 루프 라우팅
     - 피드백 결과 재시도가 필요하면 sub_node_info_create로 이동
-    - 정상이면 generate_candidates로 이동
+    - 정상이면 structured_output_parser로 이동
     """
-    feedback_retry = state.get("feedback_retry", False)
-    if feedback_retry:
+    is_valid = state.get("is_valid", True)
+    if not is_valid:
         return "sub_node_info_create"
-    return "generate_candidates"
+    return "structured_output_parser"
 
 
 def route_struct_feedback(state: NodeState) -> str:

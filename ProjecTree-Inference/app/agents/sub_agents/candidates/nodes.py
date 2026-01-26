@@ -6,7 +6,7 @@ from app.agents.sub_agents.candidates.tools import check_duplicate_work, search_
 from langchain_core.messages import HumanMessage
 from app.agents.tools.tavily import search_tool
 from app.core.llm import openai_nano_llm, openai_mini_llm
-from app.agents.schemas.candidate import CandidateList
+from app.agents.schemas.candidate import CandidateList, TaskCandidateList
 from app.agents.sub_agents.candidates.prompts.system_prompts import (
     EPIC_SYS,
     STORY_SYS,
@@ -19,17 +19,17 @@ from app.agents.sub_agents.candidates.tools import get_duplicate_check_context
 llm = openai_mini_llm
 tools = [search_tool]
 
-def create_candidate_agent(system_prompt: str):
+def create_candidate_agent(system_prompt: str, response_format):
     return create_agent(
         llm, tools, system_prompt=system_prompt, 
-        response_format=ProviderStrategy(CandidateList)
+        response_format=ProviderStrategy(response_format)
     )
 
 
-epic_agent = create_candidate_agent(EPIC_SYS)
-story_agent = create_candidate_agent(STORY_SYS)
-task_agent = create_candidate_agent(TASK_SYS)
-project_agent = create_candidate_agent(PROJECT_SYS)
+project_agent = create_candidate_agent(PROJECT_SYS, CandidateList)
+epic_agent = create_candidate_agent(EPIC_SYS, CandidateList)
+story_agent = create_candidate_agent(STORY_SYS, TaskCandidateList)
+task_agent = create_candidate_agent(TASK_SYS, CandidateList)
 
 
 def fetch_sibling_context(state: CandidateNodeState) -> CandidateNodeState:
@@ -98,7 +98,7 @@ def generate_candidates(state: CandidateNodeState) -> CandidateNodeState:
     
     # 피드백이 있으면 프롬프트에 추가 (재시도 시)
     if feedback and retry_count > 0:
-        prompt_msg += f"\n\n⚠️ **이전 시도 피드백 (재시도 {retry_count}회차)**\n{feedback}\n\n위 피드백을 반영하여 다시 생성해주세요."
+        prompt_msg += f"\n\n**이전 시도 피드백 (재시도 {retry_count}회차)**\n{feedback}\n\n위 피드백을 반영하여 다시 생성해주세요."
 
     executor = None
     if node_type == NodeType.PROJECT:

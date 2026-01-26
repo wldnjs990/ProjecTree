@@ -2,12 +2,13 @@ from app.agents.enums import NodeType
 from app.db.models import Workspace, Node, Candidate
 from app.agents.enums import TaskType
 from typing import TypedDict, List, Dict, Any, Optional
-
+from app.agents.schemas.process import BaseNodeProcessResult
 
 class GlobalState(TypedDict):
     """전역 상태"""
 
     workspace_id: int
+    headcount: int
     workspace_info: Optional[
         Workspace
     ]  # 워크스페이스에 대한 정보. 없을 수도 있음 ReadOnly임
@@ -28,3 +29,5 @@ class NodeState(GlobalState):
     candidate_id: int
     current_candidate_info: Candidate
     task_type: TaskType
+    generated_node: BaseNodeProcessResult
+    is_parse_error: Optional[bool]

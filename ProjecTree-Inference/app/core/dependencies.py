@@ -103,4 +103,7 @@ def get_recommendation_service() -> RecommendationService:
 @lru_cache()
 def get_node_service() -> NodeService:
     """NodeService 싱글톤 인스턴스 제공"""
-    return NodeService()
+    return NodeService(
+        node_repository=node_repository,
+        candidate_repository=candidate_repository,
+    )
