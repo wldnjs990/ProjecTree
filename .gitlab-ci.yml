@@ -4,8 +4,7 @@ stages:
 
 variables:
   DOCKER_IMAGE_FULL_NAME: "$DOCKERHUB_USERNAME/$DOCKERHUB_REPO:$CI_COMMIT_SHORT_SHA"
-  
-  # ★ [추가] Docker가 TCP 대신 로컬 소켓(/var/run/docker.sock)을 보게 강제함
+  # 호스트의 도커 소켓을 사용하도록 강제
   DOCKER_HOST: ""       
   DOCKER_TLS_CERTDIR: ""
 
@@ -16,20 +15,19 @@ variables:
 
 build_push_dockerhub:
   stage: build
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
+  # [수정 1] 최신 Docker 클라이언트를 사용하여 버전 오류 해결
+  image: docker:latest 
+  
+  # [수정 2] services 섹션 삭제! (호스트 도커를 쓰므로 dind 서비스는 필요 없음)
+  # services:
+  #   - docker:24.0.5-dind
+  
   before_script:
     - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
   script:
-    - echo "🔍 현재 위치(Root)의 파일 목록을 출력합니다:"
-    - ls -la
-    
-    - echo "🕵️‍♂️ 'inference'라는 글자가 들어간 폴더를 컴퓨터 전체에서 찾습니다:"
-    - find . -type d -name "*nference*"
-    - echo "Moving to projectree-inference directory..."
+    - echo "📂 ProjecTree-Inference 폴더로 이동합니다."
     - cd ProjecTree-Inference
-    - echo "Building Docker Hub image..."
+    - echo "🐳 Docker Hub 이미지를 빌드합니다..."
     - docker build -t $DOCKER_IMAGE_FULL_NAME .
     - docker push $DOCKER_IMAGE_FULL_NAME
   extends: .ai-dev-rules
@@ -45,7 +43,7 @@ deploy_to_aws:
     - chmod 700 ~/.ssh
     - ssh-keyscan $AWS_IP >> ~/.ssh/known_hosts
   script:
-    - echo "Deploying to AWS..."
+    - echo "🚀 AWS 서버에 배포를 시작합니다."
     - ssh $AWS_USER@$AWS_IP "echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin"
     - ssh $AWS_USER@$AWS_IP "docker pull $DOCKER_IMAGE_FULL_NAME"
     - ssh $AWS_USER@$AWS_IP "docker stop inference-app || true"
