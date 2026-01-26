@@ -4,6 +4,10 @@ stages:
 
 variables:
   DOCKER_IMAGE_FULL_NAME: "$DOCKERHUB_USERNAME/$DOCKERHUB_REPO:$CI_COMMIT_SHORT_SHA"
+  
+  # ★ [추가] Docker가 TCP 대신 로컬 소켓(/var/run/docker.sock)을 보게 강제함
+  DOCKER_HOST: ""       
+  DOCKER_TLS_CERTDIR: ""
 
 .ai-dev-rules:
   rules:
