@@ -19,7 +19,7 @@ build_push_dockerhub:
     - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
   script:
     - echo "Moving to projectree-inference directory..."
-    - cd projectree-inference
+    - cd Projectree-Inference
     - echo "Building Docker Hub image..."
     - docker build -t $DOCKER_IMAGE_FULL_NAME .
     - docker push $DOCKER_IMAGE_FULL_NAME
