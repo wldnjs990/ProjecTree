@@ -15,7 +15,9 @@ interface UseNodesCrdtOptions {
  * - Y.Map('nodes')를 구독하여 노드 변경 감지
  * - 노드 드래그/업데이트 시 Y.js에 반영
  */
-export const useNodesCrdt = ({ initialNodes = [] }: UseNodesCrdtOptions = {}) => {
+export const useNodesCrdt = ({
+  initialNodes = [],
+}: UseNodesCrdtOptions = {}) => {
   const yNodesRef = useRef<Y.Map<Y.Map<YNodeValue>> | null>(null);
 
   // Zustand 스토어 액션
@@ -109,6 +111,8 @@ export const useNodesCrdt = ({ initialNodes = [] }: UseNodesCrdtOptions = {}) =>
       // Y.Map에 position 업데이트 → observe가 감지 → 브로드캐스트
       yNode.set('position', { x: node.position.x, y: node.position.y });
 
+      // 스프링 서버에 저장요청
+      getCrdtClient()?.saveNodePosition(node.id);
       // 로컬 스토어도 즉시 업데이트 (UX용)
       updateNodePosition(node.id, node.position);
     },

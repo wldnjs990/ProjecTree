@@ -104,6 +104,32 @@ class CrdtClient {
   }
 
   /**
+   * 노드 위치정보 편집 데이터 저장 요청을 CRDT 서버로 전송
+   */
+  saveNodePosition(nodeId: string): string | null {
+    const requestId = crypto.randomUUID();
+
+    const ws = this.provider.ws;
+    const message = JSON.stringify({
+      type: 'save_node_position',
+      requestId,
+      nodeId,
+    });
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(message);
+      console.log('[CRDT] 노드 위치 저장 요청 전송:', {
+        requestId,
+        nodeId,
+      });
+      return requestId;
+    }
+
+    console.warn('[CRDT] WebSocket이 연결되지 않아 저장 요청 실패');
+    return null;
+  }
+
+  /**
    * 싱글톤 인스턴스 가져오기
    */
   static getInstance(): CrdtClient | null {
