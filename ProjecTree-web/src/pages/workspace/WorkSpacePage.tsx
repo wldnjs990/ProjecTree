@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Header, type ViewTab } from './components/Header';
-import { Sidebar } from './components/Sidebar';
 import { TreeCanvas } from './components/Canvas';
 import {
   mockNodes,
+  mockEdges,
   mockUsers,
   mockNodeDetails,
   mockNodesApiResponse,
@@ -15,6 +15,7 @@ import { initCrdtClient, destroyCrdtClient } from './crdt/crdtClient';
 import { useConnectionStatus, useNodeStore } from './stores/nodeStore';
 import { useNodeDetailEdit, useNodeDetailCrdtObservers } from './hooks';
 import { useParams } from 'react-router';
+import { LeftSidebar } from './components/Sidebar/LeftSidebar';
 
 // 임시 Room ID (나중에 워크스페이스 ID로 대체)
 
@@ -59,10 +60,6 @@ export default function WorkSpacePage() {
   // Header state
   const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');
 
-  // Sidebar filter state
-  const [nodeTypeFilter, setNodeTypeFilter] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
-
   // Event handlers
   const handleSettingsClick = () => {
     console.log('Settings clicked');
@@ -102,12 +99,13 @@ export default function WorkSpacePage() {
 
       {/* Main Content */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
-        {/* Sidebar */}
-        <Sidebar
-          nodeTypeFilter={nodeTypeFilter}
-          statusFilter={statusFilter}
-          onNodeTypeChange={setNodeTypeFilter}
-          onStatusChange={setStatusFilter}
+        {/* Left Sidebar (Resizable) */}
+        <LeftSidebar
+          workspaceId={workspaceId!}
+          workspaceName="AI 여행 추천 서비스"
+          className="h-full border-r border-[#EEEEEE] w-[300px] flex-none"
+          nodes={mockNodes}
+          edges={mockEdges}
         />
 
         {/* Canvas */}
