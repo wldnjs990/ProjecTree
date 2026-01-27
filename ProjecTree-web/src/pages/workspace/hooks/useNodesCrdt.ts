@@ -85,6 +85,9 @@ export const useNodesCrdt = ({
           });
         }
         syncFromYjs();
+
+        // UndoManager 초기화 (sync 완료 후)
+        client.initUndoManager();
       }
     };
 

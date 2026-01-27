@@ -50,7 +50,8 @@ export function transformServerNode(serverNode: ServerNode): FlowNode {
       x: serverNode.position.xPos,
       y: serverNode.position.yPos,
     },
-    parentId: serverNode.parentId !== null ? String(serverNode.parentId) : undefined,
+    parentId:
+      serverNode.parentId !== null ? String(serverNode.parentId) : undefined,
     data: {
       title: serverNode.name,
       status: convertStatus(serverNode.data.nodeStatus),
@@ -93,7 +94,9 @@ export function yjsNodeToFlowNode(yjsNode: YjsNode): FlowNode {
 // ===== ReactFlow → 서버 변환 (필요시) =====
 
 /** ReactFlow 상태 → 서버 상태 */
-export function convertStatusToServer(status: FlowNodeStatus): ServerNodeStatus {
+export function convertStatusToServer(
+  status: FlowNodeStatus
+): ServerNodeStatus {
   const statusMap: Record<FlowNodeStatus, ServerNodeStatus> = {
     pending: 'TODO',
     progress: 'IN_PROGRESS',

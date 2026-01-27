@@ -1,4 +1,5 @@
 import * as Y from 'yjs';
+import { UndoManager } from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import type { Awareness } from 'y-protocols/awareness';
 import { useWorkspaceStore } from '../stores/workspaceStore';
@@ -33,6 +34,7 @@ class CrdtClient {
   public provider: WebsocketProvider;
   public awareness: Awareness;
   public roomId: string;
+  private undoManager: UndoManager | null = null;
 
   private constructor(roomId: string) {
     this.roomId = roomId;
@@ -76,6 +78,59 @@ class CrdtClient {
    */
   getYMap<T>(name: string): Y.Map<T> {
     return this.yDoc.getMap(name) as Y.Map<T>;
+  }
+
+  /**
+   * UndoManager 초기화 (nodes Y.Map 전용)
+   */
+  initUndoManager(): UndoManager {
+    if (this.undoManager) {
+      return this.undoManager;
+    }
+
+    const yNodes = this.getYMap<Y.Map<YNodeValue>>('nodes');
+
+    this.undoManager = new UndoManager(yNodes, {
+      // 로컬 변경만 추적 (원격 변경은 undo 대상 아님)
+      trackedOrigins: new Set([null]),
+      // 연속 드래그를 하나의 undo 단위로 묶음 (ms)
+      captureTimeout: 300,
+    });
+
+    console.log('[CRDT] UndoManager 초기화됨');
+    return this.undoManager;
+  }
+
+  /**
+   * Undo 실행
+   */
+  undo(): boolean {
+    if (this.undoManager?.canUndo()) {
+      this.undoManager.undo();
+      console.log('[CRDT] Undo 실행');
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Redo 실행
+   */
+  redo(): boolean {
+    if (this.undoManager?.canRedo()) {
+      this.undoManager.redo();
+      console.log('[CRDT] Redo 실행');
+      return true;
+    }
+    return false;
+  }
+
+  canUndo(): boolean {
+    return this.undoManager?.canUndo() ?? false;
+  }
+
+  canRedo(): boolean {
+    return this.undoManager?.canRedo() ?? false;
   }
 
   /**
@@ -162,6 +217,8 @@ class CrdtClient {
    */
   static destroy() {
     if (CrdtClient.instance) {
+      CrdtClient.instance.undoManager?.destroy();
+      CrdtClient.instance.undoManager = null;
       CrdtClient.instance.provider.destroy();
       CrdtClient.instance.yDoc.destroy();
       CrdtClient.instance = null;

@@ -25,6 +25,7 @@ import type { AvatarColor } from '@/components/custom/UserAvatar';
 import { AdvancedNode, TaskNode } from './nodes';
 import { useNodesCrdt } from '../../hooks/useNodesCrdt';
 import { useCursors } from '../../hooks/useCursors';
+import { useUndoRedo } from '../../hooks/useUndoRedo';
 import { useNodes, useEdges } from '../../stores/nodeStore';
 import type { FlowNode } from '../../types/node';
 import CursorPointers from './CursorPointers';
@@ -69,6 +70,9 @@ function TreeCanvasInner({
   // 커서 CRDT 훅 (Awareness 커서 동기화)
   const { cursors, handleMouseMove } = useCursors();
 
+  // Undo/Redo 키보드 이벤트 훅 (Ctrl+Z, Ctrl+Shift+Z)
+  useUndoRedo();
+
   // Zustand 스토어에서 노드/엣지 가져오기
   const storeNodes = useNodes();
   const storeEdges = useEdges();
@@ -80,7 +84,12 @@ function TreeCanvasInner({
   // 스토어 노드가 변경되면 로컬 상태에 반영
   useEffect(() => {
     if (storeNodes.length > 0) {
-      setNodes(storeNodes);
+      // ReactFlow에 전달 시 parentId 제거 → 부모 드래그 시 자식 연동 이동 비활성화
+      // (엣지 생성은 스토어의 원본 parentId를 사용하므로 영향 없음)
+      const nodesForReactFlow = storeNodes.map(
+        ({ parentId: _, ...node }) => node
+      );
+      setNodes(nodesForReactFlow as FlowNode[]);
     }
   }, [storeNodes, setNodes]);
 
