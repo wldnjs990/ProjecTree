@@ -79,6 +79,7 @@ export default function LoginPage() {
             mixBlendMode: 'overlay',
           }}
         />
+
         <AnimatePresence>
           {/* Logo */}
           <div className="flex items-center gap-3 z-10">
