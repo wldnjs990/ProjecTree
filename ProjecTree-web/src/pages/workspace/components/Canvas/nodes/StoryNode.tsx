@@ -9,7 +9,7 @@ import {
 
 export interface StoryNodeData extends Record<string, unknown> {
   title: string;
-  status: "pending" | "progress" | "completed";
+  status: "TODO" | "IN_PROGRESS" | "DONE";
   taskId: string;
   priority?: Priority;
   storyPoints?: number;

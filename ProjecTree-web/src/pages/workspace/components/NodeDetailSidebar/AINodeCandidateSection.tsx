@@ -1,42 +1,44 @@
-import { useState } from "react";
-import { Lightbulb, ChevronDown, ChevronUp, Plus } from "lucide-react";
-import type { SubNodeRecommendation } from "./types";
+import { useState } from 'react';
+import { Lightbulb, ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import type { Candidate } from './types';
 
-interface AINodeRecommendSectionProps {
-  recommendations: SubNodeRecommendation[];
-  onAddNode?: (node: SubNodeRecommendation) => void;
+interface AINodeCandidateSectionProps {
+  candidates: Candidate[];
+  onCandidateClick?: (node: Candidate) => void;
   onAddManual?: () => void;
 }
 
 // 하위 노드 카드 컴포넌트
-function SubNodeCard({
-  node,
-  onAdd,
-}: {
-  node: SubNodeRecommendation;
-  onAdd: () => void;
-}) {
+interface SubNodeCardProps extends React.HTMLAttributes<HTMLButtonElement> {
+  node: Candidate;
+  onClick: () => void;
+}
+const SubNodeCard = ({ node, onClick }: SubNodeCardProps) => {
   return (
-    <div className="flex items-start justify-between p-2.5 border border-[#DEDEDE] rounded-lg">
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-[#0B0B0B] truncate">{node.title}</p>
+    <button
+      onClick={onClick}
+      className="flex flex-col w-full items-start justify-between p-2.5 border border-[#DEDEDE] hover:bg-[#1c69e30d] rounded-lg"
+    >
+      <div className="flex-1 min-w-0 w-full flex items-center justify-between">
+        <p className="text-xs font-medium text-[#0B0B0B] truncate">
+          {node.name}
+        </p>
+        <div className="ml-2 p-1 text-[#636363]">
+          <Plus className="w-3.5 h-3.5" />
+        </div>
+      </div>
+      <div className="text-left mt-1.5">
         <p className="text-[10px] text-[#636363] mt-0.5">{node.description}</p>
       </div>
-      <button
-        onClick={onAdd}
-        className="ml-2 p-1 text-[#636363] hover:text-[#0B0B0B] hover:bg-gray-100 rounded transition-colors"
-      >
-        <Plus className="w-3.5 h-3.5" />
-      </button>
-    </div>
+    </button>
   );
-}
+};
 
-export function AINodeRecommendSection({
-  recommendations,
-  onAddNode,
+export function AINodeCandidateSection({
+  candidates,
+  onCandidateClick,
   onAddManual,
-}: AINodeRecommendSectionProps) {
+}: AINodeCandidateSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
@@ -64,11 +66,11 @@ export function AINodeRecommendSection({
         <div className="px-4 pb-4 space-y-4">
           {/* 추천 노드 목록 */}
           <div className="space-y-2">
-            {recommendations.map((node) => (
+            {candidates.map((node) => (
               <SubNodeCard
                 key={node.id}
                 node={node}
-                onAdd={() => onAddNode?.(node)}
+                onClick={() => onCandidateClick?.(node)}
               />
             ))}
           </div>

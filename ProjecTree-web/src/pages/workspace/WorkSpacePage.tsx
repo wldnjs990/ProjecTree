@@ -1,36 +1,64 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-
+import { useState, useEffect } from 'react';
 import { Header, type ViewTab } from './components/Header';
-import { LeftSidebar } from './components/Sidebar/LeftSidebar';
 import { TreeCanvas } from './components/Canvas';
-import {
-  NodeDetailSidebar,
-  type NodeDetailData,
-} from './components/NodeDetailSidebar';
 import {
   mockNodes,
   mockEdges,
   mockUsers,
   mockNodeDetails,
+  mockNodesApiResponse,
 } from './constants/mockData';
 import { FeatureSpecView } from './components/FeatureSpec';
 import { TechStackStatusView } from './components/TechStackStatus';
+import type { FlowNode } from './types/node';
+import { initCrdtClient, destroyCrdtClient } from './crdt/crdtClient';
+import { useConnectionStatus, useNodeStore } from './stores/nodeStore';
+import { useNodeDetailEdit, useNodeDetailCrdtObservers } from './hooks';
+import { useParams } from 'react-router';
+import { LeftSidebar } from './components/Sidebar/LeftSidebar';
+
+// 임시 Room ID (나중에 워크스페이스 ID로 대체)
 
 export default function WorkSpacePage() {
   const { workspaceId } = useParams<{ workspaceId: string }>();
+  // CRDT 연결 상태
+  const connectionStatus = useConnectionStatus();
+
+  // Zustand store 액션
+  const setNodeDetails = useNodeStore((state) => state.setNodeDetails);
+  const setNodeListData = useNodeStore((state) => state.setNodeListData);
+
+  // 노드 상세 편집 Hook
+  const { openSidebar, closeSidebar, selectedNodeId } = useNodeDetailEdit();
+
+  // CRDT 옵저버 생명주기 관리
+  useNodeDetailCrdtObservers();
+
+  // CRDT 클라이언트 초기화 및 초기 데이터 로드
+  useEffect(() => {
+    // workspaceId params를 받아 crdt 인스턴스 생성
+    if (workspaceId) initCrdtClient(workspaceId);
+
+    // 초기 목데이터를 store에 로드
+    setNodeDetails(mockNodeDetails);
+
+    // 노드 목록 데이터를 store에 로드 (id -> NodeData 매핑)
+    const nodeListDataMap: Record<
+      number,
+      (typeof mockNodesApiResponse.data)[0]['data']
+    > = {};
+    mockNodesApiResponse.data.forEach((node) => {
+      nodeListDataMap[node.id] = node.data;
+    });
+    setNodeListData(nodeListDataMap);
+
+    return () => {
+      destroyCrdtClient();
+    };
+  }, [setNodeDetails, setNodeListData, workspaceId]);
 
   // Header state
   const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');
-
-  // Node detail sidebar state
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [isNodeDetailOpen, setIsNodeDetailOpen] = useState(false);
-
-  // Get selected node detail data
-  const selectedNodeDetail: NodeDetailData | null = selectedNodeId
-    ? mockNodeDetails[selectedNodeId] || null
-    : null;
 
   // Event handlers
   const handleSettingsClick = () => {
@@ -46,32 +74,10 @@ export default function WorkSpacePage() {
   };
 
   const handleNodeClick = (nodeId: string) => {
-    setSelectedNodeId(nodeId);
-    setIsNodeDetailOpen(true);
-  };
-
-  const handleNodeDetailClose = () => {
-    setIsNodeDetailOpen(false);
-  };
-
-  const handleTechCompare = () => {
-    console.log('Tech compare clicked');
-  };
-
-  const handleTechAddManual = () => {
-    console.log('Tech add manual clicked');
-  };
-
-  const handleNodeAdd = () => {
-    console.log('Node add clicked');
-  };
-
-  const handleNodeAddManual = () => {
-    console.log('Node add manual clicked');
-  };
-
-  const handleMemoChange = (memo: string) => {
-    console.log('Memo changed:', memo);
+    console.log(selectedNodeId);
+    console.log(nodeId);
+    if (!selectedNodeId || selectedNodeId !== nodeId) openSidebar(nodeId);
+    else closeSidebar();
   };
 
   return (
@@ -88,7 +94,7 @@ export default function WorkSpacePage() {
       />
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Left Sidebar (Resizable) */}
         <LeftSidebar
           workspaceId={workspaceId!}
@@ -99,44 +105,28 @@ export default function WorkSpacePage() {
         />
 
         {/* Canvas */}
-        <main className="flex-1 overflow-hidden">
-          {activeTab === 'tree-editor' && (
-            <TreeCanvas
-              initialNodes={mockNodes}
-              initialEdges={mockEdges}
-              onlineUsers={mockUsers}
-              onNodeClick={handleNodeClick}
-            />
-          )}
+        <main className="flex-1 min-h-0 overflow-hidden">
+          {activeTab === 'tree-editor' &&
+            (connectionStatus === 'connected' ? (
+              <TreeCanvas
+                initialNodes={mockNodes as FlowNode[]}
+                onlineUsers={mockUsers}
+                onNodeClick={handleNodeClick}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                CRDT 서버 연결 중...
+              </div>
+            ))}
 
           {activeTab === 'feature-spec' && (
-            <FeatureSpecView
-              nodes={mockNodes}
-              edges={mockEdges}
-              onNodeClick={handleNodeClick}
-            />
+            <FeatureSpecView onNodeClick={handleNodeClick} />
           )}
 
           {activeTab === 'tech-selection' && (
-            <TechStackStatusView
-              nodes={mockNodes}
-              edges={mockEdges}
-              onNodeClick={handleNodeClick}
-            />
+            <TechStackStatusView onNodeClick={handleNodeClick} />
           )}
         </main>
-
-        {/* Node Detail Sidebar */}
-        <NodeDetailSidebar
-          node={selectedNodeDetail}
-          isOpen={isNodeDetailOpen}
-          onClose={handleNodeDetailClose}
-          onTechCompare={handleTechCompare}
-          onTechAddManual={handleTechAddManual}
-          onNodeAdd={handleNodeAdd}
-          onNodeAddManual={handleNodeAddManual}
-          onMemoChange={handleMemoChange}
-        />
       </div>
     </div>
   );

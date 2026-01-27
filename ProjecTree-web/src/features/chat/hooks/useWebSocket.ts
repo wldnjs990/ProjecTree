@@ -14,7 +14,6 @@ export const useWebSocket = (workspaceId: string | null) => {
     (state) => state.updateParticipantStatus
   );
   const setConnected = useChatStore((state) => state.setConnected);
-  const setActiveWorkspace = useChatStore((state) => state.setActiveWorkspace);
 
   // Store actions are stable, but we can verify this by not including them in dependency arrays or wrapping them if needed.
   // Zustand actions are stable by identity.

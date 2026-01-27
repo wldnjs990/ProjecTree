@@ -1,77 +1,66 @@
-import type { NodeDetailData, SubNodeRecommendation } from "./types";
-import { NodeHeader } from "./NodeHeader";
-import { StatusMetaSection } from "./StatusMetaSection";
-import { AITechRecommendSection } from "./AITechRecommendSection";
-import { AINodeRecommendSection } from "./AINodeRecommendSection";
-import { MemoSection } from "./MemoSection";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import { useSelectedNodeDetail, useSelectedNodeListData } from '../../hooks';
+import {
+  useIsNodeDetailOpen,
+  useSelectedNodeId,
+} from '../../stores/nodeDetailStore';
+import CandidateNodeContainer from './CandidateNodeContainer';
+import NodeDetailContainer from './NodeDetailContainer';
+import { useMemo } from 'react';
+import { mockNodesApiResponse } from '../../constants/mockData';
+import { motion, AnimatePresence } from 'motion/react';
 
+// 노드 기본 정보 (헤더용) - WorkSpacePage에서 전달받음
 interface NodeDetailSidebarProps {
-  node: NodeDetailData | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onTechCompare?: () => void;
-  onTechAddManual?: () => void;
-  onNodeAdd?: (node: SubNodeRecommendation) => void;
-  onNodeAddManual?: () => void;
-  onMemoChange?: (memo: string) => void;
   className?: string;
 }
 
-export function NodeDetailSidebar({
-  node,
-  isOpen,
-  onClose,
-  onTechCompare,
-  onTechAddManual,
-  onNodeAdd,
-  onNodeAddManual,
-  onMemoChange,
-  className,
-}: NodeDetailSidebarProps) {
-  if (!node) return null;
+export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
+  // Store에서 상태 구독
+  const isOpen = useIsNodeDetailOpen();
+  const nodeDetail = useSelectedNodeDetail();
+  const nodeListData = useSelectedNodeListData();
+
+  const selectedNodeId = useSelectedNodeId();
+
+  // 선택된 노드의 기본 정보 (헤더용)
+  const selectedNodeInfo = useMemo(() => {
+    if (!selectedNodeId) return undefined;
+    const numericId = Number(selectedNodeId);
+    // TODO : 백엔드 API로 실제 연결하기
+    const apiNode = mockNodesApiResponse.data.find((n) => n.id === numericId);
+    if (!apiNode) return undefined;
+    return {
+      name: apiNode.name,
+      nodeType: apiNode.nodeType,
+      identifier: apiNode.data.identifier,
+      taskType: apiNode.data.taskType,
+    };
+  }, [selectedNodeId]);
 
   return (
-    <div
-      className={cn(
-        "fixed top-0 right-0 h-full w-[400px] bg-white border-l border-[#E2E8F0] shadow-lg z-50",
-        "transform transition-transform duration-300 ease-in-out",
-        isOpen ? "translate-x-0" : "translate-x-full",
-        className
+    <AnimatePresence>
+      {isOpen && nodeDetail && nodeListData && (
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          className={cn(
+            'absolute top-0 right-0 h-full w-100 bg-white border-l border-[#E2E8F0] shadow-lg z-50',
+            className
+          )}
+        >
+          {/* 스크롤 영역 */}
+          <div className="h-full overflow-y-auto">
+            <NodeDetailContainer nodeInfo={selectedNodeInfo} />
+            <CandidateNodeContainer
+              nodeInfo={selectedNodeInfo}
+              description={nodeDetail.description}
+            />
+          </div>
+        </motion.div>
       )}
-    >
-      {/* 스크롤 영역 */}
-      <div className="h-full overflow-y-auto">
-        <div className="p-4 space-y-4">
-          {/* 노드 헤더 (태그, 제목, 설명) */}
-          <NodeHeader node={node} onClose={onClose} />
-
-          {/* Status & Meta 섹션 */}
-          <StatusMetaSection node={node} />
-
-          {/* AI 기술 추천 섹션 */}
-          {node.techRecommendations && node.techRecommendations.length > 0 && (
-            <AITechRecommendSection
-              recommendations={node.techRecommendations}
-              comparison={node.techComparison}
-              onCompare={onTechCompare}
-              onAddManual={onTechAddManual}
-            />
-          )}
-
-          {/* AI 다음 노드 추천 섹션 */}
-          {node.subNodeRecommendations && node.subNodeRecommendations.length > 0 && (
-            <AINodeRecommendSection
-              recommendations={node.subNodeRecommendations}
-              onAddNode={onNodeAdd}
-              onAddManual={onNodeAddManual}
-            />
-          )}
-
-          {/* 메모 섹션 */}
-          <MemoSection memo={node.memo} onMemoChange={onMemoChange} />
-        </div>
-      </div>
-    </div>
+    </AnimatePresence>
   );
 }

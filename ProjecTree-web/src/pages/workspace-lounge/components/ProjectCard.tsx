@@ -1,9 +1,13 @@
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
-import { cn } from "@/lib/utils";
-import { Users } from "lucide-react";
-
+import { cn } from '@/lib/utils';
+import { Users } from 'lucide-react';
 
 export interface Member {
   name: string;
@@ -12,7 +16,7 @@ export interface Member {
 }
 
 // 프로젝트의 권한을 나타내는 타입
-type UserRole = "Owner" | "Editor" | "Viewer";
+type UserRole = 'Owner' | 'Editor' | 'Viewer';
 
 // 프로젝트의 정보를 나타내는 인터페이스
 export interface ProjectCardProps {
@@ -35,9 +39,9 @@ export interface ProjectCardProps {
 
 // 권한(Role)에 따른 뱃지 스타일 매핑
 const roleStyles: Record<string, string> = {
-  Owner: "bg-indigo-50 text-indigo-700 border-indigo-100",
-  Editor: "bg-emerald-50 text-emerald-700 border-emerald-100",
-  Viewer: "bg-zinc-100 text-zinc-600 border-zinc-200",
+  Owner: 'bg-indigo-50 text-indigo-700 border-indigo-100',
+  Editor: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  Viewer: 'bg-zinc-100 text-zinc-600 border-zinc-200',
 };
 
 /**
@@ -57,7 +61,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </h3>
           <Badge
             variant="outline"
-            className={cn("shrink-0 text-[11px] font-medium px-2 py-0.5", roleStyles[project.role])}
+            className={cn(
+              'shrink-0 text-[11px] font-medium px-2 py-0.5',
+              roleStyles[project.role]
+            )}
           >
             {project.role}
           </Badge>
@@ -76,7 +83,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <div className="flex-1 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-medium text-red-600">P0</span>
-              <span className="text-[10px] text-zinc-400">{project.progressP0}%</span>
+              <span className="text-[10px] text-zinc-400">
+                {project.progressP0}%
+              </span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
               <div
@@ -89,8 +98,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {/* P1 */}
           <div className="flex-1 space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-medium text-yellow-600">P1</span>
-              <span className="text-[10px] text-zinc-400">{project.progressP1}%</span>
+              <span className="text-[10px] font-medium text-yellow-600">
+                P1
+              </span>
+              <span className="text-[10px] text-zinc-400">
+                {project.progressP1}%
+              </span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
               <div
@@ -104,7 +117,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <div className="flex-1 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-medium text-green-600">P2</span>
-              <span className="text-[10px] text-zinc-400">{project.progressP2}%</span>
+              <span className="text-[10px] text-zinc-400">
+                {project.progressP2}%
+              </span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
               <div
