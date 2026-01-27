@@ -35,21 +35,17 @@ public class InferenceServiceImpl implements InferenceService {
     private String nodePath;
     @Value("${inference-server.recommend-tech-path}")
     private String recommendPath;
-    private final ObjectMapper objectMapper; // 생성자 주입 필요
 
     @Override
     public AiCandidateCreateDto.Response createCandidate(AiCandidateCreateDto.Request request) {
 
         ResponseEntity<AiCandidateCreateDto.Response> response = null;
         try {
-            String jsonBody = objectMapper.writeValueAsString(request);
-            log.info("JSON Body: {}", jsonBody); // JSON 문자열이 잘 나오는지 확인
             String uriString = UriComponentsBuilder.fromUriString(serverUrl)
                     .path(pathPrefix)
                     .path(candidatePath)
                     .build()
                     .toUriString();
-            log.info("URL : {}", uriString);
             response = restClient.post().uri(uriString)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
@@ -57,8 +53,6 @@ public class InferenceServiceImpl implements InferenceService {
                     .toEntity(AiCandidateCreateDto.Response.class);
         } catch (HttpServerErrorException | ResourceAccessException e) {
             throw new AIServiceException(ErrorCode.CANDIDATE_GENERATE_ERROR, request.getNodeId(), CacheType.CANDIDATE);
-        } catch (JsonProcessingException e) {
-	        throw new RuntimeException(e);
         }
 	    return response.getBody();
     }
