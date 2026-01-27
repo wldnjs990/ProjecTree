@@ -15,13 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TechVocabulary extends BaseEntity {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vocab_seq_gen")
-	@SequenceGenerator(
-			name = "vocab_seq_gen",
-			sequenceName = "tech_vocab_seq",
-			initialValue = 1,
-			allocationSize = 50  // 중요: batch_size와 맞춰주면 성능이 극대화됩니다.
-	)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(columnDefinition = "VARCHAR(100)", unique = true, nullable = false)
 	private String name;

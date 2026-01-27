@@ -6,6 +6,9 @@ import com.ssafy.projectree.domain.node.model.entity.EpicNode;
 import com.ssafy.projectree.domain.node.model.entity.Node;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
 import com.ssafy.projectree.domain.node.model.entity.StoryNode;
+import com.ssafy.projectree.domain.workspace.enums.ServiceType;
+import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
+import com.ssafy.projectree.domain.workspace.model.repository.WorkspaceRepository;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -16,18 +19,35 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @DataJpaTest
 @Transactional
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 이 줄 추가
 class DummyNodeSaver {
 	@Autowired
 	private NodeRepository nodeRepository;
+	@Autowired
+	private WorkspaceRepository workspaceRepository;
 
 
 	@Commit
 	@Test
 	@Disabled
 	public void saveDummyNode(){
+		Workspace workspace = Workspace.builder().serviceType(ServiceType.APP)
+				.purpose("포트폴리오")
+				.name("P성향 여행자를 위한 여행 도우미 앱")
+				.identifierPrefix("US")
+				.startDate(LocalDate.now())
+				.endDate(LocalDate.now().plusDays(30))
+				.description("""
+						계획을 세우는데 어려움을 겪는 P성향 여행자들을 위한 여행 도우미, 본 프로젝트는 '계획은 귀찮지만, 효율적인 여행은 하고 싶은' P(인식형) 성향의 여행자들을 위한 즉흥 여행 추천 및 보조 웹 어플리케이션입니다.
+						기존의 여행 플랫폼들이 J(판단형) 성향의 '철저한 계획 수립'에 초점을 맞춘 것과 달리, P-PliP은 사용자의 모호한 니즈를 파악하여 Just-in-Time (적시) 정보를 제공하고, 선택의 스트레스를 최소화하는 것을 목표로 합니다.
+						""")
+				.domain("이건 뭐지")
+				.build();
+
 		Node root = ProjectNode.builder()
 				.name("P성향 여행자를 위한 여행도우미 앱")
 				.description("""
@@ -36,6 +56,7 @@ class DummyNodeSaver {
 						""")
 				.priority(Priority.P0)
 				.identifier("US-001")
+				.workspace(workspace)
 				.status(NodeStatus.TODO)
 				.build();
 
@@ -100,6 +121,7 @@ class DummyNodeSaver {
 				.identifier("US-001")
 				.status(NodeStatus.TODO)
 				.build();
+		workspaceRepository.save(workspace);
 		nodeRepository.saveRoot(root);
 		nodeRepository.saveWithParent(root.getId(), epic);
 		nodeRepository.saveWithParent(epic.getId(), story);
