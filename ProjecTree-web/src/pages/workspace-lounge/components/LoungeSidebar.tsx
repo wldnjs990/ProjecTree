@@ -451,7 +451,7 @@ export function LoungeSidebar({
                 <button
                   onClick={() => onFilterChange(item.id)}
                   className={cn(
-                    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-300 text-left group',
+                    'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-300 text-left group',
                     isActive
                       ? 'bg-white/70 text-[var(--figma-tech-green)] font-bold shadow-sm backdrop-blur-md'
                       : 'text-zinc-500 font-medium hover:bg-white/40 hover:text-zinc-800 hover:translate-x-1'

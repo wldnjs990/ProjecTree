@@ -50,7 +50,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
   border border-white/60
   ring-1 ring-white/40 ring-inset
   shadow-[0_8px_32px_0_rgba(31,38,135,0.05)]
-  rounded-2xl overflow-hidden 
+  rounded-xl overflow-hidden 
   transition-all duration-300 
   hover:translate-y-[-4px]
   hover:shadow-[0_12px_40px_rgba(0,0,0,0.08),inset_0_0_0_1px_rgba(255,255,255,0.6)]
@@ -65,7 +65,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <Badge
             variant="outline"
             className={cn(
-              "shrink-0 text-[11px] font-semibold px-2.5 py-0.5 border-0 transition-colors shadow-sm mt-0.5",
+              "shrink-0 text-[11px] font-semibold px-2.5 py-0.5 border-0 transition-colors shadow-sm mt-0.5 rounded-lg",
               project.role === "Owner"
                 // Owner: Forest Glass (Brand Consistent)
                 ? "bg-[var(--figma-forest-bg)]/80 backdrop-blur-md text-[var(--figma-forest-deep)]"
@@ -131,8 +131,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="px-5 py-5 flex items-center justify-between border-t border-zinc-100 bg-zinc-50/50 rounded-b-2xl">
-        {/* rounded-b-2xl 추가: 부모 Card의 rounded-2xl과 곡률을 맞춰서 빈틈을 없앱니다 */}
+      <CardFooter className="px-5 py-5 flex items-center justify-between border-t border-zinc-100 bg-zinc-50/50 rounded-b-xl">
+        {/* rounded-b-xl 추가: 부모 Card의 rounded-xl과 곡률을 맞춰서 빈틈을 없앱니다 */}
 
         <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-medium">
           <Users className="h-3.5 w-3.5 text-zinc-400" />
