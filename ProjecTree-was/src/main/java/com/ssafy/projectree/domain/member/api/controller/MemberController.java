@@ -1,19 +1,24 @@
 package com.ssafy.projectree.domain.member.api.controller;
 
+import com.ssafy.projectree.domain.auth.jwt.Jwt;
+import com.ssafy.projectree.domain.auth.jwt.JwtProvider;
 import com.ssafy.projectree.domain.member.api.dto.MemberEmailReadDto;
 import com.ssafy.projectree.domain.member.api.dto.MemberNicknameUpdateDto;
 import com.ssafy.projectree.domain.member.api.dto.MemberReadDto;
+import com.ssafy.projectree.domain.member.api.dto.SignUpDto;
+import com.ssafy.projectree.domain.member.model.entity.Member;
+import com.ssafy.projectree.domain.member.usecase.MemberService;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import com.ssafy.projectree.global.docs.MemberDocsController;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -21,6 +26,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController implements MemberDocsController {
 
     // TODO: JWT 추가시 PathVariable 수정 필요
+    private final JwtProvider jwtProvider;
+    private final MemberService memberService;
+    @PatchMapping("/members/signup")
+    public CommonResponse<SignUpDto.Response> signUp(
+            @AuthenticationPrincipal Member principal, // SecurityContext에 저장된 GUEST 유저 정보
+            @RequestBody SignUpDto.Request requestDto
+    ) {
+        Member member = memberService.signUp(principal.getEmail(), requestDto);
+        Jwt generate = jwtProvider.generate(member);
+        return CommonResponse.success(SuccessCode.CREATED, new SignUpDto.Response(generate.getAccessToken()));
+    }
+
 
     @GetMapping("/members/{id}/email")
     public CommonResponse<MemberEmailReadDto.Response> getMemberEmail(@PathVariable Long id) {

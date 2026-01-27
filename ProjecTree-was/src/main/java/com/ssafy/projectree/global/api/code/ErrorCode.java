@@ -16,7 +16,8 @@ public enum ErrorCode {
     TECH_RECOMMEND_ERROR(DomainCode.TECH, ExceptionCode.FAILURE, "TECH_FAILURE"),
     CANDIDATE_NOT_FOUND_ERROR(DomainCode.CANDIDATE, ExceptionCode.NOT_FOUND,"CANDIDATE_NOT_FOUND" ),
     NODE_NOT_FOUND_ERROR(DomainCode.NODE, ExceptionCode.NOT_FOUND ,"NODE_NOT_FOUND_ERROR" ),
-    NODE_TYPE_NOT_SUPPORT_ERROR(DomainCode.NODE, ExceptionCode.NOT_SUPPORT, "NODE_TYPE_NOT_SUPPORT" );
+    NODE_TYPE_NOT_SUPPORT_ERROR(DomainCode.NODE, ExceptionCode.NOT_SUPPORT, "NODE_TYPE_NOT_SUPPORT" ),
+    JWT_CREATE_FAILURE_ERROR(DomainCode.USER, ExceptionCode.NOT_SUPPORT ,"NOT_SUPPORT_USER");
     private DomainCode domainCode;
     private ExceptionCode exceptionCode;
     private String defaultMessage;
