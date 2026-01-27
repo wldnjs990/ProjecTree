@@ -15,7 +15,7 @@ export default function WorkspaceLoungePage() {
   const [filterType, setFilterType] = useState<FilterType>("all");
 
   return (
-    <div className="flex h-screen bg-zinc-50 overflow-hidden">
+    <div className="flex h-screen bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-green-100 via-zinc-50 to-indigo-100 overflow-hidden">
       {/* 1. 좌측 사이드바: 네비게이션 및 프로필 설정 */}
       <LoungeSidebar
         collapsed={sidebarCollapsed}
