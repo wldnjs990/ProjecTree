@@ -260,9 +260,9 @@ function ProfileDialog({
                     className={cn(
                       'border-zinc-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300',
                       errorMessage &&
-                        'border-red-300 focus:border-red-400 focus:ring-red-100',
+                      'border-red-300 focus:border-red-400 focus:ring-red-100',
                       successMessage &&
-                        'border-emerald-300 focus:border-emerald-400 focus:ring-emerald-100'
+                      'border-emerald-300 focus:border-emerald-400 focus:ring-emerald-100'
                     )}
                     maxLength={16}
                     autoFocus
@@ -392,55 +392,43 @@ export function LoungeSidebar({
   return (
     <aside
       className={cn(
-        'flex flex-col border-r border-zinc-200 bg-white transition-all duration-300',
+        'group/sidebar flex flex-col border-r border-white/60 bg-gradient-to-b from-white/70 via-white/50 to-white/30 backdrop-blur-2xl shadow-[1px_0_30px_0_rgba(31,38,135,0.07)] transition-all duration-500 ease-out z-20 relative',
         collapsed ? 'w-16' : 'w-64'
       )}
     >
+      {/* Floating Toggle Button */}
+      <button
+        onClick={onToggle}
+        className="absolute -right-3 top-9 h-6 w-6 rounded-full bg-white border border-[var(--figma-forest-bg)] shadow-md flex items-center justify-center text-[var(--figma-forest-accent)] hover:text-[var(--figma-tech-green)] hover:scale-110 hover:border-[var(--figma-forest-accent)] transition-all z-50 outline-none focus:ring-2 focus:ring-[var(--figma-forest-bg)] opacity-0 group-hover/sidebar:opacity-100"
+        aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
+      >
+        {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
+      </button>
       {/* User Profile */}
       <div
         className={cn(
-          'flex items-center gap-3 border-b border-zinc-200 p-4',
+          'flex items-center gap-3 border-b border-white/20 p-4',
           collapsed && 'flex-col gap-2 p-2'
         )}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-700 text-sm font-medium">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--figma-forest-bg)] to-emerald-50 text-[var(--figma-tech-green)] text-sm font-bold shadow-inner ring-1 ring-[var(--figma-forest-accent)]/30">
           {initialLetter}
         </div>
 
         {collapsed ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100"
-            onClick={onToggle}
-            aria-label="사이드바 펼치기"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <div className="w-full flex justify-center">{/* Collapsed state is just avatar centered */}</div>
         ) : (
-          <div className="flex flex-1 items-center justify-between">
-            <span className="font-medium text-zinc-900 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
+          <div className="flex flex-1 items-center justify-between overflow-hidden">
+            <span className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis px-1">
               {nickname}
             </span>
 
-            <div className="flex items-center gap-1">
-              <ProfileDialog
-                nickname={nickname}
-                setNickname={setNickname}
-                onNicknameSave={onNicknameSave}
-                onDeleteAccount={onDeleteAccount}
-              />
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100"
-                onClick={onToggle}
-                aria-label="사이드바 접기"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-            </div>
+            <ProfileDialog
+              nickname={nickname}
+              setNickname={setNickname}
+              onNicknameSave={onNicknameSave}
+              onDeleteAccount={onDeleteAccount}
+            />
           </div>
         )}
       </div>
@@ -448,7 +436,7 @@ export function LoungeSidebar({
       {/* Navigation */}
       <nav className="flex-1 p-3" aria-label="워크스페이스 메뉴">
         {!collapsed && (
-          <p className="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-zinc-500 whitespace-nowrap overflow-hidden">
+          <p className="mb-2 px-3 text-xs font-bold text-zinc-500 whitespace-nowrap overflow-hidden">
             워크스페이스
           </p>
         )}
@@ -463,10 +451,10 @@ export function LoungeSidebar({
                 <button
                   onClick={() => onFilterChange(item.id)}
                   className={cn(
-                    'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors text-left',
+                    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-300 text-left group',
                     isActive
-                      ? 'bg-indigo-50 text-indigo-700 font-medium'
-                      : 'text-zinc-600 hover:bg-zinc-100'
+                      ? 'bg-white/70 text-[var(--figma-tech-green)] font-bold shadow-sm backdrop-blur-md'
+                      : 'text-zinc-500 font-medium hover:bg-white/40 hover:text-zinc-800 hover:translate-x-1'
                   )}
                   aria-label={item.label}
                   aria-current={isActive ? 'page' : undefined}
