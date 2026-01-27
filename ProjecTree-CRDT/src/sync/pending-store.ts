@@ -1,10 +1,10 @@
 export type PendingPos = {
-  nodeId: string;
+  nodeId: number;
   position: { x: number; y: number };
   requestId?: string;
 };
 
-export const pendingPositions = new Map<string, Map<string, PendingPos>>();
+export const pendingPositions = new Map<string, Map<number, PendingPos>>();
 
 export function addPendingPosition(workspaceId: string, pos: PendingPos) {
   let wsMap = pendingPositions.get(workspaceId);

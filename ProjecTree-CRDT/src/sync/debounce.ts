@@ -26,8 +26,9 @@ export async function flushWorkspace(workspaceId: string) {
   }));
 
   try {
+    const sendWorkspaceId: number = Number(workspaceId.split("-")[1]);
     await sendBatchToSpring({
-      workspaceId,
+      workspaceId: sendWorkspaceId,
       nodes,
     });
 

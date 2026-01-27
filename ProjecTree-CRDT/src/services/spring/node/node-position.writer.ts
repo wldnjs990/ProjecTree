@@ -1,12 +1,12 @@
 import { springClient } from "./../../spring/springClient";
 
 export interface SendNodePosition {
-  nodeId: string;
+  nodeId: number;
   position: { x: number; y: number };
 }
 
 interface SaveNodePositionsBatchPayload {
-  workspaceId: string;
+  workspaceId: number;
   nodes: SendNodePosition[];
 }
 /**
@@ -19,6 +19,10 @@ export async function sendBatchToSpring(
   try {
     if (!payload.nodes || payload.nodes.length === 0) return;
 
+    console.log("[sendBatchToSpring] 위치 저장 요청", {
+      workspaceId: payload.workspaceId,
+      nodeCount: payload.nodes.length,
+    });
     await springClient.put(
       `/api/internal/workspaces/${payload.workspaceId}/nodes/positions`,
       {
