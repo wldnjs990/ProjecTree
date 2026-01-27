@@ -1,5 +1,4 @@
 export { NodeDetailSidebar } from './NodeDetailSidebar';
-export type { EditableNodeDetail } from './NodeDetailSidebar';
 export type {
   // API 공통 타입
   ApiStatus,

@@ -87,7 +87,6 @@ class CrdtClient {
     const requestId = crypto.randomUUID();
     const message = JSON.stringify({
       type: 'save_node_detail',
-      nodeId,
       requestId,
       nodeId,
     });

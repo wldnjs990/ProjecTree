@@ -175,7 +175,7 @@ function TechCardList({
 }: {
   recommendations: TechRecommendation[];
 }) {
-  const [selectedTechId, setSelectedTechId] = useState<number | null>(
+  const [selectedTechId, _setSelectedTechId] = useState<number | null>(
     recommendations.find((r) => r.recommendationScore >= 4)?.id ||
       recommendations[0]?.id ||
       null
