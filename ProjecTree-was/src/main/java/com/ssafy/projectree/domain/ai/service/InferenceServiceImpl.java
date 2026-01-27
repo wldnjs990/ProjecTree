@@ -44,11 +44,13 @@ public class InferenceServiceImpl implements InferenceService {
         try {
             String jsonBody = objectMapper.writeValueAsString(request);
             log.info("JSON Body: {}", jsonBody); // JSON 문자열이 잘 나오는지 확인
-            response = restClient.post().uri(UriComponentsBuilder.fromUriString(serverUrl)
+            String uriString = UriComponentsBuilder.fromUriString(serverUrl)
                     .path(pathPrefix)
                     .path(candidatePath)
                     .build()
-                    .toUriString())
+                    .toUriString();
+            log.info("URL : {}", uriString);
+            response = restClient.post().uri(uriString)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
