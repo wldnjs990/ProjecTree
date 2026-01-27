@@ -16,7 +16,7 @@ export function scheduleFlush(workspaceId: string) {
   flushTimers.set(workspaceId, timer);
 }
 
-async function flushWorkspace(workspaceId: string) {
+export async function flushWorkspace(workspaceId: string) {
   const wsMap = pendingPositions.get(workspaceId);
   if (!wsMap || wsMap.size === 0) return;
 

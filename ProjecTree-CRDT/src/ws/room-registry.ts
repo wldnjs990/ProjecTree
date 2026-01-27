@@ -15,3 +15,7 @@ export function getOrCreateRoom(room: string) {
     doc: docs.get(room)!,
   };
 }
+
+export function getRoom(room: string) {
+  return rooms.get(room);
+}

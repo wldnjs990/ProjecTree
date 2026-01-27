@@ -2,7 +2,7 @@ import { WebSocket } from "ws";
 import type { IncomingMessage } from "http";
 import { getOrCreateRoom } from "./room-registry";
 import { bindYDocConnection } from "../yjs/ydoc-gateway";
-import { handleMessage } from "./handlers";
+import { handleMessage, onClientDisconnected } from "./handlers";
 
 export function handleConnection(ws: WebSocket, req: IncomingMessage) {
   const room = req.url?.slice(1) || "default";
@@ -16,6 +16,6 @@ export function handleConnection(ws: WebSocket, req: IncomingMessage) {
 
   ws.on("close", () => {
     clients.delete(ws);
-    console.log(`연결 종료 : ${room} : `);
+    onClientDisconnected(room);
   });
 }

@@ -4,7 +4,8 @@ import { saveNodeDetailToSpring } from "../services/spring/node/node-detail.writ
 import type { EditableNodeDetail } from "../domain/node/node.detail";
 import { toSendNodeDetail } from "../domain/node/node.detail";
 import { addPendingPosition } from "../sync/pending-store";
-import { scheduleFlush } from "../sync/debounce";
+import { flushWorkspace, scheduleFlush } from "../sync/debounce";
+import { getRoom } from "./room-registry";
 
 export async function handleMessage(
   ws: WebSocket,
@@ -63,4 +64,13 @@ export async function handleMessage(
       c.send(data);
     }
   });
+}
+
+export function onClientDisconnected(workspaceId: string) {
+  const room = getRoom(workspaceId);
+  if (!room || room.size > 0) return;
+  // 남은 위치 변경 즉시 저장
+  flushWorkspace(workspaceId).catch((err) =>
+    console.error("flush on room empty failed", err),
+  );
 }
