@@ -8,7 +8,7 @@ import { Users } from "lucide-react";
 export interface Member {
   name: string;
   avatar: string;
-  online: boolean;
+
 }
 
 // 프로젝트의 권한을 나타내는 타입
@@ -40,8 +40,7 @@ export interface ProjectCardProps {
  * - 프로젝트의 제목, 설명, 진행률(P0/P1/P2), 멤버 수, 최근 수정일을 표시합니다.
  */
 export function ProjectCard({ project }: ProjectCardProps) {
-  // 온라인 상태인 멤버 수 계산 (Deriv<Card classNameed state)
-  const onlineMemberCount = project.members.filter((m) => m.online).length;
+
 
   return (
     <Card className="
@@ -137,15 +136,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
         <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-medium">
           <Users className="h-3.5 w-3.5 text-zinc-400" />
-          <span>{project.members.length}</span>
-          {onlineMemberCount > 0 && (
-            <span className="flex items-center gap-1 text-[var(--figma-forest-accent)] text-[11px] font-bold ml-1.5">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[var(--figma-forest-accent)]"></span>
-              </span>
-              {onlineMemberCount} ON
-            </span>
-          )}
+          <span>{project.members.length}명</span>
+
         </div>
 
         <span className="text-[11px] text-zinc-400 font-['Inter'] tracking-tight">{project.lastModified}</span>

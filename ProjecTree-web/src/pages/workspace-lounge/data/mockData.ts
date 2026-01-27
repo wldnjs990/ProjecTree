@@ -16,9 +16,9 @@ export const workspaces: ProjectCardProps["project"][] = [
     lastModified: "2시간 전",
     updatedAt: "2024-01-03T08:30:00Z",
     members: [
-      { name: "김싸피", avatar: "", online: true },
-      { name: "이개발", avatar: "", online: false },
-      { name: "박디자인", avatar: "", online: false },
+      { name: "김싸피", avatar: "" },
+      { name: "이개발", avatar: "" },
+      { name: "박디자인", avatar: "" },
     ],
   },
   {
@@ -32,8 +32,8 @@ export const workspaces: ProjectCardProps["project"][] = [
     lastModified: "5시간 전",
     updatedAt: "2024-01-03T05:30:00Z",
     members: [
-      { name: "최기획", avatar: "", online: false },
-      { name: "김싸피", avatar: "", online: true },
+      { name: "최기획", avatar: "" },
+      { name: "김싸피", avatar: "" },
     ],
   },
   {
@@ -47,9 +47,9 @@ export const workspaces: ProjectCardProps["project"][] = [
     lastModified: "1일 전",
     updatedAt: "2024-01-02T10:00:00Z",
     members: [
-      { name: "정백엔드", avatar: "", online: true },
-      { name: "한프론트", avatar: "", online: false },
-      { name: "김싸피", avatar: "", online: false },
+      { name: "정백엔드", avatar: "" },
+      { name: "한프론트", avatar: "" },
+      { name: "김싸피", avatar: "" },
     ],
   },
   {
@@ -63,8 +63,8 @@ export const workspaces: ProjectCardProps["project"][] = [
     lastModified: "30분 전",
     updatedAt: "2024-01-03T10:00:00Z",
     members: [
-      { name: "김싸피", avatar: "", online: true },
-      { name: "송개발", avatar: "", online: true },
+      { name: "김싸피", avatar: "" },
+      { name: "송개발", avatar: "" },
     ],
   },
   {
@@ -78,9 +78,9 @@ export const workspaces: ProjectCardProps["project"][] = [
     lastModified: "3시간 전",
     updatedAt: "2024-01-03T07:30:00Z",
     members: [
-      { name: "박교수", avatar: "", online: false },
-      { name: "김싸피", avatar: "", online: true },
-      { name: "이학생", avatar: "", online: false },
+      { name: "박교수", avatar: "" },
+      { name: "김싸피", avatar: "" },
+      { name: "이학생", avatar: "" },
     ],
   },
   {
@@ -94,8 +94,8 @@ export const workspaces: ProjectCardProps["project"][] = [
     lastModified: "2일 전",
     updatedAt: "2024-01-01T10:00:00Z",
     members: [
-      { name: "최하드웨어", avatar: "", online: false },
-      { name: "김싸피", avatar: "", online: false },
+      { name: "최하드웨어", avatar: "" },
+      { name: "김싸피", avatar: "" },
     ],
   },
 ];
