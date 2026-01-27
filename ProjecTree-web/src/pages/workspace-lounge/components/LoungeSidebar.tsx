@@ -229,36 +229,46 @@ function ProfileDialog({
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100"
+          className="h-7 w-7 text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-zinc-100/50 transition-colors"
           aria-label="프로필 설정 열기"
         >
           <Settings className="h-4 w-4" />
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-106.25 bg-white">
-        <DialogHeader>
-          <DialogTitle className="text-zinc-900">프로필 정보</DialogTitle>
+      <DialogContent className="
+        sm:max-w-106.25 
+        bg-white/92
+        backdrop-blur-2xl
+        border border-white/60
+        shadow-[0_20px_48px_-12px_rgba(0,0,0,0.12)]
+        rounded-3xl
+        z-[1001]
+        p-0
+        overflow-hidden
+      ">
+        <DialogHeader className="p-6 pb-0">
+          <DialogTitle className="text-[var(--figma-tech-green)] text-xl font-bold tracking-tight">프로필 정보</DialogTitle>
           <DialogDescription className="text-zinc-500">
             계정 정보를 확인하고 수정할 수 있습니다.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className="py-4">
           <div className="grid gap-2">
-            <Label htmlFor="nickname" className="text-zinc-700">
+            <Label htmlFor="nickname" className="text-zinc-700 px-6 text-xs font-bold uppercase tracking-wider opacity-70">
               닉네임
             </Label>
 
             {editing ? (
-              <div className="flex flex-col gap-2 h-18 justify-start">
+              <div className="flex flex-col gap-2 h-18 justify-start px-6">
                 <div className="flex gap-2">
                   <Input
                     id="nickname"
                     value={temp}
                     onChange={(e) => setTemp(e.target.value)}
                     className={cn(
-                      'border-zinc-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300',
+                      'bg-white/80 border-white/60 focus:ring-2 focus:ring-[var(--figma-neon-green)]/40 focus:border-[var(--figma-neon-green)] rounded-xl backdrop-blur-sm',
                       errorMessage &&
                       'border-red-300 focus:border-red-400 focus:ring-red-100',
                       successMessage &&
@@ -271,7 +281,7 @@ function ProfileDialog({
                     variant="outline"
                     size="sm"
                     onClick={cancelEdit}
-                    className="border-zinc-200 text-zinc-600 hover:bg-zinc-50 bg-transparent"
+                    className="border-white/60 bg-white/60 text-zinc-600 hover:bg-white/80 hover:text-zinc-900 rounded-xl backdrop-blur-sm"
                   >
                     취소
                   </Button>
@@ -279,13 +289,13 @@ function ProfileDialog({
                     size="sm"
                     onClick={handleSave}
                     disabled={!isValid || isChecking}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50"
+                    className="bg-[var(--figma-neon-green)] hover:bg-[var(--figma-neon-green)]/90 text-[var(--figma-tech-green)] font-bold shadow-sm hover:shadow-[0_0_15px_rgba(74,222,128,0.4)] disabled:opacity-50 transition-all rounded-xl"
                   >
                     {isChecking ? '...' : '저장'}
                   </Button>
                 </div>
                 {/* 메시지 영역을 절대 위치로 두거나, 컨테이너 높이를 고정하여 layout shift 방지 */}
-                <div className="h-4 flex items-center">
+                <div className="h-4 flex items-center pl-1">
                   {errorMessage && (
                     <p className="text-xs text-red-500 font-medium">
                       {errorMessage}
@@ -299,28 +309,30 @@ function ProfileDialog({
                 </div>
               </div>
             ) : (
-              // 편집 모드가 아닐 때도 동일한 높이를 확보하기 위해 h-[72px] 적용
-              <div className="flex items-center justify-between rounded-md border border-zinc-200 px-3 py-2 h-10 mb-8">
-                <span className="text-zinc-900">{nickname}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100"
-                  onClick={startEdit}
-                  aria-label="닉네임 편집"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
+              // 편집 모드가 아닐 때도 동일한 높이를 확보하기 위해 h-10 mb-8 적용
+              <div className="px-6">
+                <div className="flex items-center justify-between rounded-xl border border-white/60 bg-white/60 px-3 py-2 h-10 mb-8 backdrop-blur-sm">
+                  <span className="text-zinc-800 font-medium">{nickname}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-white/80"
+                    onClick={startEdit}
+                    aria-label="닉네임 편집"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             )}
           </div>
         </div>
 
-        <div className="border-t border-zinc-200 pt-4">
+        <div className="border-t border-zinc-100 bg-zinc-50/50 p-6 pt-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-zinc-900">회원 탈퇴</p>
-              <p className="text-xs text-zinc-500">
+              <p className="text-sm font-bold text-zinc-900">회원 탈퇴</p>
+              <p className="text-[12px] text-zinc-500">
                 계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
               </p>
             </div>
@@ -330,15 +342,24 @@ function ProfileDialog({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 bg-transparent"
+                  className="border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600 bg-white focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl transition-colors"
                 >
                   탈퇴하기
                 </Button>
               </AlertDialogTrigger>
 
-              <AlertDialogContent className="bg-white">
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="text-zinc-900">
+              <AlertDialogContent className="
+                bg-white/92
+                backdrop-blur-2xl
+                border border-white/60
+                rounded-3xl
+                shadow-2xl
+                z-[1001]
+                p-0
+                overflow-hidden
+              ">
+                <AlertDialogHeader className="p-6">
+                  <AlertDialogTitle className="text-zinc-900 font-bold">
                     정말 탈퇴하시겠습니까?
                   </AlertDialogTitle>
                   <AlertDialogDescription className="text-zinc-500">
@@ -346,13 +367,13 @@ function ProfileDialog({
                     영구적으로 삭제됩니다.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-zinc-50 bg-transparent">
+                <AlertDialogFooter className="p-6 pt-2 bg-zinc-50/50 border-t border-zinc-100">
+                  <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
                     취소
                   </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteAccount}
-                    className="bg-red-600 hover:bg-red-700 text-white"
+                    className="bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg rounded-xl"
                   >
                     탈퇴하기
                   </AlertDialogAction>
@@ -361,8 +382,8 @@ function ProfileDialog({
             </AlertDialog>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </DialogContent >
+    </Dialog >
   );
 }
 
