@@ -2,13 +2,11 @@ package com.ssafy.projectree.domain.auth.attribute;
 
 import com.ssafy.projectree.domain.auth.enums.AuthRole;
 import com.ssafy.projectree.domain.member.model.entity.Member;
-import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.global.model.enums.OAuthProvider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 
 import java.util.Map;
 
@@ -60,7 +58,7 @@ public class OAuthAttributes {
                 .name(name)
                 .email(email)
                 .oauthProvider(oauthProvider)
-                .role(AuthRole.GUEST) // 중요: 가입 초기 권한은 GUEST
+                .role(AuthRole.ROLE_GUEST) // 중요: 가입 초기 권한은 GUEST
                 .build();
     }
 }

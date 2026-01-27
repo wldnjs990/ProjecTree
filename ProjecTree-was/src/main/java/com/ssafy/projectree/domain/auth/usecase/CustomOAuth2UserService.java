@@ -13,9 +13,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
-import static com.ssafy.projectree.domain.auth.jwt.JwtProperties.PROVIDER;
+import static com.ssafy.projectree.domain.auth.jwt.JwtProperties.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +34,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         Member member = saveOrUpdate(attributes);
 
-        // SecurityContext에 저장될 유저 정보 (Role Key를 String으로 변환)
-        // 여기서는 Role을 Attribute 맵에 같이 넣어주면 SuccessHandler에서 꺼내 쓰기 편합니다.
-        Map<String, Object> memberAttributes = attributes.getAttributes();
-        memberAttributes.put("role", member.getRole()); // SuccessHandler 처리를 위해 추가
+        Map<String, Object> memberAttributes = new HashMap<>(attributes.getAttributes());
+        memberAttributes.put(USERID, member.getId());
+        memberAttributes.put(ROLE, member.getRole()); // SuccessHandler 처리를 위해 추가
         memberAttributes.put(PROVIDER, member.getOauthProvider());
 
         return new DefaultOAuth2User(

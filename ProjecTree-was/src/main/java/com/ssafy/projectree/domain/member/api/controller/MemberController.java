@@ -11,6 +11,7 @@ import com.ssafy.projectree.domain.member.usecase.MemberService;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import com.ssafy.projectree.global.docs.MemberDocsController;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
+
+import static com.ssafy.projectree.domain.auth.jwt.JwtProperties.REFRESH_TOKEN_EXPIRE_TIME;
 
 @Slf4j
 @RestController
@@ -31,11 +34,17 @@ public class MemberController implements MemberDocsController {
     @PatchMapping("/members/signup")
     public CommonResponse<SignUpDto.Response> signUp(
             @AuthenticationPrincipal Member principal, // SecurityContext에 저장된 GUEST 유저 정보
-            @RequestBody SignUpDto.Request requestDto
+            @RequestBody SignUpDto.Request requestDto,
+            HttpServletResponse response
     ) {
-        Member member = memberService.signUp(principal.getEmail(), requestDto);
-        Jwt generate = jwtProvider.generate(member);
-        return CommonResponse.success(SuccessCode.CREATED, new SignUpDto.Response(generate.getAccessToken()));
+        Member member = memberService.signUp(principal.getId(), requestDto);
+        Jwt jwt = jwtProvider.generate(member);
+        Cookie cookie = new Cookie("refreshToken", jwt.getRefreshToken());
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME);
+        response.addCookie(cookie);
+        return CommonResponse.success(SuccessCode.CREATED, new SignUpDto.Response(jwt.getAccessToken()));
     }
 
 

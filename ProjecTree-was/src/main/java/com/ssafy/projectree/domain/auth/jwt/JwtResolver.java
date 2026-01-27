@@ -45,7 +45,7 @@ public class JwtResolver {
         }
 
         return Member.builder()
-                .email(payload.get(USERID, String.class))
+                .id(payload.get(USERID, Long.class))
                 .role(AuthRole.getRole(payload.get(ROLE, String.class)))
                 .oauthProvider(OAuthProvider.valueOf(payload.get(PROVIDER, String.class)))
                 .build();

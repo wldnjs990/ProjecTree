@@ -45,10 +45,10 @@ public class JwtProvider {
         SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
         return Jwts.builder()
-                .claim(USERID, member.getAttribute("email"))
-                .claim(ROLE, member.getAttribute("role"))
-                .claim(PROVIDER, member.getAttribute(""))
-                .claim("tokenType", tokenType)
+                .claim(USERID, member.getAttribute(USERID))
+                .claim(ROLE, member.getAttribute(ROLE))
+                .claim(PROVIDER, member.getAttribute(PROVIDER))
+                .claim(TOKEN_TYPE, tokenType)
                 .expiration(expiredDate)
                 .issuedAt(new Date())
                 .signWith(secretKey)
@@ -64,10 +64,10 @@ public class JwtProvider {
         SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
         return Jwts.builder()
-                .claim(USERID, member.getEmail())
+                .claim(USERID, member.getId())
                 .claim(ROLE, member.getRole().name())
-                .claim(PROVIDER, member.getOauthProvider())
-                .claim("tokenType", tokenType)
+                .claim(PROVIDER, member.getOauthProvider().name())
+                .claim(TOKEN_TYPE, tokenType)
                 .expiration(expiredDate)
                 .issuedAt(new Date())
                 .signWith(secretKey)

@@ -7,9 +7,9 @@ import org.springframework.security.core.GrantedAuthority;
 @Getter
 @RequiredArgsConstructor
 public enum AuthRole implements GrantedAuthority {
-    GUEST("ROLE_GUEST"),
-    USER("ROLE_USER"),
-    ADMIN("ROLE_ADMIN");
+    ROLE_GUEST("ROLE_GUEST"),
+    ROLE_USER("ROLE_USER"),
+    ROLE_ADMIN("ROLE_ADMIN");
     private final String key;
 
     public static AuthRole getRole(String key){
