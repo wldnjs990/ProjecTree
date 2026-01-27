@@ -1,7 +1,7 @@
 import express from "express";
 import { WebSocketServer } from "ws";
 import { handleConnection } from "./ws/connection";
-import internalRouter from "./rest/internalRouter";
+import internalRouter from "./api/internalRouter";
 
 export function startServer() {
   const PORT = Number(process.env.PORT) || 1234;

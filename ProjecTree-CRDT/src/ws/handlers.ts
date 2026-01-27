@@ -1,6 +1,6 @@
 import { WebSocket } from "ws";
-import { getRoomDoc } from "../yjs/yjsManager";
-import { saveNodeDetailToSpring } from "../services/springSync";
+import { getYDocByRoom } from "../yjs/ydoc-gateway";
+import { saveNodeDetailToSpring } from "../services/spring/node/node-detail.writer";
 import type { EditableNodeDetail } from "../domain/node/node.detail";
 import { toSendNodeDetail } from "../domain/node/node.detail";
 import { addPendingPosition } from "../sync/pending-store";
@@ -21,7 +21,7 @@ export async function handleMessage(
   }
 
   if (parsed?.type === "save_node_detail") {
-    const doc = getRoomDoc(room);
+    const doc = getYDocByRoom(room);
     const nodeDetails = doc.getMap<EditableNodeDetail>("nodeDetails");
     const nodeData = nodeDetails.get(parsed.nodeId);
 
@@ -38,7 +38,7 @@ export async function handleMessage(
     const { nodeId, requestId } = parsed;
     if (!nodeId) return;
 
-    const doc = getRoomDoc(room);
+    const doc = getYDocByRoom(room);
     const nodes = doc.getMap<any>("nodes");
     const nodeData = nodes.get(nodeId);
 
