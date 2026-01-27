@@ -45,11 +45,9 @@ export async function handleMessage(
     if (!nodeData) return;
 
     const position = nodeData.get("position");
-    const x = position.x;
-    const y = position.y;
 
-    // console.log("[handleMessage] 위치 저장 예약", { room, nodeId, x, y });
-    if (typeof x !== "number" || typeof y !== "number") return;
+    if (typeof position.x !== "number" || typeof position.y !== "number")
+      return;
 
     addPendingPosition(room, {
       nodeId,

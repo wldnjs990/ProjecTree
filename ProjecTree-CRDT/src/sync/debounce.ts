@@ -4,6 +4,7 @@ import { sendBatchToSpring } from "../services/spring/node/node-position.writer"
 const flushTimers = new Map<string, NodeJS.Timeout>();
 const DEBOUNCE_MS = 2000;
 
+// 2초간 변경이 없으면 flush
 export function scheduleFlush(workspaceId: string) {
   const prev = flushTimers.get(workspaceId);
   if (prev) clearTimeout(prev);
@@ -19,7 +20,10 @@ async function flushWorkspace(workspaceId: string) {
   const wsMap = pendingPositions.get(workspaceId);
   if (!wsMap || wsMap.size === 0) return;
 
-  const nodes = Array.from(wsMap.values());
+  const nodes = Array.from(wsMap.values()).map(({ nodeId, position }) => ({
+    nodeId,
+    position,
+  }));
 
   try {
     await sendBatchToSpring({

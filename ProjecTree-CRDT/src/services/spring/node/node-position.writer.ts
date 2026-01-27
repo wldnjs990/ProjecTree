@@ -3,7 +3,6 @@ import { springClient } from "./../../spring/springClient";
 export interface SendNodePosition {
   nodeId: string;
   position: { x: number; y: number };
-  requestId?: string;
 }
 
 interface SaveNodePositionsBatchPayload {
