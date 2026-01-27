@@ -1,7 +1,7 @@
 package com.ssafy.projectree.domain.ai.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ssafy.projectree.domain.ai.dto.schemas.CandidateSchema;
+import com.ssafy.projectree.domain.ai.dto.schemas.AiCandidateSchema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +22,6 @@ public class AiCandidateCreateDto {
         private Long workspaceId;
         @JsonProperty("candidate_count")
         private int candidateCount;
-
     }
 
     @Data
@@ -31,6 +30,6 @@ public class AiCandidateCreateDto {
     @AllArgsConstructor
     public static class Response{
         @Builder.Default
-        private List<CandidateSchema> candidates = new ArrayList<>();
+        private List<AiCandidateSchema> candidates = new ArrayList<>();
     }
 }

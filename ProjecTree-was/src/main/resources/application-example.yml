@@ -32,7 +32,7 @@ logging:
 
 inference-server:
   url: http://localhost:8000
-  path-prefix: /infernece-api/v1
+  path-prefix: /inference-api/v1
   generate-candidate-path: /candidates/generate
   generate-node-path: /nodes/create
   recommend-tech-path: /recommendations/tech-stack
