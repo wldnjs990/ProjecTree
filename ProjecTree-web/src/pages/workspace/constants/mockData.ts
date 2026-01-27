@@ -348,26 +348,6 @@ export const mockUsers: MockUser[] = [
   { id: '3', initials: 'PH', color: 'orange', isOnline: false },
 ];
 
-// Tech Stack Mappings
-export interface TechStackMapping {
-  nodeId: string;
-  confirmedTechs: string[];
-  lastUpdated: string;
-}
-
-export const mockTechStackMappings: TechStackMapping[] = [
-  {
-    nodeId: '4',
-    confirmedTechs: ['React', 'TypeScript', 'SWR'],
-    lastUpdated: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-  },
-  {
-    nodeId: '5',
-    confirmedTechs: ['Node.js', 'PostgreSQL', 'JWT'],
-    lastUpdated: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-  },
-];
-
 // Tech Stack Summary
 export interface TechStackSummary {
   totalTechStacks: number;
@@ -386,3 +366,33 @@ export const mockTechStackSummary: TechStackSummary = {
   p0Percentage: 34,
   p0Count: 13,
 };
+
+// Tech Stack Mappings
+export interface TechStackMapping {
+  nodeId: string;
+  confirmedTechs: string[];
+  lastUpdated: string;
+}
+
+export const mockTechStackMappings: TechStackMapping[] = [
+  {
+    nodeId: 'task-1',
+    confirmedTechs: ['React', 'TypeScript', 'SWR'],
+    lastUpdated: new Date(Date.now() - 15 * 60 * 1000).toISOString(), // 15분 전
+  },
+  {
+    nodeId: 'task-2',
+    confirmedTechs: ['Node.js', 'PostgreSQL', 'JWT'],
+    lastUpdated: new Date(Date.now() - 60 * 60 * 1000).toISOString(), // 1시간 전
+  },
+  {
+    nodeId: 'advanced-4',
+    confirmedTechs: ['React.memo', 'useMemo'],
+    lastUpdated: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3시간 전
+  },
+  {
+    nodeId: 'advanced-5',
+    confirmedTechs: ['Redis'],
+    lastUpdated: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6시간 전
+  },
+];

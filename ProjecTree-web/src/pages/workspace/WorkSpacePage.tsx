@@ -73,10 +73,6 @@ export default function WorkSpacePage() {
     console.log('Invite clicked');
   };
 
-  const handleChatClick = () => {
-    console.log('Chat clicked');
-  };
-
   const handleNodeClick = (nodeId: string) => {
     console.log(selectedNodeId);
     console.log(nodeId);
@@ -115,7 +111,6 @@ export default function WorkSpacePage() {
               <TreeCanvas
                 initialNodes={mockNodes as FlowNode[]}
                 onlineUsers={mockUsers}
-                onChatClick={handleChatClick}
                 onNodeClick={handleNodeClick}
               />
             ) : (

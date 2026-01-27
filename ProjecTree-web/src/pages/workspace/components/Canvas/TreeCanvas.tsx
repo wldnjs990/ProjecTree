@@ -22,7 +22,6 @@ import { CollabPanel } from './CollabPanel';
 import { MinimapPanel } from './MinimapPanel';
 import { ZoomControls } from './ZoomControls';
 import type { AvatarColor } from '@/components/custom/UserAvatar';
-import ChatButton from './ChatButton';
 import { AdvancedNode, TaskNode } from './nodes';
 import { useNodesCrdt } from '../../hooks/useNodesCrdt';
 import { useCursors } from '../../hooks/useCursors';
@@ -41,8 +40,6 @@ interface OnlineUser {
 interface TreeCanvasProps {
   initialNodes?: FlowNode[];
   onlineUsers: OnlineUser[];
-  unreadMessages?: number;
-  onChatClick?: () => void;
   onNodeClick?: (nodeId: string) => void;
 }
 
@@ -64,8 +61,6 @@ const fitviewOptions = { padding: 0.2 };
 function TreeCanvasInner({
   initialNodes = [],
   onlineUsers,
-  unreadMessages = 0,
-  onChatClick,
   onNodeClick,
 }: TreeCanvasProps) {
   // 노드 CRDT 훅 (Y.js 노드 동기화)
@@ -164,13 +159,6 @@ function TreeCanvasInner({
 
       {/* ReactFlow 캔버스 컨트롤 버튼 - Bottom Left */}
       <ZoomControls className="absolute bottom-6 left-6 z-10" />
-
-      {/* chat button */}
-      <ChatButton
-        className="absolute bottom-6 left-16 z-10"
-        unreadMessages={unreadMessages}
-        onChatClick={onChatClick}
-      />
 
       {/* Node Detail Sidebar - props 대폭 감소 */}
       <NodeDetailSidebar />
