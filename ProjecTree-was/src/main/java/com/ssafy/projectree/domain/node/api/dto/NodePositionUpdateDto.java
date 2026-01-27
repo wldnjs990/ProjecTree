@@ -20,9 +20,7 @@ public class NodePositionUpdateDto {
     @Getter
     @NoArgsConstructor
     public static class NodePositionItem {
-        private String nodeId;
-
-        private String requestId;
+        private Long nodeId;
 
         @Valid
         private NodePositionUpdateDto.Position position;

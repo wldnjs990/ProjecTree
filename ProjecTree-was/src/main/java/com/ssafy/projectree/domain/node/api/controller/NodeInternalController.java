@@ -2,6 +2,7 @@ package com.ssafy.projectree.domain.node.api.controller;
 
 import com.ssafy.projectree.domain.node.api.dto.NodePositionUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeUpdateDto;
+import com.ssafy.projectree.domain.node.usecase.NodeAsyncService;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,27 +20,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NodeInternalController {
 
+    private final NodeAsyncService nodeAsyncService;
+
     @PostMapping("/nodes/{nodeId}/detail")
     public CommonResponse<Void> saveNodeDetail(
-            @PathVariable String workspaceId,
-            @PathVariable String nodeId,
+            @PathVariable Long workspaceId,
+            @PathVariable Long nodeId,
             @RequestBody NodeUpdateDto.Request request
     ) {
 
-        log.info("NodeDetail save request:{}", request);
         return CommonResponse.success(SuccessCode.UPDATED, null);
     }
 
     @PutMapping("/nodes/positions")
     public CommonResponse<Void> updateNodePositions(
-            @PathVariable String workspaceId,
+            @PathVariable Long workspaceId,
             @RequestBody NodePositionUpdateDto.Request request
     ) {
+        nodeAsyncService.savePositionAsync(
+                workspaceId,
+                request.getNodes()
+        );
 
-        log.info("NodePosition update request:{}", request);
-
-        // TODO: 배치처리 필요
-
-        return CommonResponse.success(SuccessCode.UPDATED, null);
+        // 접수 완료
+        return CommonResponse.success(SuccessCode.UPDATED, null); // 202
     }
 }
