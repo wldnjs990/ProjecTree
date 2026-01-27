@@ -21,8 +21,8 @@ public class NodeInternalController {
 
     @PostMapping("/nodes/{nodeId}/detail")
     public CommonResponse<Void> saveNodeDetail(
-            @PathVariable String workspaceId,
-            @PathVariable String nodeId,
+            @PathVariable Long workspaceId,
+            @PathVariable Long nodeId,
             @RequestBody NodeUpdateDto.Request request
     ) {
 
@@ -32,7 +32,7 @@ public class NodeInternalController {
 
     @PutMapping("/nodes/positions")
     public CommonResponse<Void> updateNodePositions(
-            @PathVariable String workspaceId,
+            @PathVariable Long workspaceId,
             @RequestBody NodePositionUpdateDto.Request request
     ) {
 
