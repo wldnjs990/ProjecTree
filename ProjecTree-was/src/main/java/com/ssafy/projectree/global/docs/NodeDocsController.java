@@ -1,7 +1,10 @@
 package com.ssafy.projectree.global.docs;
 
+import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
+import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
+import com.ssafy.projectree.domain.node.api.dto.TechStackRecommendDto;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,9 +15,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Node", description = "노드 및 워크스페이스 트리 관련 API")
-public interface NodeDocsController {
+public interface    NodeDocsController {
 
     @Operation(
             summary = "노드 상세 정보 조회",
@@ -107,5 +111,44 @@ public interface NodeDocsController {
     CommonResponse<NodeTreeReadDto.Response> getNodeTree(
             @Parameter(description = "조회할 워크스페이스의 ID", example = "10")
             @PathVariable(value = "workspace-id") Long workspaceId
+    );
+
+    @Operation(
+            summary = "노드 생성",
+            description = "후보 노드(Candidate)를 선택하여 새로운 자식 노드를 생성합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "생성 성공")
+    })
+    CommonResponse<NodeCreateDto.Response> createNode(
+            @Parameter(description = "선택한 후보 노드 ID", example = "10")
+            @PathVariable(name = "candidate-id") Long candidateId,
+            @Parameter(description = "부모 노드 ID", example = "1")
+            @PathVariable(name = "node-id") Long parentId,
+            @RequestBody NodeCreateDto.Request request
+    );
+
+    @Operation(
+            summary = "노드 후보 생성",
+            description = "특정 부모 노드 하위에 생성 가능한 노드 후보들을 AI를 통해 생성합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "생성 성공")
+    })
+    CommonResponse<CandidateCreateDto.Response> createCandidates(
+            @Parameter(description = "부모 노드 ID", example = "1")
+            @PathVariable(name = "node-id") Long parentId
+    );
+
+    @Operation(
+            summary = "기술 스택 추천",
+            description = "특정 노드 구현에 적합한 기술 스택을 추천받습니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "추천 성공")
+    })
+    CommonResponse<TechStackRecommendDto.Response> recommendTechStack(
+            @Parameter(description = "노드 ID", example = "1")
+            @PathVariable(name = "node-id") Long nodeId
     );
 }
