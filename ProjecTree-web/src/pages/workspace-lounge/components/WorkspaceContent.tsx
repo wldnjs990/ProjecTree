@@ -44,6 +44,7 @@ export function WorkspaceContent({ filterType = "all" }: ContentProps) {
   // (2) 검색어 상태: 입력 반응성을 위해 로컬 state로 관리
   const initialQuery = searchParams.get('q') || '';
   const [inputValue, setInputValue] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery); // 필터링용 지연 상태
 
   // (3) 정렬 상태: URL에서 바로 조회 (기본값: recent)
   const sortByValue = searchParams.get('sort') || 'recent';
@@ -83,9 +84,14 @@ export function WorkspaceContent({ filterType = "all" }: ContentProps) {
     fetchWorkspaces();
   }, []);
 
-  // 3. Debounce 효과: 사용자가 입력을 멈춘 후 0.3초 뒤에 URL을 업데이트함
+  // 3. Debounce 효과: 사용자가 입력을 멈춘 후 0.3초 뒤에 URL과 필터 상태를 업데이트함
+  // 단, 입력값이 비어있을 경우(지웠을 때) 즉시 반영하여 반응성을 높임
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const updateState = () => {
+      // 필터링 상태 업데이트
+      setDebouncedQuery(inputValue);
+
+      // URL 업데이트
       setSearchParams((prev) => {
         if (inputValue) {
           prev.set('q', inputValue);
@@ -94,7 +100,14 @@ export function WorkspaceContent({ filterType = "all" }: ContentProps) {
         }
         return prev;
       });
-    }, 300);
+    };
+
+    if (inputValue === '') {
+      updateState();
+      return;
+    }
+
+    const timer = setTimeout(updateState, 300);
 
     return () => clearTimeout(timer);
   }, [inputValue, setSearchParams]);
@@ -120,11 +133,12 @@ export function WorkspaceContent({ filterType = "all" }: ContentProps) {
       return true;
     });
 
-    // (2) 2차 필터링: 검색어
+    // (2) 2차 필터링: 검색어 (Debounce 적용된 값 사용)
+    const query = debouncedQuery.toLowerCase();
     result = result.filter(
       (ws) =>
-        ws.title.toLowerCase().includes(inputValue.toLowerCase()) ||
-        ws.description.toLowerCase().includes(inputValue.toLowerCase())
+        ws.title.toLowerCase().includes(query) ||
+        ws.description.toLowerCase().includes(query)
     );
 
     // (3) 정렬 적용
