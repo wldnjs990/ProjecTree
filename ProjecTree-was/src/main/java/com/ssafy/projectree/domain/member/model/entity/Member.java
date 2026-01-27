@@ -27,6 +27,7 @@ public class Member extends BaseEntity implements UserDetails {
     private Long id;
 
     private String name;
+    
     private String nickname;
     @Column(unique = true)
     private String email;
