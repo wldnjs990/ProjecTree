@@ -21,12 +21,12 @@ export async function flushWorkspace(workspaceId: string) {
   if (!wsMap || wsMap.size === 0) return;
 
   const nodes = Array.from(wsMap.values()).map(({ nodeId, position }) => ({
-    nodeId,
+    nodeId: Number(nodeId),
     position,
   }));
 
   try {
-    const sendWorkspaceId: number = Number(workspaceId.split("-")[1]);
+    const sendWorkspaceId: number = Number(workspaceId);
     await sendBatchToSpring({
       workspaceId: sendWorkspaceId,
       nodes,
