@@ -32,11 +32,11 @@ export function NodeHeaderSection({
     : null;
 
   return (
-    <div className="relative pb-4">
+    <div className="pb-4">
       {/* 헤더 */}
-      <div className="flex px-4 py-2 justify-between fixed top-0 left-0 w-full bg-white z-10">
+      <div className="flex px-4 py-4 justify-between absolute top-0 left-0 w-full bg-white z-10 border-b border-[#EEEEEE]">
         {/* 태그 영역 */}
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-3">
           {/* 노드 타입 태그 */}
           <span
             className={cn(
@@ -72,7 +72,7 @@ export function NodeHeaderSection({
           )}
         </div>
         {/* 버튼 영역 */}
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-3">
           {/* 편집 버튼 */}
           <NodeHeaderButton onClick={toggleEdit}>
             <SquarePen

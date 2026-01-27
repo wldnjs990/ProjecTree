@@ -19,8 +19,6 @@ interface AITechRecommendSectionProps {
   isEdit: boolean;
   recommendations: TechRecommendation[];
   comparison?: string;
-  onCompare?: () => void;
-  onAddManual?: () => void;
 }
 
 // 기술 카드 컴포넌트
@@ -214,20 +212,20 @@ function TechCardList({
 export function AITechRecommendSection({
   recommendations,
   comparison,
-  onCompare,
-  onAddManual,
 }: AITechRecommendSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [showComparison, setShowComparison] = useState(false);
 
   const handleCompareClick = () => {
     setShowComparison(true);
-    onCompare?.();
   };
 
   const handleBackToRecommendations = () => {
     setShowComparison(false);
   };
+
+  //
+  const handleAddTech = () => {};
 
   return (
     <div className="rounded-[14px] border border-[rgba(227,228,235,0.5)] bg-[rgba(251,251,255,0.6)] backdrop-blur-sm overflow-hidden">
@@ -274,7 +272,7 @@ export function AITechRecommendSection({
               </button>
             )}
             <button
-              onClick={onAddManual}
+              onClick={handleAddTech}
               className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#6363C6] border border-[rgba(99,99,198,0.3)] rounded-lg hover:bg-[rgba(99,99,198,0.05)] transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4" />

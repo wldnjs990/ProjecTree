@@ -3,10 +3,7 @@ import { StatusMetaSection } from './StatusMetaSection';
 import { AITechRecommendSection } from './AITechRecommendSection';
 import { AINodeCandidateSection } from './AINodeCandidateSection';
 import { MemoSection } from './MemoSection';
-import {
-  useSelectedNodeDetail,
-  useNodeDetailEditStore,
-} from '../../stores/nodeDetailEditStore';
+import { useSelectedNodeDetail, useNodeDetailEdit } from '../../hooks';
 
 interface NodeDetailContainerProps {
   nodeInfo?: {
@@ -22,10 +19,8 @@ export default function NodeDetailContainer({
 }: NodeDetailContainerProps) {
   // Store에서 상태 및 액션 구독
   const nodeDetail = useSelectedNodeDetail();
-  const isEditing = useNodeDetailEditStore((state) => state.isEditing);
-  const closeSidebar = useNodeDetailEditStore((state) => state.closeSidebar);
-  const startEdit = useNodeDetailEditStore((state) => state.startEdit);
-  const finishEdit = useNodeDetailEditStore((state) => state.finishEdit);
+  const { isEditing, closeSidebar, startEdit, finishEdit } =
+    useNodeDetailEdit();
 
   if (!nodeDetail) return null;
 
@@ -42,15 +37,6 @@ export default function NodeDetailContainer({
     }
   };
 
-  // 기술 비교/추가 핸들러 (추후 구현)
-  const handleTechCompare = () => {
-    console.log('Tech compare clicked');
-  };
-
-  const handleTechAddManual = () => {
-    console.log('Tech add manual clicked');
-  };
-
   // 노드 후보 클릭/추가 핸들러 (추후 구현)
   const handleCandidateClick = () => {
     console.log('Candidate clicked');
@@ -61,7 +47,7 @@ export default function NodeDetailContainer({
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4 pt-20">
       {/* 노드 헤더 */}
       <NodeHeaderSection
         nodeInfo={nodeInfo}
@@ -83,8 +69,6 @@ export default function NodeDetailContainer({
           isEdit={isEditing}
           recommendations={nodeDetail.techs}
           comparison={nodeDetail.comparison}
-          onCompare={handleTechCompare}
-          onAddManual={handleTechAddManual}
         />
       )}
 

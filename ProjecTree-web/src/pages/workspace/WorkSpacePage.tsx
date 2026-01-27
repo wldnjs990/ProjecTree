@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Header, type ViewTab } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { TreeCanvas } from './components/Canvas';
-import { NodeDetailSidebar } from './components/NodeDetailSidebar';
 import {
   mockNodes,
   mockUsers,
@@ -14,13 +13,11 @@ import { TechStackStatusView } from './components/TechStackStatus';
 import type { FlowNode } from './types/node';
 import { initCrdtClient, destroyCrdtClient } from './crdt/crdtClient';
 import { useConnectionStatus, useNodeStore } from './stores/nodeStore';
-import {
-  useNodeDetailEditStore,
-  useSelectedNodeId,
-} from './stores/nodeDetailEditStore';
+import { useNodeDetailEdit, useNodeDetailCrdtObservers } from './hooks';
 
 // 임시 Room ID (나중에 워크스페이스 ID로 대체)
-const ROOM_ID = 'workspace-1';
+// TODO : 워크스페이스 ID로 대체
+const ROOM_ID = '1';
 
 export default function WorkSpacePage() {
   // CRDT 연결 상태
@@ -30,17 +27,11 @@ export default function WorkSpacePage() {
   const setNodeDetails = useNodeStore((state) => state.setNodeDetails);
   const setNodeListData = useNodeStore((state) => state.setNodeListData);
 
-  // NodeDetailEditStore 액션
-  const openSidebar = useNodeDetailEditStore((state) => state.openSidebar);
-  const initCrdtObservers = useNodeDetailEditStore(
-    (state) => state.initCrdtObservers
-  );
-  const cleanupCrdtObservers = useNodeDetailEditStore(
-    (state) => state.cleanupCrdtObservers
-  );
+  // 노드 상세 편집 Hook
+  const { openSidebar, closeSidebar, selectedNodeId } = useNodeDetailEdit();
 
-  // 선택된 노드 ID
-  const selectedNodeId = useSelectedNodeId();
+  // CRDT 옵저버 생명주기 관리
+  useNodeDetailCrdtObservers();
 
   // CRDT 클라이언트 초기화 및 초기 데이터 로드
   useEffect(() => {
@@ -59,22 +50,10 @@ export default function WorkSpacePage() {
     });
     setNodeListData(nodeListDataMap);
 
-    // CRDT 옵저버 초기화 (연결 후)
-    const timer = setTimeout(() => {
-      initCrdtObservers();
-    }, 100);
-
     return () => {
-      clearTimeout(timer);
-      cleanupCrdtObservers();
       destroyCrdtClient();
     };
-  }, [
-    setNodeDetails,
-    setNodeListData,
-    initCrdtObservers,
-    cleanupCrdtObservers,
-  ]);
+  }, [setNodeDetails, setNodeListData]);
 
   // Header state
   const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');
@@ -82,20 +61,6 @@ export default function WorkSpacePage() {
   // Sidebar filter state
   const [nodeTypeFilter, setNodeTypeFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-
-  // 선택된 노드의 기본 정보 (헤더용)
-  const selectedNodeInfo = useMemo(() => {
-    if (!selectedNodeId) return undefined;
-    const numericId = Number(selectedNodeId);
-    const apiNode = mockNodesApiResponse.data.find((n) => n.id === numericId);
-    if (!apiNode) return undefined;
-    return {
-      name: apiNode.name,
-      nodeType: apiNode.nodeType,
-      identifier: apiNode.data.identifier,
-      taskType: apiNode.data.taskType,
-    };
-  }, [selectedNodeId]);
 
   // Event handlers
   const handleSettingsClick = () => {
@@ -115,7 +80,10 @@ export default function WorkSpacePage() {
   };
 
   const handleNodeClick = (nodeId: string) => {
-    openSidebar(nodeId);
+    console.log(selectedNodeId);
+    console.log(nodeId);
+    if (!selectedNodeId || selectedNodeId !== nodeId) openSidebar(nodeId);
+    else closeSidebar();
   };
 
   return (
@@ -166,9 +134,6 @@ export default function WorkSpacePage() {
             <TechStackStatusView onNodeClick={handleNodeClick} />
           )}
         </main>
-
-        {/* Node Detail Sidebar - props 대폭 감소 */}
-        <NodeDetailSidebar nodeInfo={selectedNodeInfo} />
       </div>
     </div>
   );

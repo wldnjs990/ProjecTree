@@ -7,7 +7,7 @@ export default function NodeHeaderInfo({
   description,
 }: NodeHeaderInfoProps) {
   return (
-    <div className="mt-10">
+    <div>
       {/* 제목 */}
       <h2 className="text-base font-medium text-[#14151F] mb-2 pr-8">
         {name || '무제'}

@@ -18,19 +18,24 @@ interface UseNodesCrdtOptions {
 export const useNodesCrdt = ({
   initialNodes = [],
 }: UseNodesCrdtOptions = {}) => {
+  // 노드리스트 관리용 ref객체
   const yNodesRef = useRef<Y.Map<Y.Map<YNodeValue>> | null>(null);
 
   // Zustand 스토어 액션
   const setNodes = useNodeStore((state) => state.setNodes);
   const updateNodePosition = useNodeStore((state) => state.updateNodePosition);
 
-  // Y.Map에서 노드 배열로 변환 후 스토어 업데이트
+  // Y.Map에서 노드 배열로 변환 후 전역 스토어 업데이트
   const syncFromYjs = useCallback(() => {
+    // yNodesRef에 노드 데이터가 생성되지 않았으면 종료
     if (!yNodesRef.current) return;
 
+    // 스토어에 저장할 노드 리스트
     const nodes: FlowNode[] = [];
     yNodesRef.current.forEach((yNode, nodeId) => {
+      // 현재 노드의 부모id
       const rawParentId = yNode.get('parentId');
+      // 전역변수에 저장할 노드 생성
       const yjsNode: YjsNode = {
         id: nodeId,
         type: yNode.get('type') as YjsNode['type'],
@@ -55,6 +60,7 @@ export const useNodesCrdt = ({
       return;
     }
 
+    // 노드 리스트 가져오기
     const yNodes = client.getYMap<Y.Map<YNodeValue>>('nodes');
     yNodesRef.current = yNodes;
 

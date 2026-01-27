@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { StickyNote, ChevronDown, ChevronUp } from 'lucide-react';
-import {
-  useDisplayData,
-  useIsEditing,
-  useNodeDetailEditStore,
-} from '../../stores/nodeDetailEditStore';
+import { useDisplayData, useNodeDetailEdit } from '../../hooks';
+import { useIsEditing } from '../../stores/nodeDetailStore';
 
 // 메모 편집 컴포넌트 (편집 모드)
 interface NoteEditProps {
@@ -87,7 +84,7 @@ export function MemoSection() {
   // Store에서 상태 구독
   const displayData = useDisplayData();
   const isEdit = useIsEditing();
-  const updateField = useNodeDetailEditStore((state) => state.updateField);
+  const { updateField } = useNodeDetailEdit();
 
   if (!displayData) return null;
 

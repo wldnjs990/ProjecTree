@@ -88,19 +88,3 @@ export function AINodeCandidateSection({
     </div>
   );
 }
-
-{
-  /* <Confirm
-  key={node.id}
-  trigger={
-    <ConfirmTrigger className="flex flex-col w-full items-start justify-between p-2.5 border border-[#DEDEDE] hover:bg-[#1c69e30d] rounded-lg">
-      <SubNodeCard node={node} onAdd={() => onAddNode?.(node)} />
-    </ConfirmTrigger>
-  }
-  title={`선택한 노드: ${node.name}`}
-  content={<div>{node.description}</div>}
-  description="선택한 노드를 확정하시겠습니까? (수정 불가)"
-  cancelText="취소"
-  actionText="확정"
-/>; */
-}

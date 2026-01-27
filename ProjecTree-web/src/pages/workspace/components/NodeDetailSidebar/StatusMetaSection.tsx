@@ -2,18 +2,15 @@ import { NodeStatusField } from './NodeStatus';
 import { NodePriorityField } from './NodePriority';
 import { NodeDifficultyField } from './NodeDifficulty';
 import { NodeAssignee } from './NodeAssignee';
-import {
-  useDisplayData,
-  useIsEditing,
-  useNodeDetailEditStore,
-} from '../../stores/nodeDetailEditStore';
+import { useDisplayData, useNodeDetailEdit } from '../../hooks';
+import { useIsEditing } from '../../stores/nodeDetailStore';
 import type { NodeStatus, Priority, Assignee } from './types';
 
 export function StatusMetaSection() {
   // Store에서 상태 구독
   const displayData = useDisplayData();
   const isEdit = useIsEditing();
-  const updateField = useNodeDetailEditStore((state) => state.updateField);
+  const { updateField } = useNodeDetailEdit();
 
   if (!displayData) return null;
 

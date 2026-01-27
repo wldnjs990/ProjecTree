@@ -29,6 +29,7 @@ import { useCursors } from '../../hooks/useCursors';
 import { useNodes, useEdges } from '../../stores/nodeStore';
 import type { FlowNode } from '../../types/node';
 import CursorPointers from './CursorPointers';
+import { NodeDetailSidebar } from '../NodeDetailSidebar';
 
 interface OnlineUser {
   id: string;
@@ -170,6 +171,9 @@ function TreeCanvasInner({
         unreadMessages={unreadMessages}
         onChatClick={onChatClick}
       />
+
+      {/* Node Detail Sidebar - props 대폭 감소 */}
+      <NodeDetailSidebar />
     </div>
   );
 }
