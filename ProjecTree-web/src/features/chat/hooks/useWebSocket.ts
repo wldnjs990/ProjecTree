@@ -28,6 +28,8 @@ export const useWebSocket = (workspaceId: string | null) => {
 
     // 연결 상태 업데이트
     socket.on('connect', () => {
+      if (workspaceId) chatSocket.joinWorkspace(workspaceId);
+      else throw new Error('Workspace ID 가 등록되지 않았습니다.');
       setConnected(true);
     });
 
@@ -44,8 +46,6 @@ export const useWebSocket = (workspaceId: string | null) => {
   // 워크스페이스 입장/퇴장
   useEffect(() => {
     if (!workspaceId) return;
-
-    chatSocket.joinWorkspace(workspaceId);
     // setActiveWorkspace(workspaceId);
 
     return () => {

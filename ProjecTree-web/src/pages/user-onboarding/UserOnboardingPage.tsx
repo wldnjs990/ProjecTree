@@ -20,7 +20,7 @@ export default function UserOnboardingPage() {
   const handleSave = () => {
     // TODO: 프로필 정보 저장 API 연결 필요
     console.log('저장된 닉네임:', nickname);
-    navigate('/workspaceLounge');
+    navigate('/workspace-lounge');
   };
 
   return (
