@@ -1,273 +1,206 @@
 import { useNavigate } from 'react-router';
-import { Layers } from 'lucide-react';
+import { Layers, Github, Sprout } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    // 실제 로그인 로직은 나중에 추가
+    // 실제 로그인 로직은 추후 구현
     navigate('/user-onboarding');
   };
 
   return (
-    <div
-      className="flex flex-row justify-center items-center min-h-screen w-full relative"
-      style={{
-        background: '#FFFFFF',
-      }}
-    >
-      {/* Gradient Background - 격자 패턴 제거 */}
-      <div
-        className="absolute inset-0 pointer-events-none"
+    <div className="flex min-h-screen w-full font-sans text-slate-900 font-normal">
+      {/* 1. Left Panel (Brand Area) - Desktop Only */}
+      <motion.div
+        className="hidden lg:flex flex-col justify-between w-2/5 p-16 relative overflow-hidden"
         style={{
-          background:
-            'linear-gradient(135deg, rgba(238, 242, 255, 0.5) 0%, rgba(238, 242, 255, 0) 50%, #FAFAFA 100%)',
-          zIndex: 1,
-        }}
-      />
-
-      {/* Card Container */}
-      <div
-        className="flex flex-col items-start relative"
-        style={{
-          width: '448px',
-          maxWidth: '448px',
-          background: '#FFFFFF',
-          border: '1px solid #E4E4E7',
-          boxShadow:
-            '0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -4px rgba(0, 0, 0, 0.1)',
-          borderRadius: '12px',
-          padding: '24px 0px',
-          zIndex: 2,
+          backgroundColor: '#052e16', // Darker forest base (emerald-950)
         }}
       >
-        {/* Inner Container */}
+        {/* Sky Gradient */}
         <div
-          className="flex flex-col items-start"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            padding: '32px',
-            gap: '32px',
-            width: '100%',
+            background: 'linear-gradient(to bottom, #0f4c3a 0%, #052e16 100%)',
           }}
-        >
-          {/* Logo and Title Container */}
-          <div
-            className="flex flex-row justify-center items-center"
-            style={{
-              gap: '8px',
-              width: '382px',
-              height: '40px',
-            }}
-          >
-            {/* Logo Background */}
-            <div
-              className="flex flex-row justify-center items-center"
-              style={{
-                width: '40px',
-                height: '40px',
-                background: '#4F39F6',
-                borderRadius: '8px',
-              }}
-            >
-              {/* Lucide Icon */}
-              <Layers size={24} color="#FFFFFF" strokeWidth={2} />
-            </div>
+        />
 
-            {/* ProjecTree Text */}
-            <h2
-              className="flex items-center"
-              style={{
-                width: '111px',
-                height: '32px',
-                fontFamily: 'Roboto',
-                fontStyle: 'normal',
-                fontWeight: 100,
-                fontSize: '24px',
-                lineHeight: '32px',
-                color: '#18181B',
-              }}
-            >
+        {/* Forest Silhouette Layer 1 (Back/Faint) */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-3/5 pointer-events-none opacity-20"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 320' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='white' d='M100 256 L150 100 L200 256 L100 256 Z M300 280 L360 80 L420 280 Z M600 260 L680 50 L760 260 Z M900 270 L950 120 L1000 270 Z' /%3E%3C/svg%3E")`,
+            backgroundRepeat: 'repeat-x',
+            backgroundSize: '800px auto',
+            backgroundPosition: '0 bottom',
+          }}
+        />
+
+        {/* Forest Silhouette Layer 2 (Mid/Visible) */}
+        <div
+          className="absolute inset-x-0 bottom-[-5%] h-3/4 pointer-events-none opacity-30"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cg transform='scale(1.5, 1)'%3E%3Cpath fill='white' d='M50 400 L120 150 L190 400 Z M250 400 L320 180 L390 400 Z M500 400 L600 120 L700 400 Z M800 400 L880 200 L960 400 Z' /%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundRepeat: 'repeat-x',
+            backgroundSize: '1000px auto',
+            backgroundPosition: '150px bottom',
+            filter: 'blur(1px)', // Atmospheric depth
+          }}
+        />
+
+        {/* Forest Silhouette Layer 3 (Front/Darker & Sharp) - Simple Pine Shapes */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Cpath fill='%231a4f3d' fill-opacity='0.2' d='M-50 600 L100 200 L250 600 Z M150 600 L300 150 L450 600 Z M400 600 L550 250 L700 600 Z M650 600 L800 180 L950 600 Z' /%3E%3C/svg%3E")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center bottom',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+
+        {/* Ambient Fog Overlay (Bottom) */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(to top, rgba(5, 46, 22, 0.8) 0%, transparent 100%)',
+          }}
+        />
+
+        {/* Subtle Noise Grain */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.3]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E")`,
+            mixBlendMode: 'overlay',
+          }}
+        />
+        <AnimatePresence>
+          {/* Logo */}
+          <div className="flex items-center gap-3 z-10">
+            <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm">
+              <Layers className="text-white h-7 w-7" />
+            </div>
+            <span className="text-2xl font-bold text-white tracking-tight">
               ProjecTree
+            </span>
+          </div>
+
+          {/* Hero Section - Vertically Centered */}
+          <motion.div
+            className="z-10 flex flex-col justify-center h-full max-w-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+          >
+            <h1 className="text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight tracking-tight break-keep">
+              생각의 <span className="text-green-400">씨앗</span>을
+              <br />
+              거대한 <span className="text-green-400">숲</span>으로
+            </h1>
+            <p className="text-gray-300 text-lg lg:text-xl leading-relaxed tracking-tight break-keep max-w-lg">
+              복잡하게 얽힌 아이디어,
+              <br />
+              명확한 트리 구조로 정리하고 성공적인 프로젝트로 키워보세요.
+            </p>
+          </motion.div>
+
+          {/* Footer/Copyright */}
+          <div className="z-10 text-gray-400 text-sm tracking-tight">
+            © 2026 ProjecTree. All rights reserved.
+          </div>
+        </AnimatePresence>
+      </motion.div>
+
+      {/* 2. Right Panel (Action Area) - Clean & Seamless */}
+      <div className="flex-1 flex flex-col justify-center items-center bg-white p-8 sm:p-16 lg:p-24">
+        <motion.div
+          className="w-full max-w-sm flex flex-col gap-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
+        >
+          {/* Mobile Logo (Visible only on small screens) */}
+          <div className="lg:hidden flex justify-center mb-4">
+            <div className="flex items-center gap-2">
+              <div className="bg-[#0f4c3a] p-2 rounded-lg">
+                <Layers className="text-white h-6 w-6" />
+              </div>
+              <span className="text-2xl font-bold text-[#0f4c3a] tracking-tight">
+                ProjecTree
+              </span>
+            </div>
+          </div>
+
+          <div className="text-center sm:text-left space-y-3">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight break-keep">
+              오늘도 <span className="text-green-400">성장</span>할
+              <br className="hidden sm:block" />
+              준비 되셨나요?
+              <Sprout
+                className="text-green-400 h-8 w-8 inline-block ml-2 mb-1"
+                strokeWidth={2.5}
+              />
             </h2>
-          </div>
-
-          {/* Heading Container */}
-          <div
-            className="flex flex-col items-start"
-            style={{
-              gap: '8px',
-              width: '382px',
-              height: '60px',
-            }}
-          >
-            {/* Main Heading */}
-            <div
-              className="flex flex-col items-center w-full"
-              style={{
-                height: '32px',
-              }}
-            >
-              <h1
-                className="flex items-center text-center"
-                style={{
-                  fontFamily: 'Roboto',
-                  fontStyle: 'normal',
-                  fontWeight: 100,
-                  fontSize: '24px',
-                  lineHeight: '32px',
-                  color: '#18181B',
-                }}
-              >
-                ProjecTree 시작하기
-              </h1>
-            </div>
-
-            {/* Subtitle */}
-            <div
-              className="flex flex-col items-center w-full"
-              style={{
-                height: '20px',
-              }}
-            >
-              <p
-                className="flex items-center text-center"
-                style={{
-                  fontFamily: 'Roboto',
-                  fontStyle: 'normal',
-                  fontWeight: 100,
-                  fontSize: '13.3px',
-                  lineHeight: '20px',
-                  color: '#71717B',
-                }}
-              >
-                프로젝트 성공을 위한 여정을 시작하세요.
-              </p>
-            </div>
-          </div>
-
-          {/* Buttons Container */}
-          <div
-            className="flex flex-col items-start"
-            style={{
-              gap: '12px',
-              width: '382px',
-              height: '108px',
-            }}
-          >
-            {/* Google Button */}
-            <button
-              onClick={handleLogin}
-              className="flex flex-row justify-center items-center"
-              style={{
-                padding: '8px 12px',
-                gap: '8px',
-                width: '382px',
-                height: '48px',
-                background: '#FFFFFF',
-                border: '1px solid #E4E4E7',
-                boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-                borderRadius: '6px',
-              }}
-            >
-              {/* Google Icon - 간단한 SVG 유지 (Google 로고는 특수함) */}
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M8 6.67L14.24 6.67C14.32 7.04 14.4 7.41 14.4 7.87C14.4 10.93 12.27 13.33 8 13.33C4.32 13.33 1.33 10.35 1.33 6.67C1.33 2.99 4.32 0 8 0C9.73 0 11.23 0.64 12.37 1.69L10.29 3.77C9.73 3.25 8.93 2.93 8 2.93C5.87 2.93 4.13 4.67 4.13 6.8C4.13 8.93 5.87 10.67 8 10.67C9.87 10.67 11.23 9.6 11.6 8.13L8 8.13L8 6.67Z"
-                  fill="#4285F4"
-                />
-                <path
-                  d="M1.45 9.41L3.31 10.93C3.84 12.13 5.07 13 8 13C9.87 13 11.23 12.4 12.37 11.31L10.29 9.23C9.73 9.75 8.93 10.07 8 10.07C6.13 10.07 4.67 8.8 4.13 7.2L1.45 9.41Z"
-                  fill="#34A853"
-                />
-                <path
-                  d="M4.13 4.72C3.95 5.17 3.87 5.65 3.87 6.13C3.87 6.61 3.95 7.09 4.13 7.54L1.45 5.33C1.15 5.93 1 6.61 1 7.33C1 8.05 1.15 8.73 1.45 9.33L4.13 7.12L4.13 4.72Z"
-                  fill="#FBBC05"
-                />
-                <path
-                  d="M8 0.67C9.73 0.67 11.23 1.31 12.37 2.36L10.29 4.44C9.73 3.92 8.93 3.6 8 3.6C6.13 3.6 4.67 4.87 4.13 6.47L1.45 4.26C2.64 2.31 5.07 0.67 8 0.67Z"
-                  fill="#EA4335"
-                />
-              </svg>
-
-              <span
-                className="flex items-center text-center"
-                style={{
-                  fontFamily: 'Roboto',
-                  fontStyle: 'normal',
-                  fontWeight: 100,
-                  fontSize: '13.8px',
-                  lineHeight: '20px',
-                  color: '#000000',
-                }}
-              >
-                Google로 계속하기
-              </span>
-            </button>
-
-            {/* GitHub Button */}
-            <button
-              onClick={handleLogin}
-              className="flex flex-row justify-center items-center"
-              style={{
-                padding: '8px 12px',
-                gap: '8px',
-                width: '382px',
-                height: '48px',
-                background: '#27272A',
-                boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
-                borderRadius: '6px',
-              }}
-            >
-              {/* GitHub Icon - 간단한 SVG 유지 */}
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.08 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z"
-                  fill="#FFFFFF"
-                />
-              </svg>
-
-              <span
-                className="flex items-center text-center"
-                style={{
-                  fontFamily: 'Roboto',
-                  fontStyle: 'normal',
-                  fontWeight: 100,
-                  fontSize: '13.9px',
-                  lineHeight: '20px',
-                  color: '#FFFFFF',
-                }}
-              >
-                GitHub로 계속하기
-              </span>
-            </button>
-          </div>
-
-          {/* Terms Text */}
-          <div
-            className="flex flex-col items-center"
-            style={{
-              width: '382px',
-              height: '39px',
-            }}
-          >
-            <p
-              className="flex items-center text-center"
-              style={{
-                fontFamily: 'Roboto',
-                fontStyle: 'normal',
-                fontWeight: 100,
-                fontSize: '11.4px',
-                lineHeight: '20px',
-                color: '#71717B',
-              }}
-            >
-              계속 진행하면 ProjecTree의 이용약관 및 개인정보처리방침에 동의하는
-              것으로 간주 합니다.
+            <p className="text-gray-500 text-lg tracking-tight break-keep whitespace-pre-line">
+              아이디어를 트리 구조로 정리하고,{'\n'}팀과 함께 성장하세요.
             </p>
           </div>
-        </div>
+
+          <div className="flex flex-col gap-4 pt-2">
+            {/* Google Login Button */}
+            <motion.div
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            >
+              <Button
+                variant="outline"
+                className="h-12 w-full text-base font-medium border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-slate-700 justify-center tracking-tight transition-all rounded-md shadow-sm"
+                onClick={handleLogin}
+              >
+                <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
+                  <path
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    fill="#4285F4"
+                  />
+                  <path
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    fill="#34A853"
+                  />
+                  <path
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    fill="#FBBC05"
+                  />
+                  <path
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    fill="#EA4335"
+                  />
+                </svg>
+                Google로 시작하기
+              </Button>
+            </motion.div>
+
+            {/* GitHub Login Button */}
+            <motion.div
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            >
+              <Button
+                className="h-12 w-full text-base font-medium bg-gray-900 hover:bg-gray-800 text-white justify-center tracking-tight transition-all rounded-md shadow-lg shadow-gray-900/10"
+                onClick={handleLogin}
+              >
+                <Github className="mr-3 h-5 w-5" />
+                GitHub로 시작하기
+              </Button>
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

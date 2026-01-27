@@ -47,25 +47,25 @@ export default function WorkspaceOnboardingPage() {
     }
   };
 
-
-
   return (
     <div className="flex min-h-screen w-full bg-[var(--figma-tech-green)] font-['Pretendard'] overflow-hidden">
-
       {/* Left Side (Marketing/Vision) */}
       <div className="hidden lg:flex flex-1 relative flex-col justify-between p-12 overflow-hidden">
         {/* Abstract Geometric Lines Pattern */}
         <div
           className="absolute inset-0 opacity-20 pointer-events-none"
           style={{
-            backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(-45deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px'
+            backgroundImage:
+              'linear-gradient(45deg, rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(-45deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
           }}
         />
 
         {/* Brand */}
         <div className="relative z-10">
-          <h1 className="text-xl font-bold text-[var(--figma-neon-green)] tracking-widest">PROJECTREE</h1>
+          <h1 className="text-xl font-bold text-[var(--figma-neon-green)] tracking-widest">
+            PROJECTREE
+          </h1>
         </div>
 
         {/* Stepper (Minimalist Overlay) */}
@@ -94,7 +94,9 @@ export default function WorkspaceOnboardingPage() {
             <>
               {/* Step Indicator */}
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-[var(--figma-tech-green)] font-bold text-lg">0{currentStep}</span>
+                <span className="text-[var(--figma-tech-green)] font-bold text-lg">
+                  0{currentStep}
+                </span>
                 <div className="h-[2px] w-12 bg-gray-200">
                   <div
                     className="h-full bg-[var(--figma-neon-green)] transition-all duration-300"
