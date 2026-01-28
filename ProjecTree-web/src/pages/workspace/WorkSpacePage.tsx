@@ -107,7 +107,7 @@ export default function WorkSpacePage() {
         {/* Canvas */}
         <main className="flex-1 min-h-0 overflow-hidden">
           {activeTab === 'tree-editor' &&
-            (connectionStatus === 'connected' ? (
+            (connectionStatus === 'CONNECTED' ? (
               <TreeCanvas
                 initialNodes={mockNodes as FlowNode[]}
                 onlineUsers={mockUsers}

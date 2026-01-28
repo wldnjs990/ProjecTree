@@ -1,17 +1,17 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 export type TagType =
-  | "project"
-  | "epic"
-  | "story"
-  | "task"
-  | "advanced"
-  | "frontend"
-  | "backend"
+  | 'project'
+  | 'epic'
+  | 'story'
+  | 'task'
+  | 'advanced'
+  | 'FE'
+  | 'BE'
   // 노드 상태 (types2 NodeStatus)
-  | "TODO"
-  | "IN_PROGRESS"
-  | "DONE";
+  | 'TODO'
+  | 'IN_PROGRESS'
+  | 'DONE';
 
 interface StatusTagProps {
   type: TagType;
@@ -28,33 +28,37 @@ const tagStyles: Record<
   TagType,
   { bg: string; text: string; defaultLabel: string }
 > = {
-  project: { bg: "bg-[#64748B]", text: "text-white", defaultLabel: "프로젝트" },
-  epic: { bg: "bg-[#8B5CF6]", text: "text-white", defaultLabel: "Epic" },
-  story: { bg: "bg-[#00D492]", text: "text-white", defaultLabel: "Story" },
+  project: { bg: 'bg-[#64748B]', text: 'text-white', defaultLabel: '프로젝트' },
+  epic: { bg: 'bg-[#8B5CF6]', text: 'text-white', defaultLabel: 'Epic' },
+  story: { bg: 'bg-[#00D492]', text: 'text-white', defaultLabel: 'Story' },
   task: {
-    bg: "bg-[#2B7FFF]",
-    text: "text-white",
-    defaultLabel: "Task",
+    bg: 'bg-[#2B7FFF]',
+    text: 'text-white',
+    defaultLabel: 'Task',
   },
   advanced: {
-    bg: "bg-[#0891B2]",
-    text: "text-white",
-    defaultLabel: "Advanced",
+    bg: 'bg-[#0891B2]',
+    text: 'text-white',
+    defaultLabel: 'Advanced',
   },
-  frontend: {
-    bg: "bg-[#F97316]",
-    text: "text-white",
-    defaultLabel: "FrontEnd",
+  FE: {
+    bg: 'bg-[#F97316]',
+    text: 'text-white',
+    defaultLabel: 'FrontEnd',
   },
-  backend: {
-    bg: "bg-[#6366F1]",
-    text: "text-white",
-    defaultLabel: "BackEnd",
+  BE: {
+    bg: 'bg-[#6366F1]',
+    text: 'text-white',
+    defaultLabel: 'BackEnd',
   },
   // 노드 상태 (types2 NodeStatus)
-  TODO: { bg: "bg-[#64748B]", text: "text-white", defaultLabel: "대기" },
-  IN_PROGRESS: { bg: "bg-[#2B7FFF]", text: "text-white", defaultLabel: "진행중" },
-  DONE: { bg: "bg-[#00C950]", text: "text-white", defaultLabel: "완료" },
+  TODO: { bg: 'bg-[#64748B]', text: 'text-white', defaultLabel: '대기' },
+  IN_PROGRESS: {
+    bg: 'bg-[#2B7FFF]',
+    text: 'text-white',
+    defaultLabel: '진행중',
+  },
+  DONE: { bg: 'bg-[#00C950]', text: 'text-white', defaultLabel: '완료' },
 };
 
 export function StatusTag({ type, label, className }: StatusTagProps) {
@@ -63,10 +67,10 @@ export function StatusTag({ type, label, className }: StatusTagProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2 py-0.5 text-[8px] font-medium",
+        'inline-flex items-center rounded-full px-2 py-0.5 text-[8px] font-medium',
         style.bg,
         style.text,
-        className,
+        className
       )}
     >
       {label ?? style.defaultLabel}

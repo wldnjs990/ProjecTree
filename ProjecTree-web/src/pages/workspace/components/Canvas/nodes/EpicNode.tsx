@@ -2,20 +2,21 @@ import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { cn } from '@/lib/utils';
 import { StatusTag } from '@/components/custom/StatusTag';
-import {
-  PriorityBadge,
-  type Priority,
-} from '@/components/custom/PriorityBadge';
+import { PriorityBadge } from '@/components/custom/PriorityBadge';
+import type {
+  FlowNodeData,
+  ServerPriority,
+} from '@/pages/workspace/types/node';
 
 export interface EpicNodeData extends Record<string, unknown> {
   title: string;
   status: 'TODO' | 'IN_PROGRESS' | 'DONE';
   taskId: string;
-  priority?: Priority;
+  priority?: ServerPriority;
   difficult?: number;
 }
 
-export type EpicNodeType = Node<EpicNodeData, 'epic'>;
+export type EpicNodeType = Node<FlowNodeData, 'epic'>;
 
 function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
   const nodeData = data;
