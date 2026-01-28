@@ -25,7 +25,6 @@ export const mockNodesApiResponse: NodesApiResponse = {
         identifier: 'PROJ-001',
         taskType: null,
         status: 'IN_PROGRESS',
-        difficult: 3,
       },
     },
     {
@@ -39,7 +38,6 @@ export const mockNodesApiResponse: NodesApiResponse = {
         identifier: 'EPIC-001',
         taskType: null,
         status: 'DONE',
-        difficult: 5,
       },
     },
     {
@@ -53,7 +51,6 @@ export const mockNodesApiResponse: NodesApiResponse = {
         identifier: 'STORY-001',
         taskType: null,
         status: 'IN_PROGRESS',
-        difficult: 3,
       },
     },
     {

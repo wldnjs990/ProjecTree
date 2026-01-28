@@ -15,7 +15,7 @@ export interface ConfirmedNodeData {
   // NodeData에서 (노드 목록)
   status: NodeStatus;
   priority?: Priority;
-  difficult: number;
+  difficult?: number; // TASK, ADVANCED 타입에만 존재
   // NodeDetailData에서 (상세 API)
   assignee: Assignee | null;
   note: string;

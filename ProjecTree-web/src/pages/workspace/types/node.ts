@@ -22,7 +22,7 @@ export interface ServerNodeData {
   identifier: string;
   taskType: ServerTaskType;
   nodeStatus: ServerNodeStatus;
-  difficult: number;
+  difficult?: number; // TASK, ADVANCED 타입에만 존재
 }
 
 /** 서버에서 받는 노드 형식 */
