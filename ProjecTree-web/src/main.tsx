@@ -39,6 +39,9 @@ async function enableMocking() {
 
 // 1. 모킹 설정이 끝난 후에 -> 2. React 앱을 렌더링합니다.
 // enableMocking이 항상 Promise를 반환하므로, 개발/배포 환경 모두 안전하게 렌더링됩니다.
-enableMocking().then(() => {
-  createRoot(document.getElementById('root')!).render(<App />);
-});
+// enableMocking().then(() => {
+//   createRoot(document.getElementById('root')!).render(<App />);
+// });
+
+// Web RTC 테스트 할 때 위 enableMocking().then(...) 부분을 주석 처리하고 아래 라인 주석 풀고 실행
+createRoot(document.getElementById('root')!).render(<App />);
