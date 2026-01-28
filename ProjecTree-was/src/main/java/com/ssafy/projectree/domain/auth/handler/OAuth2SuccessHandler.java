@@ -12,6 +12,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -30,6 +31,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtUtils jwtUtils; // JWT 생성 클래스
     private final ObjectMapper om;
+    @Value("${WEB_SERVER_URI}")
+    private String webServerURI;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, IOException {
@@ -38,14 +41,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         response.addCookie(cookie);
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-        PrintWriter writer = response.getWriter();
-        writer.println(om.writeValueAsString(
-                CommonResponse.success(
-                        SuccessCode.SUCCESS,
-                        Map.of("accessToken", jwt.getAccessToken()),
-                        "OAuth2 로그인 성공"
-                )
-        ));
-        writer.flush();
+        response.sendRedirect(webServerURI+"?token="+jwt.getAccessToken());
     }
 }
