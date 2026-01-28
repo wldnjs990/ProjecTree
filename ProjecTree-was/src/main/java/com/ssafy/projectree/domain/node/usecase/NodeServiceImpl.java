@@ -4,10 +4,13 @@ import com.ssafy.projectree.domain.ai.dto.AiCandidateCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiNodeCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiTechRecommendDto;
 import com.ssafy.projectree.domain.ai.service.InferenceService;
+import com.ssafy.projectree.domain.member.model.entity.Member;
+import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
 import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
+import com.ssafy.projectree.domain.node.api.dto.NodeUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.TechStackRecommendDto;
 import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
 import com.ssafy.projectree.domain.node.model.entity.Node;
@@ -27,73 +30,103 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Transactional
 public class NodeServiceImpl implements NodeService {
-	private final InferenceService inferenceService;
-	private final NodeRepository nodeRepository;
-	private final CandidateRepository candidateRepository;
-	private final NodeTreeRepository nodeTreeRepository;
+    private final InferenceService inferenceService;
+    private final MemberRepository memberRepository;
+    private final NodeRepository nodeRepository;
+    private final CandidateRepository candidateRepository;
+    private final NodeTreeRepository nodeTreeRepository;
 
 
-	private ProjectNode findRootNode(Long nodeId){
-		PageRequest limitOne = PageRequest.of(0, 1);
+    private ProjectNode findRootNode(Long nodeId) {
+        PageRequest limitOne = PageRequest.of(0, 1);
 
-		return nodeTreeRepository.findRoot(nodeId, limitOne).stream()
-				.findFirst().orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR, "프로젝트 노드를 찾을 수 없습니다."));
-	}
+        return nodeTreeRepository.findRoot(nodeId, limitOne).stream()
+                .findFirst().orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR, "프로젝트 노드를 찾을 수 없습니다."));
+    }
 
-	@Override
-	public NodeReadDto.Response getNodeDetails(Long nodeId) {
-		return null;
-	}
+    @Override
+    public NodeReadDto.Response getNodeDetails(Long nodeId) {
+        return null;
+    }
 
-	@Override
-	public NodeTreeReadDto.Response getNodeTree(Long workspaceId) {
-		return null;
-	}
+    @Override
+    public NodeTreeReadDto.Response getNodeTree(Long workspaceId) {
+        return null;
+    }
 
-	@Override
-	public NodeCreateDto.Response createNode(Long candidateId, Long parentId, NodeCreateDto.Request request) {
+    @Override
+    public NodeCreateDto.Response createNode(Long candidateId, Long parentId, NodeCreateDto.Request request) {
 
-		ProjectNode projectNode = findRootNode(parentId);
-		//ToDo: candidate id에 대한 락 구현 - Redis 캐시 연동 이후
-		AiNodeCreateDto.Response response = inferenceService.createNode(AiNodeCreateDto.Request.builder()
-				.candidateId(candidateId)
-				.parentId(parentId)
-				.xPos(request.getXPos())
-				.yPos(request.getYPos())
-				.workspaceId(projectNode.getWorkspace().getId())
-				.build()
-		);
-		return NodeCreateDto.Response.builder().nodeId(response.getNodeId()).build();
-	}
+        ProjectNode projectNode = findRootNode(parentId);
+        //ToDo: candidate id에 대한 락 구현 - Redis 캐시 연동 이후
+        AiNodeCreateDto.Response response = inferenceService.createNode(AiNodeCreateDto.Request.builder()
+                .candidateId(candidateId)
+                .parentId(parentId)
+                .xPos(request.getXPos())
+                .yPos(request.getYPos())
+                .workspaceId(projectNode.getWorkspace().getId())
+                .build()
+        );
+        return NodeCreateDto.Response.builder().nodeId(response.getNodeId()).build();
+    }
 
-	@Override
-	public CandidateCreateDto.Response createCandidate(Long parentId) {
-		ProjectNode projectNode = findRootNode(parentId);
-		//ToDo: parent id에 대한 락 구현 - Redis 캐시 연동 이후
-		AiCandidateCreateDto.Response candidate = inferenceService.createCandidate(AiCandidateCreateDto.Request.builder()
-				.workspaceId(projectNode.getWorkspace().getId())
-				.nodeId(parentId)
-				.candidateCount(3)
-				.build());
-		return CandidateCreateDto.Response.builder()
-				.candidates(candidate.getCandidates())
-				.build();
-	}
+    @Override
+    public CandidateCreateDto.Response createCandidate(Long parentId) {
+        ProjectNode projectNode = findRootNode(parentId);
+        //ToDo: parent id에 대한 락 구현 - Redis 캐시 연동 이후
+        AiCandidateCreateDto.Response candidate = inferenceService.createCandidate(AiCandidateCreateDto.Request.builder()
+                .workspaceId(projectNode.getWorkspace().getId())
+                .nodeId(parentId)
+                .candidateCount(3)
+                .build());
+        return CandidateCreateDto.Response.builder()
+                .candidates(candidate.getCandidates())
+                .build();
+    }
 
-	@Override
-	public TechStackRecommendDto.Response recommendTechStack(Long nodeId) {
-		ProjectNode projectNode = findRootNode(nodeId);
-		Class<? extends Node> nodeClass = nodeRepository.findNodeTypeById(nodeId).orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR, "노드를 찾을 수 없습니다"));
-		if (!(nodeClass.equals(TaskNode.class) || nodeClass.equals(AdvanceNode.class))) {
-			throw new BusinessLogicException(ErrorCode.NODE_TYPE_NOT_SUPPORT_ERROR, "해당 작업은 Task와 Advance 노드에서만 수행할 수 있습니다.");
-		}
-		AiTechRecommendDto.Response response = inferenceService.recommendTechStack(AiTechRecommendDto.Request.builder()
-				.nodeId(nodeId)
-				.workspaceId(projectNode.getWorkspace().getId())
-				.build());
-		return TechStackRecommendDto.Response.builder()
-				.techs(response.getTechs())
-				.comparison(response.getComparison())
-				.build();
-	}
+    @Override
+    public TechStackRecommendDto.Response recommendTechStack(Long nodeId) {
+        ProjectNode projectNode = findRootNode(nodeId);
+        Class<? extends Node> nodeClass = nodeRepository.findNodeTypeById(nodeId).orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR, "노드를 찾을 수 없습니다"));
+        if (!(nodeClass.equals(TaskNode.class) || nodeClass.equals(AdvanceNode.class))) {
+            throw new BusinessLogicException(ErrorCode.NODE_TYPE_NOT_SUPPORT_ERROR, "해당 작업은 Task와 Advance 노드에서만 수행할 수 있습니다.");
+        }
+        AiTechRecommendDto.Response response = inferenceService.recommendTechStack(AiTechRecommendDto.Request.builder()
+                .nodeId(nodeId)
+                .workspaceId(projectNode.getWorkspace().getId())
+                .build());
+        return TechStackRecommendDto.Response.builder()
+                .techs(response.getTechs())
+                .comparison(response.getComparison())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request) {
+
+        Node node = nodeRepository.findById(nodeId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
+
+        // 1. 타입 매칭 및 난이도 설정 (Pattern Matching 활용)
+        if (request.getDifficult() != null) {
+            if (node instanceof TaskNode taskNode) {
+                taskNode.setDifficult(request.getDifficult());
+            } else if (node instanceof AdvanceNode advanceNode) {
+                advanceNode.setDifficult(request.getDifficult());
+            }
+        }
+
+        // 2. 기본 정보 업데이트
+        if (request.getStatus() != null) node.setStatus(request.getStatus());
+        if (request.getPriority() != null) node.setPriority(request.getPriority());
+        if (request.getNote() != null) node.setNote(request.getNote());
+
+        // 3. 담당자 변경
+        if (request.getAssignee() != null) {
+            Member assignee = memberRepository.findById(request.getAssignee())
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR));
+            node.setMember(assignee);
+        }
+    }
 }
