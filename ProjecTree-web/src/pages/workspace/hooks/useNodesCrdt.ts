@@ -52,6 +52,7 @@ export const useNodesCrdt = ({
       nodes.push(yjsNodeToFlowNode(yjsNode));
     });
 
+    console.log(nodes);
     setNodes(nodes);
   }, [setNodes]);
 
@@ -69,6 +70,7 @@ export const useNodesCrdt = ({
 
     // 초기 동기화 완료 시 처리
     const handleSync = (isSynced: boolean) => {
+      console.log('싱크', isSynced);
       if (isSynced) {
         // 서버에 데이터가 없으면 초기 노드로 세팅
         if (yNodes.size === 0 && initialNodes.length > 0) {
@@ -102,6 +104,8 @@ export const useNodesCrdt = ({
     // 이미 동기화된 상태라면 즉시 처리
     if (client.provider.synced) {
       handleSync(true);
+    } else {
+      console.log('어쨰서');
     }
 
     return () => {

@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
-import { MiniMap } from "@xyflow/react";
+import { cn } from '@/lib/utils';
+import { MiniMap } from '@xyflow/react';
 
 interface MinimapPanelProps {
   className?: string;
@@ -11,29 +11,29 @@ interface MinimapPanelProps {
  */
 export function MinimapPanel({ className }: MinimapPanelProps) {
   return (
-    <div className={cn("flex flex-col items-end gap-3", className)}>
+    <div className={cn('flex flex-col items-end gap-3', className)}>
       {/* Minimap Container */}
       <div className="glass rounded-3xl overflow-hidden shadow-lg border border-white/20">
         <div className="w-43.25 h-33 bg-[#808080] rounded-3xl overflow-hidden">
           <MiniMap
             nodeColor={(node) => {
               switch (node.type) {
-                case "project":
-                  return "#64748B";
-                case "epic":
-                  return "#8B5CF6";
-                case "story":
-                  return "#2B7FFF";
-                case "frontendTask":
-                  return "#00D492";
-                case "backendTask":
-                  return "#06B6D4";
-                case "frontendAdvanced":
-                  return "#00D492";
-                case "backendAdvanced":
-                  return "#0891B2";
+                case 'PROJECT':
+                  return '#64748B';
+                case 'EPIC':
+                  return '#8B5CF6';
+                case 'STORY':
+                  return '#2B7FFF';
+                case 'TASK':
+                  return '#00D492';
+                case 'ADVANCE':
+                  return '#06B6D4';
+                case 'frontendAdvanced':
+                  return '#00D492';
+                case 'backendAdvanced':
+                  return '#0891B2';
                 default:
-                  return "#DEDEDE";
+                  return '#DEDEDE';
               }
             }}
             maskColor="rgba(0, 0, 0, 0.1)"

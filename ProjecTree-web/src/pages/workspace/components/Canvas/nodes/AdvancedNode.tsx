@@ -5,7 +5,7 @@ import { StatusTag } from '@/components/custom/StatusTag';
 import { PriorityBadge } from '@/components/custom/PriorityBadge';
 import type { FlowNodeData } from '@/pages/workspace/types/node';
 
-export type AdvancedNodeType = Node<FlowNodeData, 'advanced'>;
+export type AdvancedNodeType = Node<FlowNodeData, 'ADVANCE'>;
 
 function AdvancedNodeComponent({
   data,
@@ -46,7 +46,7 @@ function AdvancedNodeComponent({
 
       {/* Tags */}
       <div className="flex flex-wrap gap-1.5 mb-2">
-        <StatusTag type="advanced" />
+        <StatusTag type="ADVANCE" />
         {nodeData.taskType && <StatusTag type={nodeData.taskType} />}
         <StatusTag type={nodeData.status} />
       </div>

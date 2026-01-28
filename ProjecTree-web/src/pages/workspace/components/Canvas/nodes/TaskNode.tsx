@@ -2,29 +2,17 @@ import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { cn } from '@/lib/utils';
 import { StatusTag } from '@/components/custom/StatusTag';
-import {
-  PriorityBadge,
-  type Priority,
-} from '@/components/custom/PriorityBadge';
+import { PriorityBadge } from '@/components/custom/PriorityBadge';
+import type { FlowNodeData } from '@/pages/workspace/types/node';
 
-export interface TaskNodeData extends Record<string, unknown> {
-  title: string;
-  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
-  taskId: string;
-  category: 'frontend' | 'backend';
-  priority?: Priority;
-  difficult?: number;
-}
-
-export type TaskNodeType = Node<TaskNodeData, 'story'>;
+export type TaskNodeType = Node<FlowNodeData, 'TASK'>;
 
 function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
   const nodeData = data;
 
   const borderColor =
-    nodeData.category === 'frontend' ? 'border-[#F97316]' : 'border-[#6366F1]';
-  const bgColor =
-    nodeData.category === 'frontend' ? 'bg-[#FFF7ED]' : 'bg-[#EEF2FF]';
+    nodeData.taskType === 'FE' ? 'border-[#F97316]' : 'border-[#6366F1]';
+  const bgColor = nodeData.taskType === 'FE' ? 'bg-[#FFF7ED]' : 'bg-[#EEF2FF]';
 
   return (
     <div
@@ -33,7 +21,7 @@ function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
         bgColor,
         borderColor,
         selected && 'ring-2 ring-offset-2',
-        nodeData.category === 'frontend' ? 'ring-[#F97316]' : 'ring-[#6366F1]'
+        nodeData.taskType === 'FE' ? 'ring-[#F97316]' : 'ring-[#6366F1]'
       )}
     >
       {/* Priority Badge */}
@@ -49,14 +37,14 @@ function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
         position={Position.Top}
         className={cn(
           'w-2 h-2 border-2 border-white',
-          nodeData.category === 'frontend' ? 'bg-[#00D492]' : 'bg-[#06B6D4]'
+          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#06B6D4]'
         )}
       />
 
       {/* Tags */}
       <div className="flex flex-wrap gap-1.5 mb-2">
-        <StatusTag type="task" />
-        <StatusTag type={nodeData.category} />
+        <StatusTag type="TASK" />
+        {nodeData.taskType && <StatusTag type={nodeData.taskType} />}
         <StatusTag type={nodeData.status} />
       </div>
 
@@ -87,7 +75,7 @@ function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
         position={Position.Bottom}
         className={cn(
           'w-2 h-2 border-2 border-white',
-          nodeData.category === 'frontend' ? 'bg-[#00D492]' : 'bg-[#0891B2]'
+          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#0891B2]'
         )}
       />
     </div>

@@ -5,11 +5,11 @@ import type { Node } from '@xyflow/react';
  */
 function getNodeLevel(nodeType: string): number {
   const levelMap: Record<string, number> = {
-    project: 0,
-    epic: 1,
-    story: 2,
-    task: 3,
-    advanced: 4,
+    PROJECT: 0,
+    EPIC: 1,
+    STORY: 2,
+    TASK: 3,
+    ADVANCE: 4,
   };
   return levelMap[nodeType] ?? 0;
 }
@@ -35,9 +35,9 @@ export function transformNodesForSpecView(nodes: Node[]) {
     data: {
       ...node.data,
       label: node.data.title || '',
-      level: getNodeLevel(node.type ?? ''),
+      level: getNodeLevel(node.type ?? 'ADVANCE'),
       complexity: node.data.difficult,
-      status: mapStatus((node.data.status as string) ?? 'pending'),
+      status: mapStatus((node.data.status as string) ?? 'TODO'),
       priority: node.data.priority || 'P2',
       assignee: node.data.assignee,
     },

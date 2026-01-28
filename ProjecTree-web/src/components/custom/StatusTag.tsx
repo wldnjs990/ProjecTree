@@ -1,11 +1,11 @@
 import { cn } from '@/lib/utils';
 
 export type TagType =
-  | 'project'
-  | 'epic'
-  | 'story'
-  | 'task'
-  | 'advanced'
+  | 'PROJECT'
+  | 'EPIC'
+  | 'STORY'
+  | 'TASK'
+  | 'ADVANCE'
   | 'FE'
   | 'BE'
   // 노드 상태 (types2 NodeStatus)
@@ -28,15 +28,15 @@ const tagStyles: Record<
   TagType,
   { bg: string; text: string; defaultLabel: string }
 > = {
-  project: { bg: 'bg-[#64748B]', text: 'text-white', defaultLabel: '프로젝트' },
-  epic: { bg: 'bg-[#8B5CF6]', text: 'text-white', defaultLabel: 'Epic' },
-  story: { bg: 'bg-[#00D492]', text: 'text-white', defaultLabel: 'Story' },
-  task: {
+  PROJECT: { bg: 'bg-[#64748B]', text: 'text-white', defaultLabel: '프로젝트' },
+  EPIC: { bg: 'bg-[#8B5CF6]', text: 'text-white', defaultLabel: 'Epic' },
+  STORY: { bg: 'bg-[#00D492]', text: 'text-white', defaultLabel: 'Story' },
+  TASK: {
     bg: 'bg-[#2B7FFF]',
     text: 'text-white',
     defaultLabel: 'Task',
   },
-  advanced: {
+  ADVANCE: {
     bg: 'bg-[#0891B2]',
     text: 'text-white',
     defaultLabel: 'Advanced',

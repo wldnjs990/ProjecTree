@@ -2,20 +2,10 @@ import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { cn } from '@/lib/utils';
 import { StatusTag } from '@/components/custom/StatusTag';
-import {
-  PriorityBadge,
-  type Priority,
-} from '@/components/custom/PriorityBadge';
+import { PriorityBadge } from '@/components/custom/PriorityBadge';
+import type { FlowNodeData } from '@/pages/workspace/types/node';
 
-export interface StoryNodeData extends Record<string, unknown> {
-  title: string;
-  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
-  taskId: string;
-  priority?: Priority;
-  difficult?: number;
-}
-
-export type StoryNodeType = Node<StoryNodeData, 'story'>;
+export type StoryNodeType = Node<FlowNodeData, 'STORY'>;
 
 function StoryNodeComponent({ data, selected }: NodeProps<StoryNodeType>) {
   const nodeData = data;
@@ -43,7 +33,7 @@ function StoryNodeComponent({ data, selected }: NodeProps<StoryNodeType>) {
 
       {/* Tags */}
       <div className="flex flex-wrap gap-1.5 mb-2">
-        <StatusTag type="story" />
+        <StatusTag type="STORY" />
         <StatusTag type={nodeData.status} />
       </div>
 

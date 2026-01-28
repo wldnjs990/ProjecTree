@@ -6,22 +6,14 @@ import {
   Bookmark,
   CheckSquare,
   Cpu,
-  Plus,
   Briefcase,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-
-export type ProjectItemType =
-  | 'project'
-  | 'epic'
-  | 'story'
-  | 'task'
-  | 'advanced';
+import type { ServerNodeType } from '../../types/node';
 
 export interface ProjectItem {
   id: string;
-  type: ProjectItemType;
+  type: ServerNodeType;
   title: string;
   children?: ProjectItem[];
 }
@@ -34,11 +26,11 @@ interface ProjectTreeItemProps {
 }
 
 const TYPE_ICONS = {
-  project: { icon: Briefcase, color: 'text-indigo-600' },
-  epic: { icon: Box, color: 'text-purple-500' },
-  story: { icon: Bookmark, color: 'text-blue-500' },
-  task: { icon: CheckSquare, color: 'text-green-500' },
-  advanced: { icon: Cpu, color: 'text-orange-500' },
+  PROJECT: { icon: Briefcase, color: 'text-indigo-600' },
+  EPIC: { icon: Box, color: 'text-purple-500' },
+  STORY: { icon: Bookmark, color: 'text-blue-500' },
+  TASK: { icon: CheckSquare, color: 'text-green-500' },
+  ADVANCE: { icon: Cpu, color: 'text-orange-500' },
 };
 
 export function ProjectTreeItem({

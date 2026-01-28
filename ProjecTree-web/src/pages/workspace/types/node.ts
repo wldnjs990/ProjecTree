@@ -3,7 +3,7 @@ import type { Node } from '@xyflow/react';
 // ===== 서버 응답 타입 =====
 
 /** 서버에서 받는 노드 타입 */
-export type ServerNodeType = 'PROJECT' | 'EPIC' | 'STORY' | 'TASK' | 'ADVANCED';
+export type ServerNodeType = 'PROJECT' | 'EPIC' | 'STORY' | 'TASK' | 'ADVANCE';
 
 /** 서버에서 받는 노드 상태 */
 export type ServerNodeStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
@@ -80,7 +80,7 @@ export interface YjsNode {
 // ===== 스토어 타입 =====
 
 /** 연결 상태 */
-export type ConnectionStatus = 'DISCONNECTED' | 'CONNECTING' | 'CONNECTED';
+export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected';
 
 /** Edge 스타일 설정 */
 export interface EdgeStyle {

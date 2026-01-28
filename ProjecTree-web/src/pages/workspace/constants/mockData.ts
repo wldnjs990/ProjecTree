@@ -264,26 +264,10 @@ export const mockNodeDetails: Record<number, NodeDetailData> =
     ])
   );
 
-// ===== React Flow 변환용 유틸리티 =====
-
-// 백엔드 노드 타입 → React Flow 노드 타입 변환
-const nodeTypeMap: Record<string, string> = {
-  PROJECT: 'project',
-  EPIC: 'epic',
-  STORY: 'story',
-  TASK: 'task',
-};
-
-// 백엔드 taskType → frontend/backend 변환
-const taskTypeMap: Record<string, 'frontend' | 'backend'> = {
-  FE: 'frontend',
-  BE: 'backend',
-};
-
 // 백엔드 API 응답을 React Flow 노드로 변환
 export const mockNodes: Node[] = mockNodesApiResponse.data.map((node) => ({
   id: String(node.id),
-  type: nodeTypeMap[node.nodeType] || 'task',
+  type: node.nodeType || 'TASK',
   position: { x: node.position.xPos, y: node.position.yPos },
   parentId: node.parentId ? String(node.parentId) : undefined,
   data: {
@@ -291,7 +275,7 @@ export const mockNodes: Node[] = mockNodesApiResponse.data.map((node) => ({
     status: node.data.status,
     priority: node.data.priority,
     taskId: `#${node.data.identifier}`,
-    category: node.data.taskType ? taskTypeMap[node.data.taskType] : undefined,
+    taskType: node.data.taskType ? node.data.taskType : undefined,
     difficult: node.data.difficult,
   },
 }));

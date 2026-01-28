@@ -1,19 +1,11 @@
-import { memo } from "react";
-import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
-import { cn } from "@/lib/utils";
-import { StatusTag } from "@/components/custom/StatusTag";
-import {
-  PriorityBadge,
-  type Priority,
-} from "@/components/custom/PriorityBadge";
+import { memo } from 'react';
+import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
+import { cn } from '@/lib/utils';
+import { StatusTag } from '@/components/custom/StatusTag';
+import { PriorityBadge } from '@/components/custom/PriorityBadge';
+import type { FlowNodeData } from '@/pages/workspace/types/node';
 
-export interface ProjectNodeData extends Record<string, unknown> {
-  title: string;
-  status: "TODO" | "IN_PROGRESS" | "DONE";
-  priority?: Priority;
-}
-
-export type ProjectNodeType = Node<ProjectNodeData, "project">;
+export type ProjectNodeType = Node<FlowNodeData, 'PROJECT'>;
 
 function ProjectNodeComponent({ data, selected }: NodeProps<ProjectNodeType>) {
   const nodeData = data;
@@ -21,8 +13,8 @@ function ProjectNodeComponent({ data, selected }: NodeProps<ProjectNodeType>) {
   return (
     <div
       className={cn(
-        "relative bg-[#F5F3FF] rounded-2xl border-2 border-[#90A1B9] shadow-md p-3 min-w-40",
-        selected && "ring-2 ring-[#90A1B9] ring-offset-2",
+        'relative bg-[#F5F3FF] rounded-2xl border-2 border-[#90A1B9] shadow-md p-3 min-w-40',
+        selected && 'ring-2 ring-[#90A1B9] ring-offset-2'
       )}
     >
       {/* Priority Badge */}
@@ -34,7 +26,7 @@ function ProjectNodeComponent({ data, selected }: NodeProps<ProjectNodeType>) {
 
       {/* Tags */}
       <div className="flex gap-1.5 mb-2">
-        <StatusTag type="project" />
+        <StatusTag type="PROJECT" />
         <StatusTag type={nodeData.status} />
       </div>
 

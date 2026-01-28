@@ -1,11 +1,21 @@
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { Node } from "@xyflow/react";
-import { statusBadge, statusLabel, priorityBadge, specGridCols, indentLevel } from "../constants/specConfig";
-import type { NodeData } from "../types";
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { Node } from '@xyflow/react';
+import {
+  statusBadge,
+  statusLabel,
+  priorityBadge,
+  specGridCols,
+  indentLevel,
+} from '../constants/specConfig';
+import type { NodeData } from '../types';
 
 interface TaskGroupProps {
   task: Node;
@@ -20,19 +30,19 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
     <AccordionItem value={task.id} className="border-b-0">
       <AccordionTrigger
         className={cn(
-          "hover:no-underline p-0 [&>svg:last-child]:hidden",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2"
+          'hover:no-underline p-0 [&>svg:last-child]:hidden',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2'
         )}
       >
         <div
           aria-label={`태스크: ${data.label}`}
           className={cn(
-            "py-3 bg-sky-50 hover:bg-sky-100 transition-colors motion-reduce:transition-none border-b border-sky-200",
-            "items-center text-left w-full",
+            'py-3 bg-sky-50 hover:bg-sky-100 transition-colors motion-reduce:transition-none border-b border-sky-200',
+            'items-center text-left w-full',
             specGridCols
           )}
         >
-          <div className={cn("flex items-center gap-2", indentLevel.task)}>
+          <div className={cn('flex items-center gap-2', indentLevel.TASK)}>
             {advanceds.length > 0 ? (
               <div className="cursor-pointer hover:bg-sky-200 rounded p-0.5 transition-colors">
                 <ChevronRight
@@ -43,11 +53,23 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
             ) : (
               <span className="w-4" />
             )}
-            <div className="w-2 h-2 rounded-full bg-sky-500" aria-hidden="true" />
-            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-sky-100 text-sky-700">태스크</span>
+            <div
+              className="w-2 h-2 rounded-full bg-sky-500"
+              aria-hidden="true"
+            />
+            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-sky-100 text-sky-700">
+              태스크
+            </span>
           </div>
           <div className="flex justify-center">
-            <Badge className={cn("text-[10px] font-medium border", priorityBadge[data.priority])}>{data.priority}</Badge>
+            <Badge
+              className={cn(
+                'text-[10px] font-medium border',
+                priorityBadge[data.priority]
+              )}
+            >
+              {data.priority}
+            </Badge>
           </div>
           <div className="flex justify-center">
             <span
@@ -61,7 +83,11 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
             </span>
           </div>
           <div className="flex justify-center">
-            <Badge className={cn("text-xs font-normal", statusBadge[data.status])}>{statusLabel[data.status]}</Badge>
+            <Badge
+              className={cn('text-xs font-normal', statusBadge[data.status])}
+            >
+              {statusLabel[data.status]}
+            </Badge>
           </div>
           <div className="flex justify-center">
             {data.complexity ? (
@@ -69,7 +95,12 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <span
                     key={star}
-                    className={cn("text-xs", star <= data.complexity! ? "text-yellow-500" : "text-gray-300")}
+                    className={cn(
+                      'text-xs',
+                      star <= data.complexity!
+                        ? 'text-yellow-500'
+                        : 'text-gray-300'
+                    )}
                   >
                     ★
                   </span>
@@ -96,18 +127,30 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
               key={advanced.id}
               aria-label={`어드밴스: ${advancedData.label}`}
               className={cn(
-                "py-3 bg-gray-50 hover:bg-gray-100 transition-colors motion-reduce:transition-none border-b border-gray-200",
-                "grid items-center",
+                'py-3 bg-gray-50 hover:bg-gray-100 transition-colors motion-reduce:transition-none border-b border-gray-200',
+                'grid items-center',
                 specGridCols
               )}
             >
-              <div className={cn("flex items-center gap-2", indentLevel.advanced)}>
+              <div
+                className={cn('flex items-center gap-2', indentLevel.ADVANCE)}
+              >
                 <span className="w-4" />
-                <div className="w-2 h-2 rounded-full bg-gray-400" aria-hidden="true" />
-                <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">어드밴스</span>
+                <div
+                  className="w-2 h-2 rounded-full bg-gray-400"
+                  aria-hidden="true"
+                />
+                <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
+                  어드밴스
+                </span>
               </div>
               <div className="flex justify-center">
-                <Badge className={cn("text-[10px] font-medium border", priorityBadge[advancedData.priority])}>
+                <Badge
+                  className={cn(
+                    'text-[10px] font-medium border',
+                    priorityBadge[advancedData.priority]
+                  )}
+                >
                   {advancedData.priority}
                 </Badge>
               </div>
@@ -118,7 +161,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
                   className="font-medium text-sm truncate cursor-pointer hover:underline inline-block"
                   onClick={() => onNodeClick?.(advanced.id)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
+                    if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
                       onNodeClick?.(advanced.id);
                     }
@@ -128,7 +171,12 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
                 </span>
               </div>
               <div className="flex justify-center">
-                <Badge className={cn("text-xs font-normal", statusBadge[advancedData.status])}>
+                <Badge
+                  className={cn(
+                    'text-xs font-normal',
+                    statusBadge[advancedData.status]
+                  )}
+                >
                   {statusLabel[advancedData.status]}
                 </Badge>
               </div>
@@ -139,8 +187,10 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
                       <span
                         key={star}
                         className={cn(
-                          "text-xs",
-                          star <= advancedData.complexity! ? "text-yellow-500" : "text-gray-300"
+                          'text-xs',
+                          star <= advancedData.complexity!
+                            ? 'text-yellow-500'
+                            : 'text-gray-300'
                         )}
                       >
                         ★

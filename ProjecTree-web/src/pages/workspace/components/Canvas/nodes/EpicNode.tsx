@@ -3,20 +3,9 @@ import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { cn } from '@/lib/utils';
 import { StatusTag } from '@/components/custom/StatusTag';
 import { PriorityBadge } from '@/components/custom/PriorityBadge';
-import type {
-  FlowNodeData,
-  ServerPriority,
-} from '@/pages/workspace/types/node';
+import type { FlowNodeData } from '@/pages/workspace/types/node';
 
-export interface EpicNodeData extends Record<string, unknown> {
-  title: string;
-  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
-  taskId: string;
-  priority?: ServerPriority;
-  difficult?: number;
-}
-
-export type EpicNodeType = Node<FlowNodeData, 'epic'>;
+export type EpicNodeType = Node<FlowNodeData, 'EPIC'>;
 
 function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
   const nodeData = data;
@@ -44,7 +33,7 @@ function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
 
       {/* Tags */}
       <div className="flex gap-1.5 mb-2">
-        <StatusTag type="epic" />
+        <StatusTag type="EPIC" />
         <StatusTag type={nodeData.status} />
       </div>
 
