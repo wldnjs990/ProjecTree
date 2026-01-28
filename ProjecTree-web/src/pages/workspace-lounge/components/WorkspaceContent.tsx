@@ -7,18 +7,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Search,
-  Plus,
-  ChevronDown,
-  Clock,
-  Calendar,
-  ArrowDownAZ,
-  Loader2,
-} from 'lucide-react';
-import { useMemo, useState, useEffect } from 'react';
-import type { FilterType } from '../types';
+} from "@/components/ui/dropdown-menu";
+import { Search, Plus, ChevronDown, Clock, Calendar, ArrowDownAZ, Loader2, Layers } from "lucide-react";
+import { useMemo, useState, useEffect } from "react";
+import type { FilterType } from "../types";
 
 // 정렬 옵션 정의
 const sortOptions = [
@@ -52,6 +44,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
   // (2) 검색어 상태: 입력 반응성을 위해 로컬 state로 관리
   const initialQuery = searchParams.get('q') || '';
   const [inputValue, setInputValue] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery); // 필터링용 지연 상태
 
   // (3) 정렬 상태: URL에서 바로 조회 (기본값: recent)
   const sortByValue = searchParams.get('sort') || 'recent';
@@ -91,9 +84,14 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
     fetchWorkspaces();
   }, []);
 
-  // 3. Debounce 효과: 사용자가 입력을 멈춘 후 0.3초 뒤에 URL을 업데이트함
+  // 3. Debounce 효과: 사용자가 입력을 멈춘 후 0.3초 뒤에 URL과 필터 상태를 업데이트함
+  // 단, 입력값이 비어있을 경우(지웠을 때) 즉시 반영하여 반응성을 높임
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const updateState = () => {
+      // 필터링 상태 업데이트
+      setDebouncedQuery(inputValue);
+
+      // URL 업데이트
       setSearchParams((prev) => {
         if (inputValue) {
           prev.set('q', inputValue);
@@ -102,7 +100,14 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
         }
         return prev;
       });
-    }, 300);
+    };
+
+    if (inputValue === '') {
+      updateState();
+      return;
+    }
+
+    const timer = setTimeout(updateState, 300);
 
     return () => clearTimeout(timer);
   }, [inputValue, setSearchParams]);
@@ -129,11 +134,12 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
       return true;
     });
 
-    // (2) 2차 필터링: 검색어
+    // (2) 2차 필터링: 검색어 (Debounce 적용된 값 사용)
+    const query = debouncedQuery.toLowerCase();
     result = result.filter(
       (ws) =>
-        ws.title.toLowerCase().includes(inputValue.toLowerCase()) ||
-        ws.description.toLowerCase().includes(inputValue.toLowerCase())
+        ws.title.toLowerCase().includes(query) ||
+        ws.description.toLowerCase().includes(query)
     );
 
     // (3) 정렬 적용
@@ -155,21 +161,22 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-zinc-50/50 h-full">
       {/* Top Bar */}
-      <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-4 shrink-0">
-        <nav className="flex items-center gap-2 text-sm">
-          <span className="text-zinc-400">홈</span>
-          <span className="text-zinc-300">/</span>
-          <span className="font-medium text-zinc-900 tracking-tight">
-            워크스페이스
-          </span>
-        </nav>
+      <header className="flex items-center justify-between border-b border-white/20 bg-white/40 px-6 py-4 shrink-0 backdrop-blur-md sticky top-0 z-10 transition-all duration-300">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#4ADE80]/20 text-[#064E3B]">
+            <Layers className="h-5 w-5" />
+          </div>
+          <h1 className="text-xl font-bold text-zinc-800 tracking-tight">
+            나의 워크스페이스
+          </h1>
+        </div>
 
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 group-focus-within:text-[#064E3B] transition-colors duration-300" />
             <Input
               placeholder="워크스페이스 검색..."
-              className="w-64 pl-9 bg-white border-zinc-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 placeholder:text-zinc-400"
+              className="w-64 pl-10 bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-zinc-200 focus:border-zinc-300 placeholder:text-zinc-400/80 transition-all duration-300 rounded-xl hover:bg-white/60"
               value={inputValue}
               onChange={(e) => handleSearchChange(e.target.value)}
             />
@@ -178,8 +185,8 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="outline"
-                className="gap-2 bg-white border-zinc-200 shadow-sm text-zinc-600 hover:bg-zinc-50 min-w-[130px] justify-between"
+                variant="ghost"
+                className="gap-2 bg-white/50 border border-white/20 shadow-sm text-zinc-600 hover:bg-white/80 min-w-[130px] justify-between backdrop-blur-sm transition-all duration-300 rounded-xl"
               >
                 <div className="flex items-center gap-2">
                   <currentSortOption.icon className="h-4 w-4" />
@@ -206,7 +213,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
           </DropdownMenu>
 
           <Button
-            className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+            className="gap-2 bg-[#4ADE80]/80 hover:bg-[#4ADE80]/90 text-[#064E3B] font-bold shadow-lg shadow-green-500/20 border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(74,222,128,0.4)]"
             onClick={() => navigate('/workspace-onboarding')}
           >
             <Plus className="h-4 w-4" />새 워크스페이스
@@ -219,6 +226,12 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
         {isLoading ? (
           <div className="flex h-full w-full items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          </div>
+        ) : workspaces.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-zinc-500">
+
+            <p className="text-lg font-bold text-zinc-700 mb-1">참여 중인 워크스페이스가 없습니다.</p>
+            <p className="text-sm text-zinc-400">우측 상단의 버튼을 눌러 새로운 워크스페이스를 시작해보세요.</p>
           </div>
         ) : filteredWorkspaces.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
