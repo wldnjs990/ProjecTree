@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse, delay } from 'msw';
 import { workspaces as mockWorkspaces } from '../pages/workspace-lounge/data/mockData';
 import {
   mockFetchMessages,
@@ -11,12 +11,10 @@ import {
  */
 export const handlers = [
   // [GET] 내 워크스페이스 목록 조회
-  // 클라이언트가 'fetch("/api/workspaces/my")'를 요청하면 이 핸들러가 가로챕니다.
   http.get('/api/workspaces/my', () => {
-    // 가짜 응답(Mock Response)을 돌려줍니다.
     return HttpResponse.json({
       status: 'success',
-      data: mockWorkspaces, // mockData.ts 파일에 있는 더미 데이터를 그대로 반환
+      data: mockWorkspaces,
     });
   }),
 
@@ -24,8 +22,6 @@ export const handlers = [
   http.get('/api/members/check-nickname', ({ request }) => {
     const url = new URL(request.url);
     const query = url.searchParams.get('query');
-
-    // 'duplicate'라는 닉네임은 이미 사용 중이라고 가정
     const isTaken = query === 'duplicate';
 
     return HttpResponse.json({
@@ -64,6 +60,26 @@ export const handlers = [
     return HttpResponse.json({
       status: 'success',
       data: participants,
+    });
+  }), // <--- 콤마(,) 필수: 다음 핸들러와 구분하기 위해 꼭 필요합니다.
+
+  // [POST] 워크스페이스 생성
+  http.post('*/api/workspaces', async ({ request }) => {
+    try {
+      // 요청 본문 확인 (FormData 파싱만 시도)
+      await request.formData().catch(() => new FormData());
+    } catch {
+      // 무시
+    }
+
+    // 로딩 UI 테스트를 위해 3초 지연
+    await delay(3000);
+
+    return HttpResponse.json({
+      status: 'success',
+      data: {
+        workspaceId: 'new-workspace-id-123',
+      },
     });
   }),
 ];
