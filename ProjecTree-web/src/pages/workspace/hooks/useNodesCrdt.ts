@@ -41,7 +41,8 @@ export const useNodesCrdt = ({
       // 전역변수에 저장할 노드 생성
       const yjsNode: YjsNode = {
         id: nodeId,
-        type: yNode.get('type') as YjsNode['type'],
+        // 데이터 대문자로 받아오게 설계됐지만 만일을 위해 대문자 변환 추가
+        type: String(yNode.get('type')).toUpperCase() as YjsNode['type'],
         parentId:
           rawParentId === null
             ? undefined

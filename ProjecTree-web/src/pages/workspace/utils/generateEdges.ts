@@ -7,7 +7,7 @@ const EDGE_COLORS: Record<ServerNodeType, string> = {
   EPIC: '#8B5CF6', // purple
   STORY: '#2B7FFF', // blue
   TASK: '#00D492', // green
-  ADVANCED: '#06B6D4', // cyan
+  ADVANCE: '#06B6D4', // cyan
 };
 
 /** 기본 엣지 스타일 */
