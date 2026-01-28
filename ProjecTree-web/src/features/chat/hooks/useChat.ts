@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { useWebSocket } from './useWebSocket';
 import { chatSocket } from '../services/chatSocket';
-import { getMockParticipants } from '../types/mockData';
+import { fetchMessages, fetchParticipants } from '@/apis/chat.api';
+import { CHAT_PAGINATION_CONFIG } from '../types/mockData';
 
 export const useChat = (workspaceId: string) => {
   const { startTyping, stopTyping, isConnected } = useWebSocket(workspaceId);
@@ -44,20 +45,22 @@ export const useChat = (workspaceId: string) => {
 
   useEffect(() => {
     // 현재 워크스페이스가 초기화되었는지 확인
-    if (initializedRef.current === workspaceId) return;
+    if (initializedRef.current === workspaceId) {
+      return;
+    }
 
     // 활성 워크스페이스 설정
     setActiveWorkspace(workspaceId);
 
-    // 🆕 페이지네이션 기반 초기 로드
+    // 🆕 페이지네이션 기반 초기 로드 (API 사용)
     const initializeChat = async () => {
-      if (messages.length === 0) {
-        const { mockFetchMessages, CHAT_PAGINATION_CONFIG } =
-          await import('../types/mockData');
-
-        const initialMessages = await mockFetchMessages(workspaceId, {
+      try {
+        const response = await fetchMessages(workspaceId, {
           limit: CHAT_PAGINATION_CONFIG.initialLoad,
         });
+
+        // response = { status: 'success', data: ChatMessage[] }
+        const initialMessages = response.data || [];
 
         useChatStore.getState().setMessages(workspaceId, initialMessages);
 
@@ -70,17 +73,32 @@ export const useChat = (workspaceId: string) => {
             initialMessages[initialMessages.length - 1]?.id || null,
           initialLoaded: true,
         });
+      } catch (error) {
+        console.error('[useChat] 메시지 로드 실패:', error);
       }
     };
 
     initializeChat();
 
-    // 참여자 목록 로드
-    if (participants.length === 0) {
-      useChatStore
-        .getState()
-        .setParticipants(workspaceId, getMockParticipants(workspaceId));
-    }
+    // 참여자 목록 로드 (API 사용)
+    const loadParticipants = async () => {
+      if (participants.length === 0) {
+        try {
+          const response = await fetchParticipants(workspaceId);
+
+          // response = { status: 'success', data: ChatParticipant[] }
+          const participantsList = response.data || [];
+
+          useChatStore
+            .getState()
+            .setParticipants(workspaceId, participantsList);
+        } catch (error) {
+          console.error('[useChat] 참여자 로드 실패:', error);
+        }
+      }
+    };
+
+    loadParticipants();
 
     initializedRef.current = workspaceId;
   }, [
