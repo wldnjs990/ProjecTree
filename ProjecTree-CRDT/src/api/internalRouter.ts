@@ -40,40 +40,28 @@ internalRouter.post("/nodes", (req: Request, res: Response) => {
     yNode.set("type", node.nodeType);
     yNode.set("parentId", node.parentId);
 
-    // 3️⃣ position
-    let pos = yNode.get("position");
-    if (!pos || typeof pos.set !== "function") {
-      pos = new (nodes.constructor as any)();
-      yNode.set("position", pos);
-    }
-    pos.set("x", node.position.xPos);
-    pos.set("y", node.position.yPos);
-
-    // 4️⃣ data
-    let data = yNode.get("data");
-    if (!data || typeof data.set !== "function") {
-      data = new (nodes.constructor as any)();
-      yNode.set("data", data);
-    }
-
-    data.set("title", node.name);
-    data.set("taskId", node.data.identifier);
-    data.set("category", node.data.taskType);
-    data.set("status", node.data.status);
-    data.set("priority", node.data.priority);
-    data.set("difficult", node.data.difficult);
-
-    // 5️⃣ details
-    const details = doc.getMap("nodeDetails");
-    let detail = details.get(String(node.id));
-    if (!detail || typeof detail.set !== "function") {
-      detail = new (nodes.constructor as any)();
-      details.set(String(node.id), detail);
-    }
-
-    Object.entries(node.data).forEach(([k, v]) => {
-      if (v !== undefined) detail.set(k, v);
+    // 3️⃣ position (plain object)
+    yNode.set("position", {
+      x: node.position.xPos,
+      y: node.position.yPos,
     });
+
+    // 4️⃣ data (plain object)
+    yNode.set("data", {
+      title: node.name,
+      taskId: node.data.identifier,
+      category: node.data.taskType,
+      status: node.data.status,
+      priority: node.data.priority,
+      difficult: node.data.difficult,
+    });
+
+    // 5️⃣ details (plain object)
+    const details = doc.getMap("nodeDetails");
+    const detail = Object.fromEntries(
+      Object.entries(node.data).filter(([, v]) => v !== undefined),
+    );
+    details.set(String(node.id), detail);
   });
 
   // 응답 (전파는 y-websocket이 자동 처리)
