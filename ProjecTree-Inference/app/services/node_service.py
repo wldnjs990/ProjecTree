@@ -4,7 +4,15 @@ from sqlalchemy import insert
 from app.api.schemas.nodes import NodeCreateRequest, NodeCreateResponse
 from app.db.repository.node_repository import NodeRepository
 from app.db.repository.candidate_repository import CandidateRepository
-from app.db.models import Node, EpicNode, StoryNode, TaskNode, AdvanceNode, node_tree, Candidate
+from app.db.models import (
+    Node,
+    EpicNode,
+    StoryNode,
+    TaskNode,
+    AdvanceNode,
+    node_tree,
+    Candidate,
+)
 from app.db.schemas.node import NodeCreate, TaskNodeCreate
 from app.agents.enums import NodeType
 from app.core.log import langfuse_handler
@@ -15,10 +23,10 @@ logger = logging.getLogger(__name__)
 
 class NodeService:
     """노드 생성 서비스 클래스
-    
+
     메인 그래프를 호출하여 노드를 생성합니다.
     """
-    
+
     def __init__(
         self,
         node_repository: NodeRepository,
@@ -26,24 +34,22 @@ class NodeService:
     ):
         self.node_repository = node_repository
         self.candidate_repository = candidate_repository
-    
+
     async def create_node(
-        self,
-        db: Session,
-        request: NodeCreateRequest
+        self, db: Session, request: NodeCreateRequest
     ) -> NodeCreateResponse:
         """노드 생성
-        
+
         Args:
             db: 데이터베이스 세션
             request: 노드 생성 요청 정보 (workspace_id, candidate_id, parent_id)
-            
+
         Returns:
             생성된 노드 ID 및 상태
         """
         # 1. Main graph import (circular import 방지를 위해 함수 내에서 import)
         from app.agents.graph import builder
-        
+
         # 2. Graph 컴파일 및 실행
         graph = builder.compile()
         result = await graph.ainvoke(
@@ -52,27 +58,30 @@ class NodeService:
                 "parent_id": request.parent_id,
                 "candidate_id": request.candidate_id,
             },
-            config={"callbacks": [langfuse_handler]}
+            config={"callbacks": [langfuse_handler]},
         )
-        
+
         # 3. 결과에서 생성된 노드 정보 추출
         generated_node = result.get("generated_node")
         parent_info = result.get("parent_info")
         current_candidate_info = result.get("current_candidate_info")
         task_type = result.get("task_type")
-        
+
         if not generated_node or not parent_info:
-            raise ValueError("Graph execution failed: generated_node or parent_info is missing")
-        
+            error_msg = result.get("last_error") if result else "Unknown error"
+            raise ValueError(
+                f"Graph execution failed: generated_node or parent_info is missing. Last Error: {error_msg}"
+            )
+
         # 4. 부모 노드의 타입에 따라 자식 노드 타입 결정
         parent_node_type = parent_info.node_type
         child_node_type = self._get_child_node_type(parent_node_type)
-        
+
         # 5. 노드 생성 (타입별 분기)
         # generated_node가 dict인지 object인지 확인하고 적절히 접근
         logger.info(f"[DEBUG] generated_node type: {type(generated_node)}")
         logger.info(f"[DEBUG] generated_node content: {generated_node}")
-        
+
         if isinstance(generated_node, dict):
             node_name = generated_node.get("name")
             node_description = generated_node.get("description")
@@ -80,10 +89,12 @@ class NodeService:
         else:
             node_name = generated_node.name
             node_description = generated_node.description
-            node_difficulty = getattr(generated_node, 'difficulty', None)
-        
-        logger.info(f"[DEBUG] Extracted - name: {node_name}, description: {node_description}")
-        
+            node_difficulty = getattr(generated_node, "difficulty", None)
+
+        logger.info(
+            f"[DEBUG] Extracted - name: {node_name}, description: {node_description}"
+        )
+
         created_node = self._create_node_by_type(
             db=db,
             node_type=child_node_type,
@@ -92,22 +103,22 @@ class NodeService:
             task_type=task_type,
             difficulty=node_difficulty,
         )
-        
+
         # 6. node_tree 관계 저장 (부모-자식 관계)
         self._create_node_tree_relation(db, request.parent_id, created_node.id)
-        
+
         # 7. Candidate의 derivation_node_id 업데이트
         if current_candidate_info:
             self._update_candidate_derivation(db, request.candidate_id, created_node.id)
-        
+
         db.commit()
-        
+
         return NodeCreateResponse(
             node_id=created_node.id,
             parent_id=request.parent_id,
             candidate_id=request.candidate_id,
         )
-    
+
     def _get_child_node_type(self, parent_node_type: NodeType) -> NodeType:
         """부모 노드 타입에 따른 자식 노드 타입 결정"""
         type_mapping = {
@@ -117,7 +128,7 @@ class NodeService:
             NodeType.TASK: NodeType.ADVANCE,
         }
         return type_mapping.get(parent_node_type, NodeType.TASK)
-    
+
     def _create_node_by_type(
         self,
         db: Session,
@@ -128,8 +139,10 @@ class NodeService:
         difficulty: int = None,
     ) -> Node:
         """노드 타입에 따른 노드 생성 (Joined Table Inheritance)"""
-        logger.info(f"[DEBUG] _create_node_by_type called with name={name}, description={description[:50] if description else None}...")
-        
+        logger.info(
+            f"[DEBUG] _create_node_by_type called with name={name}, description={description[:50] if description else None}..."
+        )
+
         # 타입별 서브클래스 직접 생성 (Joined Table Inheritance 방식)
         if node_type == NodeType.EPIC:
             node = EpicNode(
@@ -170,14 +183,16 @@ class NodeService:
                 description=description,
                 status="TODO",
             )
-        
+
         db.add(node)
         db.flush()  # ID 생성을 위해 flush
-        
-        logger.info(f"[DEBUG] Created Node id={node.id}, name={node.name}, description={node.description[:50] if node.description else None}")
-        
+
+        logger.info(
+            f"[DEBUG] Created Node id={node.id}, name={node.name}, description={node.description[:50] if node.description else None}"
+        )
+
         return node
-    
+
     def _create_node_tree_relation(
         self,
         db: Session,
@@ -186,29 +201,37 @@ class NodeService:
     ):
         """node_tree 테이블에 부모-자식 관계 저장"""
         from sqlalchemy.dialects.postgresql import insert as pg_insert
-        
+
         # 직접 부모-자식 관계 (depth=1) - ON CONFLICT DO NOTHING으로 중복 방지
-        stmt = pg_insert(node_tree).values(
-            ancestor_id=parent_id,
-            descendant_id=child_id,
-            depth=1,
-        ).on_conflict_do_nothing(index_elements=['ancestor_id', 'descendant_id'])
+        stmt = (
+            pg_insert(node_tree)
+            .values(
+                ancestor_id=parent_id,
+                descendant_id=child_id,
+                depth=1,
+            )
+            .on_conflict_do_nothing(index_elements=["ancestor_id", "descendant_id"])
+        )
         db.execute(stmt)
-        
+
         # 조상들의 관계도 추가 (closure table 패턴)
         # 부모의 모든 조상에 대해 새로운 관계 추가
         ancestor_query = db.execute(
             node_tree.select().where(node_tree.c.descendant_id == parent_id)
         ).fetchall()
-        
+
         for ancestor in ancestor_query:
-            stmt = pg_insert(node_tree).values(
-                ancestor_id=ancestor.ancestor_id,
-                descendant_id=child_id,
-                depth=ancestor.depth + 1,
-            ).on_conflict_do_nothing(index_elements=['ancestor_id', 'descendant_id'])
+            stmt = (
+                pg_insert(node_tree)
+                .values(
+                    ancestor_id=ancestor.ancestor_id,
+                    descendant_id=child_id,
+                    depth=ancestor.depth + 1,
+                )
+                .on_conflict_do_nothing(index_elements=["ancestor_id", "descendant_id"])
+            )
             db.execute(stmt)
-    
+
     def _update_candidate_derivation(
         self,
         db: Session,

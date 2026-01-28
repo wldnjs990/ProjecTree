@@ -5,6 +5,7 @@ from langchain.agents.structured_output import ProviderStrategy
 from langchain_core.messages import HumanMessage
 from app.agents.schemas.analysis import TaskAnalysis
 from app.agents.prompts.system.global_context import GLOBAL_CONTEXT
+
 llm = openai_mini_llm
 
 
@@ -31,34 +32,21 @@ from typing import Type, Any
 from langchain_core.runnables import Runnable
 
 
-def create_process_agent(
-    system_prompt: str, schema: Type[BaseNodeProcessResult]
-) -> Runnable:
-    """프로세스 노드용 에이전트 생성 팩토리"""
-    # tools 리스트가 비어있어도 create_agent는 동작합니다 (LLM 전용)
-    return create_agent(
-        llm,
-        tools=[],
-        system_prompt=system_prompt,
-        response_format=ProviderStrategy(schema),
-    )
-
-
-# 각 노드 타입별 에이전트 사전 생성 (Static)
-epic_agent = create_process_agent(EPIC_PROCESS_PROMPT, EpicProcessResult)
-story_agent = create_process_agent(STORY_PROCESS_PROMPT, StoryProcessResult)
-task_agent = create_process_agent(TASK_PROCESS_PROMPT, TaskProcessResult)
-advance_agent = create_process_agent(ADVANCE_PROCESS_PROMPT, AdvanceProcessResult)
-
-
-def _process_node(state: NodeState, user_prompt: str, agent: Runnable) -> NodeState:
-    """공통 노드 처리 로직"""
+async def _process_node(
+    state: NodeState,
+    user_prompt: str,
+    system_prompt: str,
+    schema: Type[BaseNodeProcessResult],
+) -> NodeState:
+    """공통 노드 처리 로직 (비동기)"""
     workspace_info = state.get("workspace_info")
     parent_info = state.get("parent_info")
     candidate_info = state.get("current_candidate_info")
     headcount = state.get("headcount")
+
     if not candidate_info:
         raise ValueError("current_candidate_info가 없습니다.")
+
     parent_context = f"""[부모 노드의 정보]
     Name:{parent_info.name}, Description:{parent_info.description}
     """
@@ -69,7 +57,9 @@ def _process_node(state: NodeState, user_prompt: str, agent: Runnable) -> NodeSt
 
     if workspace_info:
         workspace_context = GLOBAL_CONTEXT.format(
-            project_tech_stack=workspace_info.tech_stack,
+            project_tech_stack=[
+                tech.name for tech in workspace_info.workspace_tech_stacks
+            ],
             project_headcount=headcount,
             project_purpose=workspace_info.purpose,
             start_date=workspace_info.start_date,
@@ -87,8 +77,18 @@ def _process_node(state: NodeState, user_prompt: str, agent: Runnable) -> NodeSt
     )
 
     try:
-        # Agent 실행
-        response = agent.invoke(
+        # Agent 동적 생성 및 실행
+        # 1. Tool 비동기 획득
+        # 2. Agent 생성 (매번 생성하는 비용이 크다면 캐싱 고려 가능하지만, Context 관리가 더 중요함)
+        agent = create_agent(
+            llm,
+            tools=[],
+            system_prompt=system_prompt,
+            response_format=ProviderStrategy(schema),
+        )
+
+        # 3. 비동기 실행 (ainvoke)
+        response = await agent.ainvoke(
             {"messages": [HumanMessage(content=formatted_user_prompt)]}
         )
         result = response.get("structured_response")
@@ -106,18 +106,26 @@ def _process_node(state: NodeState, user_prompt: str, agent: Runnable) -> NodeSt
         return {"generated_node": None, "last_error": str(e)}
 
 
-def epic_node_process(state: NodeState) -> NodeState:
-    return _process_node(state, EPIC_USER_PROMPT, epic_agent)
+async def epic_node_process(state: NodeState) -> NodeState:
+    return await _process_node(
+        state, EPIC_USER_PROMPT, EPIC_PROCESS_PROMPT, EpicProcessResult
+    )
 
 
-def story_node_process(state: NodeState) -> NodeState:
-    return _process_node(state, STORY_USER_PROMPT, story_agent)
+async def story_node_process(state: NodeState) -> NodeState:
+    return await _process_node(
+        state, STORY_USER_PROMPT, STORY_PROCESS_PROMPT, StoryProcessResult
+    )
 
 
-def task_node_process(state: NodeState) -> NodeState:
+async def task_node_process(state: NodeState) -> NodeState:
     """Candidate와 부모 정보를 기반으로 상세 태스크 정보를 생성합니다."""
-    return _process_node(state, TASK_USER_PROMPT, task_agent)
+    return await _process_node(
+        state, TASK_USER_PROMPT, TASK_PROCESS_PROMPT, TaskProcessResult
+    )
 
 
-def advance_node_process(state: NodeState) -> NodeState:
-    return _process_node(state, ADVANCE_USER_PROMPT, advance_agent)
+async def advance_node_process(state: NodeState) -> NodeState:
+    return await _process_node(
+        state, ADVANCE_USER_PROMPT, ADVANCE_PROCESS_PROMPT, AdvanceProcessResult
+    )
