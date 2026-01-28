@@ -3,7 +3,8 @@ package com.ssafy.projectree.domain.auth.api.controller;
 import com.ssafy.projectree.domain.auth.jwt.Jwt;
 import com.ssafy.projectree.domain.auth.jwt.JwtProvider;
 import com.ssafy.projectree.domain.auth.usecase.AuthService;
-import com.ssafy.projectree.domain.member.api.dto.SignUpDto;
+import com.ssafy.projectree.domain.auth.utils.CookieUtils;
+import com.ssafy.projectree.domain.auth.api.dto.SignUpDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
@@ -12,12 +13,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import static com.ssafy.projectree.domain.auth.jwt.JwtProperties.REFRESH_TOKEN_EXPIRE_TIME;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +21,7 @@ import static com.ssafy.projectree.domain.auth.jwt.JwtProperties.REFRESH_TOKEN_E
 public class AuthController implements AuthDocsController {
     private final AuthService authService;
     private final JwtProvider jwtProvider;
+    private final CookieUtils cookieUtils;
 
     @PatchMapping("/members/signup")
     public CommonResponse<SignUpDto.Response> signUp(
@@ -34,11 +31,18 @@ public class AuthController implements AuthDocsController {
     ) {
         Member member = authService.signUp(principal.getId(), requestDto);
         Jwt jwt = jwtProvider.generate(member);
-        Cookie cookie = new Cookie("refreshToken", jwt.getRefreshToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME);
+        Cookie cookie = CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken());
         response.addCookie(cookie);
         return CommonResponse.success(SuccessCode.CREATED, new SignUpDto.Response(jwt.getAccessToken()));
+    }
+
+    @PostMapping("/refresh")
+    public CommonResponse<SignUpDto.Response> refresh(@CookieValue("refreshToken") String refreshToken,
+                                                      HttpServletResponse response
+    ){
+        Jwt jwt = authService.refresh(refreshToken);
+        Cookie cookie = CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken());
+        response.addCookie(cookie);
+        return CommonResponse.success(SuccessCode.CREATED, new SignUpDto.Response(jwt.getRefreshToken()));
     }
 }

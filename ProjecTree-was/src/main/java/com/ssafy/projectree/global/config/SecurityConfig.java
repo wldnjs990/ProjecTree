@@ -2,6 +2,7 @@ package com.ssafy.projectree.global.config;
 
 import com.ssafy.projectree.domain.auth.enums.AuthRole;
 import com.ssafy.projectree.domain.auth.filter.JwtAuthenticationFilter;
+import com.ssafy.projectree.domain.auth.filter.JwtExceptionFilter;
 import com.ssafy.projectree.domain.auth.handler.OAuth2SuccessHandler;
 import com.ssafy.projectree.domain.auth.usecase.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,8 @@ import java.util.Arrays;
 public class SecurityConfig {
     private final CustomOAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter; // ✅ 1. 필터 주입
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtExceptionFilter jwtExceptionFilter;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
@@ -37,12 +39,12 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable) // 폼 로그인 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable) // HTTP Basic 비활성화
 
-                // ✅ 2. 세션 관리 상태 없음(Stateless)으로 설정 (가장 중요!)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 // ✅ 5. JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class)
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
                                 .requestMatchers("/auth/members/signup").hasAuthority(AuthRole.ROLE_GUEST.name())

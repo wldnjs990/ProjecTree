@@ -1,11 +1,7 @@
 package com.ssafy.projectree.domain.member.usecase;
 
-import com.ssafy.projectree.domain.auth.enums.AuthRole;
-import com.ssafy.projectree.domain.member.api.dto.SignUpDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
-import com.ssafy.projectree.global.api.code.ErrorCode;
-import com.ssafy.projectree.global.exception.BusinessLogicException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
