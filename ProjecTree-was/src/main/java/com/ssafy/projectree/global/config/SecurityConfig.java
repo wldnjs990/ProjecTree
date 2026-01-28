@@ -4,6 +4,7 @@ import com.ssafy.projectree.domain.auth.enums.AuthRole;
 import com.ssafy.projectree.domain.auth.filter.JwtAuthenticationFilter;
 import com.ssafy.projectree.domain.auth.filter.JwtExceptionFilter;
 import com.ssafy.projectree.domain.auth.handler.OAuth2SuccessHandler;
+import com.ssafy.projectree.domain.auth.model.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.ssafy.projectree.domain.auth.usecase.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,8 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
+    private final HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
@@ -51,6 +54,9 @@ public class SecurityConfig {
                                 .requestMatchers("/", "/login/**", "/oauth2/**").permitAll()
                                 .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(auth-> auth
+                                .authorizationRequestRepository(cookieAuthorizationRequestRepository)
+                        )
                         .userInfoEndpoint(user -> user.userService(oAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
                 );

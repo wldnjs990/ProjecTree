@@ -1,46 +1,57 @@
 package com.ssafy.projectree.domain.auth.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.projectree.domain.auth.enums.AuthRole;
 import com.ssafy.projectree.domain.auth.jwt.Jwt;
-import com.ssafy.projectree.domain.auth.jwt.JwtProvider;
 import com.ssafy.projectree.domain.auth.jwt.JwtUtils;
+import com.ssafy.projectree.domain.auth.model.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.ssafy.projectree.domain.auth.utils.CookieUtils;
-import com.ssafy.projectree.global.api.code.SuccessCode;
-import com.ssafy.projectree.global.api.response.CommonResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map;
+import java.util.Optional;
 
-import static com.ssafy.projectree.domain.auth.jwt.JwtProperties.REFRESH_TOKEN_EXPIRE_TIME;
+import static com.ssafy.projectree.domain.auth.model.repository.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
+@Log4j2
+public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtils jwtUtils; // JWT 생성 클래스
-    private final ObjectMapper om;
-    @Value("${WEB_SERVER_URI}")
-    private String webServerURI;
+    private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository; // 주입 필요    @Override
 
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, IOException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+        String targetUrl = determineTargetUrl(request, response, authentication);
+
+        if (response.isCommitted()) {
+            return;
+        }
+
+        authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    }
+
+    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        // 1. 쿠키에서 redirect_uri가 있는지 확인
+        Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+                .map(Cookie::getValue);
+        log.info("redirect URL : {}", redirectUri);
+        // 2. 있으면 그걸 쓰고, 없으면 기본값(localhost:3000) 사용
+        String targetUrl = redirectUri.orElse("http://localhost:5173/oauth/callback");
+
+        // 3. 토큰 생성 및 붙이기
         Jwt jwt = jwtUtils.generate(authentication);
-        Cookie cookie = CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken());
-        response.addCookie(cookie);
-        response.setContentType("application/json;charset=UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.sendRedirect(webServerURI+"?token="+jwt.getAccessToken());
+
+        return UriComponentsBuilder.fromUriString(targetUrl)
+                .queryParam("token", jwt.getAccessToken())
+                .build().toUriString();
     }
 }
