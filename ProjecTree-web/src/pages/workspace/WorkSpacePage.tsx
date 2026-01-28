@@ -16,6 +16,7 @@ import { useConnectionStatus, useNodeStore } from './stores/nodeStore';
 import { useNodeDetailEdit, useNodeDetailCrdtObservers } from './hooks';
 import { useParams } from 'react-router';
 import { LeftSidebar } from './components/Sidebar/LeftSidebar';
+import VoiceChatBar from './components/VoiceChat/VoiceChatBar';
 
 // 임시 Room ID (나중에 워크스페이스 ID로 대체)
 
@@ -60,13 +61,16 @@ export default function WorkSpacePage() {
   // Header state
   const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');
 
+  // 음성 채팅 상태
+  const [isVoiceChatOpen, setIsVoiceChatOpen] = useState(false);
+
   // Event handlers
   const handleSettingsClick = () => {
     console.log('Settings clicked');
   };
 
   const handleVoiceCallClick = () => {
-    console.log('Voice call clicked');
+    setIsVoiceChatOpen((prev) => !prev);
   };
 
   const handleInviteClick = () => {
@@ -128,6 +132,13 @@ export default function WorkSpacePage() {
           )}
         </main>
       </div>
+
+      {/* 음성 채팅 바 */}
+      <VoiceChatBar
+        isOpen={isVoiceChatOpen}
+        onClose={() => setIsVoiceChatOpen(false)}
+        workspaceId={workspaceId || 'default'}
+      />
     </div>
   );
 }
