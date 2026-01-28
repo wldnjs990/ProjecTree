@@ -1,4 +1,4 @@
-import HomePage from '@/pages/HomePage';
+import LandingPage from '@/pages/LandingPage/LandingPage';
 import WorkspaceOnboardingPage from '@/pages/workspace-onboarding/WorkspaceOnboardingPage';
 import UserOnboardingPage from '@/pages/user-onboarding/UserOnboardingPage';
 import LoginPage from '@/pages/LoginPage';
@@ -9,8 +9,8 @@ import type { RouteObject } from 'react-router';
 export const publicRoutes: RouteObject[] = [
   {
     path: '/',
-    element: <HomePage />,
-    loader: async () => {},
+    element: <LandingPage />,
+    loader: async () => { },
   },
   {
     path: '/workspace-lounge',
