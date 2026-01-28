@@ -9,7 +9,7 @@ import type {
 export interface EditableNodeDetail {
   status: NodeStatus;
   priority?: Priority;
-  difficult: number;
+  difficult?: number;
   assignee: Assignee | null;
   note: string;
 }
