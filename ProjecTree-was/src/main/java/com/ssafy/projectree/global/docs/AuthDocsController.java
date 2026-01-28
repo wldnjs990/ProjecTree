@@ -14,10 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Auth", description = "Auth 관련 API")
 public interface AuthDocsController {
@@ -84,6 +81,38 @@ public interface AuthDocsController {
     @PostMapping("/refresh")
     CommonResponse<SignUpDto.Response> refresh(
             @Parameter(description = "쿠키에 저장된 RefreshToken", required = true) @CookieValue("refreshToken") String refreshToken,
+            @Parameter(hidden = true) HttpServletResponse response
+    );
+
+    @Operation(
+            summary = "토큰 발급",
+            description = "인증 코드(Code)를 이용하여 AccessToken과 RefreshToken을 발급합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully Completed",
+                    headers = @Header(name = "Set-Cookie", description = "RefreshToken 쿠키 설정 (HttpOnly, Secure)"),
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "message": "Successfully Completed",
+                                                "isSuccess": true,
+                                                "data": {
+                                                    "accessToken": "ey..."
+                                                },
+                                                "code": 200
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @GetMapping("/token")
+    CommonResponse<SignUpDto.Response> publishToken(
+            @Parameter(description = "인증 코드", required = true) @RequestParam("code") String code,
             @Parameter(hidden = true) HttpServletResponse response
     );
 }

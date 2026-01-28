@@ -7,6 +7,7 @@ import com.ssafy.projectree.domain.auth.utils.AuthHash;
 import com.ssafy.projectree.domain.auth.utils.CookieUtils;
 import com.ssafy.projectree.domain.auth.api.dto.SignUpDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
+import com.ssafy.projectree.domain.member.usecase.MemberService;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import com.ssafy.projectree.global.docs.AuthDocsController;
@@ -49,12 +50,11 @@ public class AuthController implements AuthDocsController {
     }
 
     @GetMapping("/token")
-    public CommonResponse<SignUpDto.Response> publishToken(
-            @RequestParam("code") String authTicket, HttpServletResponse response){
-        Jwt jwt = authHash.take(authTicket);
+    public CommonResponse<SignUpDto.Response> publishToken(@RequestParam("code") String code,
+                                                           HttpServletResponse resposne) {
+        Jwt jwt = authHash.take(code);
         Cookie cookie = CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken());
-        response.addCookie(cookie);
-        return CommonResponse.success(SuccessCode.CREATED, SignUpDto.Response.builder()
-                .accessToken(jwt.getAccessToken()).build());
+        resposne.addCookie(cookie);
+        return CommonResponse.success(SuccessCode.SUCCESS, new SignUpDto.Response(jwt.getAccessToken()));
     }
 }
