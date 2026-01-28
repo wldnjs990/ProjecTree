@@ -4,7 +4,7 @@ import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 const BASE_URL =
   import.meta.env.VITE_API_URL || 'http://projectree-was:8080/api/';
 
-export const apiClient = axios.create({
+export const wasApiClient = axios.create({
   baseURL: BASE_URL,
   // 네트워크 타임아웃 시간(10초)
   timeout: 10000,
@@ -16,7 +16,7 @@ export const apiClient = axios.create({
 });
 
 // Request Interceptor
-apiClient.interceptors.request.use(
+wasApiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // TODO: 토큰 추가 로직
     // const token = localStorage.getItem('accessToken');
@@ -32,7 +32,7 @@ apiClient.interceptors.request.use(
 );
 
 // Response Interceptor
-apiClient.interceptors.response.use(
+wasApiClient.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -76,4 +76,4 @@ apiClient.interceptors.response.use(
   }
 );
 
-export default apiClient;
+export default wasApiClient;
