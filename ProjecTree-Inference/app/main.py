@@ -1,9 +1,7 @@
 """ProjecTree Inference API
-
-FastAPI 기반 추론 서버 메인 진입점
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import sys
 import os
@@ -35,6 +33,29 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
+
+# 로깅 미들웨어 (디버깅용)
+@app.middleware("http")
+async def log_request_info(request: Request, call_next):
+    print(f"Incoming Request: {request.method} {request.url}")
+
+    # Body 스트림 읽기
+    body_bytes = await request.body()
+    print(f"Request Body Size: {len(body_bytes)} bytes")
+    print(
+        f"Request Body Content: {body_bytes.decode('utf-8') if body_bytes else 'EMPTY'}"
+    )
+
+    # Body 스트림 복구 (FastAPI가 다시 읽을 수 있도록)
+    async def receive():
+        return {"type": "http.request", "body": body_bytes}
+
+    request._receive = receive
+
+    response = await call_next(request)
+    return response
+
+
 # CORS 미들웨어 설정
 app.add_middleware(
     CORSMiddleware,
@@ -54,7 +75,7 @@ async def root():
     return {
         "status": "healthy",
         "service": "ProjecTree Inference API",
-        "version": "1.0.0"
+        "version": "1.0.0",
     }
 
 
@@ -65,14 +86,10 @@ async def health_check():
 
 
 if __name__ == "__main__":
-    
+
     # 부모 디렉토리를 Python 경로에 추가
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    
+
     uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
+        "app.main:app", host="0.0.0.0", port=8000, reload=True, log_level="info"
     )
