@@ -30,10 +30,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         String targetUrl = determineTargetUrl(request, response, authentication);
-
         if (response.isCommitted()) {
             return;
         }
+
 
         authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
@@ -45,11 +45,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .map(Cookie::getValue);
         log.info("redirect URL : {}", redirectUri);
         // 2. 있으면 그걸 쓰고, 없으면 기본값(localhost:3000) 사용
-        String targetUrl = redirectUri.orElse("http://localhost:5173/oauth/callback");
+        String targetUrl = redirectUri.orElse("http://localhost:5174" +
+                "/oauth/callback");
 
         // 3. 토큰 생성 및 붙이기
         Jwt jwt = jwtUtils.generate(authentication);
-
+        response.addCookie(CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken()));
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", jwt.getAccessToken())
                 .build().toUriString();
