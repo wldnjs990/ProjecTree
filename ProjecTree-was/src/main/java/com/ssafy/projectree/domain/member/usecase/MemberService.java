@@ -20,14 +20,14 @@ import org.springframework.stereotype.Service;
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    // TODO: 예외 발생에 대한 처리 필요
     public Member findById(Long id) {
-        return memberRepository.findById(id).get();
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR));
     }
 
-    // TODO: 예외 발생에 대한 처리 필요
     public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email).get();
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR));
     }
 
     public MemberEmailReadDto.Response getMemberEmail(Long id) {
