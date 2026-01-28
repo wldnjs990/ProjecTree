@@ -4,6 +4,7 @@ import type {
   ChatMessage,
   ChatParticipant,
 } from '../types/chat.types';
+import { mockFetchMessages, CHAT_PAGINATION_CONFIG } from '../types/mockData';
 
 export const useChatStore = create<ChatState>((set, get) => ({
   messages: {},
@@ -12,6 +13,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
   typingUsers: {},
   unreadCounts: {},
   isConnected: false,
+
+  // 페이지네이션 상태 초기화
+  pagination: {
+    hasMore: true,
+    isLoading: false,
+    oldestLoadedId: null,
+    initialLoaded: false,
+  },
 
   // 메시지 추가
   addMessage: (workspaceId: string, message: ChatMessage) => {
@@ -128,5 +137,79 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const { [workspaceId]: _, ...remainingMessages } = state.messages;
       return { messages: remainingMessages };
     });
+  },
+
+  // 🆕 페이지네이션: 메시지 앞에 추가 (과거 메시지 로드 시)
+  prependMessages: (messages: ChatMessage[]) => {
+    const { activeWorkspaceId } = get();
+    if (!activeWorkspaceId) return;
+
+    set((state) => ({
+      messages: {
+        ...state.messages,
+        [activeWorkspaceId]: [
+          ...messages,
+          ...(state.messages[activeWorkspaceId] || []),
+        ],
+      },
+    }));
+  },
+
+  // 🆕 페이지네이션: 상태 설정
+  setPaginationState: (newState) => {
+    set((state) => ({
+      pagination: {
+        ...state.pagination,
+        ...newState,
+      },
+    }));
+  },
+
+  // 🆕 페이지네이션: 더 많은 메시지 로드
+  loadMoreMessages: async () => {
+    const {
+      activeWorkspaceId,
+      pagination,
+      prependMessages,
+      setPaginationState,
+    } = get();
+
+    if (!activeWorkspaceId) {
+      console.warn('No active workspace');
+      return;
+    }
+
+    if (pagination.isLoading || !pagination.hasMore) {
+      return; // 이미 로딩 중이거나 더 이상 메시지 없음
+    }
+
+    // 로딩 시작
+    setPaginationState({ isLoading: true });
+
+    try {
+      // Mock API 호출
+      const olderMessages = await mockFetchMessages(activeWorkspaceId, {
+        before: pagination.oldestLoadedId || undefined,
+        limit: CHAT_PAGINATION_CONFIG.loadMoreSize,
+      });
+
+      if (olderMessages.length > 0) {
+        // 메시지 추가
+        prependMessages(olderMessages);
+
+        // 페이지네이션 상태 업데이트
+        setPaginationState({
+          oldestLoadedId: olderMessages[olderMessages.length - 1].id,
+          hasMore: olderMessages.length === CHAT_PAGINATION_CONFIG.loadMoreSize,
+        });
+      } else {
+        // 더 이상 메시지 없음
+        setPaginationState({ hasMore: false });
+      }
+    } catch (error) {
+      console.error('Failed to load more messages:', error);
+    } finally {
+      setPaginationState({ isLoading: false });
+    }
   },
 }));
