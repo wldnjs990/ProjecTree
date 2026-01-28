@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class NodeAsyncService {
     private final NodeRepository nodeRepository;
 
     @Async("nodePositionExecutor")
+    @Transactional
     public void savePositionAsync(Long workspaceId, List<NodePositionUpdateDto.NodePositionItem> nodes) {
         try {
             for (NodePositionUpdateDto.NodePositionItem dto : nodes) {
