@@ -8,6 +8,9 @@ from app.db.models import Node, EpicNode, StoryNode, TaskNode, AdvanceNode, node
 from app.db.schemas.node import NodeCreate, TaskNodeCreate
 from app.agents.enums import NodeType
 from app.core.log import langfuse_handler
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class NodeService:
@@ -67,8 +70,8 @@ class NodeService:
         
         # 5. 노드 생성 (타입별 분기)
         # generated_node가 dict인지 object인지 확인하고 적절히 접근
-        print(f"[DEBUG] generated_node type: {type(generated_node)}")
-        print(f"[DEBUG] generated_node content: {generated_node}")
+        logger.info(f"[DEBUG] generated_node type: {type(generated_node)}")
+        logger.info(f"[DEBUG] generated_node content: {generated_node}")
         
         if isinstance(generated_node, dict):
             node_name = generated_node.get("name")
@@ -79,7 +82,7 @@ class NodeService:
             node_description = generated_node.description
             node_difficulty = getattr(generated_node, 'difficulty', None)
         
-        print(f"[DEBUG] Extracted - name: {node_name}, description: {node_description}")
+        logger.info(f"[DEBUG] Extracted - name: {node_name}, description: {node_description}")
         
         created_node = self._create_node_by_type(
             db=db,
@@ -125,7 +128,7 @@ class NodeService:
         difficulty: int = None,
     ) -> Node:
         """노드 타입에 따른 노드 생성 (Joined Table Inheritance)"""
-        print(f"[DEBUG] _create_node_by_type called with name={name}, description={description[:50] if description else None}...")
+        logger.info(f"[DEBUG] _create_node_by_type called with name={name}, description={description[:50] if description else None}...")
         
         # 타입별 서브클래스 직접 생성 (Joined Table Inheritance 방식)
         if node_type == NodeType.EPIC:
@@ -171,7 +174,7 @@ class NodeService:
         db.add(node)
         db.flush()  # ID 생성을 위해 flush
         
-        print(f"[DEBUG] Created Node id={node.id}, name={node.name}, description={node.description[:50] if node.description else None}")
+        logger.info(f"[DEBUG] Created Node id={node.id}, name={node.name}, description={node.description[:50] if node.description else None}")
         
         return node
     

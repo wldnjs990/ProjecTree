@@ -15,6 +15,9 @@ from app.agents.sub_agents.candidates.prompts.system_prompts import (
 )
 from app.agents.sub_agents.candidates.prompts.user_prompts import CANDIDATE_USER_PROMPT
 from app.agents.sub_agents.candidates.tools import get_duplicate_check_context
+import logging
+
+logger = logging.getLogger(__name__)
 
 llm = openai_mini_llm
 tools = [search_tool]
@@ -58,7 +61,6 @@ def fetch_sibling_context(state: CandidateNodeState) -> CandidateNodeState:
         )
         return {"sibling_context": context}
     except Exception as e:
-        print(f"Sibling context fetch failed: {e}")
         return {"sibling_context": None}
 
 
@@ -118,7 +120,7 @@ def generate_candidates(state: CandidateNodeState) -> CandidateNodeState:
             if output:
                 return {"candidates": output}
         except Exception as e:
-            print(f"Candidate generation agent failed: {e}")
+            logger.error(f"Candidate generation agent failed: {e}")
 
     return {"candidates": CandidateList(candidates=[])}
 
@@ -281,7 +283,7 @@ def validate_candidates(state: CandidateNodeState) -> CandidateNodeState:
         }
         
     except Exception as e:
-        print(f"LLM validation failed: {e}")
+        logger.error(f"LLM validation failed: {e}")
         # LLM 검증 실패 시 Rule-based 통과했으므로 통과 처리
         return {
             "is_valid": True,

@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     UPSTAGE_API_KEY: str
     UPSTAGE_LARGE_MODEL: str = "solar-pro2"
     UPSTAGE_MINI_MODEL: str = "solar-mini"
+    UPSTAGE_EMBEDDING_DOCUMENT_EMBEDDING_MODEL: str = "embedding-document"
+    UPSTAGE_EMBEDDING_TEXT_EMBEDDING_MODEL: str = "embedding-query"
 
     # PostgreSQL 설정
     POSTGRES_USER: str

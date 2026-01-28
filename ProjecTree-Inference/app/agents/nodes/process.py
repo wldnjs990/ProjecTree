@@ -97,14 +97,12 @@ def _process_node(state: NodeState, user_prompt: str, agent: Runnable) -> NodeSt
             # 결과 반환
             return {"generated_node": result.model_dump()}
         else:
-            print("Node processing returned no structured response")
             return {
                 "generated_node": None,
                 "last_error": "No structured response",
             }
 
     except Exception as e:
-        print(f"Node processing failed: {e}")
         return {"generated_node": None, "last_error": str(e)}
 
 
