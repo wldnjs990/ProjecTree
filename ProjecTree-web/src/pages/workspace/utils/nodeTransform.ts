@@ -57,7 +57,7 @@ export function transformServerNode(serverNode: ServerNode): FlowNode {
       status: convertStatus(serverNode.data.nodeStatus),
       taskId: serverNode.data.identifier,
       category: convertTaskType(serverNode.data.taskType),
-      storyPoints: serverNode.data.difficult,
+      difficult: serverNode.data.difficult,
     },
   };
 }

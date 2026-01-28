@@ -60,7 +60,7 @@ export interface FlowNodeData {
   status: FlowNodeStatus;
   taskId: string;
   category?: FlowCategory;
-  storyPoints?: number;
+  difficult?: number;
   priority?: string;
   [key: string]: unknown; // ReactFlow 호환용 인덱스 시그니처
 }

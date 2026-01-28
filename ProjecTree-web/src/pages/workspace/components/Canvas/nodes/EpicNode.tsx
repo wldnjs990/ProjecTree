@@ -1,21 +1,21 @@
-import { memo } from "react";
-import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
-import { cn } from "@/lib/utils";
-import { StatusTag } from "@/components/custom/StatusTag";
+import { memo } from 'react';
+import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
+import { cn } from '@/lib/utils';
+import { StatusTag } from '@/components/custom/StatusTag';
 import {
   PriorityBadge,
   type Priority,
-} from "@/components/custom/PriorityBadge";
+} from '@/components/custom/PriorityBadge';
 
 export interface EpicNodeData extends Record<string, unknown> {
   title: string;
-  status: "TODO" | "IN_PROGRESS" | "DONE";
+  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
   taskId: string;
   priority?: Priority;
-  storyPoints?: number;
+  difficult?: number;
 }
 
-export type EpicNodeType = Node<EpicNodeData, "epic">;
+export type EpicNodeType = Node<EpicNodeData, 'epic'>;
 
 function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
   const nodeData = data;
@@ -23,9 +23,9 @@ function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
   return (
     <div
       className={cn(
-        "relative bg-[#F5F3FF] rounded-2xl border-2 border-[#8B5CF6] shadow-md p-3 min-w-40",
-        selected && "ring-2 ring-[#8B5CF6] ring-offset-2",
-        "shadow-[0_0_10px_#C5BAF8]",
+        'relative bg-[#F5F3FF] rounded-2xl border-2 border-[#8B5CF6] shadow-md p-3 min-w-40',
+        selected && 'ring-2 ring-[#8B5CF6] ring-offset-2',
+        'shadow-[0_0_10px_#C5BAF8]'
       )}
     >
       {/* Priority Badge */}
@@ -55,14 +55,14 @@ function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
       {/* Footer */}
       <div className="flex items-center justify-between border-t border-[#DEDEDE]/50 pt-2">
         <span className="text-[10px] text-[#64748B]">{nodeData.taskId}</span>
-        {nodeData.storyPoints && (
+        {nodeData.difficult && (
           <div className="flex gap-0.5">
-            {Array.from({ length: Math.min(nodeData.storyPoints, 5) }).map(
+            {Array.from({ length: Math.min(nodeData.difficult, 5) }).map(
               (_, i) => (
                 <span key={i} className="text-[8px] text-yellow">
                   ★
                 </span>
-              ),
+              )
             )}
           </div>
         )}
