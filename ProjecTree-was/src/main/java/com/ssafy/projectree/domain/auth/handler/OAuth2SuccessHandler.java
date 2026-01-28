@@ -5,6 +5,7 @@ import com.ssafy.projectree.domain.auth.enums.AuthRole;
 import com.ssafy.projectree.domain.auth.jwt.Jwt;
 import com.ssafy.projectree.domain.auth.jwt.JwtProvider;
 import com.ssafy.projectree.domain.auth.jwt.JwtUtils;
+import com.ssafy.projectree.domain.auth.utils.CookieUtils;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import jakarta.servlet.http.Cookie;
@@ -33,10 +34,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, IOException {
         Jwt jwt = jwtUtils.generate(authentication);
-        Cookie cookie = new Cookie("refreshToken", jwt.getRefreshToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME);
+        Cookie cookie = CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken());
         response.addCookie(cookie);
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");

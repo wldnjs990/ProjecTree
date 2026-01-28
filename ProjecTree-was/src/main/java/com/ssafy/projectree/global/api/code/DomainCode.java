@@ -12,7 +12,7 @@ public enum DomainCode {
     NORMAL(99),
     CANDIDATE(3),
     NODE(4),
-    TECH(5)
-    ;
+    TECH(5),
+    AUTH(6);
     private int value;
 }

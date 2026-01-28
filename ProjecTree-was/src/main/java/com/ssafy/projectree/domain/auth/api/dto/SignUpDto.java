@@ -1,4 +1,4 @@
-package com.ssafy.projectree.domain.member.api.dto;
+package com.ssafy.projectree.domain.auth.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
