@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/files")
 public class FileController {
 
-    // TODO: AWS S3 설정 후 세부 로직 구현 필요
     private final S3FileService fileService;
 
     @PostMapping("/workspaces/{id}")
