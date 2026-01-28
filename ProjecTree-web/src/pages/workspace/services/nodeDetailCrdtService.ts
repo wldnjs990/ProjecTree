@@ -9,6 +9,7 @@ import type {
   NodeStatus,
   Priority,
   Assignee,
+  NodeType,
 } from '../components/NodeDetailSidebar/types';
 
 // Y.Map에 저장되는 값 타입
@@ -177,12 +178,22 @@ class NodeDetailCrdtService {
       return;
     }
 
-    const initialData: EditableNodeDetail = {
+    const nodeType = useNodeStore
+      .getState()
+      .nodes.find((n) => n.id === selectedNodeId)
+      ?.type.toUpperCase() as NodeType;
+
+    // 노드 서버 전송용 데이터타입(difficult 식별용 nodeType 추가)
+    interface ServerEditableNodeDetail extends EditableNodeDetail {
+      nodeType: NodeType;
+    }
+    const initialData: ServerEditableNodeDetail = {
       status: nodeListData.status,
       priority: nodeListData.priority,
       difficult: nodeListData.difficult,
       assignee: nodeDetail.assignee,
       note: nodeDetail.note,
+      nodeType: nodeType,
     };
 
     // Y.Map에 편집 데이터 생성(없으면 생성)
@@ -195,6 +206,7 @@ class NodeDetailCrdtService {
       yNodeDetail.set('difficult', initialData.difficult);
       yNodeDetail.set('assignee', initialData.assignee);
       yNodeDetail.set('note', initialData.note);
+      yNodeDetail.set('nodeType', initialData.nodeType);
       yNodeDetails.set(selectedNodeId, yNodeDetail);
     });
 
