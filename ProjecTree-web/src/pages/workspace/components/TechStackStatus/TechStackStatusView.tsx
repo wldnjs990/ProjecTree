@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import type { Node, Edge } from '@xyflow/react';
 import { Layers, GitBranch, AlertCircle } from 'lucide-react';
 import { SummaryCard } from './components/SummaryCard';
 import { FilterSection } from './components/FilterSection';
@@ -9,10 +8,9 @@ import {
   mockTechStackMappings,
 } from '../../constants/mockData';
 import type { NodeLevel, TechStackNode } from './types';
+import { useNodes } from '../../stores/nodeStore';
 
 interface TechStackStatusViewProps {
-  nodes: Node[];
-  edges?: Edge[];
   onNodeClick?: (nodeId: string) => void;
 }
 
@@ -24,11 +22,10 @@ interface TechStackStatusViewProps {
  * 2. Filter Section (레벨 토글 + 정렬/조건 드롭다운)
  * 3. Node Mapping List (노드 리스트 테이블)
  */
-export function TechStackStatusView({
-  nodes,
-  edges = [],
-  onNodeClick,
-}: TechStackStatusViewProps) {
+export function TechStackStatusView({ onNodeClick }: TechStackStatusViewProps) {
+  // Zustand 스토어에서 노드 가져오기
+  const nodes = useNodes();
+
   // 필터 상태 관리
   const [selectedLevel, setSelectedLevel] = useState<NodeLevel | 'all'>('task');
   const [sortBy, setSortBy] = useState('recent');

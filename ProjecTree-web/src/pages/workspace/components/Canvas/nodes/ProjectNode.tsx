@@ -9,7 +9,7 @@ import {
 
 export interface ProjectNodeData extends Record<string, unknown> {
   title: string;
-  status: "pending" | "progress" | "completed";
+  status: "TODO" | "IN_PROGRESS" | "DONE";
   priority?: Priority;
 }
 

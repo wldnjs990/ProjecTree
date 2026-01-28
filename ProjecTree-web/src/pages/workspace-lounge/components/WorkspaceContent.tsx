@@ -29,7 +29,7 @@ interface ContentProps {
  * - 특징: URL 파라미터(?q=..., ?sort=...)를 사용하여 상태를 관리하므로 공유 및 뒤로가기가 가능
  *        검색어 입력 시 잦은 URL 업데이트를 방지하기 위해 Debounce(0.3초)를 적용
  */
-export function WorkspaceContent({ filterType = "all" }: ContentProps) {
+export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
   const navigate = useNavigate();
   // URL 쿼리 파라미터 관리 훅
   const [searchParams, setSearchParams] = useSearchParams();
@@ -126,10 +126,11 @@ export function WorkspaceContent({ filterType = "all" }: ContentProps) {
   // 4. 필터링 및 정렬 로직 (클라이언트 사이드 처리)
   const filteredWorkspaces = useMemo(() => {
     // (1) 1차 필터링: 사이드바 메뉴 (All / Mine / Joined)
-    let result = workspaces.filter(ws => {
-      if (filterType === "all") return true;
-      if (filterType === "mine") return ws.role === "Owner";
-      if (filterType === "joined") return ws.role === "Editor" || ws.role === "Viewer";
+    let result = workspaces.filter((ws) => {
+      if (filterType === 'all') return true;
+      if (filterType === 'mine') return ws.role === 'Owner';
+      if (filterType === 'joined')
+        return ws.role === 'Editor' || ws.role === 'Viewer';
       return true;
     });
 
@@ -142,13 +143,16 @@ export function WorkspaceContent({ filterType = "all" }: ContentProps) {
     );
 
     // (3) 정렬 적용
-    if (sortByValue === "name") {
+    if (sortByValue === 'name') {
       result.sort((a, b) => a.title.localeCompare(b.title));
     } else if (sortByValue === 'created') {
       result.sort((a, b) => Number(b.id) - Number(a.id));
     } else {
       // (기본값) 최근 수정순
-      result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      result.sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
     }
 
     return result;

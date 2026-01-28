@@ -1,13 +1,20 @@
-export { NodeDetailSidebar } from "./NodeDetailSidebar";
+export { NodeDetailSidebar } from './NodeDetailSidebar';
 export type {
-  NodeDetailData,
-  NodeCategory,
+  // API 공통 타입
+  ApiStatus,
+  NodeType,
+  TaskType,
   NodeStatus,
   Priority,
-  NodeType,
+  // 노드 목록 API
+  NodePosition,
+  NodeData,
+  ApiNode,
+  NodesApiResponse,
+  // 노드 상세 API
   Assignee,
-  TechTag,
+  Candidate,
   TechRecommendation,
-  TechComparison,
-  SubNodeRecommendation,
-} from "./types";
+  NodeDetailData,
+  NodeDetailApiResponse,
+} from './types';

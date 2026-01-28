@@ -1,9 +1,13 @@
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
-import { cn } from "@/lib/utils";
-import { Users } from "lucide-react";
-
+import { cn } from '@/lib/utils';
+import { Users } from 'lucide-react';
 
 export interface Member {
   name: string;
@@ -12,7 +16,7 @@ export interface Member {
 }
 
 // 프로젝트의 권한을 나타내는 타입
-type UserRole = "Owner" | "Editor" | "Viewer";
+type UserRole = 'Owner' | 'Editor' | 'Viewer';
 
 // 프로젝트의 정보를 나타내는 인터페이스
 export interface ProjectCardProps {
@@ -32,7 +36,6 @@ export interface ProjectCardProps {
     members: Member[];
   };
 }
-
 
 
 /**

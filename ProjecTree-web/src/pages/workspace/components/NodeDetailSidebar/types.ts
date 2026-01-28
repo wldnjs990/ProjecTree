@@ -1,56 +1,78 @@
 // 노드 상세 사이드바에서 사용하는 타입 정의
 
-export type NodeCategory = "frontend" | "backend";
-export type NodeStatus = "pending" | "progress" | "completed";
-export type Priority = "P0" | "P1" | "P2" | "P3";
-export type NodeType = "project" | "epic" | "story" | "task" | "advanced";
+// 백엔드 API 공통 응답 타입
+export type ApiStatus = 'SUCCESS' | 'FAIL';
+export type NodeType = 'PROJECT' | 'EPIC' | 'STORY' | 'TASK';
+export type TaskType = 'FE' | 'BE' | null;
+export type NodeStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
+export type Priority = 'P0' | 'P1' | 'P2' | 'P3';
 
+// 노드 목록 API 응답 타입
+export interface NodePosition {
+  xPos: number;
+  yPos: number;
+}
+
+export interface NodeData {
+  priority?: Priority;
+  identifier: string;
+  taskType: TaskType;
+  status: NodeStatus;
+  difficult: number;
+}
+
+export interface ApiNode {
+  id: number;
+  name: string;
+  nodeType: NodeType;
+  position: NodePosition;
+  parentId: number | null;
+  data: NodeData;
+}
+
+export interface NodesApiResponse {
+  status: ApiStatus;
+  code: number;
+  message: string;
+  data: ApiNode[];
+}
+
+// 노드 상세 API 응답 타입
 export interface Assignee {
   id: string;
   name: string;
-  initials: string;
-  color: string;
 }
 
-export interface TechTag {
-  label: string;
-  type: "positive" | "negative";
+export interface Candidate {
+  id: number;
+  name: string;
+  description: string;
+  taskType: TaskType;
 }
 
 export interface TechRecommendation {
-  id: string;
+  id: number;
   name: string;
-  category: string;
+  advantage: string;
+  disadvantage: string;
   description: string;
-  tags: TechTag[];
-  isAIRecommended?: boolean;
-}
-
-export interface SubNodeRecommendation {
-  id: string;
-  title: string;
-  description: string;
-}
-
-export interface TechComparison {
-  id: string;
-  comparedTechs: string[]; // 비교 대상 기술 ID 배열
-  comparisonTable: string; // 마크다운 형식의 비교 장표
+  ref: string;
+  recommendationScore: number;
 }
 
 export interface NodeDetailData {
-  id: string;
-  type: NodeType;
-  category?: NodeCategory;
-  taskId?: string;
-  title: string;
-  description?: string;
-  status: NodeStatus;
-  priority?: Priority;
-  assignee?: Assignee;
-  difficulty?: number; // 1-5
-  techRecommendations?: TechRecommendation[];
-  techComparison?: TechComparison; // task, advanced 타입에서만 사용
-  subNodeRecommendations?: SubNodeRecommendation[];
-  memo?: string;
+  id: number;
+  assignee: Assignee | null;
+  description: string;
+  note: string;
+  candidates: Candidate[];
+  techs: TechRecommendation[];
+  comparison: string;
+}
+
+export interface NodeDetailApiResponse {
+  status: ApiStatus;
+  code: number;
+  message: string;
+  data: NodeDetailData;
 }

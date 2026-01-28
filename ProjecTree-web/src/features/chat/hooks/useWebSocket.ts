@@ -14,7 +14,6 @@ export const useWebSocket = (workspaceId: string | null) => {
     (state) => state.updateParticipantStatus
   );
   const setConnected = useChatStore((state) => state.setConnected);
-  const setActiveWorkspace = useChatStore((state) => state.setActiveWorkspace);
 
   // Store actions are stable, but we can verify this by not including them in dependency arrays or wrapping them if needed.
   // Zustand actions are stable by identity.
@@ -28,6 +27,8 @@ export const useWebSocket = (workspaceId: string | null) => {
 
     // 연결 상태 업데이트
     socket.on('connect', () => {
+      if (workspaceId) chatSocket.joinWorkspace(workspaceId);
+      else throw new Error('Workspace ID 가 등록되지 않았습니다.');
       setConnected(true);
     });
 
@@ -44,8 +45,6 @@ export const useWebSocket = (workspaceId: string | null) => {
   // 워크스페이스 입장/퇴장
   useEffect(() => {
     if (!workspaceId) return;
-
-    chatSocket.joinWorkspace(workspaceId);
     // setActiveWorkspace(workspaceId);
 
     return () => {
