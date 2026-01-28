@@ -4,7 +4,8 @@ import type {
   ChatMessage,
   ChatParticipant,
 } from '../types/chat.types';
-import { mockFetchMessages, CHAT_PAGINATION_CONFIG } from '../types/mockData';
+import { CHAT_PAGINATION_CONFIG } from '../types/mockData';
+import { fetchMessages } from '@/apis/chat.api';
 
 export const useChatStore = create<ChatState>((set, get) => ({
   messages: {},
@@ -187,11 +188,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
     setPaginationState({ isLoading: true });
 
     try {
-      // Mock API 호출
-      const olderMessages = await mockFetchMessages(activeWorkspaceId, {
+      // API 호출 (MSW가 가로챔)
+      const response = await fetchMessages(activeWorkspaceId, {
         before: pagination.oldestLoadedId || undefined,
         limit: CHAT_PAGINATION_CONFIG.loadMoreSize,
       });
+
+      // response = { status: 'success', data: ChatMessage[] }
+      const olderMessages = response.data || [];
 
       if (olderMessages.length > 0) {
         // 메시지 추가
