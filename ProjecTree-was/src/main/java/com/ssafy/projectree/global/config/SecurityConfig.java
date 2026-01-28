@@ -1,5 +1,6 @@
 package com.ssafy.projectree.global.config;
 
+import com.ssafy.projectree.domain.auth.enums.AuthRole;
 import com.ssafy.projectree.domain.auth.filter.JwtAuthenticationFilter;
 import com.ssafy.projectree.domain.auth.handler.OAuth2SuccessHandler;
 import com.ssafy.projectree.domain.auth.usecase.CustomOAuth2UserService;
@@ -32,7 +33,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable) // 폼 로그인 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable) // HTTP Basic 비활성화
 
@@ -44,6 +45,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
+                                .requestMatchers("/auth/members/signup").hasAuthority(AuthRole.ROLE_GUEST.name())
                                 .requestMatchers("/", "/login/**", "/oauth2/**").permitAll()
                                 .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2

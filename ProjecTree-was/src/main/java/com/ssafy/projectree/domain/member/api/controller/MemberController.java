@@ -31,21 +31,6 @@ public class MemberController implements MemberDocsController {
     // TODO: JWT 추가시 PathVariable 수정 필요
     private final JwtProvider jwtProvider;
     private final MemberService memberService;
-    @PatchMapping("/members/signup")
-    public CommonResponse<SignUpDto.Response> signUp(
-            @AuthenticationPrincipal Member principal, // SecurityContext에 저장된 GUEST 유저 정보
-            @RequestBody SignUpDto.Request requestDto,
-            HttpServletResponse response
-    ) {
-        Member member = memberService.signUp(principal.getId(), requestDto);
-        Jwt jwt = jwtProvider.generate(member);
-        Cookie cookie = new Cookie("refreshToken", jwt.getRefreshToken());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME);
-        response.addCookie(cookie);
-        return CommonResponse.success(SuccessCode.CREATED, new SignUpDto.Response(jwt.getAccessToken()));
-    }
 
 
     @GetMapping("/members/{id}/email")
