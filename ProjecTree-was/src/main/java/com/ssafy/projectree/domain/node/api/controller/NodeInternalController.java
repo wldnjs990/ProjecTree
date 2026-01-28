@@ -3,6 +3,7 @@ package com.ssafy.projectree.domain.node.api.controller;
 import com.ssafy.projectree.domain.node.api.dto.NodePositionUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeUpdateDto;
 import com.ssafy.projectree.domain.node.usecase.NodeAsyncService;
+import com.ssafy.projectree.domain.node.usecase.NodeService;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NodeInternalController {
 
+    private final NodeService nodeService;
     private final NodeAsyncService nodeAsyncService;
 
     @PatchMapping("/nodes/{nodeId}/detail")
@@ -27,7 +29,7 @@ public class NodeInternalController {
             @PathVariable Long nodeId,
             @RequestBody NodeUpdateDto.Request request
     ) {
-
+        nodeService.updateNodeDetail(nodeId, request);
         return CommonResponse.success(SuccessCode.UPDATED, null);
     }
 
