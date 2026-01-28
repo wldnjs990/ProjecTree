@@ -6,29 +6,81 @@ import {
 } from '../features/chat/types/mockData';
 
 /**
+ * 프론트엔드 mockData를 백엔드 API 형식으로 변환
+ */
+const transformToApiFormat = (workspace: (typeof mockWorkspaces)[0]) => {
+  const roleMap: Record<string, 'OWNER' | 'EDITOR' | 'VIEWER'> = {
+    Owner: 'OWNER',
+    Editor: 'EDITOR',
+    Viewer: 'VIEWER',
+  };
+
+  return {
+    workspaceId: Number(workspace.id),
+    name: workspace.title,
+    description: workspace.description,
+    totalNodes: 45,
+    totalCompletedNodes: 22,
+    totalMembers: workspace.members.length,
+    role: roleMap[workspace.role] || 'VIEWER',
+    progress: {
+      p0: { total: 100, completed: workspace.progressP0 },
+      p1: { total: 100, completed: workspace.progressP1 },
+      p2: { total: 100, completed: workspace.progressP2 },
+    },
+    updatedAt: workspace.updatedAt,
+  };
+};
+
+/**
  * [MSW] API 모킹 핸들러 정의
  * - 여기서 정의한 URL로 요청이 오면, 브라우저가 실제 서버 대신 이 함수를 실행합니다.
  */
 export const handlers = [
-  // [GET] 내 워크스페이스 목록 조회
-  http.get('/api/workspaces/my', () => {
+  // [GET] 내가 속한 워크스페이스 목록 조회 (워크스페이스 라운지)
+  http.get('*/workspaces/:memberId/my', () => {
+    const apiFormatData = mockWorkspaces.map(transformToApiFormat);
     return HttpResponse.json({
       status: 'success',
-      data: mockWorkspaces,
+      data: apiFormatData,
     });
   }),
 
   // [GET] 닉네임 중복 확인
-  http.get('/api/members/check-nickname', ({ request }) => {
+  http.get('*/members/nickname-check', ({ request }) => {
     const url = new URL(request.url);
-    const query = url.searchParams.get('query');
-    const isTaken = query === 'duplicate';
+    const nickname = url.searchParams.get('nickname');
+    // 'duplicate'라는 닉네임만 중복으로 처리 (테스트용)
+    const isTaken = nickname === 'duplicate';
 
     return HttpResponse.json({
-      status: 'success',
-      data: {
-        available: !isTaken,
-      },
+      message: 'success',
+      data: { available: !isTaken },
+      code: 0,
+      success: true,
+    });
+  }),
+
+  // [PUT] 닉네임 변경
+  http.put('*/members/:id/nickname', ({ request }) => {
+    const url = new URL(request.url);
+    const nickname = url.searchParams.get('nickname');
+
+    return HttpResponse.json({
+      message: '닉네임이 변경되었습니다.',
+      data: { nickname },
+      code: 0,
+      success: true,
+    });
+  }),
+
+  // [DELETE] 회원 탈퇴
+  http.delete('*/members/:id', () => {
+    return HttpResponse.json({
+      message: '회원 탈퇴가 완료되었습니다.',
+      data: {},
+      code: 0,
+      success: true,
     });
   }),
 
