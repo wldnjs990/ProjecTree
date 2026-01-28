@@ -73,15 +73,17 @@ export function StatusMetaSection() {
           />
         </div>
 
-        {/* 난이도 */}
-        <div className="space-y-1">
-          <span className="text-xs text-[#61626F]">난이도</span>
-          <NodeDifficultyField
-            value={displayData.difficult}
-            isEdit={isEdit}
-            onChange={handleDifficultyChange}
-          />
-        </div>
+        {/* 난이도 - TASK, ADVANCED 타입에만 표시 */}
+        {displayData.difficult !== undefined && (
+          <div className="space-y-1">
+            <span className="text-xs text-[#61626F]">난이도</span>
+            <NodeDifficultyField
+              value={displayData.difficult}
+              isEdit={isEdit}
+              onChange={handleDifficultyChange}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

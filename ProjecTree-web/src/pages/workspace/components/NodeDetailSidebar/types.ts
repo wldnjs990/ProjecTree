@@ -18,7 +18,7 @@ export interface NodeData {
   identifier: string;
   taskType: TaskType;
   status: NodeStatus;
-  difficult: number;
+  difficult?: number; // TASK, ADVANCED 타입에만 존재
 }
 
 export interface ApiNode {

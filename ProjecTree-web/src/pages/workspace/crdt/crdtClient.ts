@@ -140,10 +140,15 @@ class CrdtClient {
    */
   saveNodeDetail(nodeId: string): string | null {
     const requestId = crypto.randomUUID();
+    const nodeType = useNodeStore
+      .getState()
+      .nodes.find((n) => n.id === nodeId)
+      ?.type.toUpperCase();
     const message = JSON.stringify({
       type: 'save_node_detail',
       requestId,
       nodeId,
+      nodeType,
     });
 
     const ws = this.provider.ws;
