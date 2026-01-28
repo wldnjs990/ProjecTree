@@ -30,7 +30,54 @@ export default function WorkspaceOnboardingPage() {
     teamMembers: [] as Array<{ email: string; role: string }>,
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleFormDataChange = (updates: Partial<typeof formData>) => {
+    setFormData((prev) => ({ ...prev, ...updates }));
+    // 입력 시 해당 필드의 에러 제거
+    if (Object.keys(errors).length > 0) {
+      const newErrors = { ...errors };
+      Object.keys(updates).forEach((key) => {
+        delete newErrors[key];
+      });
+      setErrors(newErrors);
+    }
+  };
+
   const handleNext = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (currentStep === 1) {
+      if (!formData.workspaceName.trim()) {
+        newErrors.workspaceName = '워크스페이스명을 입력해주세요.';
+      }
+      if (!formData.workspaceKey.trim()) {
+        newErrors.workspaceKey = '워크스페이스 키를 입력해주세요.';
+      } else if (formData.workspaceKey.length !== 4) {
+        newErrors.workspaceKey = '워크스페이스 키는 4자여야 합니다.';
+      }
+    }
+
+    if (currentStep === 2) {
+      if (!formData.domain) {
+        newErrors.domain = '도메인을 선택해주세요.';
+      }
+      if (!formData.serviceType) {
+        newErrors.serviceType = '서비스 유형을 선택해주세요.';
+      }
+    }
+
+    if (currentStep === 3) {
+      if (!formData.subject.trim()) {
+        newErrors.subject = '프로젝트 주제를 입력해주세요.';
+      }
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     if (currentStep < 6) {
       setCurrentStep((prev) => prev + 1);
     } else if (currentStep === 6) {
@@ -48,18 +95,30 @@ export default function WorkspaceOnboardingPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-[var(--figma-tech-green)] font-['Pretendard'] overflow-hidden">
-      {/* Left Side (Marketing/Vision) */}
-      <div className="hidden lg:flex flex-1 relative flex-col justify-between p-12 overflow-hidden">
-        {/* Abstract Geometric Lines Pattern */}
+    <div className="flex min-h-screen w-full bg-[var(--figma-tech-green)] font-['Pretendard'] overflow-hidden relative">
+      {/* Background Gradients & Noise (Global) */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {/* Minimalist Dot Grid Pattern */}
         <div
-          className="absolute inset-0 opacity-20 pointer-events-none"
+          className="absolute inset-0 opacity-[0.1]"
           style={{
-            backgroundImage:
-              'linear-gradient(45deg, rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(-45deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
+            backgroundImage: `radial-gradient(rgba(255,255,255,0.3) 1px, transparent 1px)`,
+            backgroundSize: '32px 32px',
           }}
         />
+
+        {/* Top-Left Ambient Light (Neon Green) */}
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[var(--figma-neon-green)] opacity-[0.08] blur-[120px]" />
+
+        {/* Bottom-Right Shadow (Dark Depth) */}
+        <div className="absolute bottom-[-20%] right-[-20%] w-[800px] h-[800px] rounded-full bg-[#001E10] opacity-[0.6] blur-[100px]" />
+
+        {/* Center Subtle Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-white opacity-[0.02] blur-[80px]" />
+      </div>
+
+      {/* Left Side (Marketing/Vision) */}
+      <div className="hidden lg:flex flex-1 relative flex-col justify-between p-12 overflow-hidden z-10">
 
         {/* Brand */}
         <div className="relative z-10">
@@ -76,7 +135,7 @@ export default function WorkspaceOnboardingPage() {
 
       {/* Right Side (Content) with Diagonal Split */}
       <div
-        className="w-full lg:w-[60%] bg-white relative flex flex-col items-center justify-center p-8 lg:p-24 shadow-2xl"
+        className="w-full lg:w-[70%] bg-white relative flex flex-col items-center justify-center p-8 lg:p-24 shadow-2xl"
         style={{ clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
         {/* Mobile Header */}
@@ -111,9 +170,8 @@ export default function WorkspaceOnboardingPage() {
                 {currentStep === 1 && (
                   <Step1BasicInfo
                     data={formData}
-                    onChange={(updates) =>
-                      setFormData((prev) => ({ ...prev, ...updates }))
-                    }
+                    errors={errors}
+                    onChange={handleFormDataChange}
                     onNext={handleNext}
                     onPrev={handlePrev}
                   />
@@ -121,9 +179,8 @@ export default function WorkspaceOnboardingPage() {
                 {currentStep === 2 && (
                   <Step2ProjectType
                     data={formData}
-                    onChange={(updates) =>
-                      setFormData((prev) => ({ ...prev, ...updates }))
-                    }
+                    errors={errors}
+                    onChange={handleFormDataChange}
                     onNext={handleNext}
                     onPrev={handlePrev}
                   />
@@ -131,9 +188,8 @@ export default function WorkspaceOnboardingPage() {
                 {currentStep === 3 && (
                   <Step3Schedule
                     data={formData}
-                    onChange={(updates) =>
-                      setFormData((prev) => ({ ...prev, ...updates }))
-                    }
+                    errors={errors}
+                    onChange={handleFormDataChange}
                     onNext={handleNext}
                     onPrev={handlePrev}
                   />
@@ -141,9 +197,7 @@ export default function WorkspaceOnboardingPage() {
                 {currentStep === 4 && (
                   <Step4TechStack
                     data={formData}
-                    onChange={(updates) =>
-                      setFormData((prev) => ({ ...prev, ...updates }))
-                    }
+                    onChange={handleFormDataChange}
                     onNext={handleNext}
                     onPrev={handlePrev}
                   />
@@ -151,9 +205,7 @@ export default function WorkspaceOnboardingPage() {
                 {currentStep === 5 && (
                   <Step5TeamInvite
                     data={formData}
-                    onChange={(updates) =>
-                      setFormData((prev) => ({ ...prev, ...updates }))
-                    }
+                    onChange={handleFormDataChange}
                     onNext={handleNext}
                     onPrev={handlePrev}
                   />
@@ -161,9 +213,7 @@ export default function WorkspaceOnboardingPage() {
                 {currentStep === 6 && (
                   <Step6EpicSetup
                     data={formData}
-                    onChange={(updates) =>
-                      setFormData((prev) => ({ ...prev, ...updates }))
-                    }
+                    onChange={handleFormDataChange}
                     onNext={handleNext}
                     onPrev={handlePrev}
                   />
@@ -198,9 +248,9 @@ export default function WorkspaceOnboardingPage() {
       {/* Back Button (Absolute) */}
       <button
         onClick={() => navigate('/workspace-lounge')}
-        className="absolute bottom-8 right-8 z-50 text-gray-300 hover:text-[var(--figma-tech-green)] transition-colors"
+        className="absolute bottom-12 left-12 z-50 text-[var(--figma-neon-green)]/60 hover:text-[var(--figma-neon-green)] transition-colors font-medium text-sm"
       >
-        나가기
+        돌아가기
       </button>
     </div>
   );
