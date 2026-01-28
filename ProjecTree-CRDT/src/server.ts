@@ -5,7 +5,7 @@ import internalRouter from "./api/internalRouter";
 
 export function startServer() {
   const PORT = Number(process.env.PORT) || 1234;
-  const HTTP_PORT = Number(process.env.HTTP_PORT) || 1235;
+  const HTTP_PORT = Number(process.env.HTTP_PORT) || 19999;
 
   const wss = new WebSocketServer({ port: PORT });
 
