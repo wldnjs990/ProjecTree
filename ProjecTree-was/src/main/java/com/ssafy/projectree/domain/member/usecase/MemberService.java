@@ -1,7 +1,12 @@
 package com.ssafy.projectree.domain.member.usecase;
 
+import com.ssafy.projectree.domain.auth.enums.AuthRole;
+import com.ssafy.projectree.domain.member.api.dto.SignUpDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
+import com.ssafy.projectree.global.api.code.ErrorCode;
+import com.ssafy.projectree.global.exception.BusinessLogicException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,8 +14,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MemberService {
-
     private final MemberRepository memberRepository;
 
     // TODO: 예외 발생에 대한 처리 필요
@@ -22,5 +27,4 @@ public class MemberService {
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).get();
     }
-
 }
