@@ -23,7 +23,7 @@ export async function sendBatchToSpring(
       workspaceId: payload.workspaceId,
       nodeCount: payload.nodes.length,
     });
-    await springClient.put(
+    await springClient.patch(
       `/api/internal/workspaces/${payload.workspaceId}/nodes/positions`,
       {
         nodes: payload.nodes,

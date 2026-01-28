@@ -9,7 +9,7 @@ interface SaveNodeDetailPayload {
 
 export async function saveNodeDetailToSpring(payload: SaveNodeDetailPayload) {
   try {
-    await springClient.post(
+    await springClient.patch(
       `/api/internal/workspaces/${payload.workspaceId}/nodes/${payload.nodeId}/detail`,
       payload.detail,
     );
