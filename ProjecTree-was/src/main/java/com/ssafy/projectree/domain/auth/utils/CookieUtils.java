@@ -3,6 +3,7 @@ package com.ssafy.projectree.domain.auth.utils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
@@ -13,12 +14,14 @@ import static com.ssafy.projectree.domain.auth.jwt.JwtProperties.REFRESH_TOKEN_E
 
 @Component
 public class CookieUtils {
-    public static Cookie createRefreshTokenCookie(String token){
-        Cookie cookie = new Cookie("refreshToken", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME);
-        return cookie;
+    public static ResponseCookie createRefreshTokenCookie(String token){
+        return ResponseCookie.from("refreshToken", token)
+                .path("/")           // 모든 경로에서 쿠키 허용
+                .httpOnly(true)      // JS에서 접근 불가능 (보안 필수)
+                .secure(true)        // HTTPS에서만 전송 (SameSite=None 사용 시 필수)
+                .maxAge(REFRESH_TOKEN_EXPIRE_TIME)
+                .sameSite("None")    // 핵심: 서로 다른 도메인(Localhost <-> AWS) 간 쿠키 전송 허용
+                .build();
     }
     // 1. 쿠키 조회
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
