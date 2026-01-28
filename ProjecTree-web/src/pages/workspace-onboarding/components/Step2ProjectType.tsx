@@ -20,6 +20,7 @@ interface Step2ProjectTypeProps {
   onChange: (updates: Partial<Step2ProjectTypeProps['data']>) => void;
   onNext: () => void;
   onPrev: () => void;
+  errors?: Record<string, string>;
 }
 
 export default function Step2ProjectType({
@@ -27,6 +28,7 @@ export default function Step2ProjectType({
   onChange,
   // onNext,
   // onPrev,
+  errors,
 }: Step2ProjectTypeProps) {
   const [customDomain, setCustomDomain] = useState('');
   const isCustomDomain =
@@ -73,7 +75,7 @@ export default function Step2ProjectType({
           >
             <SelectTrigger
               id="domain"
-              className="h-[36px] px-3 py-[8.25px] bg-white border-[var(--figma-border-mercury-alt)] shadow-sm rounded-lg font-['Pretendard'] font-normal text-[14px] leading-4 focus-visible:ring-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors"
+              className={`h-[36px] px-3 py-[8.25px] bg-white border-[var(--figma-border-mercury-alt)] shadow-sm rounded-lg font-['Pretendard'] font-normal text-[14px] leading-4 focus-visible:ring-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors ${errors?.domain ? 'border-red-500 hover:border-red-500' : ''}`}
             >
               <SelectValue placeholder="도메인을 선택하세요" />
             </SelectTrigger>
@@ -85,6 +87,11 @@ export default function Step2ProjectType({
               ))}
             </SelectContent>
           </Select>
+          {errors?.domain && (
+            <p className="font-['Pretendard'] text-[13px] text-red-500 mt-1">
+              {errors.domain}
+            </p>
+          )}
 
           {/* 기타 선택 시 커스텀 입력 필드 */}
           {isCustomDomain && (
@@ -134,9 +141,14 @@ export default function Step2ProjectType({
 
         {/* 서비스 유형 */}
         <div className="flex flex-col gap-3">
-          <Label className="font-['Pretendard'] font-medium text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]">
-            서비스 유형
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label className="font-['Pretendard'] font-medium text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]">
+              서비스 유형
+            </Label>
+            <span className="font-[Inter] font-medium text-[14px] leading-5 text-[var(--figma-required-crimson)] text-red-500">
+              *
+            </span>
+          </div>
           <RadioGroup
             value={data.serviceType}
             onValueChange={(value) => onChange({ serviceType: value })}
@@ -179,8 +191,13 @@ export default function Step2ProjectType({
               </Label>
             </div>
           </RadioGroup>
+          {errors?.serviceType && (
+            <p className="font-['Pretendard'] text-[13px] text-red-500 mt-1">
+              {errors.serviceType}
+            </p>
+          )}
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }

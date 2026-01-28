@@ -22,6 +22,7 @@ interface Step3ScheduleProps {
   onChange: (updates: Partial<Step3ScheduleProps['data']>) => void;
   onNext: () => void;
   onPrev: () => void;
+  errors?: Record<string, string>;
 }
 
 export default function Step3Schedule({
@@ -29,6 +30,7 @@ export default function Step3Schedule({
   onChange,
   // onNext,
   // onPrev,
+  errors,
 }: Step3ScheduleProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [fileError, setFileError] = useState<string>('');
@@ -123,12 +125,17 @@ export default function Step3Schedule({
       <div className="flex flex-col gap-3">
         {/* 프로젝트 주제 */}
         <div className="flex flex-col gap-1.5">
-          <Label
-            htmlFor="subject"
-            className="font-['Pretendard'] font-medium text-[13px] leading-[14px] text-[var(--figma-text-cod-gray)]"
-          >
-            프로젝트 주제
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label
+              htmlFor="subject"
+              className="font-['Pretendard'] font-medium text-[13px] leading-[14px] text-[var(--figma-text-cod-gray)]"
+            >
+              프로젝트 주제
+            </Label>
+            <span className="font-[Inter] font-medium text-[14px] leading-5 text-[var(--figma-required-crimson)] text-red-500">
+              *
+            </span>
+          </div>
           <Textarea
             id="subject"
             placeholder="예: AI가 사용자 취향을 분석해 최적의 여행 일정을 추천"
@@ -143,6 +150,11 @@ export default function Step3Schedule({
               {data.subject.length}/50
             </span>
           </div>
+          {errors?.subject && (
+            <p className="font-['Pretendard'] text-[13px] text-red-500 mt-1">
+              {errors.subject}
+            </p>
+          )}
         </div>
 
         {/* 파일 업로드 */}
@@ -237,9 +249,11 @@ export default function Step3Schedule({
 
         {/* 예상 기간 */}
         <div className="flex flex-col gap-2">
-          <Label className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
-            예상 기간
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
+              예상 기간
+            </Label>
+          </div>
           <div className="flex items-center gap-4">
             {/* 시작일 */}
             <Popover>
@@ -302,6 +316,11 @@ export default function Step3Schedule({
               </PopoverContent>
             </Popover>
           </div>
+          {(errors?.startDate || errors?.endDate) && (
+            <p className="font-['Pretendard'] text-[13px] text-red-500 mt-1">
+              {errors?.startDate || errors?.endDate}
+            </p>
+          )}
         </div>
       </div>
     </div>
