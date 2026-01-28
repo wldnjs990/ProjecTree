@@ -48,7 +48,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // 3. 토큰 생성 및 붙이기
         Jwt jwt = jwtUtils.generate(authentication);
-        response.addCookie(CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken()));
+        response.setHeader("Set-Cookie",CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken()).toString());
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", jwt.getAccessToken())
                 .build().toUriString();

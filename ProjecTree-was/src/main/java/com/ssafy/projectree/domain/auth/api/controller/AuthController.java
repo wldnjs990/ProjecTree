@@ -12,6 +12,7 @@ import com.ssafy.projectree.global.docs.AuthDocsController;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,9 +32,8 @@ public class AuthController implements AuthDocsController {
     ) {
         Member member = authService.signUp(principal.getId(), requestDto);
         Jwt jwt = jwtProvider.generate(member);
-        Cookie cookie = CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken());
-        response.addCookie(cookie);
-        return CommonResponse.success(SuccessCode.CREATED, new SignUpDto.Response(jwt.getAccessToken()));
+        ResponseCookie cookie = CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken());
+        response.addHeader("Set-Cookie", cookie.toString());        return CommonResponse.success(SuccessCode.CREATED, new SignUpDto.Response(jwt.getAccessToken()));
     }
 
     @PostMapping("/refresh")
@@ -41,8 +41,7 @@ public class AuthController implements AuthDocsController {
                                                       HttpServletResponse response
     ){
         Jwt jwt = authService.refresh(refreshToken);
-        Cookie cookie = CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken());
-        response.addCookie(cookie);
-        return CommonResponse.success(SuccessCode.CREATED, new SignUpDto.Response(jwt.getRefreshToken()));
+        ResponseCookie cookie = CookieUtils.createRefreshTokenCookie(jwt.getRefreshToken());
+        response.addHeader("Set-Cookie", cookie.toString());        return CommonResponse.success(SuccessCode.CREATED, new SignUpDto.Response(jwt.getRefreshToken()));
     }
 }
