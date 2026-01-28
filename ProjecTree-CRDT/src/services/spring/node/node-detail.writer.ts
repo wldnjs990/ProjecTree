@@ -2,8 +2,8 @@ import { springClient } from "./../../spring/springClient";
 import type { SendNodeDetail } from "../../../domain/node/node.detail";
 
 interface SaveNodeDetailPayload {
-  workspaceId: string;
-  nodeId: string;
+  workspaceId: number;
+  nodeId: number;
   detail: SendNodeDetail;
 }
 

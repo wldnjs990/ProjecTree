@@ -20,36 +20,35 @@ export async function handleMessage(
   } catch {
     return; // Yjs binary → y-websocket 처리
   }
-
+  // 노드 상세정보 저장 요청 처리
   if (parsed?.type === "save_node_detail") {
     const doc = getYDocByRoom(room);
     const nodeDetails = doc.getMap<EditableNodeDetail>("nodeDetails");
     const nodeData = nodeDetails.get(parsed.nodeId);
-
     if (!nodeData) return;
 
     const sendPayload = toSendNodeDetail(nodeData.toJSON());
-
+    const workspaceId: number = Number(room);
     await saveNodeDetailToSpring({
-      workspaceId: room,
-      nodeId: parsed.nodeId,
+      workspaceId,
+      nodeId: Number(parsed.nodeId),
       detail: sendPayload,
     });
-  } else if (parsed?.type === "save_node_position") {
+  }
+  // 노드 위치 저장 요청 처리
+  else if (parsed?.type === "save_node_position") {
     const { nodeId, requestId } = parsed;
     if (!nodeId) return;
-
+    console.log("Saving node position:", { room, nodeId, requestId });
     const doc = getYDocByRoom(room);
     const nodes = doc.getMap<any>("nodes");
     const nodeData = nodes.get(nodeId);
-
     if (!nodeData) return;
 
     const position = nodeData.get("position");
 
     if (typeof position.x !== "number" || typeof position.y !== "number")
       return;
-
     addPendingPosition(room, {
       nodeId,
       position,
