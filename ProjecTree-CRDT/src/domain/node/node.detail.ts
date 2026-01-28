@@ -1,4 +1,4 @@
-import type { NodeStatus, Priority } from "./node.type";
+import type { NodeStatus, Priority, NodeType } from "./node.type";
 
 export interface Assignee {
   id: string;
@@ -6,6 +6,7 @@ export interface Assignee {
 }
 
 export interface EditableNodeDetail {
+  nodeType: NodeType;
   status: NodeStatus;
   priority?: Priority;
   difficult: number;
@@ -14,6 +15,7 @@ export interface EditableNodeDetail {
 }
 
 export interface SendNodeDetail {
+  nodeType: NodeType;
   status: NodeStatus;
   priority?: Priority;
   difficult: number;
@@ -23,6 +25,7 @@ export interface SendNodeDetail {
 
 export function toSendNodeDetail(detail: EditableNodeDetail): SendNodeDetail {
   return {
+    nodeType: detail.nodeType,
     status: detail.status,
     ...(detail.priority !== undefined && { priority: detail.priority }),
     difficult: detail.difficult,
