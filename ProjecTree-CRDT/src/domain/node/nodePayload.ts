@@ -11,19 +11,22 @@ export function isValidNodePayload(body: any): body is IncomingNodePayload {
 }
 
 export interface IncomingNodePayload {
-  id: number;
-  name: string;
-  nodeType: NodeType;
-  position: {
-    xPos: number;
-    yPos: number;
-  };
-  parentId: number | null;
-  data: {
-    priority?: Priority;
-    identifier?: string;
-    taskType?: TaskType;
-    status?: NodeStatus;
-    difficult?: number;
+  workspaceId?: number;
+  nodeData: {
+    id: number;
+    name: string;
+    nodeType: NodeType;
+    position: {
+      xPos: number;
+      yPos: number;
+    };
+    parentId: number | null;
+    data: {
+      priority?: Priority;
+      identifier?: string;
+      taskType?: TaskType;
+      status?: NodeStatus;
+      difficult?: number;
+    };
   };
 }
