@@ -83,7 +83,7 @@ public class NodeSchema {
         private NodeStatus status;
 
         @Schema(description = "난이도", example = "2")
-        private int difficult;
+        private Integer difficult;
 
     }
 }
