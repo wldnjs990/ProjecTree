@@ -58,6 +58,7 @@ export interface TechRecommendation {
   description: string;
   ref: string;
   recommendationScore: number;
+  isSelected: boolean;
 }
 
 export interface NodeDetailData {

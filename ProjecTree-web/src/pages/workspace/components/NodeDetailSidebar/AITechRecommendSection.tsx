@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Sparkles,
   ChevronDown,
@@ -14,6 +14,8 @@ import { Confirm } from '@/components/custom/Confirm';
 import { ConfirmTrigger } from '@/components/custom/ConfirmTrigger';
 import TechDetailContent from './TechDetailContent';
 import TechDetailTitle from './TechDetailTitle';
+import { useSelectedNodeId, useSelectedTechId } from '../../stores/nodeDetailStore';
+import { nodeDetailCrdtService } from '../../services/nodeDetailCrdtService';
 
 interface AITechRecommendSectionProps {
   isEdit: boolean;
@@ -172,15 +174,13 @@ function TechComparisonMarkdown({ comparison }: { comparison: string }) {
 // 기술 카드 목록
 function TechCardList({
   recommendations,
+  onSelectTech,
+  selectedTechId,
 }: {
   recommendations: TechRecommendation[];
+  onSelectTech: (techId: number) => void;
+  selectedTechId: number | null;
 }) {
-  const [selectedTechId, _setSelectedTechId] = useState<number | null>(
-    recommendations.find((r) => r.recommendationScore >= 4)?.id ||
-      recommendations[0]?.id ||
-      null
-  );
-
   return (
     <>
       <div className="space-y-2">
@@ -199,9 +199,10 @@ function TechCardList({
               />
             }
             content={<TechDetailContent tech={tech} />}
-            description="선택한 기술을 확정하시겠습니까? (수정 불가)"
+            description="선택한 기술을 확정하시겠습니까?"
             cancelText="취소"
             actionText="확정"
+            onAction={() => onSelectTech(tech.id)}
           />
         ))}
       </div>
@@ -215,6 +216,25 @@ export function AITechRecommendSection({
 }: AITechRecommendSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [showComparison, setShowComparison] = useState(false);
+  const selectedNodeId = useSelectedNodeId();
+  const selectedTechIdFromStore = useSelectedTechId();
+
+  const fallbackSelectedTechId = useMemo(
+    () =>
+      recommendations.find((tech) => tech.isSelected)?.id ??
+      recommendations.find((r) => r.recommendationScore >= 4)?.id ??
+      recommendations[0]?.id ??
+      null,
+    [recommendations]
+  );
+  const effectiveSelectedTechId =
+    selectedTechIdFromStore ?? fallbackSelectedTechId;
+
+  const handleSelectTech = (techId: number) => {
+    if (!selectedNodeId) return;
+    nodeDetailCrdtService.updateSelectedTech(selectedNodeId, techId);
+  };
+
 
   const handleCompareClick = () => {
     setShowComparison(true);
@@ -253,7 +273,11 @@ export function AITechRecommendSection({
           {showComparison && comparison ? (
             <TechComparisonMarkdown comparison={comparison} />
           ) : (
-            <TechCardList recommendations={recommendations} />
+            <TechCardList
+              recommendations={recommendations}
+              onSelectTech={handleSelectTech}
+              selectedTechId={effectiveSelectedTechId}
+            />
           )}
 
           {/* 액션 버튼 */}

@@ -25,6 +25,7 @@ class NodeDetailCrdtService {
   private static instance: NodeDetailCrdtService | null = null;
 
   private yNodeDetailsRef: Y.Map<Y.Map<YNodeDetailValue>> | null = null;
+  private yNodeTechsRef: Y.Map<number | null> | null = null;
   private yConfirmedRef: Y.Map<ConfirmedNodeData> | null = null;
   private cleanupFn: (() => void) | null = null;
   private isInitialized = false;
@@ -55,6 +56,7 @@ class NodeDetailCrdtService {
 
     // Y.Map 참조 가져오기
     const yNodeDetails = client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
+    const yNodeTechs = client.getYMap<number | null>('nodeTechs');
     const yConfirmed = client.getYMap<ConfirmedNodeData>('confirmedNodeData');
 
     // 편집 데이터 변경 감지
@@ -79,7 +81,27 @@ class NodeDetailCrdtService {
       });
     };
 
+    // 기술 스택 선택 변경 감지 → 편집 데이터에 반영
+    const nodeTechsObserveHandler = (event: Y.YMapEvent<number | null>) => {
+      const { selectedNodeId, editData, isEditing } =
+        useNodeDetailStore.getState();
+      if (!selectedNodeId) return;
+
+      event.keysChanged.forEach((key) => {
+        if (key !== selectedNodeId) return;
+        const selectedTechId = yNodeTechs.get(key) ?? null;
+        useNodeDetailStore.getState().setSelectedTechId(selectedTechId);
+
+        if (isEditing && editData) {
+          useNodeDetailStore
+            .getState()
+            .setEditData({ ...editData, selectedTechId });
+        }
+      });
+    };
+
     yNodeDetails.observeDeep(editObserveHandler);
+    yNodeTechs.observe(nodeTechsObserveHandler);
     yConfirmed.observe(confirmedObserveHandler);
 
     // 기존 데이터 로드 함수
@@ -128,11 +150,13 @@ class NodeDetailCrdtService {
     // cleanup 함수 저장
     this.cleanupFn = () => {
       yNodeDetails.unobserveDeep(editObserveHandler);
+      yNodeTechs.unobserve(nodeTechsObserveHandler);
       yConfirmed.unobserve(confirmedObserveHandler);
       client.provider.off('sync', syncHandler);
     };
 
     this.yNodeDetailsRef = yNodeDetails;
+    this.yNodeTechsRef = yNodeTechs;
     this.yConfirmedRef = yConfirmed;
     this.isInitialized = true;
 
@@ -148,6 +172,7 @@ class NodeDetailCrdtService {
     }
 
     this.yNodeDetailsRef = null;
+    this.yNodeTechsRef = null;
     this.yConfirmedRef = null;
     this.cleanupFn = null;
     this.isInitialized = false;
@@ -187,6 +212,9 @@ class NodeDetailCrdtService {
     interface ServerEditableNodeDetail extends EditableNodeDetail {
       nodeType: NodeType;
     }
+    const yNodeTechs = client.getYMap<number | null>('nodeTechs');
+    const selectedTechIdFromMap = yNodeTechs.get(selectedNodeId) ?? null;
+
     const initialData: ServerEditableNodeDetail = {
       status: nodeListData.status,
       priority: nodeListData.priority,
@@ -194,6 +222,10 @@ class NodeDetailCrdtService {
       assignee: nodeDetail.assignee,
       note: nodeDetail.note,
       nodeType: nodeType,
+      selectedTechId:
+        selectedTechIdFromMap ??
+        (nodeDetail.techs || []).find((tech) => tech.isSelected)?.id ??
+        null,
     };
 
     // Y.Map에 편집 데이터 생성(없으면 생성)
@@ -214,6 +246,7 @@ class NodeDetailCrdtService {
     const store = useNodeDetailStore.getState();
     store.setIsEditing(true);
     store.setEditData(initialData);
+    store.setSelectedTechId(initialData.selectedTechId);
 
     console.log('[NodeDetailCrdtService] 편집 시작:', selectedNodeId);
   }
@@ -330,6 +363,28 @@ class NodeDetailCrdtService {
   }
 
   /**
+   * 노드 기술 선택 정보(selectedTechId) 업데이트 메서드
+   * 1. nodeTechs.nodeId = selectedTechId 형식으로 선택한 노드 데이터 ydoc에 업데이트 + 브로드캐스트
+   * 2. CRDT 서버에 노드 기술 선택 변경사항 DB 업데이트 요청(selectNodeTech)
+   */
+  updateSelectedTech(nodeId: string, selectedTechId: number): void {
+    const client = getCrdtClient();
+    if (!client) return;
+
+    const yNodeTechs =
+      this.yNodeTechsRef ?? client.getYMap<number | null>('nodeTechs');
+    // nodeTechs.nodeId = selectedTechId 형식으로 선택한 노드 데이터 ydoc에 업데이트 + 브로드캐스트
+    yNodeTechs.set(nodeId, selectedTechId);
+    // CRDT 서버로 select_node_tech 메시지 전송
+    client.selectNodeTech(nodeId, selectedTechId);
+    console.log(
+      '[NodeDetailCrdtService] 필드 업데이트:',
+      nodeId,
+      selectedTechId
+    );
+  }
+
+  /**
    * Y.js에서 로컬 store로 데이터 동기화
    */
   private syncFromYjs(): void {
@@ -353,11 +408,13 @@ class NodeDetailCrdtService {
       difficult: (yNodeDetail.get('difficult') as number) || 1,
       assignee: yNodeDetail.get('assignee') as Assignee | null,
       note: (yNodeDetail.get('note') as string) || '',
+      selectedTechId: this.yNodeTechsRef?.get(selectedNodeId) ?? null,
     };
 
     const store = useNodeDetailStore.getState();
     store.setEditData(data);
     store.setIsEditing(true);
+    store.setSelectedTechId(data.selectedTechId);
   }
 
   /**
@@ -372,6 +429,11 @@ class NodeDetailCrdtService {
           nodeId
         );
       }, 0);
+    }
+
+    if (this.yNodeTechsRef) {
+      const selectedTechId = this.yNodeTechsRef.get(nodeId) ?? null;
+      useNodeDetailStore.getState().setSelectedTechId(selectedTechId);
     }
   }
 }
