@@ -1,5 +1,6 @@
 package com.ssafy.projectree.global.docs;
 
+import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,10 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -67,4 +65,13 @@ public interface WorkspaceDocsController {
     })
     @GetMapping("/{id}/my")
     CommonResponse<List<WorkspaceDto.Response>> getMyWorkspaces(@PathVariable Long id);
+
+    @Operation(summary = "워크 스페이스 생성 API", description = "워크 스페이스를 생성합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "워크 스페이스 생성에 성공하였습니다."),
+            @ApiResponse(responseCode = "400", description = "워크 스페이스 생성에 실패하였습니다.")
+    })
+    @PostMapping
+    CommonResponse<?> create(Member member, WorkspaceDto.Insert dto);
+
 }

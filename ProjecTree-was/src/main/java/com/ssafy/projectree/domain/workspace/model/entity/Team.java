@@ -2,16 +2,10 @@ package com.ssafy.projectree.domain.workspace.model.entity;
 
 import com.ssafy.projectree.domain.chat.model.entity.ChatRoom;
 import com.ssafy.projectree.domain.member.model.entity.Member;
+import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.global.model.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,7 +17,7 @@ import lombok.Setter;
 @Table(
 		name = "team",
 		uniqueConstraints = {
-				@UniqueConstraint(columnNames = {"user_id", "workspace_id"})
+				@UniqueConstraint(columnNames = {"member_id", "workspace_id"})
 		}
 )
 public class Team extends BaseEntity {
@@ -33,7 +27,7 @@ public class Team extends BaseEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -43,4 +37,15 @@ public class Team extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "chat_id")
 	private ChatRoom chatRoom;
+
+	@Column(name = "role")
+	@Enumerated(EnumType.STRING)
+	private Role role;
+
+	public Team(Member member, Workspace workspace, ChatRoom chatRoom, Role role) {
+		this.member = member;
+		this.workspace = workspace;
+		this.chatRoom = chatRoom;
+		this.role = role;
+	}
 }
