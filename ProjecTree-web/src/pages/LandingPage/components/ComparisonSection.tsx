@@ -33,11 +33,11 @@ export default function ComparisonSection() {
     }
 
     return (
-        <section className="relative py-24 md:py-32 bg-zinc-950">
+        <section className="relative py-24 md:py-32">
             {/* Background */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-1/4 right-0 h-[600px] w-[600px] rounded-full bg-emerald-600/5 blur-[180px]" />
-                <div className="absolute bottom-1/4 left-0 h-[400px] w-[400px] rounded-full bg-teal-500/5 blur-[120px]" />
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-1/4 right-0 h-[600px] w-[600px] rounded-full bg-emerald-200/20 blur-[180px]" />
+                <div className="absolute bottom-1/4 left-0 h-[400px] w-[400px] rounded-full bg-blue-200/20 blur-[120px]" />
             </div>
 
             <div className="relative mx-auto max-w-6xl px-6">
@@ -53,18 +53,18 @@ export default function ComparisonSection() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-950/30 px-4 py-1.5 text-sm text-emerald-400"
+                        className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm text-emerald-600 font-medium"
                     >
                         <Leaf className="h-3.5 w-3.5" />
                         Before & After
                     </motion.div>
-                    <h2 className="mb-4 text-3xl font-bold text-white md:text-5xl">
+                    <h2 className="mb-4 text-3xl font-bold text-zinc-900 md:text-5xl">
                         From chaos to{" "}
-                        <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                             clarity
                         </span>
                     </h2>
-                    <p className="mx-auto max-w-2xl text-zinc-400 text-lg">
+                    <p className="mx-auto max-w-2xl text-zinc-500 text-lg font-medium">
                         Drag the slider to see the transformation
                     </p>
                 </motion.div>
@@ -76,7 +76,7 @@ export default function ComparisonSection() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
                     ref={containerRef}
-                    className="relative mx-auto max-w-4xl aspect-video cursor-ew-resize overflow-hidden rounded-2xl border border-zinc-800/50"
+                    className="relative mx-auto max-w-4xl aspect-video cursor-ew-resize overflow-hidden rounded-2xl border border-zinc-200 shadow-2xl shadow-zinc-200/50"
                     onMouseDown={handleMouseDown}
                     onMouseUp={handleMouseUp}
                     onMouseLeave={handleMouseUp}
@@ -84,16 +84,16 @@ export default function ComparisonSection() {
                     onTouchMove={handleTouchMove}
                 >
                     {/* Before Side (Chaos) */}
-                    <div className="absolute inset-0 bg-zinc-950">
+                    <div className="absolute inset-0 bg-zinc-100">
                         {/* Noise texture */}
                         <div
-                            className="absolute inset-0 opacity-20"
+                            className="absolute inset-0 opacity-10"
                             style={{
                                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
                             }}
                         />
                         {/* Chaotic wireframe lines */}
-                        <svg className="absolute inset-0 h-full w-full opacity-30">
+                        <svg className="absolute inset-0 h-full w-full opacity-20">
                             {[...Array(15)].map((_, i) => (
                                 <line
                                     key={i}
@@ -101,7 +101,7 @@ export default function ComparisonSection() {
                                     y1={`${Math.random() * 100}%`}
                                     x2={`${Math.random() * 100}%`}
                                     y2={`${Math.random() * 100}%`}
-                                    stroke="#71717a"
+                                    stroke="#52525b"
                                     strokeWidth="1"
                                     strokeDasharray="4 4"
                                 />
@@ -112,7 +112,7 @@ export default function ComparisonSection() {
                             {[...Array(8)].map((_, i) => (
                                 <div
                                     key={i}
-                                    className="absolute border border-zinc-700/50 bg-zinc-900/30 rounded"
+                                    className="absolute border border-zinc-300 bg-white/50 rounded shadow-sm"
                                     style={{
                                         left: `${10 + Math.random() * 70}%`,
                                         top: `${10 + Math.random() * 70}%`,
@@ -124,18 +124,18 @@ export default function ComparisonSection() {
                             ))}
                         </div>
                         {/* Label */}
-                        <div className="absolute bottom-6 left-6 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-sm text-zinc-400 backdrop-blur-sm">
+                        <div className="absolute bottom-6 left-6 rounded-full border border-zinc-200 bg-white/80 px-4 py-2 text-sm text-zinc-500 font-medium backdrop-blur-sm shadow-sm">
                             Without ProjecTree
                         </div>
                     </div>
 
                     {/* After Side (Order) */}
                     <div
-                        className="absolute inset-0 bg-zinc-950"
+                        className="absolute inset-0 bg-white"
                         style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
                     >
                         {/* Emerald glow background */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/50 via-zinc-950 to-teal-950/30" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-white to-teal-50/30" />
 
                         {/* Organized tree structure */}
                         <svg className="absolute inset-0 h-full w-full">
@@ -155,15 +155,15 @@ export default function ComparisonSection() {
                             </defs>
 
                             {/* Main trunk */}
-                            <line x1="50%" y1="85%" x2="50%" y2="50%" stroke="url(#line-gradient)" strokeWidth="3" filter="url(#glow)" />
+                            <line x1="50%" y1="85%" x2="50%" y2="50%" stroke="url(#line-gradient)" strokeWidth="3" />
 
                             {/* Branches */}
-                            <line x1="50%" y1="50%" x2="25%" y2="30%" stroke="url(#line-gradient)" strokeWidth="2" filter="url(#glow)" />
-                            <line x1="50%" y1="50%" x2="75%" y2="30%" stroke="url(#line-gradient)" strokeWidth="2" filter="url(#glow)" />
-                            <line x1="25%" y1="30%" x2="15%" y2="15%" stroke="url(#line-gradient)" strokeWidth="1.5" filter="url(#glow)" />
-                            <line x1="25%" y1="30%" x2="35%" y2="15%" stroke="url(#line-gradient)" strokeWidth="1.5" filter="url(#glow)" />
-                            <line x1="75%" y1="30%" x2="65%" y2="15%" stroke="url(#line-gradient)" strokeWidth="1.5" filter="url(#glow)" />
-                            <line x1="75%" y1="30%" x2="85%" y2="15%" stroke="url(#line-gradient)" strokeWidth="1.5" filter="url(#glow)" />
+                            <line x1="50%" y1="50%" x2="25%" y2="30%" stroke="url(#line-gradient)" strokeWidth="2" />
+                            <line x1="50%" y1="50%" x2="75%" y2="30%" stroke="url(#line-gradient)" strokeWidth="2" />
+                            <line x1="25%" y1="30%" x2="15%" y2="15%" stroke="url(#line-gradient)" strokeWidth="1.5" />
+                            <line x1="25%" y1="30%" x2="35%" y2="15%" stroke="url(#line-gradient)" strokeWidth="1.5" />
+                            <line x1="75%" y1="30%" x2="65%" y2="15%" stroke="url(#line-gradient)" strokeWidth="1.5" />
+                            <line x1="75%" y1="30%" x2="85%" y2="15%" stroke="url(#line-gradient)" strokeWidth="1.5" />
                         </svg>
 
                         {/* Nodes */}
@@ -186,15 +186,14 @@ export default function ComparisonSection() {
                                     width: node.size,
                                     height: node.size,
                                     transform: "translate(-50%, -50%)",
-                                    boxShadow: "0 0 20px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.3)",
+                                    boxShadow: "0 0 20px rgba(16, 185, 129, 0.4), 0 0 40px rgba(16, 185, 129, 0.2)",
                                 }}
                             />
                         ))}
 
                         {/* Label */}
                         <div
-                            className="absolute bottom-6 right-6 rounded-full border border-emerald-500/30 bg-emerald-950/80 px-4 py-2 text-sm text-emerald-300 backdrop-blur-sm"
-                            style={{ boxShadow: "0 0 20px rgba(16, 185, 129, 0.2)" }}
+                            className="absolute bottom-6 right-6 rounded-full border border-emerald-100 bg-white/90 px-4 py-2 text-sm text-emerald-600 font-medium backdrop-blur-sm shadow-lg shadow-emerald-100/50"
                         >
                             With ProjecTree
                         </div>
@@ -202,15 +201,14 @@ export default function ComparisonSection() {
 
                     {/* Slider Handle */}
                     <div
-                        className="absolute top-0 bottom-0 w-1 bg-white/80 cursor-ew-resize"
+                        className="absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize drop-shadow-md"
                         style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
                     >
                         {/* Leaf-shaped handle */}
                         <div
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full border-2 border-emerald-400 bg-zinc-900"
-                            style={{ boxShadow: "0 0 30px rgba(16, 185, 129, 0.5)" }}
+                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full border-4 border-white bg-emerald-500 shadow-xl"
                         >
-                            <Leaf className="h-5 w-5 text-emerald-400" />
+                            <Leaf className="h-5 w-5 text-white" />
                         </div>
                     </div>
                 </motion.div>
