@@ -1,17 +1,56 @@
 package com.ssafy.projectree.domain.workspace.api.dto;
 
 import com.ssafy.projectree.domain.workspace.enums.Role;
+import com.ssafy.projectree.domain.workspace.enums.ServiceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class WorkspaceDto {
 
-    public static class InsertRequest {
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(name = "WorkspaceDto.Insert", description = "워크 스페이스 생성")
+    public static class Insert {
+
+        @Schema(description = "워크 스페이스 이름", example = "AI 여행 프로젝트")
+        private String name;
+
+        @Schema(description = "워크 스페이스 설명", example = "AI를 활용하여 여행지를 추천해주는 서비스입니다. ...")
+        private String description;
+
+        @Schema(description = "워크 스페이스 도메인", example = "여행")
+        private String domain;
+
+        @Schema(description = "워크 스페이스 시작일자(프로젝트 시작일자)", example = "2026-01-06")
+        private LocalDate startDate;
+
+        @Schema(description = "워크 스페이스 종료일자(프로젝트 종료일자)", example = "2026-02-09")
+        private LocalDate endDate;
+
+        @Schema(description = "프로젝트 목적", example = "학습용")
+        private String purpose;
+
+        @Schema(description = "식별자", example = "AIT")
+        private String identifierPrefix;
+
+        @Schema(description = "서비스 유형(WEB/APP 중 1개)", example = "WEB")
+        private ServiceType serviceType;
+
+        @Schema(
+                description = "워크 스페이스 초대 멤버 목록(이메일, 역할) - 역할(OWNER/EDITOR/VIEWER)",
+                example = "{\"example@gmail.com\": \"OWNER\", \"user@gmail.com\": \"EDITOR\"}"
+        )
+        private Map<String, Role> memberRoles;
 
     }
 
