@@ -27,7 +27,6 @@ public class WorkspaceController implements WorkspaceDocsController {
 
     @Override
     public CommonResponse<List<WorkspaceDto.Response>> getMyWorkspaces(Long id) {
-
         return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.read());
     }
 
@@ -38,7 +37,6 @@ public class WorkspaceController implements WorkspaceDocsController {
             @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles
     ) throws IOException {
         workspaceService.create(member, dto, multipartFiles);
-
         return CommonResponse.success(SuccessCode.SUCCESS, "워크 스페이스 생성에 성공하였습니다.");
     }
 
