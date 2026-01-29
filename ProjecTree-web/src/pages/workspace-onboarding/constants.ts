@@ -15,14 +15,14 @@ export const ONBOARDING_TEXTS = {
     {
       number: 2,
       label: '프로젝트 유형',
-      title: '프로젝트 유형 설정',
-      description: '도메인, 목적, 서비스 유형을 선택하세요',
+      title: '프로젝트 유형 및 일정',
+      description: '프로젝트 유형과 예상 기간을 입력하세요',
     },
     {
       number: 3,
-      label: '주제 및 기간',
-      title: '주제 및 일정',
-      description: '프로젝트 주제와 예상 기간을 입력하세요',
+      label: '주제 및 자료',
+      title: '주제 및 자료',
+      description: '프로젝트 주제와 관련 문서를 업로드하세요',
     },
     {
       number: 4,

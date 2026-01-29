@@ -76,7 +76,7 @@ export default function Step4TechStack({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2 className="font-['Pretendard'] font-bold text-[24px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
+        <h2 className="font-['Pretendard'] font-bold text-[22px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
           사용할 기술 스택
         </h2>
         <p className="font-['Pretendard'] font-medium text-[15px] text-[#757575]">
@@ -116,9 +116,10 @@ export default function Step4TechStack({
                 <div
                   key={tech}
                   className={`cursor-pointer px-4 py-2.5 font-['Pretendard'] font-normal text-[14px] transition-colors
-                    ${index === selectedIndex
-                      ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-cod-gray)]'
-                      : 'bg-transparent text-[var(--figma-text-cod-gray)] hover:bg-[var(--figma-gray-concrete)]'
+                    ${
+                      index === selectedIndex
+                        ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-cod-gray)]'
+                        : 'bg-transparent text-[var(--figma-text-cod-gray)] hover:bg-[var(--figma-gray-concrete)]'
                     }`}
                   onClick={() => handleAdd(tech)}
                   onMouseEnter={() => setSelectedIndex(index)}
@@ -132,7 +133,7 @@ export default function Step4TechStack({
 
         {/* 선택된 기술 스택 */}
         {data.techStacks.length > 0 && (
-          <div className="flex min-h-15 flex-wrap gap-2 rounded-lg p-4 bg-[var(--figma-gray-concrete)] border border-[var(--figma-border-mercury)]">
+          <div className="flex min-h-15 max-h-[320px] overflow-y-auto chat-scrollbar flex-wrap gap-2 rounded-lg p-4 bg-[var(--figma-gray-concrete)] border border-[var(--figma-border-mercury)]">
             {data.techStacks.map((tech) => (
               <Badge
                 key={tech}

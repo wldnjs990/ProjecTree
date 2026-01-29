@@ -142,8 +142,8 @@ export default function WorkspaceOnboardingPage() {
 
       {/* Right Side (Content) with Diagonal Split */}
       <div
-        className="w-full lg:w-[70%] bg-white relative flex flex-col items-center justify-center p-8 lg:p-24 shadow-2xl"
-        style={{ clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0% 100%)' }}
+        className="w-full lg:w-[70%] bg-white relative flex flex-col items-center justify-center p-8 lg:px-24 lg:py-12 shadow-2xl"
+        style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
         {/* Mobile Header */}
         <div className="lg:hidden w-full absolute top-0 left-0 p-4 bg-[var(--figma-tech-green)] text-white flex justify-between z-50">
@@ -151,84 +151,87 @@ export default function WorkspaceOnboardingPage() {
           <span>{currentStep}/6</span>
         </div>
 
-        <div className="w-full max-w-[500px] flex flex-col gap-10 relative z-20">
+        <div className="w-full max-w-[500px] h-[600px] flex flex-col justify-between relative z-20">
           {isLoading ? (
             <div className="h-full w-full flex items-center justify-center">
               <Step7Loading />
             </div>
           ) : (
             <>
-              {/* Step Indicator */}
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-[var(--figma-tech-green)] font-bold text-lg">
-                  0{currentStep}
-                </span>
-                <div className="h-[2px] w-12 bg-gray-200">
-                  <div
-                    className="h-full bg-[var(--figma-neon-green)] transition-all duration-300"
-                    style={{ width: `${(currentStep / 6) * 100}%` }}
-                  />
+              {/* Top Section: Indicator + Form */}
+              <div className="w-full">
+                {/* Step Indicator */}
+                <div className="flex items-center gap-2 mb-8">
+                  <span className="text-[var(--figma-tech-green)] font-bold text-lg">
+                    0{currentStep}
+                  </span>
+                  <div className="h-[2px] w-12 bg-gray-200">
+                    <div
+                      className="h-full bg-[var(--figma-neon-green)] transition-all duration-300"
+                      style={{ width: `${(currentStep / 6) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-gray-300 font-medium text-lg">06</span>
                 </div>
-                <span className="text-gray-300 font-medium text-lg">06</span>
+
+                {/* Form Container with Input Override */}
+                <div className="onboarding-input-override animate-fade-in-up">
+                  {currentStep === 1 && (
+                    <Step1BasicInfo
+                      data={formData}
+                      errors={errors}
+                      onChange={handleFormDataChange}
+                      onNext={handleNext}
+                      onPrev={handlePrev}
+                    />
+                  )}
+                  {currentStep === 2 && (
+                    <Step2ProjectType
+                      data={formData}
+                      errors={errors}
+                      onChange={handleFormDataChange}
+                      onNext={handleNext}
+                      onPrev={handlePrev}
+                    />
+                  )}
+                  {currentStep === 3 && (
+                    <Step3Schedule
+                      data={formData}
+                      errors={errors}
+                      onChange={handleFormDataChange}
+                      onNext={handleNext}
+                      onPrev={handlePrev}
+                    />
+                  )}
+                  {currentStep === 4 && (
+                    <Step4TechStack
+                      data={formData}
+                      onChange={handleFormDataChange}
+                      onNext={handleNext}
+                      onPrev={handlePrev}
+                    />
+                  )}
+                  {currentStep === 5 && (
+                    <Step5TeamInvite
+                      data={formData}
+                      onChange={handleFormDataChange}
+                      onNext={handleNext}
+                      onPrev={handlePrev}
+                    />
+                  )}
+                  {currentStep === 6 && (
+                    <Step6EpicSetup
+                      data={formData}
+                      onChange={handleFormDataChange}
+                      onNext={handleNext}
+                      onPrev={handlePrev}
+                    />
+                  )}
+                </div>
               </div>
 
-              {/* Form Container with Input Override */}
-              <div className="onboarding-input-override animate-fade-in-up">
-                {currentStep === 1 && (
-                  <Step1BasicInfo
-                    data={formData}
-                    errors={errors}
-                    onChange={handleFormDataChange}
-                    onNext={handleNext}
-                    onPrev={handlePrev}
-                  />
-                )}
-                {currentStep === 2 && (
-                  <Step2ProjectType
-                    data={formData}
-                    errors={errors}
-                    onChange={handleFormDataChange}
-                    onNext={handleNext}
-                    onPrev={handlePrev}
-                  />
-                )}
-                {currentStep === 3 && (
-                  <Step3Schedule
-                    data={formData}
-                    errors={errors}
-                    onChange={handleFormDataChange}
-                    onNext={handleNext}
-                    onPrev={handlePrev}
-                  />
-                )}
-                {currentStep === 4 && (
-                  <Step4TechStack
-                    data={formData}
-                    onChange={handleFormDataChange}
-                    onNext={handleNext}
-                    onPrev={handlePrev}
-                  />
-                )}
-                {currentStep === 5 && (
-                  <Step5TeamInvite
-                    data={formData}
-                    onChange={handleFormDataChange}
-                    onNext={handleNext}
-                    onPrev={handlePrev}
-                  />
-                )}
-                {currentStep === 6 && (
-                  <Step6EpicSetup
-                    data={formData}
-                    onChange={handleFormDataChange}
-                    onNext={handleNext}
-                    onPrev={handlePrev}
-                  />
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex flex-col gap-4 mt-8">
+              {/* Bottom Section: Actions */}
+              <div className="flex flex-col gap-4 mt-auto pt-4">
                 <button
                   onClick={handleNext}
                   id="next-step-btn"

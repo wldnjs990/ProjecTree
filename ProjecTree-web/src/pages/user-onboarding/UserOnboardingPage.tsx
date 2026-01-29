@@ -47,7 +47,7 @@ export default function UserOnboardingPage() {
     <div className="flex min-h-screen w-full font-sans text-slate-900 font-normal bg-white">
       {/* 1. Left Panel (Brand Area) - Organic Waves */}
       <motion.div
-        className="hidden lg:flex flex-col justify-between w-2/5 p-16 relative overflow-hidden"
+        className="hidden lg:flex flex-col justify-between w-2/5 min-w-[400px] max-w-[600px] p-16 relative overflow-hidden"
         style={{
           backgroundColor: '#0f4c3a', // Brand Dark Green
         }}

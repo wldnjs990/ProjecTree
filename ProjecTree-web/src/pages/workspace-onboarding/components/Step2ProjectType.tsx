@@ -1,6 +1,16 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { CalendarIcon, Info } from 'lucide-react';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -16,6 +26,8 @@ interface Step2ProjectTypeProps {
     domain: string;
     purpose: string;
     serviceType: string;
+    startDate: Date | null;
+    endDate: Date | null;
   };
   onChange: (updates: Partial<Step2ProjectTypeProps['data']>) => void;
   onNext: () => void;
@@ -32,17 +44,18 @@ export default function Step2ProjectType({
 }: Step2ProjectTypeProps) {
   const [customDomain, setCustomDomain] = useState('');
   const isCustomDomain =
-    data.domain === '기타' || (!!data.domain && !DOMAIN_OPTIONS.includes(data.domain as any));
+    data.domain === '기타' ||
+    (!!data.domain && !DOMAIN_OPTIONS.includes(data.domain as any));
 
   return (
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2 className="font-['Pretendard'] font-bold text-[24px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
-          프로젝트 유형 설정
+        <h2 className="font-['Pretendard'] font-bold text-[22px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
+          프로젝트 유형 및 일정
         </h2>
         <p className="font-['Pretendard'] font-medium text-[15px] text-[#757575]">
-          도메인, 목적, 서비스 유형을 선택하세요
+          프로젝트 유형과 예상 기간을 입력하세요
         </p>
       </div>
 
@@ -60,6 +73,18 @@ export default function Step2ProjectType({
             <span className="font-[Inter] font-medium text-[14px] leading-5 text-[var(--figma-required-crimson)]">
               *
             </span>
+            <div className="relative group">
+              <Info className="h-4 w-4 text-[#BDBDBD] hover:text-[#4CAF50] transition-colors cursor-help" />
+              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block px-4 py-3 bg-white border border-[#4ADE80] text-[#374151] text-xs rounded-xl shadow-[0_4px_14px_0_rgba(74,222,128,0.25)] z-50 w-[300px] whitespace-normal text-left leading-relaxed">
+                <p>
+                  선택하신 도메인에 맞춰 <br />
+                  <span className="text-[#16A34A] font-bold text-[13px]">
+                    AI가 최적의 기능과 기술 스택
+                  </span>
+                  을 추천해 드립니다.
+                </p>
+              </div>
+            </div>
           </div>
           <Select
             value={isCustomDomain ? '기타' : data.domain}
@@ -81,7 +106,11 @@ export default function Step2ProjectType({
             </SelectTrigger>
             <SelectContent>
               {DOMAIN_OPTIONS.map((option) => (
-                <SelectItem key={option} value={option} className="font-['Pretendard']">
+                <SelectItem
+                  key={option}
+                  value={option}
+                  className="font-['Pretendard']"
+                >
                   {option}
                 </SelectItem>
               ))}
@@ -92,7 +121,6 @@ export default function Step2ProjectType({
               {errors.domain}
             </p>
           )}
-
           {/* 기타 선택 시 커스텀 입력 필드 */}
           {isCustomDomain && (
             <div className="flex flex-col gap-2">
@@ -155,7 +183,11 @@ export default function Step2ProjectType({
             className="flex gap-4"
           >
             <div className="flex items-center gap-2">
-              <RadioGroupItem value="web" id="web" className="text-[var(--figma-forest-primary)]" />
+              <RadioGroupItem
+                value="web"
+                id="web"
+                className="text-[var(--figma-forest-primary)]"
+              />
               <Label
                 htmlFor="web"
                 className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
@@ -164,7 +196,11 @@ export default function Step2ProjectType({
               </Label>
             </div>
             <div className="flex items-center gap-2">
-              <RadioGroupItem value="mobile" id="mobile" className="text-[var(--figma-forest-primary)]" />
+              <RadioGroupItem
+                value="mobile"
+                id="mobile"
+                className="text-[var(--figma-forest-primary)]"
+              />
               <Label
                 htmlFor="mobile"
                 className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
@@ -173,7 +209,11 @@ export default function Step2ProjectType({
               </Label>
             </div>
             <div className="flex items-center gap-2">
-              <RadioGroupItem value="desktop" id="desktop" className="text-[var(--figma-forest-primary)]" />
+              <RadioGroupItem
+                value="desktop"
+                id="desktop"
+                className="text-[var(--figma-forest-primary)]"
+              />
               <Label
                 htmlFor="desktop"
                 className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
@@ -182,7 +222,11 @@ export default function Step2ProjectType({
               </Label>
             </div>
             <div className="flex items-center gap-2">
-              <RadioGroupItem value="other" id="serviceOther" className="text-[var(--figma-forest-primary)]" />
+              <RadioGroupItem
+                value="other"
+                id="serviceOther"
+                className="text-[var(--figma-forest-primary)]"
+              />
               <Label
                 htmlFor="serviceOther"
                 className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
@@ -197,7 +241,83 @@ export default function Step2ProjectType({
             </p>
           )}
         </div>
-      </div >
-    </div >
+
+        {/* 예상 기간 */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-1.5">
+            <Label className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
+              예상 기간
+            </Label>
+          </div>
+          <div className="flex items-center gap-4">
+            {/* 시작일 */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={`flex-1 justify-start text-left font-normal font-['Pretendard'] h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md hover:border-[var(--figma-forest-accent)] ${!data.startDate && 'text-muted-foreground'}`}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {data.startDate ? (
+                    format(data.startDate, 'PPP', { locale: ko })
+                  ) : (
+                    <span className="text-[var(--figma-text-emperor)]">
+                      시작일
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={data.startDate || undefined}
+                  onSelect={(date) => onChange({ startDate: date || null })}
+                  initialFocus
+                  className="rounded-md border border-[var(--figma-border-mercury)] shadow-lg"
+                />
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-[var(--figma-text-emperor)] shrink-0">~</span>
+
+            {/* 종료일 */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={`flex-1 justify-start text-left font-normal font-[Roboto] h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md hover:border-[var(--figma-forest-accent)] ${!data.endDate && 'text-muted-foreground'}`}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {data.endDate ? (
+                    format(data.endDate, 'PPP', { locale: ko })
+                  ) : (
+                    <span className="text-[var(--figma-text-emperor)]">
+                      종료일
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={data.endDate || undefined}
+                  onSelect={(date) => onChange({ endDate: date || null })}
+                  initialFocus
+                  disabled={(date) =>
+                    data.startDate ? date < data.startDate : false
+                  }
+                  className="rounded-md border border-[var(--figma-border-mercury)] shadow-lg"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          {(errors?.startDate || errors?.endDate) && (
+            <p className="font-['Pretendard'] text-[13px] text-red-500 mt-1">
+              {errors?.startDate || errors?.endDate}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
