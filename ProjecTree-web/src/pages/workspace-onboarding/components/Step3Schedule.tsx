@@ -8,7 +8,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { CalendarIcon, Upload, X } from 'lucide-react';
+import { CalendarIcon, Upload, X, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
@@ -156,12 +156,25 @@ export default function Step3Schedule({
             </p>
           )}
         </div>
-
         {/* 파일 업로드 */}
         <div className="flex flex-col gap-1.5">
-          <Label className="font-['Pretendard'] font-medium text-[13px] leading-[14px] text-[var(--figma-text-cod-gray)]">
-            프로젝트 문서 업로드
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label className="font-['Pretendard'] font-medium text-[13px] leading-[14px] text-[var(--figma-text-cod-gray)]">
+              프로젝트 문서 업로드
+            </Label>
+            <div className="relative group">
+              <Info className="h-4 w-4 text-[#BDBDBD] hover:text-[#4CAF50] transition-colors cursor-help" />
+              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block px-4 py-3 bg-white border border-[#4ADE80] text-[#374151] text-xs rounded-xl shadow-[0_4px_14px_0_rgba(74,222,128,0.25)] z-50 w-[320px] whitespace-normal text-left leading-relaxed">
+                <p>
+                  기획서, 회의록 등을 업로드하면 <br />
+                  <span className="text-[#16A34A] font-bold text-[13px]">
+                    AI가 내용을 분석해 프로젝트 구조
+                  </span>
+                  를 자동으로 잡아줍니다.
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* 파일 업로드 영역 */}
           <div
@@ -245,7 +258,6 @@ export default function Step3Schedule({
             </p>
           )}
         </div>
-
         {/* 예상 기간 */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-1.5">

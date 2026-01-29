@@ -7,12 +7,23 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Search, Plus, ChevronDown, Clock, Calendar, ArrowDownAZ, Loader2, Layers } from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
-import type { FilterType } from "../types";
+} from '@/components/ui/dropdown-menu';
+import {
+  Search,
+  Plus,
+  ChevronDown,
+  Clock,
+  Calendar,
+  ArrowDownAZ,
+  Loader2,
+  Layers,
+  HelpCircle,
+} from 'lucide-react';
+import { useMemo, useState, useEffect } from 'react';
+import type { FilterType } from '../types';
 import { getMyWorkspaces } from '@/apis/workspace-lounge.api';
 import { useUserStore } from '@/stores/userStore';
+import { TutorialModal } from '@/components/common/TutorialModal';
 
 // 정렬 옵션 정의
 const sortOptions = [
@@ -45,6 +56,9 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
     []
   );
   const [isLoading, setIsLoading] = useState(true);
+
+  // 튜토리얼 모달 상태
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
   // (2) 검색어 상태: 입력 반응성을 위해 로컬 state로 관리
   const initialQuery = searchParams.get('q') || '';
@@ -168,6 +182,13 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
           <h1 className="text-xl font-bold text-zinc-800 tracking-tight">
             나의 워크스페이스
           </h1>
+          <button
+            onClick={() => setIsTutorialOpen(true)}
+            className="p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 transition-colors ml-1"
+            title="이용 가이드"
+          >
+            <HelpCircle className="h-5 w-5" />
+          </button>
         </div>
 
         <div className="flex items-center gap-3">
@@ -228,9 +249,12 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
           </div>
         ) : workspaces.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-500">
-
-            <p className="text-lg font-bold text-zinc-700 mb-1">참여 중인 워크스페이스가 없습니다.</p>
-            <p className="text-sm text-zinc-400">우측 상단의 버튼을 눌러 새로운 워크스페이스를 시작해보세요.</p>
+            <p className="text-lg font-bold text-zinc-700 mb-1">
+              참여 중인 워크스페이스가 없습니다.
+            </p>
+            <p className="text-sm text-zinc-400">
+              우측 상단의 버튼을 눌러 새로운 워크스페이스를 시작해보세요.
+            </p>
           </div>
         ) : filteredWorkspaces.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -251,6 +275,12 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
           </div>
         )}
       </div>
+
+      {/* Tutorial Modal */}
+      <TutorialModal
+        isOpen={isTutorialOpen}
+        onClose={() => setIsTutorialOpen(false)}
+      />
     </div>
   );
 }

@@ -76,7 +76,7 @@ export default function Step4TechStack({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2 className="font-['Pretendard'] font-bold text-[24px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
+        <h2 className="font-['Pretendard'] font-bold text-[22px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
           사용할 기술 스택
         </h2>
         <p className="font-['Pretendard'] font-medium text-[15px] text-[#757575]">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Info } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -32,13 +33,14 @@ export default function Step2ProjectType({
 }: Step2ProjectTypeProps) {
   const [customDomain, setCustomDomain] = useState('');
   const isCustomDomain =
-    data.domain === '기타' || (!!data.domain && !DOMAIN_OPTIONS.includes(data.domain as any));
+    data.domain === '기타' ||
+    (!!data.domain && !DOMAIN_OPTIONS.includes(data.domain as any));
 
   return (
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2 className="font-['Pretendard'] font-bold text-[24px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
+        <h2 className="font-['Pretendard'] font-bold text-[22px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
           프로젝트 유형 설정
         </h2>
         <p className="font-['Pretendard'] font-medium text-[15px] text-[#757575]">
@@ -60,6 +62,18 @@ export default function Step2ProjectType({
             <span className="font-[Inter] font-medium text-[14px] leading-5 text-[var(--figma-required-crimson)]">
               *
             </span>
+            <div className="relative group">
+              <Info className="h-4 w-4 text-[#BDBDBD] hover:text-[#4CAF50] transition-colors cursor-help" />
+              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block px-4 py-3 bg-white border border-[#4ADE80] text-[#374151] text-xs rounded-xl shadow-[0_4px_14px_0_rgba(74,222,128,0.25)] z-50 w-[300px] whitespace-normal text-left leading-relaxed">
+                <p>
+                  선택하신 도메인에 맞춰 <br />
+                  <span className="text-[#16A34A] font-bold text-[13px]">
+                    AI가 최적의 기능과 기술 스택
+                  </span>
+                  을 추천해 드립니다.
+                </p>
+              </div>
+            </div>
           </div>
           <Select
             value={isCustomDomain ? '기타' : data.domain}
@@ -81,7 +95,11 @@ export default function Step2ProjectType({
             </SelectTrigger>
             <SelectContent>
               {DOMAIN_OPTIONS.map((option) => (
-                <SelectItem key={option} value={option} className="font-['Pretendard']">
+                <SelectItem
+                  key={option}
+                  value={option}
+                  className="font-['Pretendard']"
+                >
                   {option}
                 </SelectItem>
               ))}
@@ -92,7 +110,6 @@ export default function Step2ProjectType({
               {errors.domain}
             </p>
           )}
-
           {/* 기타 선택 시 커스텀 입력 필드 */}
           {isCustomDomain && (
             <div className="flex flex-col gap-2">
@@ -155,7 +172,11 @@ export default function Step2ProjectType({
             className="flex gap-4"
           >
             <div className="flex items-center gap-2">
-              <RadioGroupItem value="web" id="web" className="text-[var(--figma-forest-primary)]" />
+              <RadioGroupItem
+                value="web"
+                id="web"
+                className="text-[var(--figma-forest-primary)]"
+              />
               <Label
                 htmlFor="web"
                 className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
@@ -164,7 +185,11 @@ export default function Step2ProjectType({
               </Label>
             </div>
             <div className="flex items-center gap-2">
-              <RadioGroupItem value="mobile" id="mobile" className="text-[var(--figma-forest-primary)]" />
+              <RadioGroupItem
+                value="mobile"
+                id="mobile"
+                className="text-[var(--figma-forest-primary)]"
+              />
               <Label
                 htmlFor="mobile"
                 className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
@@ -173,7 +198,11 @@ export default function Step2ProjectType({
               </Label>
             </div>
             <div className="flex items-center gap-2">
-              <RadioGroupItem value="desktop" id="desktop" className="text-[var(--figma-forest-primary)]" />
+              <RadioGroupItem
+                value="desktop"
+                id="desktop"
+                className="text-[var(--figma-forest-primary)]"
+              />
               <Label
                 htmlFor="desktop"
                 className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
@@ -182,7 +211,11 @@ export default function Step2ProjectType({
               </Label>
             </div>
             <div className="flex items-center gap-2">
-              <RadioGroupItem value="other" id="serviceOther" className="text-[var(--figma-forest-primary)]" />
+              <RadioGroupItem
+                value="other"
+                id="serviceOther"
+                className="text-[var(--figma-forest-primary)]"
+              />
               <Label
                 htmlFor="serviceOther"
                 className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
@@ -197,7 +230,7 @@ export default function Step2ProjectType({
             </p>
           )}
         </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 }

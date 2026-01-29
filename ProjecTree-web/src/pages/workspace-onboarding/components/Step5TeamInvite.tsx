@@ -97,7 +97,7 @@ export default function Step5TeamInvite({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2 className="font-['Pretendard'] font-bold text-[24px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
+        <h2 className="font-['Pretendard'] font-bold text-[22px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
           팀 초대
         </h2>
         <p className="font-['Pretendard'] font-medium text-[15px] text-[#757575]">
@@ -134,9 +134,7 @@ export default function Step5TeamInvite({
               권한
             </Label>
             <Select value={memberRole} onValueChange={setMemberRole}>
-              <SelectTrigger
-                className="h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md font-['Pretendard'] font-normal text-[14px] hover:border-[var(--figma-forest-accent)] transition-colors"
-              >
+              <SelectTrigger className="h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md font-['Pretendard'] font-normal text-[14px] hover:border-[var(--figma-forest-accent)] transition-colors">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -155,9 +153,10 @@ export default function Step5TeamInvite({
 
           <Button
             className={`w-full h-[44px] font-['Pretendard'] font-normal text-[13.2px] leading-5 rounded-md border-none transition-colors
-              ${!memberEmail.trim() || !!emailError
-                ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-emperor)] cursor-not-allowed'
-                : 'bg-[var(--figma-forest-primary)] text-[var(--figma-white)] hover:bg-[#1B5E20]'
+              ${
+                !memberEmail.trim() || !!emailError
+                  ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-emperor)] cursor-not-allowed'
+                  : 'bg-[var(--figma-forest-primary)] text-[var(--figma-white)] hover:bg-[#1B5E20]'
               }`}
             onClick={handleInviteMember}
             disabled={!memberEmail.trim() || !!emailError}
