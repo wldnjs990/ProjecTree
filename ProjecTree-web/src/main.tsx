@@ -1,4 +1,3 @@
-// 추천 적용 코드 (main.tsx)
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import '@/styles/index.css';

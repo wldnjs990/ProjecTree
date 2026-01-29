@@ -170,16 +170,15 @@ export default function Step3Schedule({
             onDrop={handleDrop}
             className={`
               p-3 text-center rounded-lg transition-all duration-200 border-2 border-dashed
-              ${isDragging
-                ? 'border-[var(--figma-forest-accent)] bg-green-50'
-                : 'border-[var(--figma-border-mercury)] bg-transparent hover:border-[var(--figma-forest-accent)] hover:bg-green-50/30'
+              ${
+                isDragging
+                  ? 'border-[var(--figma-forest-accent)] bg-green-50'
+                  : 'border-[var(--figma-border-mercury)] bg-transparent hover:border-[var(--figma-forest-accent)] hover:bg-green-50/30'
               }
             `}
           >
             <div className="flex flex-col items-center gap-1.5">
-              <Upload
-                className="h-6 w-6 text-[var(--figma-text-emperor)]"
-              />
+              <Upload className="h-6 w-6 text-[var(--figma-text-emperor)]" />
               <p className="font-['Pretendard'] font-normal text-[12.5px] text-[var(--figma-text-cod-gray)]">
                 Drag & drop PDF files here
               </p>
@@ -209,7 +208,7 @@ export default function Step3Schedule({
 
           {/* 업로드된 파일 목록 */}
           {data.specFiles.length > 0 && (
-            <div className="flex flex-col gap-2 mt-3">
+            <div className="flex flex-col gap-2 mt-3 max-h-[150px] overflow-y-auto chat-scrollbar pr-2">
               {data.specFiles.map((file, index) => (
                 <div
                   key={`${file.name}-${index}`}
@@ -260,7 +259,7 @@ export default function Step3Schedule({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`flex-1 justify-start text-left font-normal font-['Pretendard'] h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md hover:border-[var(--figma-forest-accent)] ${!data.startDate && "text-muted-foreground"}`}
+                  className={`flex-1 justify-start text-left font-normal font-['Pretendard'] h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md hover:border-[var(--figma-forest-accent)] ${!data.startDate && 'text-muted-foreground'}`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {data.startDate ? (
@@ -290,7 +289,7 @@ export default function Step3Schedule({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`flex-1 justify-start text-left font-normal font-[Roboto] h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md hover:border-[var(--figma-forest-accent)] ${!data.endDate && "text-muted-foreground"}`}
+                  className={`flex-1 justify-start text-left font-normal font-[Roboto] h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md hover:border-[var(--figma-forest-accent)] ${!data.endDate && 'text-muted-foreground'}`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {data.endDate ? (
