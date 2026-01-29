@@ -203,8 +203,9 @@ function TechCardList({
             }
             content={<TechDetailContent tech={tech} />}
             description="선택한 기술을 확정하시겠습니까?"
-            cancelText="취소"
+            cancelText="닫기"
             actionText="확정"
+            onAction={() => onSelectTech(tech.id)}
           />
         ))}
       </div>

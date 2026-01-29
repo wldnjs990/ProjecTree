@@ -18,6 +18,8 @@ interface ConfirmProps {
   description: string;
   cancelText: string;
   actionText: string;
+  onAction?: () => void;
+  isConfirmed?: boolean;
 }
 export function Confirm({
   trigger,
@@ -26,6 +28,8 @@ export function Confirm({
   description,
   cancelText,
   actionText,
+  onAction,
+  isConfirmed = true,
 }: ConfirmProps) {
   return (
     <AlertDialog>
@@ -36,11 +40,17 @@ export function Confirm({
           {content && <hr />}
           {content}
           <hr />
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          {!isConfirmed && (
+            <AlertDialogDescription>{description}</AlertDialogDescription>
+          )}
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction>{actionText}</AlertDialogAction>
+          {!isConfirmed && (
+            <AlertDialogAction onClick={onAction}>
+              {actionText}
+            </AlertDialogAction>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

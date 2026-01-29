@@ -4,6 +4,7 @@ import { AITechRecommendSection } from './AITechRecommendSection';
 import { AINodeCandidateSection } from './AINodeCandidateSection';
 import { MemoSection } from './MemoSection';
 import { useSelectedNodeDetail, useNodeDetailEdit } from '../../hooks';
+import { postCreateNode } from '@/apis/node.api';
 
 interface NodeDetailContainerProps {
   nodeInfo?: {
@@ -37,9 +38,11 @@ export default function NodeDetailContainer({
     }
   };
 
-  // 노드 후보 클릭/추가 핸들러 (추후 구현)
-  const handleCandidateClick = () => {
-    console.log('Candidate clicked');
+  // 노드 후보 클릭/추가 핸들러
+  const handleCandidateClick = async (nodeId: number, candidateId: number) => {
+    console.log('노드 생성 시작');
+    const response = await postCreateNode(nodeId, candidateId);
+    console.log(response);
   };
 
   const handleCandidateAddManual = () => {
