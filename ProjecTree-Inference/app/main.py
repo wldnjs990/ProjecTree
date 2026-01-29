@@ -10,6 +10,13 @@ import os
 import uvicorn
 from app.api.v1 import api_router
 from app.core.config import settings
+import logging
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 # FastAPI 앱 인스턴스 생성
 app = FastAPI(

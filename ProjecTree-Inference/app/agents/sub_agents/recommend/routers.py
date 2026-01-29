@@ -1,5 +1,8 @@
 from app.agents.enums import TaskType
 from app.agents.sub_agents.recommend.state import RecommendationState
+import logging
+
+logger = logging.getLogger(__name__)
 
 from app.agents.sub_agents.recommend.nodes import MAX_RETRIES
 
@@ -12,7 +15,7 @@ def should_retry(state: RecommendationState) -> str:
     retry_count = state.get("retry_count", 0)
     # LLM을 통해 구조화된 출력에 대한 피드백을 생성하는 것도 고려해야됨.
     if last_error and retry_count < MAX_RETRIES:
-        print(f"구조화된 출력 실패로 재시도 중... (시도 {retry_count}/{MAX_RETRIES})")
+        logger.info(f"구조화된 출력 실패로 재시도 중... (시도 {retry_count}/{MAX_RETRIES})")
         return "init"
     return "tech_stack_integrator"
 

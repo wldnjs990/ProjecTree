@@ -4,6 +4,9 @@ from app.db.repository.workspace_repository import workspace_repository
 from app.db.repository.candidate_repository import candidate_repository
 from typing import Any
 from app.db.repository.team_repository import team_repository
+from app.db.schemas.node import NodeResponse
+from app.db.schemas.candidate import CandidateResponse
+from app.db.schemas.workspace import WorkspaceResponse
 
 
 def _get_db_session():
@@ -29,7 +32,7 @@ def parent_node_fetch(state: NodeState) -> NodeState:
                 f"parent_id {parent_id}에 해당하는 Node를 찾을 수 없습니다."
             )
 
-        return {"parent_info": parent}
+        return {"parent_info": NodeResponse.model_validate(parent)}
     finally:
         db.close()
 
@@ -52,7 +55,7 @@ def project_spec_fetch(state: NodeState) -> NodeState:
             # 이렇게 하면 세션이 닫혀도 데이터가 객체 안에 남아있게 됩니다.
             _ = list(workspace.workspace_tech_stacks)
             head_count = team_repository.get_headcount_by_workspace_id(db, workspace_id)
-            return {"workspace_info": workspace, "headcount": head_count}
+            return {"workspace_info": WorkspaceResponse.model_validate(workspace), "headcount": head_count}
 
         return {"workspace_info": None, "headcount": None}
     finally:
@@ -75,7 +78,7 @@ def candidate_node_fetch(state: NodeState) -> NodeState:
                 f"candidate_id {candidate_id}에 해당하는 Candidate를 찾을 수 없습니다."
             )
 
-        return {"current_candidate_info": candidate}
+        return {"current_candidate_info": CandidateResponse.model_validate(candidate)}
     finally:
         db.close()
 

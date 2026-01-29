@@ -13,6 +13,9 @@ from app.agents.sub_agents.recommend.prompts.system_prompts import (
     BE_SYSTEM_PROMPT,
     ADVANCE_SYSTEM_PROMPT,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -59,14 +62,14 @@ def run_expert_node(state: RecommendationState, executor: Any):
         )
         output = response.get("structured_response")
         if output is None:
-            print(f"경고: {user_task}에 대한 구조화된 응답(Tool Call)이 없습니다.")
+            logger.warning(f"경고: {user_task}에 대한 구조화된 응답(Tool Call)이 없습니다.")
             return {"tech_list": TechList(techs=[], comparison=""), "last_error": None}
-        print(output)
+        logger.info(output)
         return {"tech_list": output, "last_error": None}
     
     except StructuredOutputValidationError as e:
         error_message = str(e)
-        print(f"구조화된 출력 검증 실패: {error_message}")
+        logger.error(f"구조화된 출력 검증 실패: {error_message}")
         return {"last_error": error_message}
 
 
@@ -104,10 +107,10 @@ def route_feedback(state: RecommendationState) -> RecommendationState:
     # 1. 구조적 에러(Structured Output Failure) 처리
     if last_error:
         new_retry_count = retry_count + 1
-        print(f"구조화된 출력 검증 실패 (시도 {new_retry_count}/{MAX_RETRIES}): {last_error[:100]}...")
+        logger.warning(f"구조화된 출력 검증 실패 (시도 {new_retry_count}/{MAX_RETRIES}): {last_error[:100]}...")
         
         if new_retry_count >= MAX_RETRIES:
-            print(f"최대 재시도 횟수 초과. 빈 결과를 반환합니다.")
+            logger.warning(f"최대 재시도 횟수 초과. 빈 결과를 반환합니다.")
             return {
                 "tech_list": TechList(techs=[], comparison=""),
                 "retry_count": new_retry_count,
@@ -165,18 +168,18 @@ def route_feedback(state: RecommendationState) -> RecommendationState:
             feedback_msg = f"[내용 검증 실패 - 점수: {result.score}]\n피드백: {result.feedback}\n문제점:\n"
             feedback_msg += "\n".join([f"- {issue}" for issue in result.issues])
             
-            print(f"내용 검증 실패 (시도 {new_retry_count}/{MAX_RETRIES}): {feedback_msg[:100]}...")
+            logger.warning(f"내용 검증 실패 (시도 {new_retry_count}/{MAX_RETRIES}): {feedback_msg[:100]}...")
             return {
                 "retry_count": new_retry_count,
                 "feedback": feedback_msg,
                 "last_error": None # 구조적 에러는 아님
             }
             
-        print(f"검증 통과 (점수: {result.score})")
+        logger.info(f"검증 통과 (점수: {result.score})")
         return {"retry_count": 0, "feedback": None, "last_error": None}
 
     except Exception as e:
-        print(f"LLM validation failed: {str(e)}")
+        logger.error(f"LLM validation failed: {str(e)}")
         # 검증 로직 에러 시 일단 통과 처리 (Safe Fail)
         return {"retry_count": 0}
 

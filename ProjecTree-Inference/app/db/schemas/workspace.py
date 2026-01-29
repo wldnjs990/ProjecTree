@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from app.db.schemas.base import BaseSchema, TimestampSchema
+from app.db.schemas.tech import WorkspaceTechStackResponse
 
 class WorkspaceBase(BaseSchema):
     name: str
@@ -25,3 +26,4 @@ class WorkspaceUpdate(BaseSchema):
 
 class WorkspaceResponse(WorkspaceBase, TimestampSchema):
     id: int
+    workspace_tech_stacks: List[WorkspaceTechStackResponse] = []
