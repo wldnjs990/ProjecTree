@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Info } from 'lucide-react';
 
 interface Epic {
   id: string;
@@ -51,7 +51,7 @@ export default function Step6EpicSetup({
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-2">
-        <h2 className="font-['Pretendard'] font-bold text-[24px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
+        <h2 className="font-['Pretendard'] font-bold text-[22px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
           초기 에픽 설정
         </h2>
         <p className="font-['Pretendard'] font-medium text-[15px] text-[#757575]">
@@ -63,9 +63,39 @@ export default function Step6EpicSetup({
       <div className="flex flex-col gap-6">
         {/* 초기 에픽 설정 */}
         <div className="flex flex-col gap-4">
-          <h3 className="font-['Pretendard'] font-medium text-[15px] leading-5 text-[var(--figma-text-cod-gray)]">
-            초기 에픽 설정
-          </h3>
+          <div className="flex items-center gap-1.5">
+            <h3 className="font-['Pretendard'] font-medium text-[15px] leading-5 text-[var(--figma-text-cod-gray)]">
+              초기 에픽 설정
+            </h3>
+            <div className="relative group">
+              <Info className="h-4 w-4 text-[#BDBDBD] hover:text-[#4CAF50] transition-colors cursor-help" />
+              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block px-4 py-3 bg-white border border-[#4ADE80] text-[#374151] text-xs rounded-xl shadow-[0_4px_14px_0_rgba(74,222,128,0.25)] z-50 w-[320px] whitespace-normal text-left leading-relaxed">
+                <p className="font-bold mb-2 text-[#16A34A] text-[13px]">
+                  에픽(Epic)이란?
+                </p>
+                <p className="mb-2 text-[#4B5563]">
+                  프로젝트의 기능을 나누는{' '}
+                  <b className="text-[#15803D]">가장 큰 업무 단위</b>를
+                  의미합니다.
+                </p>
+                <div className="bg-[#F0FDF4] rounded-lg p-3 mt-2 border border-[#86EFAC]">
+                  <p className="text-[11px] text-[#15803D] font-medium mb-1">
+                    예시)
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 text-[#374151]">
+                    <li>
+                      <span className="text-[#16A34A] font-bold">쇼핑몰</span>:
+                      회원 관리, 상품 검색, 장바구니, 결제
+                    </li>
+                    <li>
+                      <span className="text-[#16A34A] font-bold">일정 앱</span>:
+                      캘린더 뷰, 일정 등록, 알림 설정
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* 에픽명과 추가 버튼 */}
           <div className="flex gap-2">
