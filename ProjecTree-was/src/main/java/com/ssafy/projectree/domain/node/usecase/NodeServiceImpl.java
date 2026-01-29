@@ -4,13 +4,15 @@ import com.ssafy.projectree.domain.ai.dto.AiCandidateCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiNodeCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiTechRecommendDto;
 import com.ssafy.projectree.domain.ai.service.InferenceService;
+import com.ssafy.projectree.domain.member.model.entity.Member;
+import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
 import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
+import com.ssafy.projectree.domain.node.api.dto.NodeUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.TechStackRecommendDto;
 import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
-import com.ssafy.projectree.domain.node.api.dto.schema.PositionSchema;
 import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
 import com.ssafy.projectree.domain.node.model.entity.Node;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
@@ -31,6 +33,7 @@ import org.springframework.stereotype.Service;
 public class NodeServiceImpl implements NodeService {
     private final InferenceService inferenceService;
     private final NodeRepository nodeRepository;
+    private final MemberRepository memberRepository;
     private final CandidateRepository candidateRepository;
     private final NodeTreeRepository nodeTreeRepository;
     private final NodeCrdtService nodeCrdtService;
@@ -106,36 +109,36 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
+    @Transactional
+    public void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request) {
+        Node node = nodeRepository.findById(nodeId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
+
+        if (request.getDifficult() != null) {
+            if (node instanceof TaskNode taskNode) {
+                taskNode.setDifficult(request.getDifficult());
+            } else if (node instanceof AdvanceNode advanceNode) {
+                advanceNode.setDifficult(request.getDifficult());
+            }
+        }
+
+        if (request.getStatus() != null) node.setStatus(request.getStatus());
+        if (request.getPriority() != null) node.setPriority(request.getPriority());
+        if (request.getNote() != null) node.setNote(request.getNote());
+
+        if (request.getAssignee() != null) {
+            Member assignee = memberRepository.findById(request.getAssignee())
+                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR));
+            node.setMember(assignee);
+        }
+    }
+
+    @Override
     public NodeSchema getNodeSchemaDetail(Long nodeId, Long parentId) {
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
 
-        return convertToSchema(node, parentId);
+        return NodeSchema.convertToSchema(node, parentId);
     }
 
-    private NodeSchema convertToSchema(Node entity, Long parentId) {
-        // 공통 데이터 매핑
-        NodeSchema.Body body = NodeSchema.Body.builder()
-                .priority(entity.getPriority())
-                .identifier(entity.getIdentifier())
-                .status(entity.getStatus())
-                .build();
-
-        // 자식 타입에 따른 특화 데이터 매핑 (instanceof 활용)
-        if (entity instanceof TaskNode task) {
-            body.setTaskType(task.getType());
-            body.setDifficult(task.getDifficult());
-        } else if (entity instanceof AdvanceNode advance) {
-            body.setDifficult(advance.getDifficult());
-        }
-
-        return NodeSchema.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .nodeType(entity.getNodeType())
-                .parentId(parentId)
-                .position(new PositionSchema(entity.getXPos(), entity.getYPos()))
-                .data(body)
-                .build();
-    }
 }

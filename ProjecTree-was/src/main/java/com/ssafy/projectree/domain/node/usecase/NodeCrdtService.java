@@ -1,16 +1,8 @@
 package com.ssafy.projectree.domain.node.usecase;
 
-import com.ssafy.projectree.domain.member.model.entity.Member;
-import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
 import com.ssafy.projectree.domain.node.api.dto.NodePositionUpdateDto;
-import com.ssafy.projectree.domain.node.api.dto.NodeUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
-import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
-import com.ssafy.projectree.domain.node.model.entity.Node;
-import com.ssafy.projectree.domain.node.model.entity.TaskNode;
 import com.ssafy.projectree.domain.node.model.repository.NodeRepository;
-import com.ssafy.projectree.global.api.code.ErrorCode;
-import com.ssafy.projectree.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +21,6 @@ import java.util.List;
 public class NodeCrdtService {
 
     private final RestClient restClient;
-    private final MemberRepository memberRepository;
     private final NodeRepository nodeRepository;
 
     @Value("${crdt-server.url}")
@@ -59,30 +50,6 @@ public class NodeCrdtService {
 
         } catch (Exception e) {
             log.error("Failed to async save node positions", e);
-        }
-    }
-
-    @Transactional
-    public void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request) {
-        Node node = nodeRepository.findById(nodeId)
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
-
-        if (request.getDifficult() != null) {
-            if (node instanceof TaskNode taskNode) {
-                taskNode.setDifficult(request.getDifficult());
-            } else if (node instanceof AdvanceNode advanceNode) {
-                advanceNode.setDifficult(request.getDifficult());
-            }
-        }
-
-        if (request.getStatus() != null) node.setStatus(request.getStatus());
-        if (request.getPriority() != null) node.setPriority(request.getPriority());
-        if (request.getNote() != null) node.setNote(request.getNote());
-
-        if (request.getAssignee() != null) {
-            Member assignee = memberRepository.findById(request.getAssignee())
-                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR));
-            node.setMember(assignee);
         }
     }
 

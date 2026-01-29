@@ -15,4 +15,6 @@ public interface NodeService {
     TechStackRecommendDto.Response recommendTechStack(Long nodeId);
 
     NodeSchema getNodeSchemaDetail(Long nodeId, Long parentId);
-}
+
+    void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request);
+    }
