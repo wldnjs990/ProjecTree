@@ -188,6 +188,37 @@ class CrdtClient {
   }
 
   /**
+   * 노드 기술추천 선택 저장 요청을 CRDT 서버로 전송
+   * nodeId와 workspaceId, selectedTechId를 함께 전송해야함
+   */
+  selectNodeTech(nodeId: string, selectedTechId: number): string | null {
+    const requestId = crypto.randomUUID();
+    const workspaceId = this.roomId;
+
+    const ws = this.provider.ws;
+    const message = JSON.stringify({
+      type: 'select_node_tech',
+      workspaceId,
+      requestId,
+      nodeId,
+      selectedTechId,
+    });
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(message);
+      console.log('[CRDT] 기술 스택 선택 요청 전송:', {
+        requestId,
+        nodeId,
+        selectedTechId,
+      });
+      return requestId;
+    }
+
+    console.warn('[CRDT] WebSocket이 연결되지 않아 기술 선택 요청 실패');
+    return null;
+  }
+
+  /**
    * 싱글톤 인스턴스 가져오기
    */
   static getInstance(): CrdtClient | null {

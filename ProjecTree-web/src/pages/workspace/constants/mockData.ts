@@ -128,6 +128,7 @@ export const mockNodeDetailApiResponses: Record<number, NodeDetailApiResponse> =
               'React를 위한 폼 상태 관리 라이브러리로, 유효성 검사와 폼 제출을 효율적으로 처리합니다.',
             ref: 'https://react-hook-form.com/',
             recommendationScore: 5,
+            isSelected: false,
           },
           {
             id: 50139,
@@ -140,6 +141,7 @@ export const mockNodeDetailApiResponses: Record<number, NodeDetailApiResponse> =
               'React를 위한 데이터 페칭 라이브러리로, 캐싱과 재검증을 자동으로 처리합니다.',
             ref: 'https://swr.vercel.app/',
             recommendationScore: 4,
+            isSelected: false,
           },
           {
             id: 71996,
@@ -152,6 +154,7 @@ export const mockNodeDetailApiResponses: Record<number, NodeDetailApiResponse> =
               '서버 상태 관리를 위한 라이브러리로, 데이터 페칭, 캐싱, 동기화를 효율적으로 처리합니다.',
             ref: 'https://tanstack.com/query/',
             recommendationScore: 4,
+            isSelected: false,
           },
         ],
         comparison:
@@ -198,6 +201,7 @@ export const mockNodeDetailApiResponses: Record<number, NodeDetailApiResponse> =
               'JSON Web Token 기반의 인증 방식으로, 토큰에 사용자 정보를 담아 전달합니다.',
             ref: 'https://jwt.io/',
             recommendationScore: 5,
+            isSelected: false,
           },
         ],
         comparison:

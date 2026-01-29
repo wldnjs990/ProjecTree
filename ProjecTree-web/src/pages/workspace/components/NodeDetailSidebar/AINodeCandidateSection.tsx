@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Lightbulb, ChevronDown, ChevronUp, Plus } from 'lucide-react';
 import type { Candidate } from './types';
+import { useSelectedNodeId } from '../../stores/nodeDetailStore';
 
 interface AINodeCandidateSectionProps {
   candidates: Candidate[];
-  onCandidateClick?: (node: Candidate) => void;
+  onCandidateClick: (nodeId: number, candidateId: number) => void;
   onAddManual?: () => void;
 }
 
@@ -40,6 +41,7 @@ export function AINodeCandidateSection({
   onAddManual,
 }: AINodeCandidateSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+  const selectedNodeId = useSelectedNodeId();
 
   return (
     <div className="rounded-[14px] border border-[rgba(227,228,235,0.5)] bg-[rgba(251,251,255,0.6)] backdrop-blur-sm overflow-hidden">
@@ -66,11 +68,13 @@ export function AINodeCandidateSection({
         <div className="px-4 pb-4 space-y-4">
           {/* 추천 노드 목록 */}
           <div className="space-y-2">
-            {candidates.map((node) => (
+            {candidates.map((candidateNode) => (
               <SubNodeCard
-                key={node.id}
-                node={node}
-                onClick={() => onCandidateClick?.(node)}
+                key={candidateNode.id}
+                node={candidateNode}
+                onClick={() =>
+                  onCandidateClick(Number(selectedNodeId), candidateNode.id)
+                }
               />
             ))}
           </div>
