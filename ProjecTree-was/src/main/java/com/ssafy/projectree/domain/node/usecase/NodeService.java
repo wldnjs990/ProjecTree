@@ -1,6 +1,7 @@
 package com.ssafy.projectree.domain.node.usecase;
 
 import com.ssafy.projectree.domain.node.api.dto.*;
+import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
 
 public interface NodeService {
     NodeReadDto.Response getNodeDetails(Long nodeId);
@@ -12,4 +13,6 @@ public interface NodeService {
     CandidateCreateDto.Response createCandidate(Long parentId);
 
     TechStackRecommendDto.Response recommendTechStack(Long nodeId);
+
+    NodeSchema getNodeSchemaDetail(Long nodeId, Long parentId);
 }

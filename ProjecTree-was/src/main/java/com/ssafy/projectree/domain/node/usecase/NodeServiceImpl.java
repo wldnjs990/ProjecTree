@@ -105,6 +105,7 @@ public class NodeServiceImpl implements NodeService {
                 .build();
     }
 
+    @Override
     public NodeSchema getNodeSchemaDetail(Long nodeId, Long parentId) {
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
