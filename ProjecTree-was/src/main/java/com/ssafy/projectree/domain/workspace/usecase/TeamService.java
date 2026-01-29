@@ -11,6 +11,7 @@ import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.workspace.model.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,8 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final MemberService memberService;
 
+    @Value("${workspace.invite_url}")
+    private String baseUrl;
     /**
      * workspace id를 통해 해당 workspace의 사용자가 몇명인지 확인
      * @param workspaceId
@@ -47,7 +50,7 @@ public class TeamService {
                 Member teammate = memberService.findByEmail(email);
 
                 Team newTeam = new Team(teammate, workspace, chatRoom, role);
-                emailService.sendEmail(email, "https://i14d107.p.ssafy.io/workspace/" + workspace.getId());
+                emailService.sendEmail(email, baseUrl + workspace.getId());
                 teamRepository.save(newTeam);
             });
         }
