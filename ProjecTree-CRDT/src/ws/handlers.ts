@@ -1,11 +1,30 @@
 import { WebSocket } from "ws";
 import { getYDocByRoom } from "../yjs/ydoc-gateway";
 import { saveNodeDetailToSpring } from "../services/spring/node/node-detail.writer";
+import { saveNodeTechToSpring } from "../services/spring/node/node-tech.writer";
 import type { EditableNodeDetail } from "../domain/node/node.detail";
 import { toSendNodeDetail } from "../domain/node/node.detail";
 import { addPendingPosition } from "../sync/pending-store";
 import { flushWorkspace, scheduleFlush } from "../sync/debounce";
 import { getRoom } from "./room-registry";
+
+function sendError(
+  ws: WebSocket,
+  payload: {
+    type: "save_error";
+    action: "save_node_detail" | "select_node_tech";
+    message: string;
+    requestId?: string;
+    workspaceId?: number;
+    nodeId?: number;
+    selectedTechId?: number;
+    prevDetail?: unknown;
+  },
+) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(payload));
+  }
+}
 
 export async function handleMessage(
   ws: WebSocket,
@@ -22,6 +41,7 @@ export async function handleMessage(
   }
   // 노드 상세정보 저장 요청 처리
   if (parsed?.type === "save_node_detail") {
+    const { requestId, prevDetail } = parsed;
     const doc = getYDocByRoom(room);
     const nodeDetails = doc.getMap<EditableNodeDetail>("nodeDetails");
     const nodeData = nodeDetails.get(parsed.nodeId);
@@ -29,13 +49,53 @@ export async function handleMessage(
 
     const sendPayload = toSendNodeDetail(nodeData.toJSON());
     const workspaceId: number = Number(room);
-    await saveNodeDetailToSpring({
+    const nodeIdValue = Number(parsed.nodeId);
+    if (!Number.isFinite(nodeIdValue)) return;
+    const saved = await saveNodeDetailToSpring({
       workspaceId,
-      nodeId: Number(parsed.nodeId),
+      nodeId: nodeIdValue,
       detail: sendPayload,
     });
+    if (!saved) {
+      sendError(ws, {
+        type: "save_error",
+        action: "save_node_detail",
+        message: "spring_save_failed",
+        requestId,
+        workspaceId,
+        nodeId: nodeIdValue,
+        prevDetail,
+      });
+    }
   }
-  // 노드 위치 저장 요청 처리
+  // select node tech request
+  else if (parsed?.type === "select_node_tech") {
+    const { nodeId, selectedTechId, requestId } = parsed;
+    if (!nodeId || typeof selectedTechId !== "number") return;
+
+    const workspaceId: number = Number(room);
+    const nodeIdValue = Number(nodeId);
+    if (!Number.isFinite(nodeIdValue)) return;
+
+    const saved = await saveNodeTechToSpring({
+      workspaceId,
+      nodeId: nodeIdValue,
+      selectedTechId,
+      requestId,
+    });
+    if (!saved) {
+      sendError(ws, {
+        type: "save_error",
+        action: "select_node_tech",
+        message: "spring_save_failed",
+        requestId,
+        workspaceId,
+        nodeId: nodeIdValue,
+        selectedTechId,
+      });
+    }
+  }
+  // save node position request
   else if (parsed?.type === "save_node_position") {
     const { nodeId, requestId } = parsed;
     if (!nodeId) return;
@@ -57,12 +117,6 @@ export async function handleMessage(
 
     scheduleFlush(room);
   }
-
-  clients.forEach((c) => {
-    if (c !== ws && c.readyState === WebSocket.OPEN) {
-      c.send(data);
-    }
-  });
 }
 
 export function onClientDisconnected(workspaceId: string) {
