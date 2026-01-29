@@ -103,6 +103,8 @@ class NodeService:
             description=node_description,
             task_type=task_type,
             difficulty=node_difficulty,
+            x_pos=request.x_pos,
+            y_pos=request.y_pos,
         )
 
         # 6. node_tree 관계 저장 (부모-자식 관계)
@@ -138,6 +140,8 @@ class NodeService:
         description: str,
         task_type=None,
         difficulty: int = None,
+        x_pos: float = 0.0,
+        y_pos: float = 0.0,
     ) -> Node:
         """노드 타입에 따른 노드 생성 (Joined Table Inheritance)"""
         logger.info(
@@ -151,6 +155,8 @@ class NodeService:
                 name=name,
                 description=description,
                 status="TODO",
+                x_pos=x_pos,
+                y_pos=y_pos,
             )
         elif node_type == NodeType.STORY:
             node = StoryNode(
@@ -158,6 +164,8 @@ class NodeService:
                 name=name,
                 description=description,
                 status="TODO",
+                x_pos=x_pos,
+                y_pos=y_pos,
             )
         elif node_type == NodeType.TASK:
             node = TaskNode(
@@ -167,6 +175,8 @@ class NodeService:
                 status="TODO",
                 difficult=difficulty,
                 type=task_type,
+                x_pos=x_pos,
+                y_pos=y_pos,
             )
         elif node_type == NodeType.ADVANCE:
             node = AdvanceNode(
@@ -175,6 +185,8 @@ class NodeService:
                 description=description,
                 status="TODO",
                 difficult=difficulty,
+                x_pos=x_pos,
+                y_pos=y_pos,
             )
         else:
             # 기본 Node (일반적이지 않은 경우)
@@ -183,6 +195,8 @@ class NodeService:
                 name=name,
                 description=description,
                 status="TODO",
+                x_pos=x_pos,
+                y_pos=y_pos,
             )
 
         db.add(node)
