@@ -1,22 +1,12 @@
 import { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { CalendarIcon, Upload, X, Info } from 'lucide-react';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
+import { Upload, X, Info } from 'lucide-react';
 
 interface Step3ScheduleProps {
   data: {
     subject: string;
-    startDate: Date | null;
-    endDate: Date | null;
     specFiles: File[];
   };
   onChange: (updates: Partial<Step3ScheduleProps['data']>) => void;
@@ -114,10 +104,10 @@ export default function Step3Schedule({
       {/* 헤더 */}
       <div className="flex flex-col items-center gap-1">
         <h2 className="font-['Pretendard'] font-bold text-[22px] leading-tight tracking-[-0.02em] text-[#1A1A1A]">
-          주제 및 일정
+          주제 및 자료
         </h2>
         <p className="font-['Pretendard'] font-medium text-[13px] text-[#757575]">
-          프로젝트 주제와 예상 기간을 입력하세요
+          프로젝트 주제와 관련 문서를 업로드하세요
         </p>
       </div>
 
@@ -255,81 +245,6 @@ export default function Step3Schedule({
           {fileError && (
             <p className="font-['Pretendard'] font-normal text-xs text-red-500 mt-1">
               {fileError}
-            </p>
-          )}
-        </div>
-        {/* 예상 기간 */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-1.5">
-            <Label className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
-              예상 기간
-            </Label>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* 시작일 */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`flex-1 justify-start text-left font-normal font-['Pretendard'] h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md hover:border-[var(--figma-forest-accent)] ${!data.startDate && 'text-muted-foreground'}`}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {data.startDate ? (
-                    format(data.startDate, 'PPP', { locale: ko })
-                  ) : (
-                    <span className="text-[var(--figma-text-emperor)]">
-                      시작일
-                    </span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={data.startDate || undefined}
-                  onSelect={(date) => onChange({ startDate: date || null })}
-                  initialFocus
-                  className="rounded-md border border-[var(--figma-border-mercury)] shadow-lg"
-                />
-              </PopoverContent>
-            </Popover>
-
-            <span className="text-[var(--figma-text-emperor)] shrink-0">~</span>
-
-            {/* 종료일 */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`flex-1 justify-start text-left font-normal font-[Roboto] h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md hover:border-[var(--figma-forest-accent)] ${!data.endDate && 'text-muted-foreground'}`}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {data.endDate ? (
-                    format(data.endDate, 'PPP', { locale: ko })
-                  ) : (
-                    <span className="text-[var(--figma-text-emperor)]">
-                      종료일
-                    </span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={data.endDate || undefined}
-                  onSelect={(date) => onChange({ endDate: date || null })}
-                  initialFocus
-                  disabled={(date) =>
-                    data.startDate ? date < data.startDate : false
-                  }
-                  className="rounded-md border border-[var(--figma-border-mercury)] shadow-lg"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          {(errors?.startDate || errors?.endDate) && (
-            <p className="font-['Pretendard'] text-[13px] text-red-500 mt-1">
-              {errors?.startDate || errors?.endDate}
             </p>
           )}
         </div>

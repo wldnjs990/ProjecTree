@@ -171,19 +171,21 @@ export default function Step5TeamInvite({
             <Label className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
               초대된 팀원
             </Label>
-            {data.teamMembers.map((member, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between rounded p-2 bg-white border border-[var(--figma-border-mercury)] shadow-sm"
-              >
-                <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-cod-gray)]">
-                  {member.email}
-                </span>
-                <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-emperor)]">
-                  {member.role}
-                </span>
-              </div>
-            ))}
+            <div className="max-h-[130px] overflow-y-auto chat-scrollbar pr-1 flex flex-col gap-2">
+              {data.teamMembers.map((member, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between rounded p-2 bg-white border border-[var(--figma-border-mercury)] shadow-sm shrink-0"
+                >
+                  <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-cod-gray)]">
+                    {member.email}
+                  </span>
+                  <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-emperor)]">
+                    {member.role}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

@@ -142,7 +142,7 @@ export default function WorkspaceOnboardingPage() {
 
       {/* Right Side (Content) with Diagonal Split */}
       <div
-        className="w-full lg:w-[70%] bg-white relative flex flex-col items-center justify-center p-8 lg:p-24 shadow-2xl"
+        className="w-full lg:w-[70%] bg-white relative flex flex-col items-center justify-center p-8 lg:px-24 lg:py-12 shadow-2xl"
         style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 100%, 0% 100%)' }}
       >
         {/* Mobile Header */}
