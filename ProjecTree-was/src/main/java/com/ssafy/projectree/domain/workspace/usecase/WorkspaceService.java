@@ -31,6 +31,7 @@ public class WorkspaceService {
     private final NodeService nodeService;
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceTechStackService workspaceTechStackService;
+    private final FunctionSpecificationService functionSpecificationService;
 
     public List<WorkspaceDto.Response> read(Member member) {
         List<Long> ids = teamService.getAllWorkspacesId(member);
@@ -85,6 +86,9 @@ public class WorkspaceService {
 
         // 워크 스페이스 기술 스택 저장
         workspaceTechStackService.create(dto.getWorkspaceTechStacks(), workspace);
+
+        // 기술명세 저장
+        functionSpecificationService.create(workspace, dto.getEpics());
 
     }
 
