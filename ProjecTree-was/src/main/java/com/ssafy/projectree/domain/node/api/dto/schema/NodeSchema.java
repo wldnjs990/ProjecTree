@@ -27,6 +27,7 @@ public class NodeSchema {
 
     @Schema(description = "위치 정보")
     private PositionSchema position;
+
     @Schema(description = "현재 노드의 부모 Id",examples = {
             "null",
             "1"
