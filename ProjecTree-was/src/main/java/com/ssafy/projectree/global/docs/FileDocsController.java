@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "File", description = "파일 업로드 및 조회 관련 API")
@@ -45,7 +46,7 @@ public interface FileDocsController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    CommonResponse<FileUploadDto.Response> upload(List<MultipartFile> multipartFiles, Long id);
+    CommonResponse<FileUploadDto.Response> upload(List<MultipartFile> multipartFiles, Long id) throws IOException;
 
 
     CommonResponse<List<FileReadDto.Response>> read(@PathVariable Long id);

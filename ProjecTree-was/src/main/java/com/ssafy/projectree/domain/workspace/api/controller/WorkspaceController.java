@@ -9,10 +9,12 @@ import com.ssafy.projectree.global.docs.WorkspaceDocsController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -30,9 +32,12 @@ public class WorkspaceController implements WorkspaceDocsController {
     }
 
     @Override
-    public CommonResponse<String> create(@AuthenticationPrincipal Member member, @RequestBody WorkspaceDto.Insert dto) {
-
-        workspaceService.create(member, dto);
+    public CommonResponse<String> create(
+            @AuthenticationPrincipal Member member,
+            @RequestPart(value = "data") WorkspaceDto.Insert dto,
+            @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles
+    ) throws IOException {
+        workspaceService.create(member, dto, multipartFiles);
 
         return CommonResponse.success(SuccessCode.SUCCESS, "워크 스페이스 생성에 성공하였습니다.");
     }

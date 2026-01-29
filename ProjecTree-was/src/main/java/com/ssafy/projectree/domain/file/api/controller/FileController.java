@@ -5,6 +5,7 @@ import com.ssafy.projectree.domain.file.api.dto.FileUploadDto;
 import com.ssafy.projectree.domain.file.usecase.S3FileService;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
+import com.ssafy.projectree.global.docs.FileDocsController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +18,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/files")
-public class FileController {
+public class FileController implements FileDocsController {
 
     private final S3FileService fileService;
 
     @PostMapping("/workspaces/{id}")
-    public CommonResponse<FileUploadDto.Response> upload(List<MultipartFile> multipartFiles, @PathVariable Long id) throws IOException {
+    public CommonResponse<FileUploadDto.Response> upload(@RequestPart(value = "files", required = true) List<MultipartFile> multipartFiles, @PathVariable Long id) throws IOException {
         return CommonResponse.success(SuccessCode.SUCCESS, fileService.upload(multipartFiles, id));
     }
 
