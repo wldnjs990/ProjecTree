@@ -34,10 +34,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         Jwt generate = jwtUtils.generate(authentication);
-        UUID uuid = UUID.fromString(generate.getAccessToken());
+        UUID uuid = UUID.randomUUID();
         String uuidStr = uuid.toString().replace("-", "");
         authHash.put(uuidStr, generate);
         String targetUrl = determineTargetUrl(request, response, uuidStr);
+        log.info("send redirect target URL : {}", targetUrl);
         if (response.isCommitted()) {
             return;
         }
