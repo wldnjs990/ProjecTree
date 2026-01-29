@@ -42,11 +42,11 @@ import java.util.List;
 @Transactional
 public class NodeServiceImpl implements NodeService {
     private final InferenceService inferenceService;
-    private final MemberRepository memberRepository;
     private final NodeRepository nodeRepository;
+    private final MemberRepository memberRepository;
     private final CandidateRepository candidateRepository;
     private final NodeTreeRepository nodeTreeRepository;
-
+    private final NodeCrdtService nodeCrdtService;
 
     private ProjectNode findRootNode(Long nodeId) {
         PageRequest limitOne = PageRequest.of(0, 1);
@@ -94,15 +94,21 @@ public class NodeServiceImpl implements NodeService {
     public NodeCreateDto.Response createNode(Long candidateId, Long parentId, NodeCreateDto.Request request) {
 
         ProjectNode projectNode = findRootNode(parentId);
+
+        Long workspaceId = projectNode.getWorkspace().getId();
+
         //ToDo: candidate id에 대한 락 구현 - Redis 캐시 연동 이후
         AiNodeCreateDto.Response response = inferenceService.createNode(AiNodeCreateDto.Request.builder()
                 .candidateId(candidateId)
                 .parentId(parentId)
                 .xPos(request.getXPos())
                 .yPos(request.getYPos())
-                .workspaceId(projectNode.getWorkspace().getId())
+                .workspaceId(workspaceId)
                 .build()
         );
+
+        nodeCrdtService.sendNodeCreationToCrdt(workspaceId, getNodeSchemaDetail(response.getNodeId(), response.getParentId()));
+
         return NodeCreateDto.Response.builder().nodeId(response.getNodeId()).build();
     }
 
@@ -137,14 +143,12 @@ public class NodeServiceImpl implements NodeService {
                 .build();
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request) {
-
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
 
-        // 1. 타입 매칭 및 난이도 설정 (Pattern Matching 활용)
         if (request.getDifficult() != null) {
             if (node instanceof TaskNode taskNode) {
                 taskNode.setDifficult(request.getDifficult());
@@ -153,16 +157,23 @@ public class NodeServiceImpl implements NodeService {
             }
         }
 
-        // 2. 기본 정보 업데이트
         if (request.getStatus() != null) node.setStatus(request.getStatus());
         if (request.getPriority() != null) node.setPriority(request.getPriority());
         if (request.getNote() != null) node.setNote(request.getNote());
 
-        // 3. 담당자 변경
         if (request.getAssignee() != null) {
             Member assignee = memberRepository.findById(request.getAssignee())
                     .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR));
             node.setMember(assignee);
         }
     }
+
+    @Override
+    public NodeSchema getNodeSchemaDetail(Long nodeId, Long parentId) {
+        Node node = nodeRepository.findById(nodeId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
+
+        return NodeSchema.convertToSchema(node, parentId);
+    }
+
 }

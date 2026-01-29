@@ -2,7 +2,7 @@ package com.ssafy.projectree.domain.node.api.controller;
 
 import com.ssafy.projectree.domain.node.api.dto.NodePositionUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeUpdateDto;
-import com.ssafy.projectree.domain.node.usecase.NodeAsyncService;
+import com.ssafy.projectree.domain.node.usecase.NodeCrdtService;
 import com.ssafy.projectree.domain.node.usecase.NodeService;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NodeInternalController {
 
+    private final NodeCrdtService nodeCrdtService;
     private final NodeService nodeService;
-    private final NodeAsyncService nodeAsyncService;
 
     @PatchMapping("/nodes/{nodeId}/detail")
     public CommonResponse<Void> saveNodeDetail(
@@ -38,12 +38,11 @@ public class NodeInternalController {
             @PathVariable Long workspaceId,
             @RequestBody NodePositionUpdateDto.Request request
     ) {
-        nodeAsyncService.savePositionAsync(
+        nodeCrdtService.savePositionAsync(
                 workspaceId,
                 request.getNodes()
         );
 
-        // 접수 완료
         return CommonResponse.success(SuccessCode.UPDATED, null); // 202
     }
 }

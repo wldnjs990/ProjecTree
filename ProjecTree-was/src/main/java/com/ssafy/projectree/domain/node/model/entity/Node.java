@@ -26,7 +26,7 @@ public abstract class Node extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @Column(columnDefinition = "VARCHAR(100)")

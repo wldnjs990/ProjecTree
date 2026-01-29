@@ -4,6 +4,9 @@ import com.ssafy.projectree.domain.node.enums.NodeStatus;
 import com.ssafy.projectree.domain.node.enums.NodeType;
 import com.ssafy.projectree.domain.node.enums.Priority;
 import com.ssafy.projectree.domain.node.enums.TaskType;
+import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
+import com.ssafy.projectree.domain.node.model.entity.Node;
+import com.ssafy.projectree.domain.node.model.entity.TaskNode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +30,8 @@ public class NodeSchema {
 
     @Schema(description = "위치 정보")
     private PositionSchema position;
-    @Schema(description = "현재 노드의 부모 Id",examples = {
+
+    @Schema(description = "현재 노드의 부모 Id", examples = {
             "null",
             "1"
     })
@@ -35,11 +39,37 @@ public class NodeSchema {
 
     private Body data;
 
+    public static NodeSchema convertToSchema(Node entity, Long parentId) {
+        // 공통 데이터 매핑
+        NodeSchema.Body body = NodeSchema.Body.builder()
+                .priority(entity.getPriority())
+                .identifier(entity.getIdentifier())
+                .status(entity.getStatus())
+                .build();
+
+        // 자식 타입에 따른 특화 데이터 매핑 (instanceof 활용)
+        if (entity instanceof TaskNode task) {
+            body.setTaskType(task.getType());
+            body.setDifficult(task.getDifficult());
+        } else if (entity instanceof AdvanceNode advance) {
+            body.setDifficult(advance.getDifficult());
+        }
+
+        return NodeSchema.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .nodeType(entity.getNodeType())
+                .parentId(parentId)
+                .position(new PositionSchema(entity.getXPos(), entity.getYPos()))
+                .data(body)
+                .build();
+    }
+
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Body{
+    public static class Body {
         @Schema(description = "우선순위", example = "PO")
         private Priority priority;
 

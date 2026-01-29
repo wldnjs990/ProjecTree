@@ -1,6 +1,8 @@
 package com.ssafy.projectree.domain.workspace.usecase;
 
 import com.corundumstudio.socketio.SocketIOClient;
+import com.ssafy.projectree.domain.chat.model.entity.ChatRoom;
+import com.ssafy.projectree.domain.chat.model.repository.ChatRoomRepository;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.usecase.MemberService;
 import com.ssafy.projectree.domain.workspace.api.dto.ChatPayloadDto;
@@ -18,6 +20,7 @@ import java.util.UUID;
 public class ChatService {
 
     private final MemberService memberService;
+    private final ChatRoomRepository chatRoomRepository;
 
     public ChatPayloadDto.MessageReceive process(ChatPayloadDto.MessageSend data, SocketIOClient client) {
 //        Member member = memberService.findByEmail("todo@example.com");
@@ -33,6 +36,16 @@ public class ChatService {
 
 //        log.info("{}님이 전송한 메시지: {}", member.getName(), data.getContent());
         return message;
+    }
+
+    public ChatRoom create() {
+
+        String uuid = UUID.randomUUID().toString();
+        ChatRoom chatRoom = new ChatRoom(uuid);
+
+        chatRoomRepository.save(chatRoom);
+
+        return chatRoom;
     }
 
 }
