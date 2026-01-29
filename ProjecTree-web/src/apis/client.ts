@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
@@ -18,11 +19,13 @@ export const wasApiClient = axios.create({
 // Request Interceptor
 wasApiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // TODO: 토큰 추가 로직
-    // const token = localStorage.getItem('accessToken');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // accessToken 있으면 요청 보낼때 마다 헤더에 토큰 담아서 보내기
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization;
+    }
 
     return config;
   },
@@ -56,8 +59,6 @@ wasApiClient.interceptors.response.use(
       case 401:
         console.error('[API] 인증이 필요합니다.');
         // 로그인 페이지로 리다이렉트(임시)
-        // TODO : zustand 전역변수 등에 저장해 navigation으로 리다이렉트 처리 필요
-        window.location.href = '/login';
         break;
       case 403:
         console.error('[API] 접근 권한이 없습니다.');
