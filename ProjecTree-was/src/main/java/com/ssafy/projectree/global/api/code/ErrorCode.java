@@ -20,10 +20,11 @@ public enum ErrorCode {
     NODE_TYPE_NOT_SUPPORT_ERROR(DomainCode.NODE, ExceptionCode.NOT_SUPPORT, "NODE_TYPE_NOT_SUPPORT"),
     JWT_CREATE_FAILURE_ERROR(DomainCode.USER, ExceptionCode.NOT_SUPPORT, "NOT_SUPPORT_USER"),
     TOKEN_EXPIRED(DomainCode.AUTH, ExceptionCode.EXPIRED, "TOKEN_EXPIRED - AccessToken 만료시 해당 에러 발급"),
-    TOKEN_MALFORMED(DomainCode.AUTH, ExceptionCode.MALFORMED, "TOKEN_MALFORMED - 토큰 위조됨"),
-    TOKEN_INVALID_SIGNATURE(DomainCode.AUTH, ExceptionCode.INVALID, "TOKEN_INVALID_SIGNATURE - 서명 불일치"),
-    TOKEN_EMPTY(DomainCode.AUTH, ExceptionCode.EMPTY, "TOKEN_EMPTY-토큰 비어있음"),
-    UN_EXPECTED_TOKEN_VALIDATION(DomainCode.AUTH, ExceptionCode.UN_EXPECTED, "UN_EXPECTED - 예기치 못한 토큰");
+    TOKEN_MALFORMED(DomainCode.AUTH, ExceptionCode.MALFORMED, "TOKEN_MALFORMED - 토큰 위조됨" ),
+    TOKEN_INVALID_SIGNATURE(DomainCode.AUTH, ExceptionCode.INVALID,"TOKEN_INVALID_SIGNATURE - 서명 불일치" ),
+    TOKEN_EMPTY(DomainCode.AUTH, ExceptionCode.EMPTY,"TOKEN_EMPTY-토큰 비어있음" ),
+    UN_EXPECTED_TOKEN_VALIDATION(DomainCode.AUTH, ExceptionCode.UN_EXPECTED ,"UN_EXPECTED - 예기치 못한 토큰" ),
+    WORKSPACE_NOT_FOUND(DomainCode.WORKSPACE, ExceptionCode.NOT_FOUND, "WORKSPACE_NOT_FOUND");
 
     private DomainCode domainCode;
     private ExceptionCode exceptionCode;

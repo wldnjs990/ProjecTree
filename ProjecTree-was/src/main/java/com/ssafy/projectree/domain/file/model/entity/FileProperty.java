@@ -27,7 +27,6 @@ public class FileProperty extends BaseEntity {
 	private String path;
 	private String contentType;
 	private String savedFileName;
-	private Long uploaderId;
 	private long size;
 
 	@ManyToOne
