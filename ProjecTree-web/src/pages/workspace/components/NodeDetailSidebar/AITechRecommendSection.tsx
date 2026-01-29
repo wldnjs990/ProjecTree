@@ -14,7 +14,10 @@ import { Confirm } from '@/components/custom/Confirm';
 import { ConfirmTrigger } from '@/components/custom/ConfirmTrigger';
 import TechDetailContent from './TechDetailContent';
 import TechDetailTitle from './TechDetailTitle';
-import { useSelectedNodeId, useSelectedTechId } from '../../stores/nodeDetailStore';
+import {
+  useSelectedNodeId,
+  useSelectedTechId,
+} from '../../stores/nodeDetailStore';
 import { nodeDetailCrdtService } from '../../services/nodeDetailCrdtService';
 
 interface AITechRecommendSectionProps {
@@ -202,7 +205,6 @@ function TechCardList({
             description="선택한 기술을 확정하시겠습니까?"
             cancelText="취소"
             actionText="확정"
-            onAction={() => onSelectTech(tech.id)}
           />
         ))}
       </div>
@@ -234,7 +236,6 @@ export function AITechRecommendSection({
     if (!selectedNodeId) return;
     nodeDetailCrdtService.updateSelectedTech(selectedNodeId, techId);
   };
-
 
   const handleCompareClick = () => {
     setShowComparison(true);
