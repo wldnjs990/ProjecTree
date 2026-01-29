@@ -1,12 +1,9 @@
-import { useNavigate } from 'react-router';
 import { Layers, Github, Sprout } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { redirectToGithubOauth, redirectToGoogleOauth } from '@/apis';
 
 export default function LoginPage() {
-  const navigate = useNavigate();
-
   const handleGoogleOauth = () => {
     redirectToGoogleOauth();
   };
