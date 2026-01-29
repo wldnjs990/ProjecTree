@@ -11,6 +11,8 @@ import {
 import { Search, Plus, ChevronDown, Clock, Calendar, ArrowDownAZ, Loader2, Layers } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import type { FilterType } from "../types";
+import { getMyWorkspaces } from '@/apis/workspace-lounge.api';
+import { useUserStore } from '@/stores/userStore';
 
 // 정렬 옵션 정의
 const sortOptions = [
@@ -34,6 +36,9 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
   // URL 쿼리 파라미터 관리 훅
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // 사용자 정보 (memberId)
+  const { user } = useUserStore();
+
   // 1. 상태 관리
   // (1) 워크스페이스 데이터 및 로딩 상태 (비동기 처리)
   const [workspaces, setWorkspaces] = useState<ProjectCardProps['project'][]>(
@@ -54,35 +59,29 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
   // 2. 데이터 Fetching (API 호출)
   useEffect(() => {
     const fetchWorkspaces = async () => {
+      // 사용자 정보가 없으면 API 호출하지 않음
+      if (!user?.memberId) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        setIsLoading(true); // 로딩 시작 (스피너 표시)
+        setIsLoading(true);
 
-        // [API 요청] GET /api/workspaces/my
-        // 1. 브라우저가 이 주소로 요청을 보냅니다.
-        // 2. MSW(가짜 서버)가 이 요청을 보고 가로챕니다. (handlers.ts에 정의됨)
-        // 3. handlers.ts에서 정의한 가짜 데이터가 응답으로 돌아옵니다.
-
-        // [추후 실제 서버 연동 가이드]
-        // Q. 실제 서버 API 주소가 '/api/workspaces/my'가 아니라면?
-        // A. 백엔드 개발자와 상의하여 결정된 실제 주소로 아래 문자열만 바꾸시면 됩니다.
-        //    (예: fetch('http://localhost:8080/v1/workspaces'))
-        //
-        // Tip: 'vite.config.ts'에서 Proxy 설정을 해두었다면, 도메인 없이 경로만 적어도 됩니다.
-        const response = await fetch('/api/workspaces/my');
-        const result = await response.json();
-
-        if (result.status === 'success') {
-          setWorkspaces(result.data); // 받아온 데이터로 state 업데이트
-        }
+        // [API 요청] GET /workspaces/{memberId}/my
+        // wasApiClient를 사용하여 백엔드 API 호출
+        // 개발 환경에서는 MSW가 요청을 가로채서 mock 데이터 반환
+        const data = await getMyWorkspaces(user.memberId);
+        setWorkspaces(data);
       } catch (error) {
         console.error('워크스페이스 목록을 불러오는데 실패했습니다.', error);
       } finally {
-        setIsLoading(false); // 로딩 끝 (목록 표시)
+        setIsLoading(false);
       }
     };
 
     fetchWorkspaces();
-  }, []);
+  }, [user?.memberId]);
 
   // 3. Debounce 효과: 사용자가 입력을 멈춘 후 0.3초 뒤에 URL과 필터 상태를 업데이트함
   // 단, 입력값이 비어있을 경우(지웠을 때) 즉시 반영하여 반응성을 높임

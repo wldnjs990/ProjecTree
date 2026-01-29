@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useUserStore } from '@/stores/userStore';
+import { checkNicknameDuplicate, updateNickname, deleteMember } from '@/apis/member.api';
 import {
   Dialog,
   DialogContent,
@@ -44,15 +47,6 @@ interface SidebarProps {
   currentFilter: FilterType;
   // 필터 변경 핸들러
   onFilterChange: (filter: FilterType) => void;
-
-  /** 초기 닉네임 (실제로는 API에서 가져온 값 사용) */
-  initialNickname?: string;
-  /** 닉네임 변경 시 호출되는 콜백 */
-  onNicknameSave?: (nextNickname: string) => void | Promise<void>;
-  /** 회원 탈퇴 시 호출되는 콜백 */
-  onDeleteAccount?: () => void | Promise<void>;
-  /** 팀 생성 버튼 클릭 시 호출되는 콜백 */
-  onCreateTeam?: () => void;
 }
 
 type MenuItem = {
@@ -115,14 +109,15 @@ function useProfileDialogState(nickname: string) {
 function ProfileDialog({
   nickname,
   setNickname,
-  onNicknameSave,
-  onDeleteAccount,
+  memberId,
+  onDeleteSuccess,
 }: {
   nickname: string;
   setNickname: (next: string) => void;
-  onNicknameSave?: (nextNickname: string) => void | Promise<void>;
-  onDeleteAccount?: () => void | Promise<void>;
+  memberId: number;
+  onDeleteSuccess?: () => void;
 }) {
+  const navigate = useNavigate();
   const {
     open,
     setOpen,
@@ -175,18 +170,15 @@ function ProfileDialog({
     }
 
     // (2) 서버 중복 체크 요청 (Debounce 500ms)
-    const checkDuplicate = async () => {
+    const checkDuplicateNickname = async () => {
       setIsChecking(true);
       setErrorMessage('');
       setSuccessMessage('');
 
       try {
-        const res = await fetch(
-          `/api/members/check-nickname?query=${encodeURIComponent(temp)}`
-        );
-        const result = await res.json();
+        const isAvailable = await checkNicknameDuplicate(temp);
 
-        if (result.status === 'success' && result.data.available) {
+        if (isAvailable) {
           setIsValid(true);
           setSuccessMessage('사용 가능한 닉네임입니다.');
         } else {
@@ -202,7 +194,7 @@ function ProfileDialog({
       }
     };
 
-    const timer = setTimeout(checkDuplicate, 500);
+    const timer = setTimeout(checkDuplicateNickname, 500);
     return () => clearTimeout(timer);
   }, [temp, editing, nickname]);
 
@@ -212,16 +204,29 @@ function ProfileDialog({
     const next = temp.trim();
     if (next.length === 0) return;
 
-    if (onNicknameSave) await onNicknameSave(next);
-
-    setNickname(next);
-    setEditing(false);
-  }, [temp, onNicknameSave, setNickname, setEditing, isValid]);
+    try {
+      // API를 통해 닉네임 변경
+      await updateNickname(memberId, next);
+      setNickname(next);
+      setEditing(false);
+    } catch (error) {
+      console.error('닉네임 변경 실패', error);
+      setErrorMessage('닉네임 변경에 실패했습니다.');
+    }
+  }, [temp, memberId, setNickname, setEditing, isValid]);
 
   const handleDeleteAccount = useCallback(async () => {
-    if (onDeleteAccount) await onDeleteAccount();
-    setOpen(false);
-  }, [onDeleteAccount, setOpen]);
+    try {
+      // API를 통해 회원 탈퇴
+      await deleteMember(memberId);
+      setOpen(false);
+      if (onDeleteSuccess) onDeleteSuccess();
+      // 로그인 페이지로 이동
+      navigate('/login');
+    } catch (error) {
+      console.error('회원 탈퇴 실패', error);
+    }
+  }, [memberId, setOpen, onDeleteSuccess, navigate]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -397,12 +402,10 @@ export function LoungeSidebar({
   onToggle,
   currentFilter,
   onFilterChange,
-  initialNickname = '김싸피',
-  onNicknameSave,
-  onDeleteAccount,
-  // onCreateTeam,
 }: SidebarProps) {
-  const [nickname, setNickname] = useState(initialNickname);
+  // userStore에서 사용자 정보 가져오기
+  const { user, clearUser } = useUserStore();
+  const [nickname, setNickname] = useState(user?.nickname || '사용자');
 
   // 닉네임 첫 글자로 아바타 이니셜 생성
   const initialLetter = useMemo(
@@ -444,12 +447,14 @@ export function LoungeSidebar({
               {nickname}
             </span>
 
-            <ProfileDialog
-              nickname={nickname}
-              setNickname={setNickname}
-              onNicknameSave={onNicknameSave}
-              onDeleteAccount={onDeleteAccount}
-            />
+            {user && (
+              <ProfileDialog
+                nickname={nickname}
+                setNickname={setNickname}
+                memberId={user.memberId}
+                onDeleteSuccess={clearUser}
+              />
+            )}
           </div>
         )}
       </div>
