@@ -1,6 +1,6 @@
 import React, { useRef, useMemo } from "react"
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion"
-import { ArrowRight, Sparkles, GitBranch, Layers, Zap } from "lucide-react"
+import { ArrowRight, Sparkles, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
 
@@ -60,7 +60,7 @@ function GlassMockupCard({ rotateX, rotateY }: { rotateX: any; rotateY: any }) {
 
                 {/* Mockup Content */}
                 <div className="relative rounded-xl bg-white/90 p-6 shadow-inner">
-                    {/* Window Controls */}
+                    Window Controls
                     <div className="mb-4 flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full bg-red-400/80" />
                         <div className="h-3 w-3 rounded-full bg-yellow-400/80" />
@@ -68,52 +68,22 @@ function GlassMockupCard({ rotateX, rotateY }: { rotateX: any; rotateY: any }) {
                         <span className="ml-4 text-xs text-zinc-400">ProjecTree - 프로젝트 개요</span>
                     </div>
 
-                    {/* Mockup UI */}
-                    <div className="grid grid-cols-3 gap-4">
-                        {/* Sidebar */}
-                        <div className="col-span-1 space-y-3 rounded-lg bg-zinc-50 p-3 border border-zinc-100">
-                            <div className="flex items-center gap-2 text-emerald-600">
-                                <GitBranch className="h-4 w-4" />
-                                <span className="text-xs font-medium">프로젝트 트리</span>
-                            </div>
-                            <div className="space-y-2">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <motion.div
-                                        key={i}
-                                        initial={{ width: "0%" }}
-                                        animate={{ width: `${60 + i * 10}%` }}
-                                        transition={{ delay: 0.5 + i * 0.2, duration: 0.8 }}
-                                        className="h-2 rounded-full bg-emerald-100"
-                                        style={{ marginLeft: `${(i - 1) * 8}px` }}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Main Content */}
-                        <div className="col-span-2 space-y-3 rounded-lg bg-zinc-50 p-3 border border-zinc-100">
-                            <div className="flex items-center gap-2 text-teal-600">
-                                <Layers className="h-4 w-4" />
-                                <span className="text-xs font-medium">기능 명세</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <motion.div
-                                        key={i}
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: 0.8 + i * 0.15, duration: 0.5 }}
-                                        className="rounded-lg border border-emerald-100 bg-white p-2 shadow-sm"
-                                    >
-                                        <div className="mb-2 h-1.5 w-12 rounded-full bg-emerald-200" />
-                                        <div className="space-y-1">
-                                            <div className="h-1 w-full rounded-full bg-zinc-200" />
-                                            <div className="h-1 w-3/4 rounded-full bg-zinc-200" />
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </div>
+                    {/* Mockup UI - Replaced with Image */}
+                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
+                        <img
+                            src="/dashboard-preview.png"
+                            alt="ProjecTree Dashboard Preview"
+                            className="h-full w-full object-cover object-top"
+                            onError={(e) => {
+                                // Fallback if image not found
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
+                                const fallback = document.createElement('div');
+                                fallback.className = 'text-center text-zinc-400 p-8';
+                                fallback.innerHTML = '<p class="text-sm font-medium">Dashboard Screenshot</p><p class="text-xs mt-1">Add dashboard-preview.png to public folder</p>';
+                                e.currentTarget.parentElement?.appendChild(fallback);
+                            }}
+                        />
                     </div>
                 </div>
             </div>
