@@ -206,6 +206,7 @@ function TechCardList({
             cancelText="닫기"
             actionText="확정"
             onAction={() => onSelectTech(tech.id)}
+            isConfirmed={selectedTechId === tech.id}
           />
         ))}
       </div>

@@ -29,7 +29,7 @@ export function Confirm({
   cancelText,
   actionText,
   onAction,
-  isConfirmed = true,
+  isConfirmed = false,
 }: ConfirmProps) {
   return (
     <AlertDialog>
