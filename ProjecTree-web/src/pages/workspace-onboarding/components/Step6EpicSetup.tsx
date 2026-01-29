@@ -136,27 +136,29 @@ export default function Step6EpicSetup({
         {/* 에픽 목록 */}
         {data.epics.length > 0 && (
           <div className="flex flex-col gap-2">
-            {data.epics.map((epic) => (
-              <div
-                key={epic.id}
-                className="flex items-start justify-between rounded-lg p-3 bg-white border border-[var(--figma-border-mercury)] shadow-sm"
-              >
-                <div className="flex-1">
-                  <h4 className="font-['Pretendard'] font-medium text-[14px] text-[var(--figma-text-cod-gray)]">
-                    {epic.name}
-                  </h4>
-                  <p className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-emperor)]">
-                    {epic.description}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleRemoveEpic(epic.id)}
-                  className="ml-2 rounded-full p-1 hover:bg-black/10 transition-colors"
+            <div className="max-h-[220px] overflow-y-auto chat-scrollbar pr-1 flex flex-col gap-2">
+              {data.epics.map((epic) => (
+                <div
+                  key={epic.id}
+                  className="flex items-start justify-between rounded-lg p-3 bg-white border border-[var(--figma-border-mercury)] shadow-sm shrink-0"
                 >
-                  <X className="h-4 w-4 text-[#666]" />
-                </button>
-              </div>
-            ))}
+                  <div className="flex-1">
+                    <h4 className="font-['Pretendard'] font-medium text-[14px] text-[var(--figma-text-cod-gray)]">
+                      {epic.name}
+                    </h4>
+                    <p className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-emperor)]">
+                      {epic.description}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveEpic(epic.id)}
+                    className="ml-2 rounded-full p-1 hover:bg-black/10 transition-colors"
+                  >
+                    <X className="h-4 w-4 text-[#666]" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
