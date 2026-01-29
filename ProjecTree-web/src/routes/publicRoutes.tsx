@@ -5,6 +5,7 @@ import LoginPage from '@/pages/LoginPage';
 import WorkSpacePage from '@/pages/workspace/WorkSpacePage';
 import WorkspaceLoungePage from '@/pages/workspace-lounge/WorkspaceLoungePage';
 import type { RouteObject } from 'react-router';
+import OAuthCallback from '@/pages/OauthCallback';
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -23,6 +24,10 @@ export const publicRoutes: RouteObject[] = [
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/oauth/callback',
+    element: <OAuthCallback />,
   },
   {
     path: '/user-onboarding',

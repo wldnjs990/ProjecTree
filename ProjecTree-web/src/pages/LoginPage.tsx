@@ -1,14 +1,14 @@
-import { useNavigate } from 'react-router';
 import { Layers, Github, Sprout } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { redirectToGithubOauth, redirectToGoogleOauth } from '@/apis';
 
 export default function LoginPage() {
-  const navigate = useNavigate();
-
-  const handleLogin = () => {
-    // 실제 로그인 로직은 추후 구현
-    navigate('/user-onboarding');
+  const handleGoogleOauth = () => {
+    redirectToGoogleOauth();
+  };
+  const handleGithubOauth = () => {
+    redirectToGithubOauth();
   };
 
   return (
@@ -23,41 +23,39 @@ export default function LoginPage() {
           backgroundSize: '32px 32px',
         }}
       >
-        <AnimatePresence>
-          {/* Logo */}
-          <div className="flex items-center gap-3 z-10">
-            <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm">
-              <Layers className="text-white h-7 w-7" />
-            </div>
-            <span className="text-2xl font-bold text-white tracking-tight">
-              ProjecTree
-            </span>
+        {/* Logo */}
+        <div className="flex items-center gap-3 z-10">
+          <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm">
+            <Layers className="text-white h-7 w-7" />
           </div>
+          <span className="text-2xl font-bold text-white tracking-tight">
+            ProjecTree
+          </span>
+        </div>
 
-          {/* Hero Section - Vertically Centered */}
-          <motion.div
-            className="z-10 flex flex-col justify-center h-full max-w-xl"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
-          >
-            <h1 className="text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight tracking-tight break-keep">
-              생각의 씨앗을
-              <br />
-              거대한 숲으로
-            </h1>
-            <p className="text-gray-300 text-lg lg:text-xl leading-relaxed tracking-tight break-keep max-w-lg">
-              복잡하게 얽힌 아이디어,
-              <br />
-              명확한 트리 구조로 정리하고 성공적인 프로젝트로 키워보세요.
-            </p>
-          </motion.div>
+        {/* Hero Section - Vertically Centered */}
+        <motion.div
+          className="z-10 flex flex-col justify-center h-full max-w-xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+        >
+          <h1 className="text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight tracking-tight break-keep">
+            생각의 씨앗을
+            <br />
+            거대한 숲으로
+          </h1>
+          <p className="text-gray-300 text-lg lg:text-xl leading-relaxed tracking-tight break-keep max-w-lg">
+            복잡하게 얽힌 아이디어,
+            <br />
+            명확한 트리 구조로 정리하고 성공적인 프로젝트로 키워보세요.
+          </p>
+        </motion.div>
 
-          {/* Footer/Copyright */}
-          <div className="z-10 text-gray-400 text-sm tracking-tight">
-            © 2026 ProjecTree. All rights reserved.
-          </div>
-        </AnimatePresence>
+        {/* Footer/Copyright */}
+        <div className="z-10 text-gray-400 text-sm tracking-tight">
+          © 2026 ProjecTree. All rights reserved.
+        </div>
 
         {/* Abstract Background Decoration */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
@@ -104,7 +102,7 @@ export default function LoginPage() {
             <Button
               variant="outline"
               className="h-12 w-full text-base font-medium border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-slate-700 justify-center tracking-tight transition-all rounded-md shadow-sm"
-              onClick={handleLogin}
+              onClick={handleGoogleOauth}
             >
               <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
                 <path
@@ -130,7 +128,7 @@ export default function LoginPage() {
             {/* GitHub Login Button */}
             <Button
               className="h-12 w-full text-base font-medium bg-gray-900 hover:bg-gray-800 text-white justify-center tracking-tight transition-all rounded-md shadow-lg shadow-gray-900/10"
-              onClick={handleLogin}
+              onClick={handleGithubOauth}
             >
               <Github className="mr-3 h-5 w-5" />
               GitHub로 시작하기
