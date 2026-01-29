@@ -33,97 +33,76 @@ class DummyNodeSaver {
 
 	@Commit
 	@Test
-	@Disabled
-	public void saveDummyNode(){
-		Workspace workspace = Workspace.builder().serviceType(ServiceType.APP)
-				.purpose("포트폴리오")
-				.name("P성향 여행자를 위한 여행 도우미 앱")
-				.identifierPrefix("US")
+	// @Disabled
+	public void initDevLinkProjectData() {
+
+		// 1. 워크스페이스 (Workspace)
+		Workspace workspace = Workspace.builder()
+				.serviceType(ServiceType.WEB)
+				.purpose("포트폴리오") // 프로젝트의 성격
+				.name("DevLink") // 팀 이름
+				.identifierPrefix("DEV")
 				.startDate(LocalDate.now())
-				.endDate(LocalDate.now().plusDays(30))
+				.endDate(LocalDate.now().plusDays(45))
+				.domain("EDUTECH") // 도메인: 교육 기술
 				.description("""
-						계획을 세우는데 어려움을 겪는 P성향 여행자들을 위한 여행 도우미, 본 프로젝트는 '계획은 귀찮지만, 효율적인 여행은 하고 싶은' P(인식형) 성향의 여행자들을 위한 즉흥 여행 추천 및 보조 웹 어플리케이션입니다.
-						기존의 여행 플랫폼들이 J(판단형) 성향의 '철저한 계획 수립'에 초점을 맞춘 것과 달리, P-PliP은 사용자의 모호한 니즈를 파악하여 Just-in-Time (적시) 정보를 제공하고, 선택의 스트레스를 최소화하는 것을 목표로 합니다.
-						""")
-				.domain("이건 뭐지")
+                   [서비스 개요]
+                   취준생과 현업자를 연결하는 개발자 전용 1:1 멘토링 및 스터디 매집 웹 서비스.
+
+                   [상세 기능 요구사항 (Scope)]
+                   1. 멘토링 마켓:
+                      - 멘토는 자신의 기술 스택(태그), 경력, 커피챗 가격을 등록 가능.
+                      - 멘티는 원하는 시간대에 예약을 요청하고 포인트로 결제.
+                   
+                   2. 신뢰 기반 스터디 모집:
+                      - 스터디장이 '보증금(예: 1만원)'을 걸고 모집 글 작성.
+                      - 깃허브(GitHub) 계정 연동을 통해 커밋 기록(잔디)을 시각화하여 성실도 증명.
+                   
+                   3. 실시간 소통 시스템:
+                      - 매칭된 멘토-멘티 간의 1:1 실시간 채팅 (웹소켓).
+                      - 스터디원 간의 그룹 채팅 및 일정 공유 캘린더.
+
+                   [기술적 제약 사항 & 챌린지]
+                   - 실시간 채팅 시 메시지 누락 방지 및 순서 보장 필수.
+                   - 인기 멘토 예약 오픈 시 트래픽 폭주에 대비한 대기열 또는 락(Lock) 처리.
+                   - 결제 정합성 보장을 위한 트랜잭션 관리.
+                   """)
 				.build();
 
-		Node root = ProjectNode.builder()
-				.name("P성향 여행자를 위한 여행도우미 앱")
-				.description("""
-						계획을 세우는데 어려움을 겪는 P성향 여행자들을 위한 여행 도우미, 본 프로젝트는 '계획은 귀찮지만, 효율적인 여행은 하고 싶은' P(인식형) 성향의 여행자들을 위한 즉흥 여행 추천 및 보조 웹 어플리케이션입니다.
-						기존의 여행 플랫폼들이 J(판단형) 성향의 '철저한 계획 수립'에 초점을 맞춘 것과 달리, P-PliP은 사용자의 모호한 니즈를 파악하여 Just-in-Time (적시) 정보를 제공하고, 선택의 스트레스를 최소화하는 것을 목표로 합니다.
-						""")
-				.priority(Priority.P0)
-				.identifier("US-001")
+		// 2. 프로젝트 루트 노드 (Project Root Node)
+		// 역할: 실제 구현해야 할 '서비스'의 상세 요구사항.
+		// AI 활용: 에픽(Epic)과 스토리(Story)를 추출하는 직접적인 소스 데이터.
+		Node rootProject = ProjectNode.builder()
 				.workspace(workspace)
+				.name("DevLink: 멘토링 매칭 플랫폼 구축") // 구체적인 프로젝트/버전 명
+				.identifier("DEV-ROOT")
+				.priority(Priority.P0)
 				.status(NodeStatus.TODO)
+				.description("""
+                   [서비스 개요]
+                   취준생과 현업자를 연결하는 개발자 전용 1:1 멘토링 및 스터디 매집 웹 서비스.
+
+                   [상세 기능 요구사항 (Scope)]
+                   1. 멘토링 마켓:
+                      - 멘토는 자신의 기술 스택(태그), 경력, 커피챗 가격을 등록 가능.
+                      - 멘티는 원하는 시간대에 예약을 요청하고 포인트로 결제.
+                   
+                   2. 신뢰 기반 스터디 모집:
+                      - 스터디장이 '보증금(예: 1만원)'을 걸고 모집 글 작성.
+                      - 깃허브(GitHub) 계정 연동을 통해 커밋 기록(잔디)을 시각화하여 성실도 증명.
+                   
+                   3. 실시간 소통 시스템:
+                      - 매칭된 멘토-멘티 간의 1:1 실시간 채팅 (웹소켓).
+                      - 스터디원 간의 그룹 채팅 및 일정 공유 캘린더.
+
+                   [기술적 제약 사항 & 챌린지]
+                   - 실시간 채팅 시 메시지 누락 방지 및 순서 보장 필수.
+                   - 인기 멘토 예약 오픈 시 트래픽 폭주에 대비한 대기열 또는 락(Lock) 처리.
+                   - 결제 정합성 보장을 위한 트랜잭션 관리.
+                   """)
 				.build();
 
-		Node epic = EpicNode.builder()
-				.name("[회원 시스템] 소셜 로그인 및 계정 통합 관리")
-				.description("""
-						목표: 사용자가 상품을 선택하고 결제까지 완료할 수 있는 전체 프로세스 구축
-						주요 기능: 장바구니 담기, 수량 변경, 쿠폰 적용, 결제 모듈 연동(PG), 주문 내역 생성
-						비즈니스 가치: 구매 전환율 상승 및 결제 편의성 제공
-						""")
-				.priority(Priority.P0)
-				.identifier("US-001")
-				.status(NodeStatus.TODO)
-				.build();
-		Node story = StoryNode.builder()
-				.name("[로그인] 사용자는 구글 계정을 통해 간편하게 로그인할 수 있다.")
-				.description("""
-						1. User Story (사용자 보이스)
-						As a (누가): 서비스를 처음 방문한 예비 사용자로서 I want to (무엇을): 별도의 가입 절차 없이 내 구글 계정으로 즉시 로그인하고 싶음 So that (왜): 서비스를 바로 이용하기 위해 회원가입에 드는 시간과 노력을 최소화하기 위함
-						
-						2. 작업 배경 및 설명 (Description)
-						현재 우리 서비스는 사용자 인증 시스템이 부재한 상태임. 서비스 런칭 시 빠른 사용자 유입을 위해 복잡한 자체 회원가입 구현보다 Google OAuth 2.0을 우선 도입하여 인증 기반을 마련하고자 함. 이를 통해 사용자 테이블(Member)을 생성하고, 인증 세션(JWT 등) 관리의 초석을 다짐.
-						
-						목표: 구글 로그인을 통한 신규 회원 데이터 생성(Sign-up) 및 로그인(Sign-in) 프로세스 완성
-						
-						선행 작업: GCP(Google Cloud Platform) 프로젝트 생성 및 OAuth 2.0 클라이언트 ID 발급 필요
-						
-						3. 인수 조건 (Acceptance Criteria)
-						기능의 완성 여부를 판단하는 필수 체크리스트임. 초기 구축이므로 '데이터 적재'와 '인증 토큰 발급'이 핵심임.
-						
-						✅ UI/UX (화면)
-						
-						[ ] 랜딩 페이지(또는 진입 화면)에 'Google 계정으로 시작하기' 버튼이 배치되어야 함.
-						
-						[ ] 버튼 디자인은 Google Identity 가이드라인(색상, 로고 규격)을 준수해야 함.
-						
-						✅ 기능 및 데이터 (백엔드 핵심)
-						
-						[ ] (회원 스키마 생성) 최초 로그인 시, DB의 Member 테이블에 아래 정보가 저장되어야 함.
-						
-						email (Unique Key): 구글 이메일
-						
-						name: 사용자 이름
-						
-						profile_image: 프로필 사진 URL
-						
-						social_type: 'GOOGLE' (Enum)
-						
-						role: 'USER' (기본 권한)
-						
-						[ ] (재로그인) 이미 DB에 존재하는 이메일로 요청 시, 데이터를 새로 생성하지 않고 기존 회원 정보를 조회하여 로그인 처리해야 함.
-						
-						[ ] (토큰 발급) 로그인/가입 성공 시, 클라이언트(프론트)에게 Access Token과 Refresh Token을 응답 헤더(또는 바디)로 전달해야 함.
-						
-						✅ 예외 처리
-						
-						[ ] 유효하지 않은 구글 토큰이거나 인증 실패 시 401 Unauthorized 에러를 반환해야 함.
-						
-						[ ] 필수 동의 항목(이메일, 프로필)을 사용자가 거부했을 경우, "필수 권한 동의가 필요합니다" 안내와 함께 로그인 초기 화면으로 복귀해야 함.
-						""")
-				.priority(Priority.P0)
-				.identifier("US-001")
-				.status(NodeStatus.TODO)
-				.build();
 		workspaceRepository.save(workspace);
-		nodeRepository.saveRoot(root);
-		nodeRepository.saveWithParent(root.getId(), epic);
-		nodeRepository.saveWithParent(epic.getId(), story);
+		nodeRepository.saveRoot(rootProject);
 	}
 }

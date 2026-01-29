@@ -12,6 +12,13 @@ import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.TechStackRecommendDto;
+import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
+import com.ssafy.projectree.domain.node.api.dto.schema.NodeWithParentSchema;
+import com.ssafy.projectree.domain.node.api.dto.schema.PositionSchema;
+import com.ssafy.projectree.domain.node.enums.NodeStatus;
+import com.ssafy.projectree.domain.node.enums.NodeType;
+import com.ssafy.projectree.domain.node.enums.Priority;
+import com.ssafy.projectree.domain.node.enums.TaskType;
 import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
 import com.ssafy.projectree.domain.node.model.entity.Node;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
@@ -23,9 +30,13 @@ import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.exception.BusinessLogicException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -51,7 +62,32 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public NodeTreeReadDto.Response getNodeTree(Long workspaceId) {
-        return null;
+        List<NodeWithParentSchema> flatNodes = nodeRepository.findAllFlatNodesByWorkspace(workspaceId);
+        return NodeTreeReadDto.Response
+                .builder()
+                .tree(flatNodes.stream().map(node-> {
+                    log.info("node type : {} ",node.getNodeType());
+                    log.info("task type : {}", node.getTaskType());
+                    log.info("status type : {}", node.getStatus());
+
+                    return NodeSchema.builder()
+                            .id(node.getId())
+                            .name(node.getName())
+                            .parentId(node.getParentId())//todo
+                            .nodeType(NodeType.fromClassName(node.getNodeType()))
+                            .data(NodeSchema.Body.builder()
+                                    .status(NodeStatus.valueOf(node.getStatus()))
+                                    .identifier(node.getIdentifier())
+                                    .difficult(node.getDifficult())//todo
+                                    .taskType(node.getTaskType() != null ? TaskType.valueOf(node.getTaskType()): null) //todo
+                                    .priority(node.getPriority() != null ? Priority.valueOf(node.getPriority()): null)
+                                    .build())
+                            .position(PositionSchema.builder()
+                                    .xPos(node.getXPos())
+                                    .yPos(node.getYPos())
+                                    .build()).build();
+                }).toList())
+                .build();
     }
 
     @Override
