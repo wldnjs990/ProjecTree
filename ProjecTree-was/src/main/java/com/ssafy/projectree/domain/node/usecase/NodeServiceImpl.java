@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class NodeServiceImpl implements NodeService {
     private final InferenceService inferenceService;
-    private final MemberRepository memberRepository;
     private final NodeRepository nodeRepository;
     private final CandidateRepository candidateRepository;
     private final NodeTreeRepository nodeTreeRepository;
@@ -105,29 +104,4 @@ public class NodeServiceImpl implements NodeService {
                 .build();
     }
 
-    @Transactional
-    @Override
-    public void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request) {
-
-        Node node = nodeRepository.findById(nodeId)
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
-
-        if (request.getDifficult() != null) {
-            if (node instanceof TaskNode taskNode) {
-                taskNode.setDifficult(request.getDifficult());
-            } else if (node instanceof AdvanceNode advanceNode) {
-                advanceNode.setDifficult(request.getDifficult());
-            }
-        }
-
-        if (request.getStatus() != null) node.setStatus(request.getStatus());
-        if (request.getPriority() != null) node.setPriority(request.getPriority());
-        if (request.getNote() != null) node.setNote(request.getNote());
-
-        if (request.getAssignee() != null) {
-            Member assignee = memberRepository.findById(request.getAssignee())
-                    .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR));
-            node.setMember(assignee);
-        }
-    }
 }

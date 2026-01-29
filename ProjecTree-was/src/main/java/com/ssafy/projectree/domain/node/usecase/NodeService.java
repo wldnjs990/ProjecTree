@@ -12,6 +12,4 @@ public interface NodeService {
     CandidateCreateDto.Response createCandidate(Long parentId);
 
     TechStackRecommendDto.Response recommendTechStack(Long nodeId);
-
-    void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request);
 }
