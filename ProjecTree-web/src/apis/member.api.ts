@@ -13,7 +13,7 @@ export interface MemberInfoResponse {
  * [타입] 닉네임 중복 확인 응답
  */
 export interface NicknameCheckResponse {
-  available: boolean;
+  exist: boolean;
 }
 
 /**
@@ -30,7 +30,9 @@ interface ApiResponse<T> {
  * [API] 회원 기본 정보 조회
  * @param id - 회원 ID
  */
-export const getMemberInfo = async (id: number): Promise<MemberInfoResponse> => {
+export const getMemberInfo = async (
+  id: number
+): Promise<MemberInfoResponse> => {
   const response = await wasApiClient.get<ApiResponse<MemberInfoResponse>>(
     `/members/${id}`
   );
@@ -53,7 +55,10 @@ export const getMemberEmail = async (id: number): Promise<string> => {
  * @param id - 회원 ID
  * @param nickname - 새 닉네임
  */
-export const updateNickname = async (id: number, nickname: string): Promise<void> => {
+export const updateNickname = async (
+  id: number,
+  nickname: string
+): Promise<void> => {
   await wasApiClient.put(`/members/${id}/nickname`, null, {
     params: { nickname },
   });
@@ -64,12 +69,14 @@ export const updateNickname = async (id: number, nickname: string): Promise<void
  * @param nickname - 확인할 닉네임
  * @returns 사용 가능 여부
  */
-export const checkNicknameDuplicate = async (nickname: string): Promise<boolean> => {
+export const checkNicknameDuplicate = async (
+  nickname: string
+): Promise<boolean> => {
   const response = await wasApiClient.get<ApiResponse<NicknameCheckResponse>>(
     '/members/nickname-check',
     { params: { nickname } }
   );
-  return response.data.data.available;
+  return response.data.data.exist;
 };
 
 /**
