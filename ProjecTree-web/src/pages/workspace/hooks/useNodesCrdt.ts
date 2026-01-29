@@ -41,7 +41,8 @@ export const useNodesCrdt = ({
       // 전역변수에 저장할 노드 생성
       const yjsNode: YjsNode = {
         id: nodeId,
-        type: yNode.get('type') as YjsNode['type'],
+        // 데이터 대문자로 받아오게 설계됐지만 만일을 위해 대문자 변환 추가
+        type: String(yNode.get('type')).toUpperCase() as YjsNode['type'],
         parentId:
           rawParentId === null
             ? undefined
@@ -52,6 +53,7 @@ export const useNodesCrdt = ({
       nodes.push(yjsNodeToFlowNode(yjsNode));
     });
 
+    console.log(nodes);
     setNodes(nodes);
   }, [setNodes]);
 
@@ -69,6 +71,7 @@ export const useNodesCrdt = ({
 
     // 초기 동기화 완료 시 처리
     const handleSync = (isSynced: boolean) => {
+      console.log('싱크', isSynced);
       if (isSynced) {
         // 서버에 데이터가 없으면 초기 노드로 세팅
         if (yNodes.size === 0 && initialNodes.length > 0) {
@@ -102,6 +105,8 @@ export const useNodesCrdt = ({
     // 이미 동기화된 상태라면 즉시 처리
     if (client.provider.synced) {
       handleSync(true);
+    } else {
+      console.log('어쨰서');
     }
 
     return () => {

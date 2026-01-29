@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { useWebSocket } from './useWebSocket';
 import { chatSocket } from '../services/chatSocket';
-import { getMockMessages, getMockParticipants } from '../types/mockData';
+import { fetchMessages, fetchParticipants } from '@/apis/chat.api';
+import { CHAT_PAGINATION_CONFIG } from '../types/mockData';
 
 export const useChat = (workspaceId: string) => {
   const { startTyping, stopTyping, isConnected } = useWebSocket(workspaceId);
@@ -40,30 +41,73 @@ export const useChat = (workspaceId: string) => {
   const initializedRef = useRef<string | null>(null);
 
   const setActiveWorkspace = useChatStore((state) => state.setActiveWorkspace);
+  const setPaginationState = useChatStore((state) => state.setPaginationState);
 
   useEffect(() => {
     // 현재 워크스페이스가 초기화되었는지 확인
-    if (initializedRef.current === workspaceId) return;
+    if (initializedRef.current === workspaceId) {
+      return;
+    }
 
     // 활성 워크스페이스 설정
     setActiveWorkspace(workspaceId);
 
-    // 이미 메시지가 있으면 스튜디오 설정에 따라 스킵할 수도 있으나,
-    // 여기서는 워크스페이스가 바뀔 때마다 초기화되지 않았다면 넣어줌
-    if (messages.length === 0) {
-      useChatStore
-        .getState()
-        .setMessages(workspaceId, getMockMessages(workspaceId));
-    }
+    // 🆕 페이지네이션 기반 초기 로드 (API 사용)
+    const initializeChat = async () => {
+      try {
+        const response = await fetchMessages(workspaceId, {
+          limit: CHAT_PAGINATION_CONFIG.initialLoad,
+        });
 
-    if (participants.length === 0) {
-      useChatStore
-        .getState()
-        .setParticipants(workspaceId, getMockParticipants(workspaceId));
-    }
+        // response = { status: 'success', data: ChatMessage[] }
+        const initialMessages = response.data || [];
+
+        useChatStore.getState().setMessages(workspaceId, initialMessages);
+
+        // 페이지네이션 상태 초기화
+        setPaginationState({
+          hasMore:
+            initialMessages.length === CHAT_PAGINATION_CONFIG.initialLoad,
+          isLoading: false,
+          oldestLoadedId:
+            initialMessages[initialMessages.length - 1]?.id || null,
+          initialLoaded: true,
+        });
+      } catch (error) {
+        console.error('[useChat] 메시지 로드 실패:', error);
+      }
+    };
+
+    initializeChat();
+
+    // 참여자 목록 로드 (API 사용)
+    const loadParticipants = async () => {
+      if (participants.length === 0) {
+        try {
+          const response = await fetchParticipants(workspaceId);
+
+          // response = { status: 'success', data: ChatParticipant[] }
+          const participantsList = response.data || [];
+
+          useChatStore
+            .getState()
+            .setParticipants(workspaceId, participantsList);
+        } catch (error) {
+          console.error('[useChat] 참여자 로드 실패:', error);
+        }
+      }
+    };
+
+    loadParticipants();
 
     initializedRef.current = workspaceId;
-  }, [workspaceId, messages.length, participants.length, setActiveWorkspace]);
+  }, [
+    workspaceId,
+    messages.length,
+    participants.length,
+    setActiveWorkspace,
+    setPaginationState,
+  ]);
 
   return {
     messages,

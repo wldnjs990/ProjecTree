@@ -46,11 +46,11 @@ interface TreeCanvasProps {
 
 // 노드 컴포넌트 커스텀용 객체
 const nodeTypes = {
-  project: ProjectNode,
-  epic: EpicNode,
-  story: StoryNode,
-  task: TaskNode,
-  advanced: AdvancedNode,
+  PROJECT: ProjectNode,
+  EPIC: EpicNode,
+  STORY: StoryNode,
+  TASK: TaskNode,
+  ADVANCE: AdvancedNode,
 };
 
 // hideAttribution: reactflow 워터마크가 기본적으로 표시되는데, 그걸 끄는 설정

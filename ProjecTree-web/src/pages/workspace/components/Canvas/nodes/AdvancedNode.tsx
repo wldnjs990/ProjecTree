@@ -1,22 +1,11 @@
-import { memo } from "react";
-import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
-import { cn } from "@/lib/utils";
-import { StatusTag } from "@/components/custom/StatusTag";
-import {
-  PriorityBadge,
-  type Priority,
-} from "@/components/custom/PriorityBadge";
+import { memo } from 'react';
+import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
+import { cn } from '@/lib/utils';
+import { StatusTag } from '@/components/custom/StatusTag';
+import { PriorityBadge } from '@/components/custom/PriorityBadge';
+import type { FlowNodeData } from '@/pages/workspace/types/node';
 
-export interface AdvancedNodeData extends Record<string, unknown> {
-  title: string;
-  status: "TODO" | "IN_PROGRESS" | "DONE";
-  taskId: string;
-  category: "frontend" | "backend";
-  priority?: Priority;
-  storyPoints?: number;
-}
-
-export type AdvancedNodeType = Node<AdvancedNodeData, "advanced">;
+export type AdvancedNodeType = Node<FlowNodeData, 'ADVANCE'>;
 
 function AdvancedNodeComponent({
   data,
@@ -25,18 +14,17 @@ function AdvancedNodeComponent({
   const nodeData = data;
 
   const borderColor =
-    nodeData.category === "frontend" ? "border-[#F97316]" : "border-[#6366F1]";
-  const bgColor =
-    nodeData.category === "frontend" ? "bg-[#FFF7ED]" : "bg-[#EEF2FF]";
+    nodeData.taskType === 'FE' ? 'border-[#F97316]' : 'border-[#6366F1]';
+  const bgColor = nodeData.taskType === 'FE' ? 'bg-[#FFF7ED]' : 'bg-[#EEF2FF]';
 
   return (
     <div
       className={cn(
-        "relative rounded-2xl border-2 shadow-md p-3 min-w-40",
+        'relative rounded-2xl border-2 shadow-md p-3 min-w-40',
         bgColor,
         borderColor,
-        selected && "ring-2 ring-offset-2",
-        nodeData.category === "frontend" ? "ring-[#F97316]" : "ring-[#6366F1]",
+        selected && 'ring-2 ring-offset-2',
+        nodeData.taskType === 'FE' ? 'ring-[#F97316]' : 'ring-[#6366F1]'
       )}
     >
       {/* Priority Badge */}
@@ -51,15 +39,15 @@ function AdvancedNodeComponent({
         type="target"
         position={Position.Top}
         className={cn(
-          "w-2 h-2 border-2 border-white",
-          nodeData.category === "frontend" ? "bg-[#00D492]" : "bg-[#0891B2]",
+          'w-2 h-2 border-2 border-white',
+          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#0891B2]'
         )}
       />
 
       {/* Tags */}
       <div className="flex flex-wrap gap-1.5 mb-2">
-        <StatusTag type="advanced" />
-        <StatusTag type={nodeData.category} />
+        <StatusTag type="ADVANCE" />
+        {nodeData.taskType && <StatusTag type={nodeData.taskType} />}
         <StatusTag type={nodeData.status} />
       </div>
 
@@ -71,14 +59,14 @@ function AdvancedNodeComponent({
       {/* Footer */}
       <div className="flex items-center justify-between border-t border-[#DEDEDE]/50 pt-2">
         <span className="text-[10px] text-[#64748B]">{nodeData.taskId}</span>
-        {nodeData.storyPoints && (
+        {nodeData.difficult && (
           <div className="flex gap-0.5">
-            {Array.from({ length: Math.min(nodeData.storyPoints, 5) }).map(
+            {Array.from({ length: Math.min(nodeData.difficult, 5) }).map(
               (_, i) => (
                 <span key={i} className="text-[8px] text-yellow">
                   ★
                 </span>
-              ),
+              )
             )}
           </div>
         )}
@@ -89,8 +77,8 @@ function AdvancedNodeComponent({
         type="source"
         position={Position.Bottom}
         className={cn(
-          "w-2 h-2 border-2 border-white",
-          nodeData.category === "frontend" ? "bg-[#00D492]" : "bg-[#0891B2]",
+          'w-2 h-2 border-2 border-white',
+          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#0891B2]'
         )}
       />
     </div>

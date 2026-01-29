@@ -14,4 +14,19 @@ export default defineConfig({
     tailwindcss(),
     tsconfigPaths(),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://i14d107.p.ssafy.io',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/livekit': {
+        target: 'https://i14d107.p.ssafy.io',
+        changeOrigin: true,
+        ws: true,
+        secure: false,
+      },
+    },
+  },
 });

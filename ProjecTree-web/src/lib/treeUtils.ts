@@ -1,8 +1,6 @@
 import type { Node, Edge } from '@xyflow/react';
-import type {
-  ProjectItem,
-  ProjectItemType,
-} from '../pages/workspace/components/Sidebar/ProjectTreeItem';
+import type { ProjectItem } from '../pages/workspace/components/Sidebar/ProjectTreeItem';
+import type { ServerNodeType } from '@/pages/workspace/types/node';
 
 export function buildProjectTree(nodes: Node[], edges: Edge[]): ProjectItem[] {
   if (!nodes || !edges) return [];
@@ -12,11 +10,11 @@ export function buildProjectTree(nodes: Node[], edges: Edge[]): ProjectItem[] {
 
   nodes.forEach((node) => {
     // Determine type safely
-    let type: ProjectItemType = 'task'; // default
+    let type: ServerNodeType = 'TASK'; // default
     if (
-      ['project', 'epic', 'story', 'task', 'advanced'].includes(node.type || '')
+      ['PROJECT', 'EPIC', 'STORY', 'TASK', 'ADVANCE'].includes(node.type || '')
     ) {
-      type = node.type as ProjectItemType;
+      type = node.type as ServerNodeType;
     }
 
     itemMap.set(node.id, {

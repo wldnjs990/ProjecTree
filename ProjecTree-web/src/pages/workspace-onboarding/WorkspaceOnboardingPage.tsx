@@ -9,6 +9,7 @@ import Step4TechStack from './components/Step4TechStack';
 import Step5TeamInvite from './components/Step5TeamInvite';
 import Step6EpicSetup from './components/Step6EpicSetup';
 import Step7Loading from './components/Step7Loading';
+import { createWorkspace } from '@/apis/workspace.api';
 
 export default function WorkspaceOnboardingPage() {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ export default function WorkspaceOnboardingPage() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const newErrors: Record<string, string> = {};
 
     if (currentStep === 1) {
@@ -82,9 +83,16 @@ export default function WorkspaceOnboardingPage() {
       setCurrentStep((prev) => prev + 1);
     } else if (currentStep === 6) {
       setIsLoading(true);
-      setTimeout(() => {
-        console.log('워크스페이스 생성 완료!', formData);
-      }, 3000);
+      try {
+        await createWorkspace(formData);
+        // 성공 시 워크스페이스 라운지나 생성된 워크스페이스로 이동
+        // 여기서는 임시로 라운지로 이동
+        navigate('/workspace-lounge');
+      } catch (error) {
+        alert('중요한 오류가 발생했습니다. 다시 시도해주세요.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -119,7 +127,6 @@ export default function WorkspaceOnboardingPage() {
 
       {/* Left Side (Marketing/Vision) */}
       <div className="hidden lg:flex flex-1 relative flex-col justify-between p-12 overflow-hidden z-10">
-
         {/* Brand */}
         <div className="relative z-10">
           <h1 className="text-xl font-bold text-[var(--figma-neon-green)] tracking-widest">
