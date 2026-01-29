@@ -3,13 +3,13 @@
  */
 
 // 노드 레벨 타입 (Task 또는 Advanced)
-export type NodeLevel = 'task' | 'advanced';
+export type NodeLevel = 'TASK' | 'ADVANCE';
 
 // 우선순위 타입
 export type Priority = 'P0' | 'P1' | 'P2';
 
 // 상태 타입
-export type Status = 'progress' | 'pending' | 'completed';
+export type Status = 'TODO' | 'IN_PROGRESS' | 'DONE';
 
 // 기술 스택이 매핑된 노드 정보
 export interface TechStackNode {

@@ -1,13 +1,13 @@
 import type { Edge } from '@xyflow/react';
-import type { FlowNode, FlowNodeType } from '../types/node';
+import type { FlowNode, ServerNodeType } from '../types/node';
 
 /** 노드 타입별 엣지 색상 */
-const EDGE_COLORS: Record<FlowNodeType, string> = {
-  project: '#8B5CF6', // purple
-  epic: '#8B5CF6',    // purple
-  story: '#2B7FFF',   // blue
-  task: '#00D492',    // green
-  advanced: '#06B6D4', // cyan
+const EDGE_COLORS: Record<ServerNodeType, string> = {
+  PROJECT: '#8B5CF6', // purple
+  EPIC: '#8B5CF6', // purple
+  STORY: '#2B7FFF', // blue
+  TASK: '#00D492', // green
+  ADVANCE: '#06B6D4', // cyan
 };
 
 /** 기본 엣지 스타일 */
@@ -28,7 +28,7 @@ export function generateEdges(nodes: FlowNode[]): Edge[] {
       const parentNode = nodes.find((n) => n.id === node.parentId);
       const edgeColor = parentNode
         ? EDGE_COLORS[parentNode.type]
-        : EDGE_COLORS.task;
+        : EDGE_COLORS.TASK;
 
       return {
         id: `e-${node.parentId}-${node.id}`,
@@ -49,7 +49,10 @@ export function generateEdges(nodes: FlowNode[]): Edge[] {
  * @param parentId - 부모 노드 ID
  * @returns 자식 노드 배열
  */
-export function findChildNodes(nodes: FlowNode[], parentId: string): FlowNode[] {
+export function findChildNodes(
+  nodes: FlowNode[],
+  parentId: string
+): FlowNode[] {
   return nodes.filter((node) => node.parentId === parentId);
 }
 
@@ -59,7 +62,10 @@ export function findChildNodes(nodes: FlowNode[], parentId: string): FlowNode[] 
  * @param parentId - 부모 노드 ID
  * @returns 모든 하위 노드 배열
  */
-export function findAllDescendants(nodes: FlowNode[], parentId: string): FlowNode[] {
+export function findAllDescendants(
+  nodes: FlowNode[],
+  parentId: string
+): FlowNode[] {
   const children = findChildNodes(nodes, parentId);
   const descendants: FlowNode[] = [...children];
 

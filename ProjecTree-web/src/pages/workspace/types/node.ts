@@ -2,14 +2,17 @@ import type { Node } from '@xyflow/react';
 
 // ===== 서버 응답 타입 =====
 
-/** 서버에서 받는 노드 타입 (대문자) */
-export type ServerNodeType = 'PROJECT' | 'EPIC' | 'STORY' | 'TASK' | 'ADVANCED';
+/** 서버에서 받는 노드 타입 */
+export type ServerNodeType = 'PROJECT' | 'EPIC' | 'STORY' | 'TASK' | 'ADVANCE';
 
 /** 서버에서 받는 노드 상태 */
 export type ServerNodeStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
 
 /** 서버에서 받는 태스크 타입 */
 export type ServerTaskType = 'FE' | 'BE' | null;
+
+/** 서버에서 받는 우선순위 타입 */
+export type ServerPriority = 'P0' | 'P1' | 'P2';
 
 /** 서버 응답의 position 형식 */
 export interface ServerPosition {
@@ -45,29 +48,20 @@ export interface ServerResponse<T> {
 
 // ===== ReactFlow 노드 타입 =====
 
-/** ReactFlow에서 사용하는 노드 타입 (소문자) */
-export type FlowNodeType = 'project' | 'epic' | 'story' | 'task' | 'advanced';
-
-/** ReactFlow에서 사용하는 노드 상태 */
-export type FlowNodeStatus = 'pending' | 'progress' | 'completed';
-
-/** ReactFlow에서 사용하는 카테고리 */
-export type FlowCategory = 'frontend' | 'backend';
-
 /** ReactFlow 노드의 data 형식 */
 export interface FlowNodeData {
   title: string;
-  status: FlowNodeStatus;
+  status: ServerNodeStatus;
   taskId: string;
-  category?: FlowCategory;
+  taskType?: ServerTaskType;
   difficult?: number;
-  priority?: string;
+  priority?: ServerPriority;
   [key: string]: unknown; // ReactFlow 호환용 인덱스 시그니처
 }
 
 /** ReactFlow에서 사용하는 노드 형식 (parentId 포함) */
 export interface FlowNode extends Node {
-  type: FlowNodeType;
+  type: ServerNodeType;
   parentId?: string; // undefined = 루트 노드
   data: FlowNodeData;
 }
@@ -77,7 +71,7 @@ export interface FlowNode extends Node {
 /** Y.Map에 저장되는 노드 형식 */
 export interface YjsNode {
   id: string;
-  type: FlowNodeType;
+  type: ServerNodeType;
   parentId?: string; // undefined = 루트 노드
   position: { x: number; y: number };
   data: FlowNodeData;

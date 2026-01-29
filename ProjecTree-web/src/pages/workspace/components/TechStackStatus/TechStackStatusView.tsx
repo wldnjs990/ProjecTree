@@ -7,7 +7,7 @@ import {
   mockTechStackSummary,
   mockTechStackMappings,
 } from '../../constants/mockData';
-import type { NodeLevel, TechStackNode } from './types';
+import type { NodeLevel, Status, TechStackNode } from './types';
 import { useNodes } from '../../stores/nodeStore';
 
 interface TechStackStatusViewProps {
@@ -27,7 +27,7 @@ export function TechStackStatusView({ onNodeClick }: TechStackStatusViewProps) {
   const nodes = useNodes();
 
   // 필터 상태 관리
-  const [selectedLevel, setSelectedLevel] = useState<NodeLevel | 'all'>('task');
+  const [selectedLevel, setSelectedLevel] = useState<NodeLevel | 'all'>('TASK');
   const [sortBy, setSortBy] = useState('recent');
   const [filterBy, setFilterBy] = useState('all');
 
@@ -36,9 +36,9 @@ export function TechStackStatusView({ onNodeClick }: TechStackStatusViewProps) {
     // Task(Level 3)와 Advanced(Level 4) 노드만 필터링
     const filteredNodes = nodes.filter((node) => {
       const nodeType = node.type;
-      if (selectedLevel === 'task') return nodeType === 'task';
-      if (selectedLevel === 'advanced') return nodeType === 'advanced';
-      return nodeType === 'task' || nodeType === 'advanced';
+      if (selectedLevel === 'TASK') return nodeType === 'TASK';
+      if (selectedLevel === 'ADVANCE') return nodeType === 'ADVANCE';
+      return nodeType === 'TASK' || nodeType === 'ADVANCE';
     });
 
     // mockTechStackMappings와 조합
@@ -48,12 +48,10 @@ export function TechStackStatusView({ onNodeClick }: TechStackStatusViewProps) {
         id: node.id,
         title: (node.data.title as string) || '',
         priority: (node.data.priority as 'P0' | 'P1' | 'P2') || 'P2',
-        status:
-          (node.data.status as 'progress' | 'pending' | 'completed') ||
-          'pending',
+        status: (node.data.status as Status) || 'TODO',
         confirmedTechs: mapping?.confirmedTechs || [],
         lastUpdated: mapping?.lastUpdated || new Date().toISOString(),
-        level: node.type === 'task' ? ('task' as const) : ('advanced' as const),
+        level: node.type === 'TASK' ? ('TASK' as const) : ('ADVANCE' as const),
       };
     });
 

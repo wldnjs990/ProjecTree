@@ -27,9 +27,9 @@ export function LevelToggle({
           size="sm"
           className={cn(
             'rounded-r-none border-r',
-            selectedLevel === 'task' && 'bg-muted'
+            selectedLevel === 'TASK' && 'bg-muted'
           )}
-          onClick={() => onLevelChange('task')}
+          onClick={() => onLevelChange('TASK')}
         >
           Task
         </Button>
@@ -38,9 +38,9 @@ export function LevelToggle({
           size="sm"
           className={cn(
             'rounded-l-none',
-            selectedLevel === 'advanced' && 'bg-muted'
+            selectedLevel === 'ADVANCE' && 'bg-muted'
           )}
-          onClick={() => onLevelChange('advanced')}
+          onClick={() => onLevelChange('ADVANCE')}
         >
           Advance
         </Button>
