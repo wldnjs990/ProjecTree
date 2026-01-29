@@ -67,6 +67,10 @@ public class NodeServiceImpl implements NodeService {
                 .workspaceId(projectNode.getWorkspace().getId())
                 .build()
         );
+
+        // TODO: 해당 위치에 y-websocket 서버에 데이터 전송 로직 필요
+        // 별개의 서비스에서 구현
+
         return NodeCreateDto.Response.builder().nodeId(response.getNodeId()).build();
     }
 
@@ -108,7 +112,6 @@ public class NodeServiceImpl implements NodeService {
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
 
-        // 1. 타입 매칭 및 난이도 설정 (Pattern Matching 활용)
         if (request.getDifficult() != null) {
             if (node instanceof TaskNode taskNode) {
                 taskNode.setDifficult(request.getDifficult());
@@ -117,12 +120,10 @@ public class NodeServiceImpl implements NodeService {
             }
         }
 
-        // 2. 기본 정보 업데이트
         if (request.getStatus() != null) node.setStatus(request.getStatus());
         if (request.getPriority() != null) node.setPriority(request.getPriority());
         if (request.getNote() != null) node.setNote(request.getNote());
 
-        // 3. 담당자 변경
         if (request.getAssignee() != null) {
             Member assignee = memberRepository.findById(request.getAssignee())
                     .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR));

@@ -32,8 +32,6 @@ public class NodeAsyncService {
                         dto.getPosition().getY()
                 );
             }
-            log.info("Async node position saved. workspaceId={}, size={}",
-                    workspaceId, nodes.size());
 
         } catch (Exception e) {
             log.error("Failed to async save node positions", e);
