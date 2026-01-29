@@ -2,6 +2,7 @@ package com.ssafy.projectree.domain.member.api.dto;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 
 public class MemberNicknameUpdateDto {
@@ -17,6 +18,7 @@ public class MemberNicknameUpdateDto {
         private String nickname;
     }
 
+    @Builder
     @Getter
     @Schema(name = "MemberNicknameUpdateDto.Response", description = "회원 닉네임 변경 응답 DTO")
     public static class Response {

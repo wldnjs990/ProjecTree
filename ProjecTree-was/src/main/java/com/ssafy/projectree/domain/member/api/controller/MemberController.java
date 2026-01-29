@@ -1,15 +1,17 @@
 package com.ssafy.projectree.domain.member.api.controller;
 
-import com.ssafy.projectree.domain.auth.jwt.JwtProvider;
 import com.ssafy.projectree.domain.member.api.dto.MemberEmailReadDto;
+import com.ssafy.projectree.domain.member.api.dto.MemberNicknameReadDto;
 import com.ssafy.projectree.domain.member.api.dto.MemberNicknameUpdateDto;
 import com.ssafy.projectree.domain.member.api.dto.MemberReadDto;
+import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.usecase.MemberService;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import com.ssafy.projectree.global.docs.MemberDocsController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -17,38 +19,31 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MemberController implements MemberDocsController {
 
-    // TODO: JWT 추가시 PathVariable 수정 필요
-    private final JwtProvider jwtProvider;
     private final MemberService memberService;
 
-
-    @GetMapping("/members/{id}/email")
-    public CommonResponse<MemberEmailReadDto.Response> getMemberEmail(@PathVariable Long id) {
-
-        return CommonResponse.success(SuccessCode.SUCCESS, null);
+    @GetMapping("/members/me/email")
+    public CommonResponse<MemberEmailReadDto.Response> getMemberEmail(@AuthenticationPrincipal Member principal) {
+        return CommonResponse.success(SuccessCode.SUCCESS, memberService.getMemberEmail(principal.getId()));
     }
 
     @GetMapping("/members/nickname-check")
-    public CommonResponse<MemberReadDto.Response> checkNicknameCheck(@RequestParam String nickname) {
-
-        return CommonResponse.success(SuccessCode.SUCCESS, null);
+    public CommonResponse<MemberNicknameReadDto.Response> checkNicknameCheck(@RequestParam String nickname) {
+        return CommonResponse.success(SuccessCode.SUCCESS, memberService.existsByNickname(nickname));
     }
 
-    @PutMapping("/members/{id}/nickname")
-    public CommonResponse<MemberNicknameUpdateDto.Response> updateMemberNickname(@PathVariable Long id, MemberNicknameUpdateDto.Request request) {
-
-        return CommonResponse.success(SuccessCode.UPDATED, null);
+    @PutMapping("/members/me/nickname")
+    public CommonResponse<MemberNicknameUpdateDto.Response> updateMemberNickname(@AuthenticationPrincipal Member principal, MemberNicknameUpdateDto.Request request) {
+        return CommonResponse.success(SuccessCode.UPDATED, memberService.updateMemberByNickname(principal.getId(), request.getNickname()));
     }
 
-    @GetMapping("/members/{id}")
-    public CommonResponse<MemberReadDto.Response> getMemberDetail(@PathVariable Long id) {
-
-        return CommonResponse.success(SuccessCode.SUCCESS, null);
+    @GetMapping("/members/me")
+    public CommonResponse<MemberReadDto.Response> getMemberDetail(@AuthenticationPrincipal Member principal) {
+        return CommonResponse.success(SuccessCode.SUCCESS, memberService.getMemberById(principal.getId()));
     }
 
-    @DeleteMapping("/members/{id}")
-    public CommonResponse<Void> deleteMember(@PathVariable Long id) {
-
+    @DeleteMapping("/members/me")
+    public CommonResponse<Void> deleteMember(@AuthenticationPrincipal Member principal) {
+        memberService.deleteMember(principal.getId());
         return CommonResponse.success(SuccessCode.REMOVED, null);
     }
 }
