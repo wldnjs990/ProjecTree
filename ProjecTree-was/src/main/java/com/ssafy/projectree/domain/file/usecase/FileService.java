@@ -5,7 +5,6 @@ import com.ssafy.projectree.domain.file.api.dto.FileUploadDto;
 import com.ssafy.projectree.domain.file.model.entity.FileProperty;
 import com.ssafy.projectree.domain.file.model.repository.FileRepository;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
-import com.ssafy.projectree.domain.workspace.usecase.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,9 +20,6 @@ public class FileService {
     private final S3Service s3Service;
     private final FileRepository fileRepository;
 
-    public FileUploadDto.Response upload(List<MultipartFile> files, Workspace workspace) throws IOException {
-        return uploadFiles(files, workspace);
-    }
 
     public FileUploadDto.Response uploadFiles(List<MultipartFile> files, Workspace workspace) throws IOException {
 

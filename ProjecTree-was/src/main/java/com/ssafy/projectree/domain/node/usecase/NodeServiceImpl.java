@@ -20,12 +20,14 @@ import com.ssafy.projectree.domain.node.enums.NodeType;
 import com.ssafy.projectree.domain.node.enums.Priority;
 import com.ssafy.projectree.domain.node.enums.TaskType;
 import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
+import com.ssafy.projectree.domain.node.model.entity.EpicNode;
 import com.ssafy.projectree.domain.node.model.entity.Node;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
 import com.ssafy.projectree.domain.node.model.entity.TaskNode;
-import com.ssafy.projectree.domain.node.model.repository.CandidateRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeTreeRepository;
+import com.ssafy.projectree.domain.workspace.api.dto.FunctionSpecificationDto;
+import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.exception.BusinessLogicException;
 import jakarta.transaction.Transactional;
@@ -44,7 +46,6 @@ public class NodeServiceImpl implements NodeService {
     private final InferenceService inferenceService;
     private final NodeRepository nodeRepository;
     private final MemberRepository memberRepository;
-    private final CandidateRepository candidateRepository;
     private final NodeTreeRepository nodeTreeRepository;
     private final NodeCrdtService nodeCrdtService;
 
@@ -110,6 +111,46 @@ public class NodeServiceImpl implements NodeService {
         nodeCrdtService.sendNodeCreationToCrdt(workspaceId, getNodeSchemaDetail(response.getNodeId(), response.getParentId()));
 
         return NodeCreateDto.Response.builder().nodeId(response.getNodeId()).build();
+    }
+
+    @Override
+    public ProjectNode createProjectNode(Workspace workspace) {
+
+        ProjectNode projectNode = new ProjectNode();
+
+        projectNode.setWorkspace(workspace);
+        projectNode.setName(workspace.getName());
+        projectNode.setDescription(workspace.getDescription());
+        projectNode.setStatus(NodeStatus.TODO);
+        projectNode.setIdentifier(workspace.getIdentifierPrefix());
+
+        projectNode.setXPos(0.0);
+        projectNode.setYPos(0.0);
+
+        nodeRepository.save(projectNode);
+
+        return projectNode;
+    }
+
+    @Override
+    public void createEpicNodes(Workspace workspace, Node projectNode, List<FunctionSpecificationDto.EpicInfo> epics) {
+
+        for (FunctionSpecificationDto.EpicInfo info : epics) {
+
+            EpicNode epicNode = new EpicNode();
+
+            epicNode.setName(info.getName());
+            epicNode.setDescription(info.getDescription());
+            epicNode.setIdentifier(workspace.getIdentifierPrefix());
+            epicNode.setStatus(NodeStatus.TODO);
+            epicNode.setXPos(0.0);
+            epicNode.setYPos(0.0);
+
+            nodeRepository.save(epicNode);
+            nodeRepository.saveWithParent(projectNode.getId(), epicNode);
+
+        }
+
     }
 
     @Override

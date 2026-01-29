@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,8 +69,8 @@ public interface WorkspaceDocsController {
                     )
             )
     })
-    @GetMapping("/{id}/my")
-    CommonResponse<List<WorkspaceDto.Response>> getMyWorkspaces(@PathVariable Long id);
+    @GetMapping("/my")
+    CommonResponse<List<WorkspaceDto.Response>> getMyWorkspaces(Member member);
 
     @Operation(summary = "워크 스페이스 생성 API", description = "워크 스페이스를 생성합니다.")
     @ApiResponses({

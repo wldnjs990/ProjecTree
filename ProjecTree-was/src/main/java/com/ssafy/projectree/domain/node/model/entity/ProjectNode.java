@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @DiscriminatorValue("PROJECT")
-public class ProjectNode extends Node{
+public class ProjectNode extends Node {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "workspace_id")

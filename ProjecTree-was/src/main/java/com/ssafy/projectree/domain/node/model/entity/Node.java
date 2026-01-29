@@ -31,6 +31,7 @@ public abstract class Node extends BaseEntity {
 
     @Column(columnDefinition = "VARCHAR(100)")
     private String name;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

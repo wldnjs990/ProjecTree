@@ -4,7 +4,6 @@ import com.ssafy.projectree.domain.chat.model.entity.ChatRoom;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.usecase.EmailService;
 import com.ssafy.projectree.domain.member.usecase.MemberService;
-import com.ssafy.projectree.domain.workspace.api.dto.TeamDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.model.entity.Team;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
@@ -14,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +55,18 @@ public class TeamService {
             });
         }
 
+    }
+
+    public List<Long> getAllWorkspacesId(Member member) {
+
+        List<Team> myTeams = teamRepository.findAllByMember(member);
+        List<Long> workspacesId = new ArrayList<>();
+
+        for (Team team : myTeams) {
+            workspacesId.add(team.getWorkspace().getId());
+        }
+
+        return workspacesId;
     }
 
 }

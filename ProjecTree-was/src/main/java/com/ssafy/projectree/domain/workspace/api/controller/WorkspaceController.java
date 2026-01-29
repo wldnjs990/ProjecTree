@@ -26,8 +26,8 @@ public class WorkspaceController implements WorkspaceDocsController {
     private final WorkspaceService workspaceService;
 
     @Override
-    public CommonResponse<List<WorkspaceDto.Response>> getMyWorkspaces(Long id) {
-        return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.read());
+    public CommonResponse<List<WorkspaceDto.Response>> getMyWorkspaces(@AuthenticationPrincipal Member member) {
+        return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.read(member));
     }
 
     @Override
