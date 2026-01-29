@@ -33,7 +33,7 @@ public class NodeServiceImpl implements NodeService {
     private final NodeRepository nodeRepository;
     private final CandidateRepository candidateRepository;
     private final NodeTreeRepository nodeTreeRepository;
-
+    private final NodeCrdtService nodeCrdtService;
 
     private ProjectNode findRootNode(Long nodeId) {
         PageRequest limitOne = PageRequest.of(0, 1);
@@ -56,18 +56,20 @@ public class NodeServiceImpl implements NodeService {
     public NodeCreateDto.Response createNode(Long candidateId, Long parentId, NodeCreateDto.Request request) {
 
         ProjectNode projectNode = findRootNode(parentId);
+
+        Long workspaceId = projectNode.getWorkspace().getId();
+
         //ToDo: candidate id에 대한 락 구현 - Redis 캐시 연동 이후
         AiNodeCreateDto.Response response = inferenceService.createNode(AiNodeCreateDto.Request.builder()
                 .candidateId(candidateId)
                 .parentId(parentId)
                 .xPos(request.getXPos())
                 .yPos(request.getYPos())
-                .workspaceId(projectNode.getWorkspace().getId())
+                .workspaceId(workspaceId)
                 .build()
         );
 
-        // TODO: 해당 위치에 y-websocket 서버에 데이터 전송 로직 필요
-        // 별개의 서비스에서 구현
+        nodeCrdtService.sendNodeCreationToCrdt(workspaceId, getNodeSchemaDetail(response.getNodeId(), response.getParentId()));
 
         return NodeCreateDto.Response.builder().nodeId(response.getNodeId()).build();
     }

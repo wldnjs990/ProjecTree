@@ -4,6 +4,7 @@ import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
 import com.ssafy.projectree.domain.node.api.dto.NodePositionUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeUpdateDto;
+import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
 import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
 import com.ssafy.projectree.domain.node.model.entity.Node;
 import com.ssafy.projectree.domain.node.model.entity.TaskNode;
@@ -12,9 +13,13 @@ import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -23,8 +28,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NodeCrdtService {
 
+    private final RestClient restClient;
     private final MemberRepository memberRepository;
     private final NodeRepository nodeRepository;
+
+    @Value("${crdt-server.url}")
+    private String crdtServerUrl;
+
+    @Value("${crdt-server.path-prefix}")
+    private String pathPrefix;
+
+    @Value("${crdt-server.new-node-path}")
+    private String nodePath;
 
     @Async("nodePositionExecutor")
     @Transactional
@@ -49,7 +64,6 @@ public class NodeCrdtService {
 
     @Transactional
     public void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request) {
-
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
 
@@ -71,4 +85,24 @@ public class NodeCrdtService {
             node.setMember(assignee);
         }
     }
+
+    public void sendNodeCreationToCrdt(Long workspaceId, NodeSchema payload) {
+        String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
+                .path(pathPrefix)
+                .path(nodePath)
+                .build()
+                .toUriString();
+
+        try {
+            restClient.post().uri(uriString, workspaceId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve().toBodilessEntity();
+        } catch (Exception e) {
+            // TODO: 현재는 트랜잭션과 같이 동작 하기에 로그만 띄우지만
+            // Transaction 과 별개로 동작하여 예외 반환 로직을 구현하는 것이 더 좋을 것같음
+            log.error("CRDT 서버 전송 실패: {}", e.getMessage());
+        }
+    }
+
 }
