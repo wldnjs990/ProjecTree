@@ -64,3 +64,12 @@ class NodeTechStackUpdate(BaseSchema):
 
 class NodeTechStackResponse(NodeTechStackBase, TimestampSchema):
     id: int
+
+
+class WorkspaceTechStackBase(BaseSchema):
+    tech_vocab_id: int
+    workspace_id: int
+
+class WorkspaceTechStackResponse(WorkspaceTechStackBase, TimestampSchema):
+    id: int
+    tech_vocabulary: Optional[TechVocabularyResponse] = None

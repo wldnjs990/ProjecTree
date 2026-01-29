@@ -1,14 +1,10 @@
 from app.agents.states.state import NodeState
-from app.core.llm import openai_mini_llm
+from app.core.llm import openai_mini_llm, opendai_reasoning_llm
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ProviderStrategy
 from langchain_core.messages import HumanMessage
 from app.agents.schemas.analysis import TaskAnalysis
 from app.agents.prompts.system.global_context import GLOBAL_CONTEXT
-
-llm = openai_mini_llm
-
-
 from app.agents.prompts.system.process_prompts import (
     EPIC_PROCESS_PROMPT,
     STORY_PROCESS_PROMPT,
@@ -30,6 +26,8 @@ from app.agents.schemas.process import (
 )
 from typing import Type, Any
 from langchain_core.runnables import Runnable
+
+llm = opendai_reasoning_llm
 
 
 async def _process_node(

@@ -7,8 +7,8 @@ class NodeCreateRequest(BaseModel):
     workspace_id: int = Field(..., description="워크스페이스 ID")
     candidate_id: int = Field(..., description="후보 노드 ID")
     parent_id: int = Field(..., description="부모 노드 ID")
-    x_pos: int = Field(..., description="노드 X 좌표")
-    y_pos: int = Field(..., description="노드 Y 좌표")
+    x_pos: float = Field(..., description="노드 X 좌표")
+    y_pos: float = Field(..., description="노드 Y 좌표")
 
 
 class NodeCreateResponse(BaseModel):

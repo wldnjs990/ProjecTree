@@ -65,7 +65,6 @@ class NodeService:
         generated_node = result.get("generated_node")
         parent_info = result.get("parent_info")
         current_candidate_info = result.get("current_candidate_info")
-        task_type = result.get("task_type")
 
         if not generated_node or not parent_info:
             error_msg = result.get("last_error") if result else "Unknown error"
@@ -86,10 +85,12 @@ class NodeService:
             node_name = generated_node.get("name")
             node_description = generated_node.get("description")
             node_difficulty = generated_node.get("difficulty")
+            task_type = generated_node.get("task_type")
         else:
             node_name = generated_node.name
             node_description = generated_node.description
             node_difficulty = getattr(generated_node, "difficulty", None)
+            task_type = getattr(generated_node, "task_type", None)
 
         logger.info(
             f"[DEBUG] Extracted - name: {node_name}, description: {node_description}"

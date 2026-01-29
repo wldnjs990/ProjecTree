@@ -5,6 +5,7 @@ TASK_SYSTEM_PROMPT = """
    - 사용자 작업(`user_task`)과 설명(`task_description`)을 분석하여 "Best practices for [Task] in [FE/BE]", "Top libraries for [Task] 2024"와 같은 구체적인 키워드로 검색하세요.
    - 프레임워크 전체(예: Spring, React)가 아닌, 해당 기능을 구현하는 **구체적인 라이브러리, 패턴, 혹은 알고리즘**을 찾는 데 집중하세요.
    - `tavily_search`는 최적의 결과를 위해 최대 1~2회만 수행하세요.
+   - `tavliy_search`를 사용하여 검색 할때는 '기술 블로그'를 위주로 검색하세요.
 
 2. 기술 선정 및 점수 부여 (Selection & Scoring):
    - 검색 결과 중 가장 신뢰도가 높고 널리 쓰이는 3가지 기술/방식을 선정하세요.
