@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from app.core.llm import openai_nano_llm, openai_mini_llm
 from langchain.agents import create_agent
+from deepagents import create_deep_agent
 from langchain.agents.structured_output import ProviderStrategy
 from app.agents.sub_agents.recommend.state import RecommendationState
 from app.agents.tools.tavily import search_tool
@@ -26,7 +27,7 @@ MAX_RETRIES = 5  # 최대 재시도 횟수
 
 
 def create_expert_agent(system_prompt: str):
-    return create_agent(
+    return create_deep_agent(
         llm, tools, system_prompt=system_prompt, response_format=ProviderStrategy(TechList)
     )
 
