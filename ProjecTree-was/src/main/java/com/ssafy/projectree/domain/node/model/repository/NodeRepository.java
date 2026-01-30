@@ -59,4 +59,18 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
             """)
     List<NodeWithParentSchema> findAllFlatNodesByWorkspace(@Param("workspaceId") Long workspaceId);
 
+
+    @Modifying(clearAutomatically = true)
+    @Query("""
+                update Node n
+                set n.deletedAt = CURRENT_TIMESTAMP
+                where n.id in (
+                    select nt.descendant.id
+                    from NodeTree nt
+                    where nt.ancestor.id = :nodeId
+                )
+            """)
+    void deleteNodeAndDescendants(@Param("nodeId") Long nodeId);
+
+
 }

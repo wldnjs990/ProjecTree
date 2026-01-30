@@ -351,4 +351,15 @@ public class NodeServiceImpl implements NodeService {
         return NodeSchema.convertToSchema(node, parentId);
     }
 
+    @Override
+    public void deleteNode(Long nodeId) {
+        Node node = nodeRepository.findById(nodeId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
+
+        if (node.isDeleted()) {
+            return;
+        }
+
+        nodeRepository.deleteNodeAndDescendants(nodeId);
+    }
 }

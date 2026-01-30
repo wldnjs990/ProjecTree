@@ -37,4 +37,7 @@ public interface NodeService {
     void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request);
 
     void selectNodeTech(Long nodeId, Long selectedTechId);
+
+    void deleteNode(Long nodeId);
+
 }
