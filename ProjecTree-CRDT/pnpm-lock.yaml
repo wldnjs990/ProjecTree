@@ -4,16 +4,19 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  yjs: 13.6.29
+
 importers:
 
   .:
     dependencies:
       axios:
         specifier: ^1.13.2
-        version: 1.13.2
+        version: 1.13.4
       cors:
         specifier: ^2.8.5
-        version: 2.8.5
+        version: 2.8.6
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
@@ -27,7 +30,7 @@ importers:
         specifier: 2.1.0
         version: 2.1.0(yjs@13.6.29)
       yjs:
-        specifier: ^13.6.29
+        specifier: 13.6.29
         version: 13.6.29
     devDependencies:
       '@types/express':
@@ -298,8 +301,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.13.2:
-    resolution: {integrity: sha512-VPk9ebNqPcy5lRGuSlKx752IlDatOjT9paPlm8A7yOuW2Fbvp4X3JznJtT4f0GzGLLiWE9W8onz51SqLYwzGaA==}
+  axios@1.13.4:
+    resolution: {integrity: sha512-1wVkUaAO6WyaYtCkcYCOx12ZgpGf9Zif+qXa4n+oYzK558YryKqiL6UWwd5DqiH3VRW0GYhTZQ/vlgJrCoNQlg==}
 
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
@@ -343,8 +346,8 @@ packages:
     resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
 
-  cors@2.8.5:
-    resolution: {integrity: sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==}
+  cors@2.8.6:
+    resolution: {integrity: sha512-tJtZBBHA6vjIAaF6EnIaq6laBBP9aq/Y3ouVJjEfoHbRBcHBAHYcMh/w8LDrk2PvIMMq8gmopa5D4V8RmbrxGw==}
     engines: {node: '>= 0.10'}
 
   create-require@1.1.1:
@@ -798,20 +801,20 @@ packages:
   y-leveldb@0.1.2:
     resolution: {integrity: sha512-6ulEn5AXfXJYi89rXPEg2mMHAyyw8+ZfeMMdOtBbV8FJpQ1NOrcgi6DTAcXof0dap84NjHPT2+9d0rb6cFsjEg==}
     peerDependencies:
-      yjs: ^13.0.0
+      yjs: 13.6.29
 
   y-protocols@1.0.7:
     resolution: {integrity: sha512-YSVsLoXxO67J6eE/nV4AtFtT3QEotZf5sK5BHxFBXso7VDUT3Tx07IfA6hsu5Q5OmBdMkQVmFZ9QOA7fikWvnw==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
     peerDependencies:
-      yjs: ^13.0.0
+      yjs: 13.6.29
 
   y-websocket@2.1.0:
     resolution: {integrity: sha512-WHYDRqomaGkkaujtowCDwL8KYk+t1zQCGIgKyvxvchhjTQlMgWXRHJK+FDEcWmHA7I7o/4fy0eniOrtmz0e4mA==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
     hasBin: true
     peerDependencies:
-      yjs: ^13.5.6
+      yjs: 13.6.29
 
   yjs@13.6.29:
     resolution: {integrity: sha512-kHqDPdltoXH+X4w1lVmMtddE3Oeqq48nM40FD5ojTd8xYhQpzIDcfE2keMSU5bAgRPJBe225WTUdyUgj1DtbiQ==}
@@ -1003,7 +1006,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.13.2:
+  axios@1.13.4:
     dependencies:
       follow-redirects: 1.15.11
       form-data: 4.0.5
@@ -1058,7 +1061,7 @@ snapshots:
 
   cookie@0.7.2: {}
 
-  cors@2.8.5:
+  cors@2.8.6:
     dependencies:
       object-assign: 4.1.1
       vary: 1.1.2

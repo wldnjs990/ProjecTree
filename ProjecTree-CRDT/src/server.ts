@@ -4,8 +4,8 @@ import { handleConnection } from "./ws/connection";
 import internalRouter from "./api/internalRouter";
 
 export function startServer() {
-  const PORT = Number(process.env.PORT) || 1234;
-  const HTTP_PORT = Number(process.env.HTTP_PORT) || 1235;
+  const PORT = Number(process.env.PORT) || 8898;
+  const HTTP_PORT = Number(process.env.HTTP_PORT) || 8899;
 
   const wss = new WebSocketServer({ port: PORT });
 
