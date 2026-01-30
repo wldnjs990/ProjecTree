@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Layers, Lock, CheckCircle2, AlertCircle, Sprout } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -7,28 +7,90 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { checkNicknameDuplicate } from '@/apis/member.api';
 import { patchMemberSignup } from '@/apis/oauth.api';
-import { useSetAccessToken } from '@/stores/authStore';
+import { useSetAccessToken, useAccessToken } from '@/stores/authStore';
+import { parseJwt } from '@/lib/utils';
 
 export default function UserOnboardingPage() {
   const [nickname, setNickname] = useState('');
   const [isChecking, setIsChecking] = useState(false);
-  const [checkStatus, setCheckStatus] = useState<
-    'idle' | 'available' | 'unavailable'
-  >('idle');
+  const [isValid, setIsValid] = useState(false); // 유효성 검사 통과 여부
+  const [errorMessage, setErrorMessage] = useState(''); // 에러 메시지
+  const [successMessage, setSuccessMessage] = useState(''); // 성공 메시지
+
   const navigate = useNavigate();
-
   const setAccessToken = useSetAccessToken();
+  const accessToken = useAccessToken();
 
-  const handleDuplicateCheck = async () => {
-    setIsChecking(true);
-    const isDuplicated = await checkNicknameDuplicate(nickname);
-    setIsChecking(false);
-    if (isDuplicated) {
-      setCheckStatus('unavailable');
-    } else {
-      setCheckStatus('available');
+  // 토큰 유효성 및 권한 검사 (페이지 진입 시)
+  useEffect(() => {
+    if (!accessToken) {
+      alert('로그인이 필요한 페이지입니다.');
+      navigate('/login');
+      return;
     }
-  };
+
+    // Role 확인: ROLE_USER라면 이미 온보딩 완료한 유저이므로 라운지로 이동
+    const { role } = parseJwt(accessToken);
+    if (role === 'ROLE_USER') {
+      alert('이미 가입된 회원입니다.');
+      navigate('/workspace-lounge');
+    }
+  }, [accessToken, navigate]);
+
+  // 닉네임 유효성 검사 및 중복 확인 (Debounce 500ms)
+  useEffect(() => {
+    // 1. 입력이 없으면 초기화
+    if (!nickname) {
+      setIsValid(false);
+      setErrorMessage('');
+      setSuccessMessage('');
+      return;
+    }
+
+    // 2. 유효성 검사 (길이, 정규식)
+    if (nickname.length > 16) {
+      setIsValid(false);
+      setErrorMessage('닉네임은 16자 이내여야 합니다.');
+      setSuccessMessage('');
+      return;
+    }
+
+    const regex = /^[a-zA-Z0-9가-힣_]+$/;
+    if (!regex.test(nickname)) {
+      setIsValid(false);
+      setErrorMessage('한글, 영문, 숫자, 언더스코어(_)만 사용할 수 있습니다.');
+      setSuccessMessage('');
+      return;
+    }
+
+    // 3. 중복 확인 API 호출 (Debounce)
+    const checkDuplicate = async () => {
+      setIsChecking(true);
+      setErrorMessage('');
+      setSuccessMessage('');
+
+      try {
+        const isDuplicate = await checkNicknameDuplicate(nickname);
+        if (isDuplicate) {
+          setIsValid(false);
+          setErrorMessage('이미 사용 중인 닉네임입니다.');
+        } else {
+          setIsValid(true);
+          setSuccessMessage('사용 가능한 닉네임입니다.');
+        }
+      } catch (error) {
+        console.error('중복 확인 에러:', error);
+        setIsValid(false);
+        setErrorMessage('중복 확인 중 오류가 발생했습니다.');
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    const timer = setTimeout(checkDuplicate, 500);
+
+    return () => clearTimeout(timer);
+  }, [nickname]);
 
   const handleSave = async () => {
     // TODO: 프로필 정보 저장 API 연결 필요
@@ -158,62 +220,58 @@ export default function UserOnboardingPage() {
               >
                 닉네임
               </Label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
+              <div className="group relative">
+                <div className="relative">
                   <Input
                     id="nickname"
                     type="text"
                     value={nickname}
-                    onChange={(e) => {
-                      setNickname(e.target.value);
-                      setCheckStatus('idle');
-                    }}
+                    onChange={(e) => setNickname(e.target.value)}
                     placeholder="사용하실 닉네임을 입력하세요"
-                    className={`h-12 text-base transition-colors ${
-                      checkStatus === 'available'
-                        ? 'border-green-500 focus-visible:ring-green-500'
-                        : ''
-                    } ${checkStatus === 'unavailable' ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                    maxLength={16}
+                    className={`h-12 text-base pr-12 transition-all ${
+                      errorMessage
+                        ? 'border-red-500 focus-visible:ring-red-500 bg-red-50/10'
+                        : successMessage
+                          ? 'border-green-500 focus-visible:ring-green-500 bg-green-50/10'
+                          : 'border-slate-200 hover:border-slate-300'
+                    }`}
                   />
-                  {checkStatus === 'available' && (
-                    <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 h-5 w-5" />
-                  )}
-                  {checkStatus === 'unavailable' && (
-                    <AlertCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 h-5 w-5" />
+                  {/* Status Indicator Icon */}
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
+                    {isChecking ? (
+                      <div className="h-5 w-5 border-2 border-slate-200 border-t-[var(--figma-tech-green)] rounded-full animate-spin" />
+                    ) : successMessage ? (
+                      <CheckCircle2 className="h-5 w-5 text-green-500 animate-in zoom-in spin-in-90 duration-300" />
+                    ) : errorMessage ? (
+                      <AlertCircle className="h-5 w-5 text-red-500 animate-in zoom-in duration-300" />
+                    ) : null}
+                  </div>
+                </div>
+
+                {/* Validation Messages */}
+                <div className="absolute top-full left-0 mt-1.5 pl-1 w-full overflow-hidden">
+                  {errorMessage ? (
+                    <p className="text-sm font-medium text-red-500 flex items-center gap-1.5 animate-in slide-in-from-top-1 fade-in duration-300">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {errorMessage}
+                    </p>
+                  ) : successMessage ? (
+                    <p className="text-sm font-medium text-green-600 flex items-center gap-1.5 animate-in slide-in-from-top-1 fade-in duration-300">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      {successMessage}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-slate-400">
+                      * 한글, 영문, 숫자, 언더스코어(_) 사용 가능 (최대 16자)
+                    </p>
                   )}
                 </div>
-                <Button
-                  onClick={handleDuplicateCheck}
-                  disabled={
-                    !nickname || isChecking || checkStatus === 'available'
-                  }
-                  variant="outline"
-                  className="h-12 px-6 font-medium whitespace-nowrap border-slate-200 hover:bg-slate-50 text-slate-700"
-                >
-                  {isChecking ? (
-                    <span className="inline-block w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    '중복 확인'
-                  )}
-                </Button>
-              </div>
-              {/* Validation Message */}
-              <div className="h-5">
-                {checkStatus === 'available' && (
-                  <p className="text-green-600 text-sm font-medium animate-in slide-in-from-top-1 fade-in">
-                    사용 가능한 닉네임입니다.
-                  </p>
-                )}
-                {checkStatus === 'unavailable' && (
-                  <p className="text-red-500 text-sm font-medium animate-in slide-in-from-top-1 fade-in">
-                    이미 사용 중인 닉네임입니다.
-                  </p>
-                )}
               </div>
             </div>
 
             {/* Email Field (Read-only) */}
-            <div className="space-y-3">
+            <div className="space-y-3 pt-4">
               <Label className="text-slate-600 font-medium text-sm">
                 이메일
               </Label>
@@ -222,7 +280,7 @@ export default function UserOnboardingPage() {
                   type="text"
                   value="user@ssafy.com"
                   readOnly
-                  className="h-12 bg-slate-50 text-slate-500 border-slate-200 pl-11"
+                  className="h-12 bg-slate-50 text-slate-500 border-slate-200 pl-11 shadow-inner"
                 />
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
               </div>
@@ -234,10 +292,10 @@ export default function UserOnboardingPage() {
             {/* Submit Button */}
             <Button
               onClick={handleSave}
-              disabled={checkStatus !== 'available'}
-              className="w-full h-14 text-lg font-bold mt-8 bg-[#0f4c3a] hover:bg-[#0a3a2a] text-white shadow-lg shadow-green-900/20 transition-all hover:-translate-y-1"
+              disabled={!isValid || isChecking}
+              className="w-full h-14 text-lg font-bold mt-8 bg-[#0f4c3a] hover:bg-[#0a3a2a] text-white shadow-lg shadow-green-900/20 disabled:opacity-50 disabled:shadow-none transition-all hover:-translate-y-1"
             >
-              저장하고 시작하기
+              {isChecking ? '확인 중...' : '저장하고 시작하기'}
             </Button>
           </div>
         </motion.div>
