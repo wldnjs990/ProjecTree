@@ -111,15 +111,14 @@ class Member(Base, TimestampMixin):
     teams = relationship("Team", back_populates="member")
     nodes = relationship(
         "Node", back_populates="owner"
-    )  # user_id in Node references Member
+    ) 
 
 
 class Team(Base, TimestampMixin):
     __tablename__ = "team"
-    # unique (user_id, workspace_id)
 
     id = Column(BigInteger, primary_key=True, index=True)
-    user_id = Column(BigInteger, ForeignKey("member.id"), nullable=False)
+    member_id = Column(BigInteger, ForeignKey("member.id"), nullable=False)
     workspace_id = Column(BigInteger, ForeignKey("workspace.id"), nullable=False)
     chat_id = Column(UUID(as_uuid=True), ForeignKey("chat_room.id"), nullable=True)
 
@@ -245,7 +244,7 @@ class Node(Base, TimestampMixin):
     __tablename__ = "node"
 
     id = Column(BigInteger, primary_key=True, index=True)
-    user_id = Column(BigInteger, ForeignKey("member.id"))
+    member_id = Column(BigInteger, ForeignKey("member.id"))
     node_type = Column(Enum(NodeType), nullable=False)  # Discriminator
     identifier = Column(String(50))
     name = Column(String(30))
