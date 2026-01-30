@@ -6,7 +6,7 @@ import { Upload, X, Info } from 'lucide-react';
 
 interface Step3ScheduleProps {
   data: {
-    subject: string;
+    description: string;
     specFiles: File[];
   };
   onChange: (updates: Partial<Step3ScheduleProps['data']>) => void;
@@ -117,7 +117,7 @@ export default function Step3Schedule({
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-1.5">
             <Label
-              htmlFor="subject"
+              htmlFor="description"
               className="font-['Pretendard'] font-medium text-[13px] leading-[14px] text-[var(--figma-text-cod-gray)]"
             >
               프로젝트 주제
@@ -127,22 +127,22 @@ export default function Step3Schedule({
             </span>
           </div>
           <Textarea
-            id="subject"
+            id="description"
             placeholder="예: AI가 사용자 취향을 분석해 최적의 여행 일정을 추천"
-            value={data.subject}
-            onChange={(e) => onChange({ subject: e.target.value })}
+            value={data.description}
+            onChange={(e) => onChange({ description: e.target.value })}
             maxLength={50}
             rows={2}
             className="resize-none font-['Pretendard'] font-normal text-[13.5px] leading-relaxed p-[10px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors"
           />
           <div className="flex justify-end">
             <span className="font-['Pretendard'] font-normal text-[11px] leading-3 text-[var(--figma-text-dove-gray)]">
-              {data.subject.length}/50
+              {data.description.length}/50
             </span>
           </div>
-          {errors?.subject && (
+          {errors?.description && (
             <p className="font-['Pretendard'] text-[13px] text-red-500 mt-1">
-              {errors.subject}
+              {errors.description}
             </p>
           )}
         </div>

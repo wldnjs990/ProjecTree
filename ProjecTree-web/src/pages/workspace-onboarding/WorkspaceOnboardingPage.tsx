@@ -10,6 +10,7 @@ import Step5TeamInvite from './components/Step5TeamInvite';
 import Step6EpicSetup from './components/Step6EpicSetup';
 import Step7Loading from './components/Step7Loading';
 import { createWorkspace } from '@/apis/workspace.api';
+import type { Role } from '@/apis/workspace.api';
 
 export default function WorkspaceOnboardingPage() {
   const navigate = useNavigate();
@@ -17,18 +18,18 @@ export default function WorkspaceOnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    workspaceName: '',
+    name: '',
     workspaceKey: '',
     domain: '',
     purpose: '',
     serviceType: '',
-    subject: '',
+    description: '',
     startDate: null as Date | null,
     endDate: null as Date | null,
     specFiles: [] as File[],
     techStacks: [] as number[], // 🚨 ID 기반 (number)
-    epics: [] as Array<{ id: string; name: string; description: string }>,
-    teamMembers: [] as Array<{ email: string; role: string }>,
+    epics: [] as Array<{ name: string; description: string }>,
+    memberRoles: {} as Record<string, Role>, // 🚨 변경: Map 구조 (이메일 -> 역할)
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -49,8 +50,8 @@ export default function WorkspaceOnboardingPage() {
     const newErrors: Record<string, string> = {};
 
     if (currentStep === 1) {
-      if (!formData.workspaceName.trim()) {
-        newErrors.workspaceName = '워크스페이스명을 입력해주세요.';
+      if (!formData.name.trim()) {
+        newErrors.name = '워크스페이스명을 입력해주세요.';
       }
       if (!formData.workspaceKey.trim()) {
         newErrors.workspaceKey = '워크스페이스 키를 입력해주세요.';
@@ -69,8 +70,8 @@ export default function WorkspaceOnboardingPage() {
     }
 
     if (currentStep === 3) {
-      if (!formData.subject.trim()) {
-        newErrors.subject = '프로젝트 주제를 입력해주세요.';
+      if (!formData.description.trim()) {
+        newErrors.description = '프로젝트 주제를 입력해주세요.';
       }
     }
 

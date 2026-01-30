@@ -3,8 +3,13 @@ import { wasApiClient } from '@/apis/client';
 /**
  * [타입] 프론트엔드 폼 데이터 (기존 유지)
  */
+/**
+ * [타입] 멤버 역할 (API 호환용)
+ */
+export type Role = 'OWNER' | 'EDITOR' | 'VIEWER';
+
 export interface CreateWorkspaceFormData {
-  workspaceName: string;
+  name: string;
   workspaceKey: string;
   domain: string;
   purpose: string;
@@ -14,8 +19,8 @@ export interface CreateWorkspaceFormData {
   endDate: Date | null;
   specFiles: File[];
   techStacks: number[]; // 🚨 변경: 이름(string) -> ID(number) 목록으로 변경
-  epics: Array<{ id: string; name: string; description: string }>; // id는 프론트엔드 UI용
-  teamMembers: Array<{ email: string; role: string }>;
+  epics: Array<{ name: string; description: string }>; // 🚨 변경: ID 제거 (백엔드 X, 프론트엔드도 Index 사용)
+  memberRoles: Array<{ email: string; role: string }>;
 }
 
 /**
@@ -65,66 +70,39 @@ export const getTechStacks = async (): Promise<TechStackItem[]> => {
 };
 
 /**
- * [워크스페이스 API] 워크스페이스 생성
- * @param data - 워크스페이스 생성 정보
- * @returns 워크스페이스 생성 응답
+ * [API] 워크스페이스 생성
  */
-export const createWorkspace = async (data: CreateWorkspaceFormData) => {
+export const createWorkspace = async (
+  data: CreateWorkspaceFormData
+): Promise<WorkspaceResponse> => {
   // 파일이 포함되어 있으므로 FormData 사용
   const formData = new FormData();
 
   // 1. JSON 데이터 객체 생성
-  // 멤버 역할 변환 (한글 -> 영어 Enum)
-  const roleMap: Record<string, string> = {
-    '관리자 - 모든 권한': 'OWNER',
-    '편집자 - 편집 가능': 'EDITOR',
-    '뷰어 - 보기만 가능': 'VIEWER', // UI 텍스트와 일치시킴
-  };
-
-  const memberRoles: Record<string, string> = {};
-  data.teamMembers.forEach((member) => {
-    // 1. 이미 영어라면 그대로 사용
-    if (['OWNER', 'EDITOR', 'VIEWER'].includes(member.role)) {
-      memberRoles[member.email] = member.role;
-    } else {
-      // 2. 한글이라면 매핑된 영어 값 사용 (없으면 기본값 EDITOR)
-      memberRoles[member.email] = roleMap[member.role] || 'EDITOR';
-    }
-  });
-
   // 에픽 변환 (id 제거)
-  const epics = data.epics.map(({ name, description }) => ({
-    name,
-    description,
-  }));
+  // 에픽: 이미 { name, description } 형태이므로 그대로 사용 가능
+  // 만약 추가적인 가공이 필요하다면 여기서 처리
+  const epics = data.epics;
 
   // JSON 데이터 구성
   const requestData = {
-    name: data.workspaceName,
-    description: data.subject,
+    name: data.name,
+    description: data.description,
     domain: data.domain,
     purpose: data.purpose,
-    serviceType: data.serviceType, // 🚨 UI에서 이미 WEB/APP으로 관리하므로 그대로 전송
+    serviceType: data.serviceType,
     identifierPrefix: data.workspaceKey,
     startDate: data.startDate
       ? data.startDate.toISOString().split('T')[0]
       : null,
     endDate: data.endDate ? data.endDate.toISOString().split('T')[0] : null,
-    memberRoles,
+    memberRoles: data.memberRoles, // 🚨 이제 그대로 전송 (Record<string, Role>)
+    workspaceTechStacks: data.techStacks, // 🚨 백엔드 요청대로 필드명 변경 및 활성화
+    epics: epics, // 🚨 재변경: 백엔드 DTO(epics) 확인 -> epics (복수형)
   };
 
-  // techStacks가 있을 때만 추가 (백엔드 준비되면 주석 해제)
-  // if (data.techStacks && data.techStacks.length > 0) {
-  //   (requestData as any).techStacks = data.techStacks; // 이제 [1, 5, 10] 같은 ID 배열이 들어감
-  // }
-
-  // epics가 있을 때만 추가 (사용자 요청으로 제거 - 백엔드 미구현)
-  // if (epics && epics.length > 0) {
-  //   (requestData as any).epics = epics;
-  // }
-
-  // 📝 디버깅 로그 추가 (이 내용을 캡쳐해주세요!)
-  console.log('🚀 [API 요청 데이터 확인 - 최신 버전(기술스택 미포함)]');
+  // 📝 디버깅 로그 추가
+  console.log('🚀 [API 요청 데이터 확인 - 최종 수정 버전]');
   console.log('1. JSON 데이터:', JSON.stringify(requestData, null, 2));
   console.log('2. 파일 개수:', data.specFiles.length);
   data.specFiles.forEach((file, index) => {
