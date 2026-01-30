@@ -18,4 +18,12 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
     Optional<Team> findByWorkspaceAndMember(Workspace workspace, Member member);
 
+    @Query("""
+    select count(t) > 0
+    from Team t
+    where t.workspace = :workspace
+    and t.member = :member
+    """)
+    boolean isParticipant(@Param("workspace") Workspace workspace, @Param("member") Member member);
+
 }

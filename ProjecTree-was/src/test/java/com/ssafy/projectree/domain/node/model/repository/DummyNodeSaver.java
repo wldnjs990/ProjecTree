@@ -9,6 +9,7 @@ import com.ssafy.projectree.domain.node.model.entity.StoryNode;
 import com.ssafy.projectree.domain.workspace.enums.ServiceType;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.workspace.model.repository.WorkspaceRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -29,11 +30,13 @@ class DummyNodeSaver {
 	private NodeRepository nodeRepository;
 	@Autowired
 	private WorkspaceRepository workspaceRepository;
+	@PersistenceContext
+	private EntityManager em;
 
 
 	@Commit
 	@Test
-	// @Disabled
+	@Disabled
 	public void initDevLinkProjectData() {
 
 		// 1. 워크스페이스 (Workspace)
@@ -75,7 +78,6 @@ class DummyNodeSaver {
 		Node rootProject = ProjectNode.builder()
 				.workspace(workspace)
 				.name("DevLink: 멘토링 매칭 플랫폼 구축") // 구체적인 프로젝트/버전 명
-				.identifier("DEV-ROOT")
 				.priority(Priority.P0)
 				.status(NodeStatus.TODO)
 				.description("""
@@ -104,5 +106,7 @@ class DummyNodeSaver {
 
 		workspaceRepository.save(workspace);
 		nodeRepository.saveRoot(rootProject);
+		em.flush();
+		em.refresh(rootProject);
 	}
 }

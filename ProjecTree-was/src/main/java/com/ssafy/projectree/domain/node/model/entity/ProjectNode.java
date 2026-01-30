@@ -24,7 +24,7 @@ import lombok.experimental.SuperBuilder;
 @DiscriminatorValue("PROJECT")
 public class ProjectNode extends Node {
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id")
     private Workspace workspace;
     @Override

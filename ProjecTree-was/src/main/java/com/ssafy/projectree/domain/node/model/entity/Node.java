@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 @Entity
 @NoArgsConstructor
@@ -44,7 +46,7 @@ public abstract class Node extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String note;
 
-    @Column(columnDefinition = "VARCHAR(50)")
+    @Column(columnDefinition = "VARCHAR(50)", name = "identifier", insertable = false, updatable = false)
     private String identifier;
 
     @Column(name = "x_pos")

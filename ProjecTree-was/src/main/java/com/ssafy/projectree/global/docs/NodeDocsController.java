@@ -33,6 +33,10 @@ public interface    NodeDocsController {
             @PathVariable(value = "node-id") Long nodeId
     );
 
+    @Operation(
+            summary = "노드 트리 정보 조회",
+            description = "워크스페이스 최초 진입시 워크스페이스의 노드 트리 전체를 조회합니다."
+    )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
