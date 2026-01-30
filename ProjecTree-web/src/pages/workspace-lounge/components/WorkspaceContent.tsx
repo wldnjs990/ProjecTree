@@ -196,7 +196,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 group-focus-within:text-[#064E3B] transition-colors duration-300" />
             <Input
               placeholder="워크스페이스 검색..."
-              className="w-48 lg:w-64 pl-10 bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-zinc-200 focus:border-zinc-300 placeholder:text-zinc-400/80 transition-all duration-300 rounded-xl hover:bg-white/60"
+              className="w-48 pl-10 bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-zinc-200 focus:border-zinc-300 placeholder:text-zinc-400/80 transition-colors duration-300 rounded-xl hover:bg-white/60"
               value={inputValue}
               onChange={(e) => handleSearchChange(e.target.value)}
             />
@@ -206,7 +206,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="gap-2 bg-white/50 border border-white/20 shadow-sm text-zinc-600 hover:bg-white/80 sm:min-w-[130px] justify-between backdrop-blur-sm transition-all duration-300 rounded-xl"
+                className="gap-2 bg-white/50 border border-white/20 shadow-sm text-zinc-600 hover:bg-white/80 sm:w-[140px] justify-between backdrop-blur-sm transition-all duration-300 rounded-xl"
               >
                 <div className="flex items-center gap-2">
                   <currentSortOption.icon className="h-4 w-4" />
