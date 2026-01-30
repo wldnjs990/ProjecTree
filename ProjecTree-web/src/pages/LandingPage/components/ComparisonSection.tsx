@@ -88,10 +88,11 @@ export default function ComparisonSection() {
                         <img
                             src="/before.png"
                             alt="ProjecTree 사용 전"
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-cover select-none pointer-events-none"
+                            draggable={false}
                         />
                         {/* Label */}
-                        <div className="absolute bottom-6 left-6 rounded-full border border-zinc-200 bg-white/80 px-4 py-2 text-sm text-zinc-500 font-medium backdrop-blur-sm shadow-sm">
+                        <div className="absolute bottom-6 left-6 rounded-full border border-zinc-200 bg-white/80 px-4 py-2 text-sm text-zinc-500 font-medium backdrop-blur-sm shadow-sm select-none pointer-events-none">
                             ProjecTree 사용 전
                         </div>
                     </div>
@@ -104,11 +105,12 @@ export default function ComparisonSection() {
                         <img
                             src="/after.png"
                             alt="ProjecTree 사용 후"
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-cover select-none pointer-events-none"
+                            draggable={false}
                         />
                         {/* Label */}
                         <div
-                            className="absolute bottom-6 right-6 rounded-full border border-emerald-100 bg-white/90 px-4 py-2 text-sm text-emerald-600 font-medium backdrop-blur-sm shadow-lg shadow-emerald-100/50"
+                            className="absolute bottom-6 right-6 rounded-full border border-emerald-100 bg-white/90 px-4 py-2 text-sm text-emerald-600 font-medium backdrop-blur-sm shadow-lg shadow-emerald-100/50 select-none pointer-events-none"
                         >
                             ProjecTree 사용 후
                         </div>
