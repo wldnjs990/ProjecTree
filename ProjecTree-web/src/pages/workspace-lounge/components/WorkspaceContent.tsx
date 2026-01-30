@@ -180,7 +180,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
             <Layers className="h-5 w-5" />
           </div>
           <h1 className="text-xl font-bold text-zinc-800 tracking-tight hidden lg:block">
-            나의 워크스페이스
+            워크스페이스 목록
           </h1>
           <button
             onClick={() => setIsTutorialOpen(true)}

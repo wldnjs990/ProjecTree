@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
   FolderOpen,
-  User,
+  UserStar,
   Users,
   ChevronLeft,
   ChevronRight,
@@ -57,9 +57,9 @@ type MenuItem = {
 
 // 사이드바 메뉴 항목 정의
 const MENU_ITEMS: MenuItem[] = [
-  { id: 'all', icon: FolderOpen, label: '전체 프로젝트' },
-  { id: 'mine', icon: User, label: '내가 만든 것' },
-  { id: 'joined', icon: Users, label: '참여 중인 것' },
+  { id: 'all', icon: FolderOpen, label: '전체 워크스페이스' },
+  { id: 'mine', icon: UserStar, label: '내 워크스페이스' },
+  { id: 'joined', icon: Users, label: '초대받은 워크스페이스' },
 ];
 
 /**
@@ -417,7 +417,7 @@ export function LoungeSidebar({
     <aside
       className={cn(
         'group/sidebar flex flex-col border-r border-white/60 bg-gradient-to-b from-white/70 via-white/50 to-white/30 backdrop-blur-2xl shadow-[1px_0_30px_0_rgba(31,38,135,0.07)] transition-all duration-500 ease-out z-20 relative',
-        collapsed ? 'w-16' : 'w-64'
+        collapsed ? 'w-16' : 'w-75'
       )}
     >
       {/* Floating Toggle Button */}
