@@ -12,7 +12,6 @@ export interface EditableNodeDetail {
   difficult?: number;
   assignee: Assignee | null;
   note: string;
-  selectedTechId: number | null;
 }
 
 interface NodeDetailState {
@@ -22,7 +21,6 @@ interface NodeDetailState {
   isEditing: boolean;
   editData: EditableNodeDetail | null;
   isSaving: boolean;
-  selectedTechId: number | null;
 
   // === 단순 setter ===
   setSelectedNodeId: (id: string | null) => void;
@@ -30,7 +28,6 @@ interface NodeDetailState {
   setIsEditing: (editing: boolean) => void;
   setEditData: (data: EditableNodeDetail | null) => void;
   setIsSaving: (saving: boolean) => void;
-  setSelectedTechId: (techId: number | null) => void;
 
   // === 복합 setter ===
   openSidebar: (nodeId: string) => void;
@@ -45,7 +42,6 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   isEditing: false,
   editData: null,
   isSaving: false,
-  selectedTechId: null,
 
   // === 단순 setter ===
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
@@ -53,7 +49,6 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   setIsEditing: (editing) => set({ isEditing: editing }),
   setEditData: (data) => set({ editData: data }),
   setIsSaving: (saving) => set({ isSaving: saving }),
-  setSelectedTechId: (techId) => set({ selectedTechId: techId }),
 
   // === 복합 setter ===
   openSidebar: (nodeId) => {
@@ -66,7 +61,6 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       selectedNodeId: null,
       isEditing: false,
       editData: null,
-      selectedTechId: null,
     });
   },
 
@@ -77,7 +71,6 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       isEditing: false,
       editData: null,
       isSaving: false,
-      selectedTechId: null,
     }),
 }));
 
@@ -100,10 +93,6 @@ export const useEditData = () => useNodeDetailStore((state) => state.editData);
 
 /** 저장 중 상태 */
 export const useIsSaving = () => useNodeDetailStore((state) => state.isSaving);
-
-/** 선택된 기술 스택 ID */
-export const useSelectedTechId = () =>
-  useNodeDetailStore((state) => state.selectedTechId);
 
 /** 특정 편집 필드 값 */
 export const useEditField = <K extends keyof EditableNodeDetail>(field: K) =>
