@@ -1,13 +1,19 @@
 package com.ssafy.projectree.domain.workspace.usecase;
 
+import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
+import com.ssafy.projectree.domain.file.model.entity.FileProperty;
 import com.ssafy.projectree.domain.file.usecase.FileService;
+import com.ssafy.projectree.domain.file.usecase.S3Service;
 import com.ssafy.projectree.domain.member.model.entity.Member;
+import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
 import com.ssafy.projectree.domain.node.usecase.NodeService;
 import com.ssafy.projectree.domain.tech.usecase.WorkspaceTechStackService;
+import com.ssafy.projectree.domain.workspace.api.dto.FunctionSpecificationDto;
 import com.ssafy.projectree.domain.workspace.api.dto.TeamDto;
 import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
+import com.ssafy.projectree.domain.workspace.model.entity.FunctionSpecification;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.workspace.model.repository.WorkspaceRepository;
 import com.ssafy.projectree.global.api.code.ErrorCode;
@@ -34,17 +40,29 @@ public class WorkspaceService {
     private final FunctionSpecificationService functionSpecificationService;
 
     public List<WorkspaceDto.Response> read(Member member) {
+
         List<Long> ids = teamService.getAllWorkspacesId(member);
+        List<WorkspaceDto.Response> myAllWorkspaces = new ArrayList<>();
 
         for (Long id : ids) {
             // WorkspaceDto.Response 객체에 담기
-            nodeService.getNodeTree(id);
+            Workspace workspace = findById(id);
 
-
+            // 워크 스페이스별 조회 결과 리스트에 저장
+            myAllWorkspaces.add(
+                    WorkspaceDto.Response.builder()
+                            .workspaceId(id)
+                            .name(workspace.getName())
+                            .description(workspace.getDescription())
+                            .totalMembers(teamService.getMemberCount(id))
+                            .role(teamService.getMyRole(workspace, member))
+                            .progress(nodeService.getStatistics(id))
+                            .updatedAt(workspace.getUpdatedAt())
+                            .build()
+            );
         }
 
-
-        return null;
+        return myAllWorkspaces;
     }
 
     public Workspace findById(Long id) {
@@ -90,6 +108,29 @@ public class WorkspaceService {
         // 기술명세 저장
         functionSpecificationService.create(workspace, dto.getEpics());
 
+    }
+
+    public WorkspaceDto.Detail details(Member member, Long workspaceId) {
+
+        Workspace workspace = findById(workspaceId);
+
+        List<FileReadDto.Response> files = fileService.findByWorkspaceId(workspace);
+
+        List<FunctionSpecification> functionSpecifications = functionSpecificationService.findAllByWorkspace(workspace);
+        List<FunctionSpecificationDto.EpicInfo> epics = new ArrayList<>();
+
+        for (FunctionSpecification fs : functionSpecifications) {
+            epics.add(FunctionSpecificationDto.EpicInfo.builder()
+                    .name(fs.getName())
+                    .description(fs.getDescription())
+                    .build()
+            );
+        }
+
+        return WorkspaceDto.Detail.builder()
+                .nodeTree(nodeService.getNodeTree(workspaceId))
+                .files(files)
+                .epics(epics).build();
     }
 
 }

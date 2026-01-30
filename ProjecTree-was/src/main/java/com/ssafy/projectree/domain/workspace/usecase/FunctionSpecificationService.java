@@ -23,4 +23,8 @@ public class FunctionSpecificationService {
 
     }
 
+    public List<FunctionSpecification> findAllByWorkspace(Workspace workspace) {
+        return functionSpecificationRepository.findAllByWorkspace(workspace);
+    }
+
 }

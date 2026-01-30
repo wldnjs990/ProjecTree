@@ -41,8 +41,8 @@ public class FileService {
         return FileUploadDto.Response.of("파일 업로드에 성공하였습니다.");
     }
 
-    public List<FileReadDto.Response> read(Long id) {
-        return fileRepository.getFilesByWorkspaceId(id)
+    public List<FileReadDto.Response> findByWorkspaceId(Workspace workspace) {
+        return fileRepository.getFilesByWorkspace(workspace)
                 .stream()
                 .map(file -> FileReadDto.Response.builder()
                         .id(file.getId())

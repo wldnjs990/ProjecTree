@@ -1,5 +1,8 @@
 package com.ssafy.projectree.domain.workspace.api.dto;
 
+import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
+import com.ssafy.projectree.domain.file.model.entity.FileProperty;
+import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.enums.ServiceType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +20,7 @@ import java.util.Map;
 public class WorkspaceDto {
 
     @Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     @Schema(name = "WorkspaceDto.Insert", description = "워크 스페이스 생성")
@@ -52,11 +57,11 @@ public class WorkspaceDto {
         private Map<String, Role> memberRoles;
 
         @Schema(description = "워크 스페이스 생성 시 입력받는 에픽 정보", example = """
-    [
-        {"name": "항목1", "description": "설명1"},
-        {"name": "항목2", "description": "설명2"}
-    ]
-    """)
+                [
+                    {"name": "항목1", "description": "설명1"},
+                    {"name": "항목2", "description": "설명2"}
+                ]
+                """)
         private List<FunctionSpecificationDto.EpicInfo> epics;
 
         @Schema(description = "워크 스페이스 생성 시 입력받는 기술 스택들의 id값", example = "[1, 2, 3, ... ]")
@@ -122,6 +127,21 @@ public class WorkspaceDto {
 
         @Schema(description = "완료된 노드 개수", example = "6")
         private long completed;
+
     }
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "워크 스페이스 진입 요청에 대한 응답 DTO")
+    public static class Detail {
+
+        private NodeTreeReadDto.Response nodeTree;
+
+        private List<FileReadDto.Response> files;
+
+        private List<FunctionSpecificationDto.EpicInfo> epics;
+
+    }
 }

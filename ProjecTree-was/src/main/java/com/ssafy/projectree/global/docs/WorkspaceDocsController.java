@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -80,4 +81,19 @@ public interface WorkspaceDocsController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     CommonResponse<?> create(Member member, WorkspaceDto.Insert dto, List<MultipartFile> multipartFiles) throws IOException;
 
+    @Operation(summary = "워크 스페이스 수정 API", description = "워크 스페이스 정보를 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "워크 스페이스 정보 수정에 성공하였습니다."),
+            @ApiResponse(responseCode = "400", description = "워크 스페이스 정보 수정에 실패하였습니다.")
+    })
+    @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    CommonResponse<?> update(Member member, WorkspaceDto.Insert dto, List<MultipartFile> multipartFiles) throws IOException;
+
+    @Operation(summary = "워크 스페이스 상세조회 API", description = "워크 스페이스 진입 시 보여주는 정보입니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "워크 스페이스 생성에 성공하였습니다."),
+            @ApiResponse(responseCode = "400", description = "워크 스페이스 생성에 실패하였습니다.")
+    })
+    @GetMapping()
+    CommonResponse<?> details(Member member, Long workspaceId);
 }

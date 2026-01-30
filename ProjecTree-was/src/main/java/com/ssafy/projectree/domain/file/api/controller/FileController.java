@@ -34,9 +34,4 @@ public class FileController implements FileDocsController {
         return CommonResponse.success(SuccessCode.SUCCESS, fileService.uploadFiles(multipartFiles, workspaceService.findById(id)));
     }
 
-    @GetMapping("/workspaces/{id}")
-    public CommonResponse<List<FileReadDto.Response>> read(@PathVariable Long id) {
-        return CommonResponse.success(SuccessCode.SUCCESS, fileService.read(id));
-    }
-
 }
