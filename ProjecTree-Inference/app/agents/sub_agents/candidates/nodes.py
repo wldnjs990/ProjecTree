@@ -2,10 +2,7 @@ from langchain.agents.structured_output import ProviderStrategy
 from app.agents.sub_agents.candidates.state import CandidateNodeState
 from app.agents.enums import NodeType
 from langchain.agents import create_agent
-from app.agents.sub_agents.candidates.tools import (
-    check_duplicate_work,
-    search_sibling_nodes,
-)
+
 from langchain_core.messages import HumanMessage
 from app.core.llm import openai_nano_llm, openai_mini_llm
 from app.agents.schemas.candidate import CandidateList, TaskCandidateList

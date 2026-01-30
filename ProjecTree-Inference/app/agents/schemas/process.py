@@ -6,6 +6,7 @@ from app.agents.enums import TaskType
 class BaseNodeProcessResult(BaseModel):
     name: str = Field(description="정제된 노드 이름 (명확하고 간결하게)")
     description: str = Field(description="노드에 대한 상세 설명 및 구현 가이드")
+    summary: str = Field(description="노드에 대한 요약", min_length=1, max_length=60)
 
 
 class EpicProcessResult(BaseNodeProcessResult):
