@@ -6,6 +6,10 @@ EXPERT_USER_PROMPT = """
 - Task Name: {user_task}
 - Description: {task_description}
 
+{workspace_info}
+
+{candidate_info}
+
 [요청 사항]
 위 기능을 구현하기 위해 현업에서 가장 많이 쓰이거나 학습 가치가 높은 '구현 기술/방식' 3가지를 추천해 주세요.
 
