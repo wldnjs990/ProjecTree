@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 @Table
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Tri
 public class NodeTree{
 	@EmbeddedId
 	private NodeTreeId id;

@@ -9,6 +9,7 @@ import com.ssafy.projectree.domain.node.model.entity.StoryNode;
 import com.ssafy.projectree.domain.workspace.enums.ServiceType;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.workspace.model.repository.WorkspaceRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -29,11 +30,13 @@ class DummyNodeSaver {
 	private NodeRepository nodeRepository;
 	@Autowired
 	private WorkspaceRepository workspaceRepository;
+	@PersistenceContext
+	private EntityManager em;
 
 
 	@Commit
 	@Test
-	@Disabled
+	//@Disabled
 	public void initDevLinkProjectData() {
 
 		// 1. 워크스페이스 (Workspace)
@@ -103,5 +106,7 @@ class DummyNodeSaver {
 
 		workspaceRepository.save(workspace);
 		nodeRepository.saveRoot(rootProject);
+		em.flush();
+		em.refresh(rootProject);
 	}
 }

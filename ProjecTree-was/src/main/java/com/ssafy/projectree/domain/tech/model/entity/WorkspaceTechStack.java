@@ -32,7 +32,7 @@ public class WorkspaceTechStack extends BaseEntity {
 	@JoinColumn(name = "workspace_id", nullable = false)
 	private Workspace workspace;
 
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "tech_vocab_id", nullable = false)
 	private TechVocabulary techVocabulary;
 }

@@ -4,6 +4,7 @@ import com.ssafy.projectree.domain.ai.dto.AiCandidateCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiNodeCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiTechRecommendDto;
 import com.ssafy.projectree.domain.ai.service.InferenceService;
+import com.ssafy.projectree.domain.member.api.dto.schemas.MemberSchema;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
 import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
@@ -19,13 +20,14 @@ import com.ssafy.projectree.domain.node.enums.NodeStatus;
 import com.ssafy.projectree.domain.node.enums.NodeType;
 import com.ssafy.projectree.domain.node.enums.Priority;
 import com.ssafy.projectree.domain.node.enums.TaskType;
-import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
-import com.ssafy.projectree.domain.node.model.entity.Node;
-import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
-import com.ssafy.projectree.domain.node.model.entity.TaskNode;
+import com.ssafy.projectree.domain.node.model.entity.*;
 import com.ssafy.projectree.domain.node.model.repository.CandidateRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeTreeRepository;
+import com.ssafy.projectree.domain.tech.model.entity.NodeTechStack;
+import com.ssafy.projectree.domain.tech.model.repository.NodeTechStackRepository;
+import com.ssafy.projectree.domain.tech.api.dto.schemas.TechStackSchema;
+import com.ssafy.projectree.domain.node.api.dto.schema.CandidateSchema;
 import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.exception.BusinessLogicException;
 import jakarta.transaction.Transactional;
@@ -47,6 +49,7 @@ public class NodeServiceImpl implements NodeService {
     private final CandidateRepository candidateRepository;
     private final NodeTreeRepository nodeTreeRepository;
     private final NodeCrdtService nodeCrdtService;
+    private final NodeTechStackRepository nodeTechStackRepository;
 
     private ProjectNode findRootNode(Long nodeId) {
         PageRequest limitOne = PageRequest.of(0, 1);
@@ -57,7 +60,48 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public NodeReadDto.Response getNodeDetails(Long nodeId) {
-        return null;
+        Node node = nodeRepository.findById(nodeId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR, "노드를 찾을 수 없습니다."));
+
+        List<Candidate> candidates = candidateRepository.findByParent(node);
+        List<NodeTechStack> techStacks = nodeTechStackRepository.findAllByNode(node);
+
+        String comparison = null;
+        if (node instanceof TaskNode taskNode) {
+            comparison = taskNode.getComparison();
+        } else if (node instanceof AdvanceNode advanceNode) {
+            comparison = advanceNode.getComparison();
+        }
+
+        return NodeReadDto.Response.builder()
+                .id(node.getId())
+                .assignee(node.getMember() != null ?
+                        MemberSchema.builder()
+                                .id(node.getMember().getId())
+                                .nickname(node.getMember().getNickname())
+                                .build() : null)
+                .description(node.getDescription())
+                .note(node.getNote())
+                .candidates(candidates.stream()
+                        .map(candidate -> CandidateSchema.builder()
+                                .id(candidate.getId())
+                                .name(candidate.getName())
+                                .description(candidate.getDescription())
+                                .build())
+                        .toList())
+                .techs(techStacks.stream()
+                        .map(techStack -> TechStackSchema.builder()
+                                .id(techStack.getId())
+                                .name(techStack.getTechVocabulary().getName())
+                                .advantage(techStack.getTechStackInfo().getAdvantage())
+                                .disAdvantage(techStack.getTechStackInfo().getDisadvantage())
+                                .description(techStack.getTechStackInfo().getDescription())
+                                .ref(techStack.getTechStackInfo().getRef())
+                                .recommendScore(techStack.getTechStackInfo().getRecommendation())
+                                .build())
+                        .toList())
+                .comparison(comparison)
+                .build();
     }
 
     @Override
