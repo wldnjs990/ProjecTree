@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/internal/workspaces/{workspaceId}")
+@RequestMapping("/internal")
 @RequiredArgsConstructor
 public class NodeInternalController {
 
@@ -25,7 +25,6 @@ public class NodeInternalController {
 
     @PatchMapping("/nodes/{nodeId}/detail")
     public CommonResponse<Void> saveNodeDetail(
-            @PathVariable Long workspaceId,
             @PathVariable Long nodeId,
             @RequestBody NodeUpdateDto.Request request
     ) {
@@ -33,7 +32,7 @@ public class NodeInternalController {
         return CommonResponse.success(SuccessCode.UPDATED, null);
     }
 
-    @PatchMapping("/nodes/positions")
+    @PatchMapping("/workspaces/{workspaceId}/nodes/positions")
     public CommonResponse<Void> updateNodePositions(
             @PathVariable Long workspaceId,
             @RequestBody NodePositionUpdateDto.Request request
