@@ -33,7 +33,7 @@ class DummyNodeSaver {
 
 	@Commit
 	@Test
-	// @Disabled
+	@Disabled
 	public void initDevLinkProjectData() {
 
 		// 1. 워크스페이스 (Workspace)
@@ -75,7 +75,6 @@ class DummyNodeSaver {
 		Node rootProject = ProjectNode.builder()
 				.workspace(workspace)
 				.name("DevLink: 멘토링 매칭 플랫폼 구축") // 구체적인 프로젝트/버전 명
-				.identifier("DEV-ROOT")
 				.priority(Priority.P0)
 				.status(NodeStatus.TODO)
 				.description("""

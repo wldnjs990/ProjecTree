@@ -45,7 +45,7 @@ public class Workspace extends BaseEntity {
 	@Column(columnDefinition = "VARCHAR(20)")
 	private String purpose;
 
-	@Column(name = "identifier_prefix", length = 20)
+	@Column(name = "identifier_prefix", length = 20, nullable = false)
 	private String identifierPrefix;
 }
 
