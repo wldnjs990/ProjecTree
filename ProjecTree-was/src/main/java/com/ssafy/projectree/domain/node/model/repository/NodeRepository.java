@@ -58,4 +58,5 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
                 )
             """)
     List<NodeWithParentSchema> findAllFlatNodesByWorkspace(@Param("workspaceId") Long workspaceId);
+
 }

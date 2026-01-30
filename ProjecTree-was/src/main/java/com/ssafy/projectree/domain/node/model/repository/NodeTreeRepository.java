@@ -19,4 +19,6 @@ public interface NodeTreeRepository extends JpaRepository<NodeTree, NodeTreeId> 
 			"WHERE nt.descendant.id = :descendantId " +
 			"ORDER BY nt.depth DESC")
 	List<ProjectNode> findRoot(@Param("descendantId") Long descendantId, Pageable pageable);
+
+	List<NodeTree> findAllByDescendant(com.ssafy.projectree.domain.node.model.entity.Node descendant);
 }
