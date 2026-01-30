@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Info } from 'lucide-react';
@@ -20,6 +21,8 @@ export default function Step1BasicInfo({
   // onPrev,
   errors,
 }: Step1BasicInfoProps) {
+  const [localError, setLocalError] = useState<string>('');
+
   return (
     <div className="flex flex-col gap-8">
       {/* 헤더 */}
@@ -101,16 +104,25 @@ export default function Step1BasicInfo({
             placeholder="ex) ASDF"
             value={data.workspaceKey}
             onChange={(e) => {
-              const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+              const checkedValue = e.target.value;
+              const hasKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(checkedValue);
+
+              if (hasKorean) {
+                setLocalError('영어로 입력해주세요');
+              } else {
+                setLocalError('');
+              }
+
+              const value = checkedValue.toUpperCase().replace(/[^A-Z]/g, '');
               onChange({ workspaceKey: value });
             }}
             maxLength={4}
-            className={`h-[52px] px-4 bg-[#F9FAFB] border-[#E0E0E0] shadow-sm rounded-xl font-['Pretendard'] text-[15px] focus-visible:ring-4 focus-visible:ring-[#4CAF50]/10 focus-visible:border-[#4CAF50] focus-visible:bg-[#F1F8E9] transition-all duration-200 placeholder:text-[#BDBDBD] ${errors?.workspaceKey ? 'border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/10' : ''}`}
+            className={`h-[52px] px-4 bg-[#F9FAFB] border-[#E0E0E0] shadow-sm rounded-xl font-['Pretendard'] text-[15px] focus-visible:ring-4 focus-visible:ring-[#4CAF50]/10 focus-visible:border-[#4CAF50] focus-visible:bg-[#F1F8E9] transition-all duration-200 placeholder:text-[#BDBDBD] ${errors?.workspaceKey || localError ? 'border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/10' : ''}`}
             autoComplete="off"
           />
-          {errors?.workspaceKey && (
+          {(errors?.workspaceKey || localError) && (
             <p className="font-['Pretendard'] text-[13px] text-red-500 mt-1">
-              {errors.workspaceKey}
+              {localError || errors?.workspaceKey}
             </p>
           )}
           <div className="flex justify-end">
