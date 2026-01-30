@@ -56,6 +56,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
     []
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // 튜토리얼 모달 상태
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
@@ -87,8 +88,8 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
         // 개발 환경에서는 MSW가 요청을 가로채서 mock 데이터 반환
         const data = await getMyWorkspaces(user.memberId);
         setWorkspaces(data);
-      } catch (error) {
-        console.error('워크스페이스 목록을 불러오는데 실패했습니다.', error);
+      } catch (_error) {
+        setError('워크스페이스 목록을 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
       }
@@ -246,6 +247,11 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
         {isLoading ? (
           <div className="flex h-full w-full items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-full text-zinc-500">
+            <p className="text-lg font-medium text-red-500">{error}</p>
+            <p className="text-sm text-zinc-400 mt-1">잠시 후 다시 시도해주세요.</p>
           </div>
         ) : workspaces.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-500">
