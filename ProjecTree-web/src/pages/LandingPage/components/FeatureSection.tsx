@@ -27,18 +27,6 @@ const features = [
         description: "라이브 커서와 동시 편집, 실시간 음성 채팅과 채팅 기능을 제공합니다. 실시간 커뮤니케이션과 동시 편집으로 팀원들과 함께 프로젝트를 만들어가세요.",
         size: "medium",
     },
-    // {
-    //     icon: Zap,
-    //     title: "빠른 개발 설정",
-    //     description: "클릭 한 번으로 필요한 개발 환경 세팅 가이드를 받아보세요.",
-    //     size: "small",
-    // },
-    // {
-    //     icon: Shield,
-    //     title: "버전 관리",
-    //     description: "모든 변경 사항을 추적하고 언제든 이전 버전으로 되돌릴 수 있습니다.",
-    //     size: "small",
-    // },
 ]
 
 function BentoCard({
@@ -140,7 +128,7 @@ function BentoCard({
                 {/* Large card additional content */}
                 {feature.size === "large" && (
                     <div className="mt-6 grid grid-cols-2 gap-3">
-                        {["드래그 앤 드롭", "실시간 동기화", "줌 컨트롤", "SVG 내보내기"].map((tag) => (
+                        {["드래그 앤 드롭", "실시간 동기화", "줌 컨트롤", "인피니트 캔버스"].map((tag) => (
                             <div
                                 key={tag}
                                 className="rounded-lg border border-emerald-100 bg-emerald-50/50 px-3 py-2 text-xs text-emerald-600 font-medium"
