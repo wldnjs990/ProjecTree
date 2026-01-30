@@ -2,7 +2,6 @@ import { springClient } from "./../../spring/springClient";
 import type { SendNodeDetail } from "../../../domain/node/node.detail";
 
 interface SaveNodeDetailPayload {
-  workspaceId: number;
   nodeId: number;
   detail: SendNodeDetail;
 }
@@ -12,7 +11,7 @@ export async function saveNodeDetailToSpring(
 ): Promise<boolean> {
   try {
     await springClient.patch(
-      `/api/internal/workspaces/${payload.workspaceId}/nodes/${payload.nodeId}/detail`,
+      `/api/internal/nodes/${payload.nodeId}/detail`,
       payload.detail,
     );
     return true;
