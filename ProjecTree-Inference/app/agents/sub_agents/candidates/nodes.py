@@ -7,7 +7,7 @@ from app.agents.sub_agents.candidates.tools import (
     search_sibling_nodes,
 )
 from langchain_core.messages import HumanMessage
-from app.agents.tools.tavily import search_tool
+from app.agents.tools.search import search_tool
 from app.core.llm import openai_nano_llm, openai_mini_llm
 from app.agents.schemas.candidate import CandidateList, TaskCandidateList
 from app.agents.sub_agents.candidates.prompts.system_prompts import (

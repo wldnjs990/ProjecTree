@@ -4,9 +4,9 @@ from langchain.agents import create_agent
 from deepagents import create_deep_agent
 from langchain.agents.structured_output import ProviderStrategy
 from app.agents.sub_agents.recommend.state import RecommendationState
-from app.agents.tools.tavily import search_tool
+from app.agents.tools.search import restricted_search
 from app.agents.schemas.expert import TechList
-from app.agents.tools.tech_db import search_official_tech_name, insert_official_tech_name
+from app.agents.tools.tech_db import  insert_official_tech_name
 from typing import Any
 from app.agents.sub_agents.recommend.prompts.user_prompts import EXPERT_USER_PROMPT
 from app.agents.sub_agents.recommend.prompts.system_prompts import (
@@ -14,21 +14,32 @@ from app.agents.sub_agents.recommend.prompts.system_prompts import (
     BE_SYSTEM_PROMPT,
     ADVANCE_SYSTEM_PROMPT,
 )
+from pathlib import Path
 import logging
+import os
+
+BASE_DIR = Path(__file__).parent
+SKILL_DIR = BASE_DIR / "skills"  # 'tech_research'가 들어있는 부모 폴더 지정
+
+
+print(f"DEBUG: Checking skill path: {SKILL_DIR}")
+print(f"DEBUG: Does it exist? {os.path.exists(SKILL_DIR)}")
+print(f"DEBUG: Files in dir: {os.listdir(SKILL_DIR) if os.path.exists(SKILL_DIR) else 'N/A'}")
+
 
 logger = logging.getLogger(__name__)
 
 load_dotenv()
 
 llm = openai_mini_llm
-tools = [search_tool]
+tools = [restricted_search]
 
 MAX_RETRIES = 5  # 최대 재시도 횟수
 
-
 def create_expert_agent(system_prompt: str):
     return create_deep_agent(
-        llm, tools, system_prompt=system_prompt, response_format=ProviderStrategy(TechList)
+        llm, tools, system_prompt=system_prompt, response_format=ProviderStrategy(TechList),
+        skills=[str(SKILL_DIR)]
     )
 
 
