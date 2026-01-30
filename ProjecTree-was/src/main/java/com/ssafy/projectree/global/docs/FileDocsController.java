@@ -48,7 +48,4 @@ public interface FileDocsController {
     })
     CommonResponse<FileUploadDto.Response> upload(List<MultipartFile> multipartFiles, Long id) throws IOException;
 
-
-    CommonResponse<List<FileReadDto.Response>> read(@PathVariable Long id);
-
 }

@@ -20,10 +20,18 @@ import com.ssafy.projectree.domain.node.enums.NodeStatus;
 import com.ssafy.projectree.domain.node.enums.NodeType;
 import com.ssafy.projectree.domain.node.enums.Priority;
 import com.ssafy.projectree.domain.node.enums.TaskType;
+import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
+import com.ssafy.projectree.domain.node.model.entity.EpicNode;
+import com.ssafy.projectree.domain.node.model.entity.Node;
+import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
+import com.ssafy.projectree.domain.node.model.entity.TaskNode;
 import com.ssafy.projectree.domain.node.model.entity.*;
 import com.ssafy.projectree.domain.node.model.repository.CandidateRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeTreeRepository;
+import com.ssafy.projectree.domain.workspace.api.dto.FunctionSpecificationDto;
+import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
+import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.tech.model.entity.NodeTechStack;
 import com.ssafy.projectree.domain.tech.model.repository.NodeTechStackRepository;
 import com.ssafy.projectree.domain.tech.api.dto.schemas.TechStackSchema;
@@ -139,6 +147,66 @@ public class NodeServiceImpl implements NodeService {
                 .build();
     }
 
+    public WorkspaceDto.ProgressInfo getStatistics(Long workspaceId) {
+
+        List<NodeWithParentSchema> flatNodes = nodeRepository.findAllFlatNodesByWorkspace(workspaceId);
+
+        // 통계 계산
+        int totalCount = flatNodes.size();
+        int p0Total = 0, p0Completed = 0;
+        int p1Total = 0, p1Completed = 0;
+        int p2Total = 0, p2Completed = 0;
+
+        for (NodeWithParentSchema node : flatNodes) {
+            Priority priority = node.getPriority() != null ? Priority.valueOf(node.getPriority()) : null;
+            boolean isCompleted = "COMPLETED".equals(node.getStatus());
+
+            if (priority != null) {
+                switch (priority) {
+                    case P0:
+                        p0Total++;
+                        if (isCompleted) p0Completed++;
+                        break;
+                    case P1:
+                        p1Total++;
+                        if (isCompleted) p1Completed++;
+                        break;
+                    case P2:
+                        p2Total++;
+                        if (isCompleted) p2Completed++;
+                        break;
+                }
+            }
+        }
+
+        WorkspaceDto.PriorityProgress p0 = WorkspaceDto.PriorityProgress
+                .builder()
+                .total(p0Total)
+                .completed(p0Completed)
+                .build();
+
+        WorkspaceDto.PriorityProgress p1 = WorkspaceDto.PriorityProgress
+                .builder()
+                .total(p1Total)
+                .completed(p1Completed)
+                .build();
+
+        WorkspaceDto.PriorityProgress p2 = WorkspaceDto.PriorityProgress
+                .builder()
+                .total(p2Total)
+                .completed(p2Completed)
+                .build();
+
+        WorkspaceDto.ProgressInfo statistics = WorkspaceDto.ProgressInfo
+                .builder()
+                .p0(p0)
+                .p1(p1)
+                .p2(p2)
+                .build();
+
+        return statistics;
+    }
+
     @Override
     public NodeCreateDto.Response createNode(Long candidateId, Long parentId, NodeCreateDto.Request request) {
 
@@ -159,6 +227,46 @@ public class NodeServiceImpl implements NodeService {
         nodeCrdtService.sendNodeCreationToCrdt(workspaceId, getNodeSchemaDetail(response.getNodeId(), response.getParentId()));
 
         return NodeCreateDto.Response.builder().nodeId(response.getNodeId()).build();
+    }
+
+    @Override
+    public ProjectNode createProjectNode(Workspace workspace) {
+
+        ProjectNode projectNode = new ProjectNode();
+
+        projectNode.setWorkspace(workspace);
+        projectNode.setName(workspace.getName());
+        projectNode.setDescription(workspace.getDescription());
+        projectNode.setStatus(NodeStatus.TODO);
+        projectNode.setIdentifier(workspace.getIdentifierPrefix());
+
+        projectNode.setXPos(0.0);
+        projectNode.setYPos(0.0);
+
+        nodeRepository.save(projectNode);
+
+        return projectNode;
+    }
+
+    @Override
+    public void createEpicNodes(Workspace workspace, Node projectNode, List<FunctionSpecificationDto.EpicInfo> epics) {
+
+        for (FunctionSpecificationDto.EpicInfo info : epics) {
+
+            EpicNode epicNode = new EpicNode();
+
+            epicNode.setName(info.getName());
+            epicNode.setDescription(info.getDescription());
+            epicNode.setIdentifier(workspace.getIdentifierPrefix());
+            epicNode.setStatus(NodeStatus.TODO);
+            epicNode.setXPos(0.0);
+            epicNode.setYPos(0.0);
+
+            nodeRepository.save(epicNode);
+            nodeRepository.saveWithParent(projectNode.getId(), epicNode);
+
+        }
+
     }
 
     @Override

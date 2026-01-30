@@ -4,16 +4,18 @@ import com.ssafy.projectree.domain.chat.model.entity.ChatRoom;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.usecase.EmailService;
 import com.ssafy.projectree.domain.member.usecase.MemberService;
-import com.ssafy.projectree.domain.workspace.api.dto.TeamDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.model.entity.Team;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.workspace.model.repository.TeamRepository;
+import com.ssafy.projectree.global.api.code.ErrorCode;
+import com.ssafy.projectree.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ public class TeamService {
      * @param workspaceId
      * @return
      */
-    private int getMemberCount(Long workspaceId) {
+    public int getMemberCount(Long workspaceId) {
         return teamRepository.getMemberCountByWorkspaceId(workspaceId);
     }
 
@@ -55,6 +57,25 @@ public class TeamService {
             });
         }
 
+    }
+
+    public List<Long> getAllWorkspacesId(Member member) {
+
+        List<Team> myTeams = teamRepository.findAllByMember(member);
+        List<Long> workspacesId = new ArrayList<>();
+
+        for (Team team : myTeams) {
+            workspacesId.add(team.getWorkspace().getId());
+        }
+
+        return workspacesId;
+    }
+
+    public Role getMyRole(Workspace workspace, Member member) {
+        Team team = teamRepository.findByWorkspaceAndMember(workspace, member)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND_IN_WORKSPACE));
+
+        return team.getRole();
     }
 
 }

@@ -31,6 +31,13 @@ public class FunctionSpecification extends BaseEntity {
 
 	@Column(columnDefinition = "VARCHAR(20)")
 	private String name;
+
 	@Column(columnDefinition = "TEXT")
 	private String description;
+
+	public FunctionSpecification(Workspace workspace, String name, String description) {
+		this.workspace = workspace;
+		this.name = name;
+		this.description = description;
+	}
 }
