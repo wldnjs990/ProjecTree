@@ -1,9 +1,5 @@
 package com.ssafy.projectree.domain.node.api.dto.schema;
 
-import com.ssafy.projectree.domain.node.enums.NodeStatus;
-import com.ssafy.projectree.domain.node.enums.NodeType;
-import com.ssafy.projectree.domain.node.enums.Priority;
-import com.ssafy.projectree.domain.node.enums.TaskType;
 import org.springframework.beans.factory.annotation.Value;
 
 public interface NodeWithParentSchema {
@@ -17,8 +13,8 @@ public interface NodeWithParentSchema {
     String getStatus();
     String getIdentifier();
     String getPriority();
-    Double getXPos();
-    Double getYPos();
+    Double getxPos();
+    Double getyPos();
 
     Long getParentId();
     Integer getDifficult();
