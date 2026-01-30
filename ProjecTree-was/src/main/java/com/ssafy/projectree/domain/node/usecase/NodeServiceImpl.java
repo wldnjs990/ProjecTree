@@ -118,6 +118,7 @@ public class NodeServiceImpl implements NodeService {
                     log.info("node type : {} ",node.getNodeType());
                     log.info("task type : {}", node.getTaskType());
                     log.info("status type : {}", node.getStatus());
+                    log.info("position info : {} {}", node.getxPos(), node.getyPos());
 
                     return NodeSchema.builder()
                             .id(node.getId())
@@ -132,8 +133,8 @@ public class NodeServiceImpl implements NodeService {
                                     .priority(node.getPriority() != null ? Priority.valueOf(node.getPriority()): null)
                                     .build())
                             .position(PositionSchema.builder()
-                                    .xPos(node.getXPos())
-                                    .yPos(node.getYPos())
+                                    .xPos(node.getxPos())
+                                    .yPos(node.getyPos())
                                     .build()).build();
                 }).toList())
                 .build();
