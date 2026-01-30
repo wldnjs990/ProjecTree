@@ -26,8 +26,8 @@ public class WorkspaceController implements WorkspaceDocsController {
     private final WorkspaceService workspaceService;
 
     @Override
-    public CommonResponse<List<WorkspaceDto.Response>> getMyWorkspaces(Long id) {
-        return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.read());
+    public CommonResponse<List<WorkspaceDto.Response>> getMyWorkspaces(@AuthenticationPrincipal Member member) {
+        return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.read(member));
     }
 
     @Override
@@ -40,4 +40,16 @@ public class WorkspaceController implements WorkspaceDocsController {
         return CommonResponse.success(SuccessCode.SUCCESS, "워크 스페이스 생성에 성공하였습니다.");
     }
 
+    @Override
+    public CommonResponse<?> update(@AuthenticationPrincipal Member member,
+                                    @RequestPart(value = "data") WorkspaceDto.Insert dto,
+                                    @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles
+    ) throws IOException {
+        return null;
+    }
+
+    @Override
+    public CommonResponse<?> details(Member member, Long workspaceId) {
+        return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.details(member, workspaceId));
+    }
 }

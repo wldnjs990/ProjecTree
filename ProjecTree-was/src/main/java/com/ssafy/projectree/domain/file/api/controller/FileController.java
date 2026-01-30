@@ -31,12 +31,7 @@ public class FileController implements FileDocsController {
 
     @PostMapping("/workspaces/{id}")
     public CommonResponse<FileUploadDto.Response> upload(@RequestPart(value = "files", required = true) List<MultipartFile> multipartFiles, @PathVariable Long id) throws IOException {
-        return CommonResponse.success(SuccessCode.SUCCESS, fileService.upload(multipartFiles, workspaceService.findById(id)));
-    }
-
-    @GetMapping("/workspaces/{id}")
-    public CommonResponse<List<FileReadDto.Response>> read(@PathVariable Long id) {
-        return CommonResponse.success(SuccessCode.SUCCESS, fileService.read(id));
+        return CommonResponse.success(SuccessCode.SUCCESS, fileService.uploadFiles(multipartFiles, workspaceService.findById(id)));
     }
 
 }

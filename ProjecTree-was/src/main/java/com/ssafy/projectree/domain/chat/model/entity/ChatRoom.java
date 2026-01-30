@@ -19,7 +19,7 @@ import java.util.UUID;
 public class ChatRoom extends BaseEntity {
 
 	@Id
-	@Column(length = 36)
+	@Column(columnDefinition = "VARCHAR(36)")
 	private String id;
 
 	public ChatRoom(String id) {

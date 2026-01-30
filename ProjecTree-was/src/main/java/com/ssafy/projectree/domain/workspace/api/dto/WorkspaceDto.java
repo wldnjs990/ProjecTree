@@ -1,5 +1,8 @@
 package com.ssafy.projectree.domain.workspace.api.dto;
 
+import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
+import com.ssafy.projectree.domain.file.model.entity.FileProperty;
+import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.enums.ServiceType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,23 +10,26 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 public class WorkspaceDto {
 
     @Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     @Schema(name = "WorkspaceDto.Insert", description = "워크 스페이스 생성")
     public static class Insert {
 
-        @Schema(description = "워크 스페이스 이름", example = "AI 여행 프로젝트")
+        @Schema(description = "워크 스페이스 이름", example = "AI Trip")
         private String name;
 
-        @Schema(description = "워크 스페이스 설명", example = "AI를 활용하여 여행지를 추천해주는 서비스입니다. ...")
+        @Schema(description = "워크 스페이스 설명 -> 프로젝트 주제", example = "AI기반 추천 여행 프로젝트")
         private String description;
 
         @Schema(description = "워크 스페이스 도메인", example = "여행")
@@ -35,7 +41,7 @@ public class WorkspaceDto {
         @Schema(description = "워크 스페이스 종료일자(프로젝트 종료일자)", example = "2026-02-09")
         private LocalDate endDate;
 
-        @Schema(description = "프로젝트 목적", example = "학습용")
+        @Schema(description = "워크 스페이스 목적", example = "학습용")
         private String purpose;
 
         @Schema(description = "식별자", example = "AIT")
@@ -49,6 +55,17 @@ public class WorkspaceDto {
                 example = "{\"example@gmail.com\": \"OWNER\", \"user@gmail.com\": \"EDITOR\"}"
         )
         private Map<String, Role> memberRoles;
+
+        @Schema(description = "워크 스페이스 생성 시 입력받는 에픽 정보", example = """
+                [
+                    {"name": "항목1", "description": "설명1"},
+                    {"name": "항목2", "description": "설명2"}
+                ]
+                """)
+        private List<FunctionSpecificationDto.EpicInfo> epics;
+
+        @Schema(description = "워크 스페이스 생성 시 입력받는 기술 스택들의 id값", example = "[1, 2, 3, ... ]")
+        private List<Long> workspaceTechStacks;
 
     }
 
@@ -110,6 +127,21 @@ public class WorkspaceDto {
 
         @Schema(description = "완료된 노드 개수", example = "6")
         private long completed;
+
     }
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "워크 스페이스 진입 요청에 대한 응답 DTO")
+    public static class Detail {
+
+        private NodeTreeReadDto.Response nodeTree;
+
+        private List<FileReadDto.Response> files;
+
+        private List<FunctionSpecificationDto.EpicInfo> epics;
+
+    }
 }
