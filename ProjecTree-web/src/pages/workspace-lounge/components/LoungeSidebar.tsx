@@ -186,7 +186,6 @@ function ProfileDialog({
           setErrorMessage('이미 사용 중인 닉네임입니다.');
         }
       } catch (error) {
-        console.error('중복 확인 실패', error);
         setErrorMessage('확인 중 오류가 발생했습니다.');
         setIsValid(false);
       } finally {
@@ -210,7 +209,6 @@ function ProfileDialog({
       setNickname(next);
       setEditing(false);
     } catch (error) {
-      console.error('닉네임 변경 실패', error);
       setErrorMessage('닉네임 변경에 실패했습니다.');
     }
   }, [temp, memberId, setNickname, setEditing, isValid]);
@@ -224,7 +222,7 @@ function ProfileDialog({
       // 로그인 페이지로 이동
       navigate('/login');
     } catch (error) {
-      console.error('회원 탈퇴 실패', error);
+      alert('회원 탈퇴에 실패했습니다. 다시 시도해주세요.');
     }
   }, [memberId, setOpen, onDeleteSuccess, navigate]);
 
