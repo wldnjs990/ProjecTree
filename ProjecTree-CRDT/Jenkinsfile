@@ -20,29 +20,26 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy') {
             steps {
-                withCredentials([string(credentialsId: 'crdt-env', variable: 'ENV_CONTENT')]) {
+                withCredentials([file(credentialsId: 'crdt-env-file', variable: 'ENV_FILE')]) {
                     sh """
-                        echo "\${ENV_CONTENT}" > /tmp/.env.crdt
                         docker stop ${CONTAINER_NAME} || true
                         docker rm ${CONTAINER_NAME} || true
                         docker run -d \
                             --name ${CONTAINER_NAME} \
                             --network app-network \
                             --restart unless-stopped \
-                            --env-file /tmp/.env.crdt \
+                            --env-file ${ENV_FILE} \
                             -p 8898:8898 \
                             -p 8899:8899 \
                             ${IMAGE_NAME}:latest
-                        rm /tmp/.env.crdt
                     """
                 }
             }
         }
-    }
-    
+        
     post {
         success {
             echo 'CRDT Server deployed successfully!'
