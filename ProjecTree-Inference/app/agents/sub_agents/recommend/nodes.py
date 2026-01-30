@@ -18,15 +18,6 @@ from pathlib import Path
 import logging
 import os
 
-BASE_DIR = Path(__file__).parent
-SKILL_DIR = BASE_DIR / "skills"  # 'tech_research'가 들어있는 부모 폴더 지정
-
-
-print(f"DEBUG: Checking skill path: {SKILL_DIR}")
-print(f"DEBUG: Does it exist? {os.path.exists(SKILL_DIR)}")
-print(f"DEBUG: Files in dir: {os.listdir(SKILL_DIR) if os.path.exists(SKILL_DIR) else 'N/A'}")
-
-
 logger = logging.getLogger(__name__)
 
 load_dotenv()
@@ -39,7 +30,6 @@ MAX_RETRIES = 5  # 최대 재시도 횟수
 def create_expert_agent(system_prompt: str):
     return create_deep_agent(
         llm, tools, system_prompt=system_prompt, response_format=ProviderStrategy(TechList),
-        skills=[str(SKILL_DIR)]
     )
 
 
