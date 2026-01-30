@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface TeamRepository extends JpaRepository<Team, Long> {
 
+    @Query("SELECT COUNT(t) FROM Team t WHERE t.workspace.id = :workspaceId")
     int getMemberCountByWorkspaceId(Long id);
 
     List<Team> findAllByMember(Member member);
