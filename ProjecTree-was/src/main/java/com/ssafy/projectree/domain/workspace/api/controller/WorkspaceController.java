@@ -50,6 +50,6 @@ public class WorkspaceController implements WorkspaceDocsController {
 
     @Override
     public CommonResponse<?> details(Member member, Long workspaceId) {
-        return null;
+        return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.details(member, workspaceId));
     }
 }

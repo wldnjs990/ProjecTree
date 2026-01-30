@@ -75,24 +75,59 @@ public interface WorkspaceDocsController {
 
     @Operation(summary = "워크 스페이스 생성 API", description = "워크 스페이스를 생성합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "워크 스페이스 생성에 성공하였습니다."),
-            @ApiResponse(responseCode = "400", description = "워크 스페이스 생성에 실패하였습니다.")
+            @ApiResponse(responseCode = "200", description = "Successfully Completed"),
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     CommonResponse<?> create(Member member, WorkspaceDto.Insert dto, List<MultipartFile> multipartFiles) throws IOException;
 
     @Operation(summary = "워크 스페이스 수정 API", description = "워크 스페이스 정보를 수정합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "워크 스페이스 정보 수정에 성공하였습니다."),
-            @ApiResponse(responseCode = "400", description = "워크 스페이스 정보 수정에 실패하였습니다.")
+            @ApiResponse(responseCode = "200", description = "Successfully Completed"),
     })
     @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     CommonResponse<?> update(Member member, WorkspaceDto.Insert dto, List<MultipartFile> multipartFiles) throws IOException;
 
     @Operation(summary = "워크 스페이스 상세조회 API", description = "워크 스페이스 진입 시 보여주는 정보입니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "워크 스페이스 생성에 성공하였습니다."),
-            @ApiResponse(responseCode = "400", description = "워크 스페이스 생성에 실패하였습니다.")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully Completed",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = WorkspaceDto.Detail.class),
+                            examples = @ExampleObject(
+                                    name = "워크 스페이스 상세 조회 API 응답 예시",
+                                    value = """
+                                            {
+                                              "nodeTree": {
+                                                "tree": [
+                                                  {
+                                                    "id": 1,
+                                                    "name": "프로젝트 루트",
+                                                    "nodeType": "PROJECT",
+                                                    ...
+                                                  }
+                                                ]
+                                              },
+                                              "files": [
+                                                {
+                                                  "id": 1,
+                                                  "orginFileName": "AI여행_기능명세서.pdf",
+                                                  "contentType": "application/pdf",
+                                                  "path": "s3://testbucket/test/AI여행기능명세서.pdf",
+                                                  "size": 10042314
+                                                }
+                                              ],
+                                              "epics": [
+                                                {
+                                                  "name": "인증/인가",
+                                                  "description": "인증/인가를 통해 사용자의 서비스 이용에 대한 접근을 관리합니다."
+                                                }
+                                              ]
+                                            }
+                                            """
+                            )
+                    )),
     })
     @GetMapping()
     CommonResponse<?> details(Member member, Long workspaceId);
