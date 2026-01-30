@@ -43,7 +43,10 @@ export interface WorkspaceCardData {
 /**
  * 진행률 계산 (completed / total * 100)
  */
-const calculateProgress = (data: { total: number; completed: number }): number => {
+const calculateProgress = (data: {
+  total: number;
+  completed: number;
+}): number => {
   if (data.total === 0) return 0;
   return Math.round((data.completed / data.total) * 100);
 };
@@ -51,7 +54,9 @@ const calculateProgress = (data: { total: number; completed: number }): number =
 /**
  * 역할 변환 (OWNER -> Owner)
  */
-const convertRole = (role: 'OWNER' | 'EDITOR' | 'VIEWER'): 'Owner' | 'Editor' | 'Viewer' => {
+const convertRole = (
+  role: 'OWNER' | 'EDITOR' | 'VIEWER'
+): 'Owner' | 'Editor' | 'Viewer' => {
   const roleMap: Record<string, 'Owner' | 'Editor' | 'Viewer'> = {
     OWNER: 'Owner',
     EDITOR: 'Editor',
@@ -81,7 +86,9 @@ const formatRelativeTime = (dateString: string): string => {
 /**
  * API 응답을 프론트엔드 형식으로 변환
  */
-const transformWorkspace = (workspace: WorkspaceLoungeResponse): WorkspaceCardData => {
+const transformWorkspace = (
+  workspace: WorkspaceLoungeResponse
+): WorkspaceCardData => {
   return {
     id: String(workspace.workspaceId),
     title: workspace.name,
@@ -101,14 +108,13 @@ const transformWorkspace = (workspace: WorkspaceLoungeResponse): WorkspaceCardDa
 
 /**
  * [API] 내가 속한 워크스페이스 목록 조회
- * @param memberId - 회원 ID
  * @returns 워크스페이스 카드 데이터 배열
  */
-export const getMyWorkspaces = async (memberId: number): Promise<WorkspaceCardData[]> => {
+export const getMyWorkspaces = async (): Promise<WorkspaceCardData[]> => {
   const response = await wasApiClient.get<{
     status: string;
     data: WorkspaceLoungeResponse[];
-  }>(`/workspaces/${memberId}/my`);
+  }>(`/workspaces/my`);
 
   return response.data.data.map(transformWorkspace);
 };
