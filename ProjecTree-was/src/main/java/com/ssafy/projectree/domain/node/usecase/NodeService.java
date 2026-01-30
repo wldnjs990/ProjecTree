@@ -10,6 +10,7 @@ import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
 import com.ssafy.projectree.domain.node.model.entity.Node;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
 import com.ssafy.projectree.domain.workspace.api.dto.FunctionSpecificationDto;
+import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public interface NodeService {
     NodeReadDto.Response getNodeDetails(Long nodeId);
 
     NodeTreeReadDto.Response getNodeTree(Long workspaceId);
+
+    WorkspaceDto.ProgressInfo getStatistics(Long workspaceId);
 
     NodeCreateDto.Response createNode(Long candidateId, Long parentId, NodeCreateDto.Request request);
 
