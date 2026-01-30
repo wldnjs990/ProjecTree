@@ -17,3 +17,4 @@ class TechList(BaseModel):
         description="비교 가능한 기술 목록. 각 기술의 'recommendation_score'는 리스트 내에서 절대로 중복되지 않아야 하며, 가장 추천하는 기술부터 높은 점수를 부여하여 순위를 매겨야 함."
     )
     comparison: str = Field(description="기술 비교에 대한 상세한 비교 설명 및 Markdown 형식의 텍스트")
+ 
