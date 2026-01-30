@@ -52,7 +52,8 @@ public class InferenceServiceImpl implements InferenceService {
                     .retrieve()
                     .toEntity(AiCandidateCreateDto.Response.class);
         } catch (HttpServerErrorException | ResourceAccessException e) {
-            throw new AIServiceException(ErrorCode.CANDIDATE_GENERATE_ERROR, request.getNodeId(), CacheType.CANDIDATE, e.getMessage());
+            e.printStackTrace();
+            throw new AIServiceException(ErrorCode.CANDIDATE_GENERATE_ERROR, request.getNodeId(), CacheType.CANDIDATE, e.getCause().getMessage());
         }
 	    return response.getBody();
     }
@@ -71,7 +72,9 @@ public class InferenceServiceImpl implements InferenceService {
                     .retrieve()
                     .toEntity(AiNodeCreateDto.Response.class);
         }catch (HttpServerErrorException | ResourceAccessException e){
-            throw new AIServiceException(ErrorCode.NODE_GENERATE_ERROR, request.getCandidateId(), CacheType.NODE, e.getMessage());
+            e.printStackTrace();
+
+            throw new AIServiceException(ErrorCode.NODE_GENERATE_ERROR, request.getCandidateId(), CacheType.NODE, e.getCause().getMessage());
         }
         return response.getBody();
     }
@@ -91,7 +94,8 @@ public class InferenceServiceImpl implements InferenceService {
                     .retrieve()
                     .toEntity(AiTechRecommendDto.Response.class);
         }catch (HttpServerErrorException | ResourceAccessException e){
-            throw new AIServiceException(ErrorCode.NODE_GENERATE_ERROR, request.getNodeId(),CacheType.TECH, e.getMessage());
+            e.printStackTrace();
+            throw new AIServiceException(ErrorCode.NODE_GENERATE_ERROR, request.getNodeId(),CacheType.TECH, e.getCause().getMessage());
         }
         return response.getBody();
     }
