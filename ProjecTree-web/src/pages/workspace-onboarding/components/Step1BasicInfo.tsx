@@ -4,7 +4,7 @@ import { Info } from 'lucide-react';
 
 interface Step1BasicInfoProps {
   data: {
-    workspaceName: string;
+    name: string;
     workspaceKey: string;
   };
   onChange: (updates: Partial<Step1BasicInfoProps['data']>) => void;
@@ -38,7 +38,7 @@ export default function Step1BasicInfo({
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center gap-1">
             <Label
-              htmlFor="workspaceName"
+              htmlFor="name"
               className="font-['Pretendard'] font-semibold text-[14px] text-[#424242]"
             >
               워크스페이스명
@@ -48,21 +48,21 @@ export default function Step1BasicInfo({
             </span>
           </div>
           <Input
-            id="workspaceName"
+            id="name"
             placeholder="Untitled-1"
-            value={data.workspaceName}
-            onChange={(e) => onChange({ workspaceName: e.target.value })}
+            value={data.name}
+            onChange={(e) => onChange({ name: e.target.value })}
             maxLength={20}
-            className={`h-[52px] px-4 bg-[#F9FAFB] border-[#E0E0E0] shadow-sm rounded-xl font-['Pretendard'] text-[15px] focus-visible:ring-4 focus-visible:ring-[#4CAF50]/10 focus-visible:border-[#4CAF50] focus-visible:bg-[#F1F8E9] transition-all duration-200 placeholder:text-[#BDBDBD] ${errors?.workspaceName ? 'border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/10' : ''}`}
+            className={`h-[52px] px-4 bg-[#F9FAFB] border-[#E0E0E0] shadow-sm rounded-xl font-['Pretendard'] text-[15px] focus-visible:ring-4 focus-visible:ring-[#4CAF50]/10 focus-visible:border-[#4CAF50] focus-visible:bg-[#F1F8E9] transition-all duration-200 placeholder:text-[#BDBDBD] ${errors?.name ? 'border-red-500 focus-visible:border-red-500 focus-visible:ring-red-500/10' : ''}`}
           />
-          {errors?.workspaceName && (
+          {errors?.name && (
             <p className="font-['Pretendard'] text-[13px] text-red-500 mt-1">
-              {errors.workspaceName}
+              {errors.name}
             </p>
           )}
           <div className="flex justify-end">
             <span className="font-['Inter'] text-[12px] text-[#9E9E9E]">
-              {data.workspaceName.length}/20
+              {data.name.length}/20
             </span>
           </div>
         </div>

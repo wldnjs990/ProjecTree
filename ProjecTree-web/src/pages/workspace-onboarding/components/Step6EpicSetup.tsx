@@ -5,7 +5,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { X, Plus, Info } from 'lucide-react';
 
 interface Epic {
-  id: string;
   name: string;
   description: string;
 }
@@ -31,7 +30,6 @@ export default function Step6EpicSetup({
   const handleAddEpic = () => {
     if (epicName.trim()) {
       const newEpic: Epic = {
-        id: Date.now().toString(),
         name: epicName,
         description: epicDescription,
       };
@@ -41,9 +39,9 @@ export default function Step6EpicSetup({
     }
   };
 
-  const handleRemoveEpic = (id: string) => {
+  const handleRemoveEpic = (indexToRemove: number) => {
     onChange({
-      epics: data.epics.filter((epic) => epic.id !== id),
+      epics: data.epics.filter((_, index) => index !== indexToRemove),
     });
   };
 
@@ -137,9 +135,9 @@ export default function Step6EpicSetup({
         {data.epics.length > 0 && (
           <div className="flex flex-col gap-2">
             <div className="max-h-[220px] overflow-y-auto chat-scrollbar pr-1 flex flex-col gap-2">
-              {data.epics.map((epic) => (
+              {data.epics.map((epic, index) => (
                 <div
-                  key={epic.id}
+                  key={index}
                   className="flex items-start justify-between rounded-lg p-3 bg-white border border-[var(--figma-border-mercury)] shadow-sm shrink-0"
                 >
                   <div className="flex-1">
@@ -151,7 +149,7 @@ export default function Step6EpicSetup({
                     </p>
                   </div>
                   <button
-                    onClick={() => handleRemoveEpic(epic.id)}
+                    onClick={() => handleRemoveEpic(index)}
                     className="ml-2 rounded-full p-1 hover:bg-black/10 transition-colors"
                   >
                     <X className="h-4 w-4 text-[#666]" />

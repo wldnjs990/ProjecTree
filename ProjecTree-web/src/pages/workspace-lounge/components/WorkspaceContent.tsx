@@ -47,9 +47,6 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
   // URL 쿼리 파라미터 관리 훅
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // 사용자 정보 (memberId)
-  const { user } = useUserStore();
-
   // 1. 상태 관리
   // (1) 워크스페이스 데이터 및 로딩 상태 (비동기 처리)
   const [workspaces, setWorkspaces] = useState<ProjectCardProps['project'][]>(
@@ -74,12 +71,6 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
   // 2. 데이터 Fetching (API 호출)
   useEffect(() => {
     const fetchWorkspaces = async () => {
-      // 사용자 정보가 없으면 API 호출하지 않음
-      if (!user?.memberId) {
-        setIsLoading(false);
-        return;
-      }
-
       try {
         setIsLoading(true);
 
@@ -96,7 +87,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
     };
 
     fetchWorkspaces();
-  }, [user?.memberId]);
+  }, []);
 
   // 3. Debounce 효과: 사용자가 입력을 멈춘 후 0.3초 뒤에 URL과 필터 상태를 업데이트함
   // 단, 입력값이 비어있을 경우(지웠을 때) 즉시 반영하여 반응성을 높임
@@ -252,7 +243,9 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
         ) : error ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-500">
             <p className="text-lg font-medium text-red-500">{error}</p>
-            <p className="text-sm text-zinc-400 mt-1">잠시 후 다시 시도해주세요.</p>
+            <p className="text-sm text-zinc-400 mt-1">
+              잠시 후 다시 시도해주세요.
+            </p>
           </div>
         ) : workspaces.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-500">
