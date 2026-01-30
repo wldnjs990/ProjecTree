@@ -93,7 +93,8 @@ function GlassMockupCard() {
                                     key={image.src}
                                     src={image.src}
                                     alt={image.alt}
-                                    className="absolute inset-0 h-full w-full object-contain bg-white"
+                                    className="absolute inset-0 h-full w-full object-contain bg-white select-none"
+                                    draggable={false}
                                     initial={{ opacity: 0 }}
                                     animate={{
                                         opacity: index === currentIndex ? 1 : 0,
