@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+    
+    environment {
+        IMAGE_NAME = 'projectree-crdt'
+        CONTAINER_NAME = 'crdt-server'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                dir('ProjecTree-CRDT') {
+                    sh "docker build -t ${IMAGE_NAME}:latest ."
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                withCredentials([string(credentialsId: 'crdt-env', variable: 'ENV_CONTENT')]) {
+                    sh """
+                        echo "\${ENV_CONTENT}" > /tmp/.env.crdt
+                        docker stop ${CONTAINER_NAME} || true
+                        docker rm ${CONTAINER_NAME} || true
+                        docker run -d \
+                            --name ${CONTAINER_NAME} \
+                            --network app-network \
+                            --restart unless-stopped \
+                            --env-file /tmp/.env.crdt \
+                            -p 8898:8898 \
+                            -p 8899:8899 \
+                            ${IMAGE_NAME}:latest
+                        rm /tmp/.env.crdt
+                    """
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'CRDT Server deployed successfully!'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
+    }
+}
