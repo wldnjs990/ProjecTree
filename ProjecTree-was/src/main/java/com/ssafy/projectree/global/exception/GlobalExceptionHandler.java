@@ -44,6 +44,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AIServiceException.class)
     public CommonResponse<Void> handleAiException(AIServiceException e){
+        log.error("AI SERVER ERROR : {}", e.getMessage());
         for(Cache cache : caches){
             if(cache.getName().equals(e.getCacheType().name())){
                 CacheType cacheType = e.getCacheType();
