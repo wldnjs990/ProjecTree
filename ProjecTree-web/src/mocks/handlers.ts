@@ -115,23 +115,37 @@ export const handlers = [
     });
   }), // <--- 콤마(,) 필수: 다음 핸들러와 구분하기 위해 꼭 필요합니다.
 
-  // [POST] 워크스페이스 생성
-  http.post('*/api/workspaces', async ({ request }) => {
+  // [POST] 워크스페이스 생성 (백엔드 명세서 기준)
+  http.post('*/workspaces', async ({ request }) => {
     try {
-      // 요청 본문 확인 (FormData 파싱만 시도)
-      await request.formData().catch(() => new FormData());
-    } catch {
-      // 무시
+      // FormData 파싱
+      const formData = await request.formData();
+
+      // 로그 출력 (개발 중 확인용)
+      console.log('[MSW] 워크스페이스 생성 요청:');
+      console.log('- name:', formData.get('name'));
+      console.log('- description:', formData.get('description'));
+      console.log('- domain:', formData.get('domain'));
+      console.log('- purpose:', formData.get('purpose'));
+      console.log('- serviceType:', formData.get('serviceType'));
+      console.log('- identifierPrefix:', formData.get('identifierPrefix'));
+      console.log('- startDate:', formData.get('startDate'));
+      console.log('- endDate:', formData.get('endDate'));
+      console.log('- memberRoles:', formData.get('memberRoles'));
+      console.log('- specFiles:', formData.getAll('specFiles'));
+    } catch (error) {
+      console.error('[MSW] FormData 파싱 실패:', error);
     }
 
     // 로딩 UI 테스트를 위해 3초 지연
     await delay(3000);
 
+    // 백엔드 명세서에 맞는 응답 형식
     return HttpResponse.json({
-      status: 'success',
-      data: {
-        workspaceId: 'new-workspace-id-123',
-      },
+      message: '워크스페이스가 성공적으로 생성되었습니다.',
+      data: 'new-workspace-id-123',
+      code: 1073741824, // 숫자 타입
+      success: true,
     });
   }),
 ];

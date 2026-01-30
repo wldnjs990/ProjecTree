@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
-import { TECH_STACK_OPTIONS } from '../techStackData';
+import { getTechStacks } from '@/apis/workspace.api';
+import type { TechStackItem } from '@/apis/workspace.api';
 
 interface Step4TechStackProps {
   data: {
-    techStacks: string[];
+    techStacks: number[]; // 🚨 ID 목록 (number[])
   };
   onChange: (updates: Partial<Step4TechStackProps['data']>) => void;
   onNext: () => void;
@@ -17,34 +18,52 @@ interface Step4TechStackProps {
 export default function Step4TechStack({
   data,
   onChange,
-  // onNext,
-  // onPrev,
 }: Step4TechStackProps) {
+  const [techOptions, setTechOptions] = useState<TechStackItem[]>([]); // 전체 기술 목록 (API)
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const filteredTechs = TECH_STACK_OPTIONS.filter(
-    (tech) =>
-      tech.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !data.techStacks.includes(tech)
-  ).slice(0, 10);
+  // 1. 컴포넌트 마운트 시 API로 기술 스택 목록 가져오기
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const stacks = await getTechStacks();
+        setTechOptions(stacks);
+      } catch (error) {
+        console.error('기술 스택 로딩 실패:', error);
+      }
+    };
+    loadData();
+  }, []);
 
-  const handleAdd = (tech: string) => {
-    if (!data.techStacks.includes(tech)) {
-      onChange({ techStacks: [...data.techStacks, tech] });
+  // 검색어 필터링 (이미 선택된 것 제외)
+  const filteredTechs = techOptions
+    .filter(
+      (tech) =>
+        tech.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !data.techStacks.includes(tech.id)
+    )
+    .slice(0, 10);
+
+  // 추가 (ID 저장)
+  const handleAdd = (techEntry: TechStackItem) => {
+    if (!data.techStacks.includes(techEntry.id)) {
+      onChange({ techStacks: [...data.techStacks, techEntry.id] });
       setSearchTerm('');
       setShowSuggestions(false);
       setSelectedIndex(0);
     }
   };
 
-  const handleRemove = (tech: string) => {
+  // 삭제 (ID로 삭제)
+  const handleRemove = (techId: number) => {
     onChange({
-      techStacks: data.techStacks.filter((t) => t !== tech),
+      techStacks: data.techStacks.filter((id) => id !== techId),
     });
   };
 
+  // 키보드 조작 핸들러
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showSuggestions || filteredTechs.length === 0) return;
 
@@ -72,6 +91,11 @@ export default function Step4TechStack({
     }
   };
 
+  // ID로 이름 찾기 헬퍼
+  const getTechName = (id: number) => {
+    return techOptions.find((t) => t.id === id)?.name || `Unknown(${id})`;
+  };
+
   return (
     <div className="flex flex-col gap-6">
       {/* 헤더 */}
@@ -96,7 +120,7 @@ export default function Step4TechStack({
           </Label>
           <Input
             id="techSearch"
-            placeholder="사용할 기술스택 검색"
+            placeholder="사용할 기술스택 검색 (React, Spring...)"
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -114,7 +138,7 @@ export default function Step4TechStack({
             <div className="absolute top-full mt-1 max-h-60 w-full overflow-y-auto rounded-lg shadow-xl bg-white border border-[var(--figma-border-mercury)] z-50 ring-1 ring-black/5">
               {filteredTechs.map((tech, index) => (
                 <div
-                  key={tech}
+                  key={tech.id}
                   className={`cursor-pointer px-4 py-2.5 font-['Pretendard'] font-normal text-[14px] transition-colors
                     ${
                       index === selectedIndex
@@ -124,7 +148,7 @@ export default function Step4TechStack({
                   onClick={() => handleAdd(tech)}
                   onMouseEnter={() => setSelectedIndex(index)}
                 >
-                  {tech}
+                  {tech.name}
                 </div>
               ))}
             </div>
@@ -134,17 +158,17 @@ export default function Step4TechStack({
         {/* 선택된 기술 스택 */}
         {data.techStacks.length > 0 && (
           <div className="flex min-h-15 max-h-[320px] overflow-y-auto chat-scrollbar flex-wrap gap-2 rounded-lg p-4 bg-[var(--figma-gray-concrete)] border border-[var(--figma-border-mercury)]">
-            {data.techStacks.map((tech) => (
+            {data.techStacks.map((techId) => (
               <Badge
-                key={tech}
+                key={techId}
                 variant="secondary"
                 className="flex items-center gap-2 px-3 py-1.5 text-sm font-['Pretendard'] font-normal bg-white text-[var(--figma-text-cod-gray)] border border-[var(--figma-border-mercury)] shadow-sm hover:bg-gray-50"
               >
-                {tech}
+                {getTechName(techId)}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleRemove(tech);
+                    handleRemove(techId);
                   }}
                   className="rounded-full p-0.5 hover:bg-gray-200 transition-colors"
                 >

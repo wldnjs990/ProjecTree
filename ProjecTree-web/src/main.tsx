@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import '@/styles/index.css';
 
-const USE_MSW = false; // 실제 서버 쓸 때 false로 변경
+const USE_MSW = false; // MSW 활성화 (API 연동 테스트용)
 
 (async () => {
   const container = document.getElementById('root');

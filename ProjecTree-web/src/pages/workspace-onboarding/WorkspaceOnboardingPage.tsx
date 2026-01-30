@@ -26,7 +26,7 @@ export default function WorkspaceOnboardingPage() {
     startDate: null as Date | null,
     endDate: null as Date | null,
     specFiles: [] as File[],
-    techStacks: [] as string[],
+    techStacks: [] as number[], // 🚨 ID 기반 (number)
     epics: [] as Array<{ id: string; name: string; description: string }>,
     teamMembers: [] as Array<{ email: string; role: string }>,
   });
@@ -84,12 +84,16 @@ export default function WorkspaceOnboardingPage() {
     } else if (currentStep === 6) {
       setIsLoading(true);
       try {
-        await createWorkspace(formData);
-        // 성공 시 워크스페이스 라운지나 생성된 워크스페이스로 이동
-        // 여기서는 임시로 라운지로 이동
+        console.log('[API] 워크스페이스 생성 요청 시작...');
+        const response = await createWorkspace(formData);
+        console.log('[API] 워크스페이스 생성 성공:', response);
+
+        // 성공 시 워크스페이스 라운지로 이동
+        alert(`워크스페이스가 생성되었습니다! (ID: ${response.data})`);
         navigate('/workspace-lounge');
       } catch (error) {
-        alert('중요한 오류가 발생했습니다. 다시 시도해주세요.');
+        console.error('[API] 워크스페이스 생성 실패:', error);
+        alert('워크스페이스 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
       } finally {
         setIsLoading(false);
       }
