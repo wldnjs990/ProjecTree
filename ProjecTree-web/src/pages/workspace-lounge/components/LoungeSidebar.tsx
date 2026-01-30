@@ -185,7 +185,7 @@ function ProfileDialog({
           setIsValid(false);
           setErrorMessage('이미 사용 중인 닉네임입니다.');
         }
-      } catch (error) {
+      } catch (_error) {
         setErrorMessage('확인 중 오류가 발생했습니다.');
         setIsValid(false);
       } finally {
@@ -208,7 +208,7 @@ function ProfileDialog({
       await updateNickname(memberId, next);
       setNickname(next);
       setEditing(false);
-    } catch (error) {
+    } catch (_error) {
       setErrorMessage('닉네임 변경에 실패했습니다.');
     }
   }, [temp, memberId, setNickname, setEditing, isValid]);
@@ -221,7 +221,7 @@ function ProfileDialog({
       if (onDeleteSuccess) onDeleteSuccess();
       // 로그인 페이지로 이동
       navigate('/login');
-    } catch (error) {
+    } catch (_error) {
       alert('회원 탈퇴에 실패했습니다. 다시 시도해주세요.');
     }
   }, [memberId, setOpen, onDeleteSuccess, navigate]);
