@@ -175,16 +175,16 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
     <div className="flex flex-1 flex-col overflow-hidden bg-zinc-50/50 h-full">
       {/* Top Bar */}
       <header className="flex items-center justify-between border-b border-white/20 bg-white/40 px-6 py-4 shrink-0 backdrop-blur-md sticky top-0 z-10 transition-all duration-300">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#4ADE80]/20 text-[#064E3B]">
             <Layers className="h-5 w-5" />
           </div>
-          <h1 className="text-xl font-bold text-zinc-800 tracking-tight">
+          <h1 className="text-xl font-bold text-zinc-800 tracking-tight hidden lg:block">
             나의 워크스페이스
           </h1>
           <button
             onClick={() => setIsTutorialOpen(true)}
-            className="p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 transition-colors ml-1"
+            className="p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 transition-colors ml-1 hidden sm:block"
             title="이용 가이드"
           >
             <HelpCircle className="h-5 w-5" />
@@ -192,11 +192,11 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="relative group">
+          <div className="relative group hidden md:block">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 group-focus-within:text-[#064E3B] transition-colors duration-300" />
             <Input
               placeholder="워크스페이스 검색..."
-              className="w-64 pl-10 bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-zinc-200 focus:border-zinc-300 placeholder:text-zinc-400/80 transition-all duration-300 rounded-xl hover:bg-white/60"
+              className="w-48 lg:w-64 pl-10 bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-zinc-200 focus:border-zinc-300 placeholder:text-zinc-400/80 transition-all duration-300 rounded-xl hover:bg-white/60"
               value={inputValue}
               onChange={(e) => handleSearchChange(e.target.value)}
             />
@@ -206,13 +206,13 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="gap-2 bg-white/50 border border-white/20 shadow-sm text-zinc-600 hover:bg-white/80 min-w-[130px] justify-between backdrop-blur-sm transition-all duration-300 rounded-xl"
+                className="gap-2 bg-white/50 border border-white/20 shadow-sm text-zinc-600 hover:bg-white/80 sm:min-w-[130px] justify-between backdrop-blur-sm transition-all duration-300 rounded-xl"
               >
                 <div className="flex items-center gap-2">
                   <currentSortOption.icon className="h-4 w-4" />
-                  {currentSortOption.label}
+                  <span className="hidden sm:inline">{currentSortOption.label}</span>
                 </div>
-                <ChevronDown className="h-4 w-4 opacity-50" />
+                <ChevronDown className="h-4 w-4 opacity-50 hidden sm:block" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -236,7 +236,8 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
             className="gap-2 bg-[#4ADE80]/80 hover:bg-[#4ADE80]/90 text-[#064E3B] font-bold shadow-lg shadow-green-500/20 border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(74,222,128,0.4)]"
             onClick={() => navigate('/workspace-onboarding')}
           >
-            <Plus className="h-4 w-4" />새 워크스페이스
+            <Plus className="h-4 w-4" />
+            <span className="hidden md:inline">새 워크스페이스</span>
           </Button>
         </div>
       </header>
