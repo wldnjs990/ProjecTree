@@ -100,8 +100,6 @@ export const useNodeStore = create<NodeState>((set) => ({
 
   setNodeListData: (data) => set({ nodeListData: data }),
 
-  // 지금 목 데이터가 nodeId를 key값으로 사용하는 객체 배열로 만들어져서 nodeDetails가 저런식으로 만들어져있음
-  // TODO : 진짜 API 연동 이후, [nodeId] 없애고 단일 state로 관리
   updateNodeDetail: (nodeId, updates) =>
     set((state) => ({
       nodeDetails: {

@@ -13,15 +13,15 @@ export default function LandingHeader() {
         >
             <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
                 {/* Logo */}
-                <Link to="/" className="flex items-center gap-2 group">
+                <div className="flex items-center gap-2">
                     <div
-                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 border border-emerald-200 transition-all duration-300 group-hover:bg-emerald-200"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 border border-emerald-200"
                         style={{ boxShadow: "0 0 20px rgba(16, 185, 129, 0.15)" }}
                     >
                         <TreeDeciduous className="h-4 w-4 text-emerald-600" />
                     </div>
                     <span className="text-lg font-bold text-zinc-900 tracking-tight">ProjecTree</span>
-                </Link>
+                </div>
 
                 {/* Navigation
                 <nav className="hidden md:flex items-center gap-8">

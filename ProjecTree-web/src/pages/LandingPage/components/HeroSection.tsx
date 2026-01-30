@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react"
-import { motion, useMotionValue, useSpring, useTransform, MotionValue } from "framer-motion"
-import { ArrowRight, Sparkles, Zap } from "lucide-react"
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { ArrowRight, Sparkles, Zap, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
 
@@ -31,8 +31,8 @@ function Firefly({ delay, duration, startX, startY }: { delay: number; duration:
     )
 }
 
-// 3D Tilting Glass Card Mockup with Carousel
-function GlassMockupCard({ rotateX, rotateY }: { rotateX: MotionValue<number>; rotateY: MotionValue<number> }) {
+// Glass Card Mockup with Arrow Navigation
+function GlassMockupCard() {
     const images = [
         { src: "/tree.png", alt: "ProjecTree - 트리 시각화", label: "트리 시각화" },
         { src: "/spec.png", alt: "ProjecTree - 명세서", label: "명세서 생성" },
@@ -40,117 +40,105 @@ function GlassMockupCard({ rotateX, rotateY }: { rotateX: MotionValue<number>; r
 
     const [currentIndex, setCurrentIndex] = useState(0)
 
-    // Auto-rotate images every 4 seconds
-    useState(() => {
-        const interval = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % images.length)
-        }, 4000)
-        return () => clearInterval(interval)
-    })
+    const goToPrevious = () => {
+        setCurrentIndex((prev) => (prev - 1 + images.length) % images.length)
+    }
+
+    const goToNext = () => {
+        setCurrentIndex((prev) => (prev + 1) % images.length)
+    }
 
     return (
-        <motion.div
-            style={{
-                rotateX,
-                rotateY,
-                transformPerspective: 1200,
-                transformStyle: "preserve-3d"
-            }}
-            className="relative mx-auto mt-16 max-w-3xl"
-        >
-            {/* Breathing Glow Behind Card */}
-            <motion.div
-                animate={{
-                    scale: [1, 1.1, 1],
-                    opacity: [0.4, 0.6, 0.4],
-                }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute inset-0 -z-10 rounded-3xl bg-emerald-400/20 blur-[60px]"
-            />
+        <div className="relative mx-auto mt-16 flex items-center gap-12 px-8 max-w-[1500px] w-full">
+            {/* Left Arrow - Outside Card */}
+            <button
+                onClick={goToPrevious}
+                className="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-full bg-white/80 border border-zinc-200 shadow-lg hover:bg-white transition-all duration-200 hover:scale-105"
+                aria-label="이전 이미지"
+            >
+                <ChevronLeft className="h-6 w-6 text-emerald-500" />
+            </button>
 
-            {/* Glass Card Container */}
-            <div className="relative overflow-hidden rounded-2xl border border-white/60 bg-white/40 backdrop-blur-xl p-1 shadow-2xl shadow-emerald-100/50">
-                {/* Inner Border Glow */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/80 via-transparent to-emerald-50/50" />
+            {/* Card Container */}
+            <div className="relative flex-1">
+                {/* Breathing Glow Behind Card */}
+                <motion.div
+                    animate={{
+                        scale: [1, 1.1, 1],
+                        opacity: [0.4, 0.6, 0.4],
+                    }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute inset-0 -z-10 rounded-3xl bg-emerald-400/20 blur-[60px]"
+                />
 
-                {/* Mockup Content */}
-                <div className="relative rounded-xl bg-white/90 p-6 shadow-inner">
-                    {/* Window Controls */}
-                    <div className="mb-4 flex items-center gap-2">
-                        <div className="h-3 w-3 rounded-full bg-red-400/80" />
-                        <div className="h-3 w-3 rounded-full bg-yellow-400/80" />
-                        <div className="h-3 w-3 rounded-full bg-green-400/80" />
-                        <span className="ml-4 text-xs text-zinc-400">ProjecTree - {images[currentIndex].label}</span>
-                    </div>
+                {/* Glass Card Container */}
+                <div className="relative overflow-hidden rounded-2xl border border-white/60 bg-white/40 backdrop-blur-xl p-1 shadow-2xl shadow-emerald-100/50">
+                    {/* Inner Border Glow */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/80 via-transparent to-emerald-50/50" />
 
-                    {/* Mockup UI - Carousel */}
-                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
-                        {images.map((image, index) => (
-                            <motion.img
-                                key={image.src}
-                                src={image.src}
-                                alt={image.alt}
-                                className="absolute inset-0 h-full w-full object-cover object-top"
-                                initial={{ opacity: 0 }}
-                                animate={{
-                                    opacity: index === currentIndex ? 1 : 0,
-                                    scale: index === currentIndex ? 1 : 1.05,
-                                }}
-                                transition={{ duration: 0.8, ease: "easeInOut" }}
-                                onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                }}
-                            />
-                        ))}
+                    {/* Mockup Content */}
+                    <div className="relative rounded-xl bg-white/90 p-6 shadow-inner">
+                        {/* Window Controls */}
+                        <div className="mb-4 flex items-center gap-2">
+                            <div className="h-3 w-3 rounded-full bg-red-400/80" />
+                            <div className="h-3 w-3 rounded-full bg-yellow-400/80" />
+                            <div className="h-3 w-3 rounded-full bg-green-400/80" />
+                            <span className="ml-4 text-xs text-zinc-400">ProjecTree - {images[currentIndex].label}</span>
+                        </div>
 
-                        {/* Carousel Indicators */}
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                            {images.map((_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentIndex(index)}
-                                    className={`h-2 w-2 rounded-full transition-all duration-300 ${
-                                        index === currentIndex
-                                            ? 'bg-emerald-500 w-6'
-                                            : 'bg-zinc-300 hover:bg-zinc-400'
-                                    }`}
-                                    aria-label={`Go to slide ${index + 1}`}
+                        {/* Mockup UI - Carousel */}
+                        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
+                            {images.map((image, index) => (
+                                <motion.img
+                                    key={image.src}
+                                    src={image.src}
+                                    alt={image.alt}
+                                    className="absolute inset-0 h-full w-full object-contain bg-white select-none"
+                                    draggable={false}
+                                    initial={{ opacity: 0 }}
+                                    animate={{
+                                        opacity: index === currentIndex ? 1 : 0,
+                                    }}
+                                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                    }}
                                 />
                             ))}
+
+                            {/* Carousel Indicators */}
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                                {images.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setCurrentIndex(index)}
+                                        className={`h-2 rounded-full transition-all duration-300 ${
+                                            index === currentIndex
+                                                ? 'bg-emerald-500 w-6'
+                                                : 'bg-zinc-300 hover:bg-zinc-400 w-2'
+                                        }`}
+                                        aria-label={`${index + 1}번 슬라이드로 이동`}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </motion.div>
+
+            {/* Right Arrow - Outside Card */}
+            <button
+                onClick={goToNext}
+                className="flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-full bg-white/80 border border-zinc-200 shadow-lg hover:bg-white transition-all duration-200 hover:scale-105"
+                aria-label="다음 이미지"
+            >
+                <ChevronRight className="h-6 w-6 text-emerald-500" />
+            </button>
+        </div>
     )
 }
 
 export default function HeroSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springConfig = { damping: 30, stiffness: 200 };
-  const x = useSpring(mouseX, springConfig);
-  const y = useSpring(mouseY, springConfig);
-
-  const rotateX = useTransform(y, [-300, 300], [8, -8]);
-  const rotateY = useTransform(x, [-300, 300], [-8, 8]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    mouseX.set(e.clientX - centerX);
-    mouseY.set(e.clientY - centerY);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
-
   // Generate fireflies with random positions (only once on mount)
   const [fireflies] = useState(() =>
     Array.from({ length: 20 }, (_, i) => ({
@@ -164,28 +152,16 @@ export default function HeroSection() {
 
     return (
         <section
-            ref={containerRef}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
             className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 pb-12"
         >
-            {/* Animated Grid Background */}
-            <motion.div
-                style={{ x: useTransform(x, (v) => v * 0.015), y: useTransform(y, (v) => v * 0.015) }}
-                className="absolute inset-0 z-0"
-            >
+            {/* Grid Background */}
+            <div className="absolute inset-0 z-0">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b98108_1px,transparent_1px),linear-gradient(to_bottom,#10b98108_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_50%_at_50%_50%,#000_30%,transparent_100%)] opacity-50" />
-            </motion.div>
+            </div>
 
             {/* Light Gradient Orbs */}
-            <motion.div
-                style={{ x: useTransform(x, (v) => v * 0.04), y: useTransform(y, (v) => v * 0.04) }}
-                className="absolute top-1/3 left-1/4 h-[600px] w-[600px] rounded-full bg-emerald-300/20 blur-[150px]"
-            />
-            <motion.div
-                style={{ x: useTransform(x, (v) => -v * 0.03), y: useTransform(y, (v) => -v * 0.03) }}
-                className="absolute bottom-1/4 right-1/4 h-[500px] w-[500px] rounded-full bg-blue-300/20 blur-[120px]"
-            />
+            <div className="absolute top-1/3 left-1/4 h-[600px] w-[600px] rounded-full bg-emerald-300/20 blur-[150px]" />
+            <div className="absolute bottom-1/4 right-1/4 h-[500px] w-[500px] rounded-full bg-blue-300/20 blur-[120px]" />
 
             {/* Digital Fireflies / Data Spores */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -265,10 +241,10 @@ export default function HeroSection() {
                         </Link>
                     </motion.div>
                 </motion.div>
+            </div>
 
-        {/* 3D Glass Mockup Card */}
-        <GlassMockupCard rotateX={rotateX} rotateY={rotateY} />
-      </div>
-    </section>
+            {/* Glass Mockup Card */}
+            <GlassMockupCard />
+        </section>
   );
 }
