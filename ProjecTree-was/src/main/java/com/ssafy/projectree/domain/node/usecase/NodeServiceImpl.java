@@ -29,6 +29,8 @@ import com.ssafy.projectree.domain.node.model.entity.*;
 import com.ssafy.projectree.domain.node.model.repository.CandidateRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeTreeRepository;
+import com.ssafy.projectree.domain.tech.model.entity.TechStackInfo;
+import com.ssafy.projectree.domain.tech.model.repository.TechStackInfoRepository;
 import com.ssafy.projectree.domain.workspace.api.dto.FunctionSpecificationDto;
 import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
@@ -59,6 +61,7 @@ public class NodeServiceImpl implements NodeService {
     private final NodeTreeRepository nodeTreeRepository;
     private final NodeCrdtService nodeCrdtService;
     private final NodeTechStackRepository nodeTechStackRepository;
+    private final TechStackInfoRepository techStackInfoRepository;
     private final TeamRepository teamRepository;
 
     private ProjectNode findRootNode(Long nodeId) {
@@ -123,8 +126,8 @@ public class NodeServiceImpl implements NodeService {
         List<NodeWithParentSchema> flatNodes = nodeRepository.findAllFlatNodesByWorkspace(workspaceId);
         return NodeTreeReadDto.Response
                 .builder()
-                .tree(flatNodes.stream().map(node-> {
-                    log.info("node type : {} ",node.getNodeType());
+                .tree(flatNodes.stream().map(node -> {
+                    log.info("node type : {} ", node.getNodeType());
                     log.info("task type : {}", node.getTaskType());
                     log.info("status type : {}", node.getStatus());
                     log.info("position info : {} {}", node.getxPos(), node.getyPos());
@@ -138,8 +141,8 @@ public class NodeServiceImpl implements NodeService {
                                     .status(NodeStatus.valueOf(node.getStatus()))
                                     .identifier(node.getIdentifier())
                                     .difficult(node.getDifficult())//todo
-                                    .taskType(node.getTaskType() != null ? TaskType.valueOf(node.getTaskType()): null) //todo
-                                    .priority(node.getPriority() != null ? Priority.valueOf(node.getPriority()): null)
+                                    .taskType(node.getTaskType() != null ? TaskType.valueOf(node.getTaskType()) : null) //todo
+                                    .priority(node.getPriority() != null ? Priority.valueOf(node.getPriority()) : null)
                                     .build())
                             .position(PositionSchema.builder()
                                     .xPos(node.getxPos())
@@ -325,6 +328,19 @@ public class NodeServiceImpl implements NodeService {
                     .orElseThrow(() -> new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR));
             node.setMember(assignee);
         }
+    }
+
+    @Transactional
+    @Override
+    public void selectNodeTech(Long nodeId, Long selectedTechId) {
+        nodeTechStackRepository.unselectAllByNodeId(nodeId);
+
+        TechStackInfo techStackInfo = techStackInfoRepository.findById(selectedTechId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.TECHSTACK_NOT_FOUND, "존재하지 않는 기술입니다."));
+
+        techStackInfo.setSelected(true);
+
+        techStackInfoRepository.save(techStackInfo);
     }
 
     @Override

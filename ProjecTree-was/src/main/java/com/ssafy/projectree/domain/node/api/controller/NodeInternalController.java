@@ -44,4 +44,13 @@ public class NodeInternalController {
 
         return CommonResponse.success(SuccessCode.UPDATED, null); // 202
     }
+
+    @PostMapping("/nodes/{nodeId}/tech")
+    public CommonResponse<Void> selectNodeTech(
+            @PathVariable Long nodeId, @RequestBody NodeTechSelectDto.Request request
+    ) {
+
+        nodeService.selectNodeTech(nodeId, request.getSelectedTechId());
+        return CommonResponse.success(SuccessCode.UPDATED, null);
+    }
 }
