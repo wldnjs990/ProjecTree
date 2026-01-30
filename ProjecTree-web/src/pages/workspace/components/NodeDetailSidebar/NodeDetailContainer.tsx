@@ -41,7 +41,10 @@ export default function NodeDetailContainer({
   // 노드 후보 클릭/추가 핸들러
   const handleCandidateClick = async (nodeId: number, candidateId: number) => {
     console.log('노드 생성 시작');
-    const response = await postCreateNode(nodeId, candidateId);
+    // 일단 하드코딩으로 만듬
+    // TODO : 좌표설정 유틸 함수 만들기
+    const requestBody = { xpos: 200, ypos: 200 };
+    const response = await postCreateNode(requestBody, nodeId, candidateId);
     console.log(response);
   };
 
