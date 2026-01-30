@@ -45,7 +45,7 @@ public class Team extends BaseEntity {
 	private Workspace workspace;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "chat_id")
+	@JoinColumn(name = "chat_room_id")
 	private ChatRoom chatRoom;
 
 	@Column(name = "role")
