@@ -33,11 +33,11 @@ public class TeamService {
     private String baseUrl;
     /**
      * workspace id를 통해 해당 workspace의 사용자가 몇명인지 확인
-     * @param workspaceId
+     * @param workspace
      * @return
      */
-    public int getMemberCount(Long workspaceId) {
-        return teamRepository.getMemberCountByWorkspaceId(workspaceId);
+    public int getMemberCount(Workspace workspace) {
+        return teamRepository.countByWorkspace(workspace);
     }
 
     public void create(Member member, Workspace workspace, Map<String, Role> memberRoles) {
