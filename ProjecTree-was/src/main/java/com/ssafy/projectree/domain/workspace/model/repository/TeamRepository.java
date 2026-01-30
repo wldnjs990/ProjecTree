@@ -4,6 +4,7 @@ import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.workspace.model.entity.Team;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.hibernate.jdbc.Work;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,8 +13,7 @@ import java.util.Optional;
 
 public interface TeamRepository extends JpaRepository<Team, Long> {
 
-    @Query("SELECT COUNT(t) FROM Team t WHERE t.workspace.id = :workspaceId")
-    int getMemberCountByWorkspaceId(Long id);
+    int countByWorkspace(Workspace workspace);
 
     List<Team> findAllByMember(Member member);
 
