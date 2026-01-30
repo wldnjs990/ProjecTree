@@ -83,10 +83,10 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
       try {
         setIsLoading(true);
 
-        // [API 요청] GET /workspaces/{memberId}/my
+        // [API 요청] GET /workspaces/my
         // wasApiClient를 사용하여 백엔드 API 호출
         // 개발 환경에서는 MSW가 요청을 가로채서 mock 데이터 반환
-        const data = await getMyWorkspaces(user.memberId);
+        const data = await getMyWorkspaces();
         setWorkspaces(data);
       } catch (_error) {
         setError('워크스페이스 목록을 불러오는데 실패했습니다.');
