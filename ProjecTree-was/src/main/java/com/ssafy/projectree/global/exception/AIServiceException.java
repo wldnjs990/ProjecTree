@@ -10,8 +10,8 @@ public class AIServiceException extends CustomException {
 
 	private CacheType cacheType;
 
-	public AIServiceException(ErrorCode errorCode, Long key, CacheType cacheType) {
-		super(errorCode);
+	public AIServiceException(ErrorCode errorCode, Long key, CacheType cacheType, String message) {
+		super(errorCode, message);
 		this.key = key;
 		this.cacheType = cacheType;
 	}

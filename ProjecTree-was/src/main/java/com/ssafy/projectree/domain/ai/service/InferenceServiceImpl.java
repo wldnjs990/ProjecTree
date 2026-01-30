@@ -52,7 +52,7 @@ public class InferenceServiceImpl implements InferenceService {
                     .retrieve()
                     .toEntity(AiCandidateCreateDto.Response.class);
         } catch (HttpServerErrorException | ResourceAccessException e) {
-            throw new AIServiceException(ErrorCode.CANDIDATE_GENERATE_ERROR, request.getNodeId(), CacheType.CANDIDATE);
+            throw new AIServiceException(ErrorCode.CANDIDATE_GENERATE_ERROR, request.getNodeId(), CacheType.CANDIDATE, e.getMessage());
         }
 	    return response.getBody();
     }
@@ -71,7 +71,7 @@ public class InferenceServiceImpl implements InferenceService {
                     .retrieve()
                     .toEntity(AiNodeCreateDto.Response.class);
         }catch (HttpServerErrorException | ResourceAccessException e){
-            throw new AIServiceException(ErrorCode.NODE_GENERATE_ERROR, request.getCandidateId(), CacheType.NODE);
+            throw new AIServiceException(ErrorCode.NODE_GENERATE_ERROR, request.getCandidateId(), CacheType.NODE, e.getMessage());
         }
         return response.getBody();
     }
@@ -91,7 +91,7 @@ public class InferenceServiceImpl implements InferenceService {
                     .retrieve()
                     .toEntity(AiTechRecommendDto.Response.class);
         }catch (HttpServerErrorException | ResourceAccessException e){
-            throw new AIServiceException(ErrorCode.NODE_GENERATE_ERROR, request.getNodeId(),CacheType.TECH);
+            throw new AIServiceException(ErrorCode.NODE_GENERATE_ERROR, request.getNodeId(),CacheType.TECH, e.getMessage());
         }
         return response.getBody();
     }
