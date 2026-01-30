@@ -28,6 +28,7 @@ import com.ssafy.projectree.domain.tech.model.entity.NodeTechStack;
 import com.ssafy.projectree.domain.tech.model.repository.NodeTechStackRepository;
 import com.ssafy.projectree.domain.tech.api.dto.schemas.TechStackSchema;
 import com.ssafy.projectree.domain.node.api.dto.schema.CandidateSchema;
+import com.ssafy.projectree.domain.workspace.model.repository.TeamRepository;
 import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.exception.BusinessLogicException;
 import jakarta.transaction.Transactional;
@@ -50,6 +51,7 @@ public class NodeServiceImpl implements NodeService {
     private final NodeTreeRepository nodeTreeRepository;
     private final NodeCrdtService nodeCrdtService;
     private final NodeTechStackRepository nodeTechStackRepository;
+    private final TeamRepository teamRepository;
 
     private ProjectNode findRootNode(Long nodeId) {
         PageRequest limitOne = PageRequest.of(0, 1);
@@ -62,6 +64,9 @@ public class NodeServiceImpl implements NodeService {
     public NodeReadDto.Response getNodeDetails(Long nodeId) {
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR, "노드를 찾을 수 없습니다."));
+//        ProjectNode rootNode = findRootNode(node.getId());
+//TODO: 시큐리티 Utils 추가되면 member 입력
+//        teamRepository.isParticipant(rootNode.getWorkspace(), )
 
         List<Candidate> candidates = candidateRepository.findByParent(node);
         List<NodeTechStack> techStacks = nodeTechStackRepository.findAllByNode(node);

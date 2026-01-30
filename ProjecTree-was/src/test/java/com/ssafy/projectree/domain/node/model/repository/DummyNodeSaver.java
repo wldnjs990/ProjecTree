@@ -36,7 +36,7 @@ class DummyNodeSaver {
 
 	@Commit
 	@Test
-	//@Disabled
+	@Disabled
 	public void initDevLinkProjectData() {
 
 		// 1. 워크스페이스 (Workspace)
