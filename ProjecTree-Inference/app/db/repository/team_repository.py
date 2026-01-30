@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 # Team용 스키마 (필요시 별도 파일로 분리)
 class TeamCreate(BaseModel):
-    user_id: int
+    member_id: int
     workspace_id: int
     chat_id: Optional[str] = None
 
@@ -34,7 +34,7 @@ class TeamRepository(BaseRepository[Team, TeamCreate, TeamUpdate]):
         """워크스페이스의 참여 멤버 정보 조회"""
         return (
             db.query(Member)
-            .join(Team, Team.user_id == Member.id)
+            .join(Team, Team.member_id == Member.id)
             .filter(Team.workspace_id == workspace_id)
             .all()
         )

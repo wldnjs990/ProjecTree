@@ -9,7 +9,7 @@ class NodeBase(BaseSchema):
     note: Optional[str] = None
     priority: Optional[str] = None
     status: Optional[str] = None
-    user_id: Optional[int] = None
+    member_id: Optional[int] = None
 
 class NodeCreate(NodeBase):
     pass
