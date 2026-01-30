@@ -14,6 +14,7 @@ from app.agents.sub_agents.recommend.prompts.system_prompts import (
     BE_SYSTEM_PROMPT,
     ADVANCE_SYSTEM_PROMPT,
 )
+from app.agents.prompts.system.global_context import GLOBAL_CONTEXT
 from pathlib import Path
 import logging
 import os
@@ -29,7 +30,10 @@ MAX_RETRIES = 5  # 최대 재시도 횟수
 
 def create_expert_agent(system_prompt: str):
     return create_deep_agent(
-        llm, tools, system_prompt=system_prompt, response_format=ProviderStrategy(TechList),
+        llm, 
+        tools, 
+        system_prompt=system_prompt, 
+        response_format=ProviderStrategy(TechList),
     )
 
 
@@ -46,7 +50,33 @@ def run_expert_node(state: RecommendationState, executor: Any):
     task_description = state.get("node_description")
     feedback = state.get("feedback")
     
-    prompt_msg = EXPERT_USER_PROMPT.format(task_type=task_type, user_task=user_task, task_description=task_description)
+    candidate_info = state.get("current_candidate_info")
+    workspace_info = state.get("workspace_info")
+    headcount = state.get("headcount")
+
+    if workspace_info:
+        workspace_context = GLOBAL_CONTEXT.format(
+            project_tech_stack=[
+                tech.name for tech in workspace_info.workspace_tech_stacks
+            ],
+            project_headcount=headcount,
+            project_purpose=workspace_info.purpose,
+            start_date=workspace_info.start_date,
+            end_date=workspace_info.end_date,
+            project_description=workspace_info.description,
+        )
+    else:
+        workspace_context = "[프로젝트 정보가 없습니다.]"
+
+    if candidate_info:
+        candidate_context = f"""[현재 구현해야할 후보 노드의 정보]
+        이번 작업에서 실제로 구체화 해야할 후보 노드의 정보입니다. 노드의 이름과 설명을 보고 설명을 구체화 해주세요.
+        Name:{candidate_info.name}, Description:{candidate_info.description}
+        """
+    else:
+        candidate_context = ""
+    
+    prompt_msg = EXPERT_USER_PROMPT.format(task_type=task_type, user_task=user_task, task_description=task_description, workspace_info=workspace_context, candidate_info=candidate_context)
     
     if feedback:
         prompt_msg += f"\n\n[이전 추천에 대한 피드백]\n{feedback}\n\n위 피드백을 반영하여 다시 추천해주세요."
@@ -87,7 +117,7 @@ def advance_expert(state: RecommendationState) -> RecommendationState:
     return run_expert_node(state, advance_executor)
 
 
-def init_node(state: RecommendationState) -> RecommendationState:
+def expert_route(state: RecommendationState) -> RecommendationState:
     """초기화 노드 - last_error를 초기화"""
     return {"last_error": None}
 
