@@ -183,7 +183,7 @@ export default function Step3Schedule({
             <div className="flex flex-col items-center gap-1.5">
               <Upload className="h-6 w-6 text-[var(--figma-text-emperor)]" />
               <p className="font-['Pretendard'] font-normal text-[12.5px] text-[var(--figma-text-cod-gray)]">
-                Drag & drop PDF files here
+                PDF 파일을 여기에 놓아주세요
               </p>
               <label>
                 <input
@@ -203,7 +203,7 @@ export default function Step3Schedule({
                   }}
                   className="font-['Pretendard'] font-normal text-[11px] h-[28px] px-2.5 bg-[var(--figma-forest-primary)] text-[var(--figma-white)] rounded-md hover:bg-[#1B5E20] transition-colors mt-0.5"
                 >
-                  파일 업로드 (Max 10MB)
+                  파일 업로드 (최대 10MB)
                 </Button>
               </label>
             </div>

@@ -247,6 +247,7 @@ export default function Step2ProjectType({
                   selected={data.startDate || undefined}
                   onSelect={(date) => onChange({ startDate: date || null })}
                   initialFocus
+                  locale={ko}
                   className="rounded-md border border-[var(--figma-border-mercury)] shadow-lg"
                 />
               </PopoverContent>
@@ -280,6 +281,7 @@ export default function Step2ProjectType({
                   disabled={(date) =>
                     data.startDate ? date < data.startDate : false
                   }
+                  locale={ko}
                   className="rounded-md border border-[var(--figma-border-mercury)] shadow-lg"
                 />
               </PopoverContent>
