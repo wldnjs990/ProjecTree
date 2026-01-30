@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class AiCandidateSchema {
     private String name;
     private String description;
+    private String summary;
 }
