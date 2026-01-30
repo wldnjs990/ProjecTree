@@ -48,11 +48,9 @@ export async function handleMessage(
     if (!nodeData) return;
 
     const sendPayload = toSendNodeDetail(nodeData.toJSON());
-    const workspaceId: number = Number(room);
     const nodeIdValue = Number(parsed.nodeId);
     if (!Number.isFinite(nodeIdValue)) return;
     const saved = await saveNodeDetailToSpring({
-      workspaceId,
       nodeId: nodeIdValue,
       detail: sendPayload,
     });
@@ -62,7 +60,6 @@ export async function handleMessage(
         action: "save_node_detail",
         message: "spring_save_failed",
         requestId,
-        workspaceId,
         nodeId: nodeIdValue,
         prevDetail,
       });
@@ -73,12 +70,10 @@ export async function handleMessage(
     const { nodeId, selectedTechId, requestId } = parsed;
     if (!nodeId || typeof selectedTechId !== "number") return;
 
-    const workspaceId: number = Number(room);
     const nodeIdValue = Number(nodeId);
     if (!Number.isFinite(nodeIdValue)) return;
 
     const saved = await saveNodeTechToSpring({
-      workspaceId,
       nodeId: nodeIdValue,
       selectedTechId,
       requestId,
@@ -89,7 +84,6 @@ export async function handleMessage(
         action: "select_node_tech",
         message: "spring_save_failed",
         requestId,
-        workspaceId,
         nodeId: nodeIdValue,
         selectedTechId,
       });
@@ -99,7 +93,6 @@ export async function handleMessage(
   else if (parsed?.type === "save_node_position") {
     const { nodeId, requestId } = parsed;
     if (!nodeId) return;
-    console.log("Saving node position:", { room, nodeId, requestId });
     const doc = getYDocByRoom(room);
     const nodes = doc.getMap<any>("nodes");
     const nodeData = nodes.get(nodeId);
