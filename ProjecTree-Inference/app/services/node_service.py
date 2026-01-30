@@ -47,7 +47,6 @@ class NodeService:
         Returns:
             생성된 노드 ID 및 상태
         """
-        # 1. Main graph import (circular import 방지를 위해 함수 내에서 import)
         from app.agents.graph import builder
 
         # 2. Graph 컴파일 및 실행
@@ -76,10 +75,6 @@ class NodeService:
         parent_node_type = parent_info.node_type
         child_node_type = self._get_child_node_type(parent_node_type)
 
-        # 5. 노드 생성 (타입별 분기)
-        # generated_node가 dict인지 object인지 확인하고 적절히 접근
-        logger.info(f"[DEBUG] generated_node type: {type(generated_node)}")
-        logger.info(f"[DEBUG] generated_node content: {generated_node}")
 
         if isinstance(generated_node, dict):
             node_name = generated_node.get("name")
