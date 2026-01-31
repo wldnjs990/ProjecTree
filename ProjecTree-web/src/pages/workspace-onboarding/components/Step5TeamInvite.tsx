@@ -9,15 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
-interface TeamMember {
-  email: string;
-  role: string;
-}
+import type { Role } from '@/apis/workspace.api';
 
 interface Step5TeamInviteProps {
   data: {
-    teamMembers: TeamMember[];
+    memberRoles: Record<string, Role>;
   };
   onChange: (updates: Partial<Step5TeamInviteProps['data']>) => void;
   onNext: () => void;
@@ -31,8 +27,15 @@ export default function Step5TeamInvite({
   // onPrev,
 }: Step5TeamInviteProps) {
   const [memberEmail, setMemberEmail] = useState('');
-  const [memberRole, setMemberRole] = useState('편집자 - 편집 가능');
+  const [memberRole, setMemberRole] = useState<Role>('EDITOR');
   const [emailError, setEmailError] = useState('');
+
+  // 권한 표시용 맵
+  const ROLE_LABELS: Record<Role, string> = {
+    OWNER: '관리자 - 모든 권한',
+    EDITOR: '편집자 - 편집 가능',
+    VIEWER: '뷰어 - 보기만 가능',
+  };
 
   // 이메일 유효성 검사 함수
   const validateEmail = (email: string): boolean => {
@@ -42,21 +45,17 @@ export default function Step5TeamInvite({
       return false;
     }
 
+    // 중복 체크 (Map의 Key 확인)
+    if (Object.prototype.hasOwnProperty.call(data.memberRoles, email)) {
+      setEmailError('이미 초대된 멤버입니다.');
+      return false;
+    }
+
     // 이메일 형식 정규식 (RFC 5322 기반 간소화 버전)
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!emailRegex.test(email)) {
       setEmailError('올바른 이메일 형식이 아닙니다');
-      return false;
-    }
-
-    // 중복 이메일 체크
-    const isDuplicate = data.teamMembers.some(
-      (member) => member.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (isDuplicate) {
-      setEmailError('이미 초대된 이메일입니다');
       return false;
     }
 
@@ -83,14 +82,22 @@ export default function Step5TeamInvite({
       return;
     }
 
-    const newMember: TeamMember = {
-      email: memberEmail.trim(),
-      role: memberRole,
+    // 🚨 Record update: 새로운 객체 생성 후 추가
+    const newMemberRoles = {
+      ...data.memberRoles,
+      [memberEmail.trim()]: memberRole,
     };
-    onChange({ teamMembers: [...data.teamMembers, newMember] });
+    onChange({ memberRoles: newMemberRoles });
+
     setMemberEmail('');
-    setMemberRole('편집자 - 편집 가능');
+    setMemberRole('EDITOR'); // 기본값 리셋
     setEmailError('');
+  };
+
+  const handleRemoveMember = (emailToRemove: string) => {
+    const newMemberRoles = { ...data.memberRoles };
+    delete newMemberRoles[emailToRemove];
+    onChange({ memberRoles: newMemberRoles });
   };
 
   return (
@@ -133,20 +140,17 @@ export default function Step5TeamInvite({
             <Label className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
               권한
             </Label>
-            <Select value={memberRole} onValueChange={setMemberRole}>
+            <Select
+              value={memberRole}
+              onValueChange={(val: Role) => setMemberRole(val)}
+            >
               <SelectTrigger className="h-[44px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md font-['Pretendard'] font-normal text-[14px] hover:border-[var(--figma-forest-accent)] transition-colors">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="편집자 - 편집 가능">
-                  편집자 - 편집 가능
-                </SelectItem>
-                <SelectItem value="뷰어 - 보기만 가능">
-                  뷰어 - 보기만 가능
-                </SelectItem>
-                <SelectItem value="관리자 - 모든 권한">
-                  관리자 - 모든 권한
-                </SelectItem>
+                <SelectItem value="EDITOR">편집자 - 편집 가능</SelectItem>
+                <SelectItem value="VIEWER">뷰어 - 보기만 가능</SelectItem>
+                <SelectItem value="OWNER">관리자 - 모든 권한</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -166,23 +170,34 @@ export default function Step5TeamInvite({
         </div>
 
         {/* 초대된 팀원 목록 */}
-        {data.teamMembers.length > 0 && (
+        {Object.keys(data.memberRoles).length > 0 && (
           <div className="flex flex-col gap-2">
             <Label className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]">
               초대된 팀원
             </Label>
             <div className="max-h-[130px] overflow-y-auto chat-scrollbar pr-1 flex flex-col gap-2">
-              {data.teamMembers.map((member, index) => (
+              {Object.entries(data.memberRoles).map(([email, role]) => (
                 <div
-                  key={index}
+                  key={email}
                   className="flex items-center justify-between rounded p-2 bg-white border border-[var(--figma-border-mercury)] shadow-sm shrink-0"
                 >
                   <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-cod-gray)]">
-                    {member.email}
+                    {email}
                   </span>
-                  <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-emperor)]">
-                    {member.role}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-emperor)]">
+                      {ROLE_LABELS[role]}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-red-50 hover:text-red-500"
+                      onClick={() => handleRemoveMember(email)}
+                    >
+                      <span className="sr-only">삭제</span>
+                      &times;
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

@@ -47,15 +47,13 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
   // URL 쿼리 파라미터 관리 훅
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // 사용자 정보 (memberId)
-  const { user } = useUserStore();
-
   // 1. 상태 관리
   // (1) 워크스페이스 데이터 및 로딩 상태 (비동기 처리)
   const [workspaces, setWorkspaces] = useState<ProjectCardProps['project'][]>(
     []
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // 튜토리얼 모달 상태
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
@@ -73,29 +71,23 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
   // 2. 데이터 Fetching (API 호출)
   useEffect(() => {
     const fetchWorkspaces = async () => {
-      // 사용자 정보가 없으면 API 호출하지 않음
-      if (!user?.memberId) {
-        setIsLoading(false);
-        return;
-      }
-
       try {
         setIsLoading(true);
 
-        // [API 요청] GET /workspaces/{memberId}/my
+        // [API 요청] GET /workspaces/my
         // wasApiClient를 사용하여 백엔드 API 호출
         // 개발 환경에서는 MSW가 요청을 가로채서 mock 데이터 반환
-        const data = await getMyWorkspaces(user.memberId);
+        const data = await getMyWorkspaces();
         setWorkspaces(data);
-      } catch (error) {
-        console.error('워크스페이스 목록을 불러오는데 실패했습니다.', error);
+      } catch (_error) {
+        setError('워크스페이스 목록을 불러오는데 실패했습니다.');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchWorkspaces();
-  }, [user?.memberId]);
+  }, []);
 
   // 3. Debounce 효과: 사용자가 입력을 멈춘 후 0.3초 뒤에 URL과 필터 상태를 업데이트함
   // 단, 입력값이 비어있을 경우(지웠을 때) 즉시 반영하여 반응성을 높임
@@ -175,16 +167,16 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
     <div className="flex flex-1 flex-col overflow-hidden bg-zinc-50/50 h-full">
       {/* Top Bar */}
       <header className="flex items-center justify-between border-b border-white/20 bg-white/40 px-6 py-4 shrink-0 backdrop-blur-md sticky top-0 z-10 transition-all duration-300">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#4ADE80]/20 text-[#064E3B]">
             <Layers className="h-5 w-5" />
           </div>
-          <h1 className="text-xl font-bold text-zinc-800 tracking-tight">
-            나의 워크스페이스
+          <h1 className="text-xl font-bold text-zinc-800 tracking-tight hidden lg:block">
+            워크스페이스 목록
           </h1>
           <button
             onClick={() => setIsTutorialOpen(true)}
-            className="p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 transition-colors ml-1"
+            className="p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 transition-colors ml-1 hidden sm:block"
             title="이용 가이드"
           >
             <HelpCircle className="h-5 w-5" />
@@ -192,11 +184,11 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="relative group">
+          <div className="relative group hidden md:block">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 group-focus-within:text-[#064E3B] transition-colors duration-300" />
             <Input
               placeholder="워크스페이스 검색..."
-              className="w-64 pl-10 bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-zinc-200 focus:border-zinc-300 placeholder:text-zinc-400/80 transition-all duration-300 rounded-xl hover:bg-white/60"
+              className="w-48 pl-10 bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-zinc-200 focus:border-zinc-300 placeholder:text-zinc-400/80 transition-colors duration-300 rounded-xl hover:bg-white/60"
               value={inputValue}
               onChange={(e) => handleSearchChange(e.target.value)}
             />
@@ -206,13 +198,13 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="gap-2 bg-white/50 border border-white/20 shadow-sm text-zinc-600 hover:bg-white/80 min-w-[130px] justify-between backdrop-blur-sm transition-all duration-300 rounded-xl"
+                className="gap-2 bg-white/50 border border-white/20 shadow-sm text-zinc-600 hover:bg-white/80 sm:w-[140px] justify-between backdrop-blur-sm transition-all duration-300 rounded-xl"
               >
                 <div className="flex items-center gap-2">
                   <currentSortOption.icon className="h-4 w-4" />
-                  {currentSortOption.label}
+                  <span className="hidden sm:inline">{currentSortOption.label}</span>
                 </div>
-                <ChevronDown className="h-4 w-4 opacity-50" />
+                <ChevronDown className="h-4 w-4 opacity-50 hidden sm:block" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -236,7 +228,8 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
             className="gap-2 bg-[#4ADE80]/80 hover:bg-[#4ADE80]/90 text-[#064E3B] font-bold shadow-lg shadow-green-500/20 border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(74,222,128,0.4)]"
             onClick={() => navigate('/workspace-onboarding')}
           >
-            <Plus className="h-4 w-4" />새 워크스페이스
+            <Plus className="h-4 w-4" />
+            <span className="hidden md:inline">새 워크스페이스</span>
           </Button>
         </div>
       </header>
@@ -246,6 +239,13 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
         {isLoading ? (
           <div className="flex h-full w-full items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-full text-zinc-500">
+            <p className="text-lg font-medium text-red-500">{error}</p>
+            <p className="text-sm text-zinc-400 mt-1">
+              잠시 후 다시 시도해주세요.
+            </p>
           </div>
         ) : workspaces.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-500">

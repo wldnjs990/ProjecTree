@@ -1,7 +1,15 @@
 import { wasApiClient } from '@/apis/client';
 
-export interface CreateWorkspaceRequest {
-  workspaceName: string;
+/**
+ * [타입] 프론트엔드 폼 데이터 (기존 유지)
+ */
+/**
+ * [타입] 멤버 역할 (API 호환용)
+ */
+export type Role = 'OWNER' | 'EDITOR' | 'VIEWER';
+
+export interface CreateWorkspaceFormData {
+  name: string;
   workspaceKey: string;
   domain: string;
   purpose: string;
@@ -10,47 +18,109 @@ export interface CreateWorkspaceRequest {
   startDate: Date | null;
   endDate: Date | null;
   specFiles: File[];
-  techStacks: string[];
-  epics: Array<{ id: string; name: string; description: string }>;
-  teamMembers: Array<{ email: string; role: string }>;
-}
-
-export interface WorkspaceResponse {
-  status: string;
-  data: {
-    workspaceId: string;
-    // 필요한 다른 응답 데이터 추가 가능
-  };
+  techStacks: number[]; // 🚨 변경: 이름(string) -> ID(number) 목록으로 변경
+  epics: Array<{ name: string; description: string }>; // 🚨 변경: ID 제거 (백엔드 X, 프론트엔드도 Index 사용)
+  memberRoles: Array<{ email: string; role: string }>;
 }
 
 /**
- * [워크스페이스 API] 워크스페이스 생성
- * @param data - 워크스페이스 생성 정보
+ * [타입] 백엔드 API 응답 (명세서 기준)
  */
-export const createWorkspace = async (data: CreateWorkspaceRequest) => {
+export interface WorkspaceResponse {
+  message: string;
+  data: string;
+  code: number; // 숫자 타입 (예: 1073741824)
+  success: boolean;
+}
+
+/**
+ * [타입] 기술 스택 아이템 (API 조회용)
+ */
+export interface TechStackItem {
+  id: number;
+  name: string;
+}
+
+/**
+ * [가짜 API] 기술 스택 목록 조회
+ * (백엔드가 /api/tech-stacks 만들면, axios 호출로 교체 예정)
+ */
+export const getTechStacks = async (): Promise<TechStackItem[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // 🟢 가짜 데이터 (ID, Name만 넘김)
+      resolve([
+        { id: 1, name: 'React' },
+        { id: 2, name: 'Vue' },
+        { id: 3, name: 'Angular' },
+        { id: 4, name: 'Spring Boot' },
+        { id: 5, name: 'Django' },
+        { id: 6, name: 'Node.js' },
+        { id: 7, name: 'MySQL' },
+        { id: 8, name: 'PostgreSQL' },
+        { id: 9, name: 'MongoDB' },
+        { id: 10, name: 'Docker' },
+        { id: 11, name: 'Kubernetes' },
+        { id: 12, name: 'AWS' },
+        { id: 13, name: 'Next.js' },
+        { id: 14, name: 'NestJS' },
+      ]);
+    }, 300); // 0.3초 로딩 흉내
+  });
+};
+
+/**
+ * [API] 워크스페이스 생성
+ */
+export const createWorkspace = async (
+  data: CreateWorkspaceFormData
+): Promise<WorkspaceResponse> => {
   // 파일이 포함되어 있으므로 FormData 사용
   const formData = new FormData();
 
-  formData.append('workspaceName', data.workspaceName);
-  formData.append('workspaceKey', data.workspaceKey);
-  formData.append('domain', data.domain);
-  formData.append('purpose', data.purpose);
-  formData.append('serviceType', data.serviceType);
-  formData.append('subject', data.subject);
-  if (data.startDate)
-    formData.append('startDate', data.startDate.toISOString());
-  if (data.endDate) formData.append('endDate', data.endDate.toISOString());
+  // 1. JSON 데이터 객체 생성
+  // 에픽 변환 (id 제거)
+  // 에픽: 이미 { name, description } 형태이므로 그대로 사용 가능
+  // 만약 추가적인 가공이 필요하다면 여기서 처리
+  const epics = data.epics;
 
-  // 배열 데이터 처리
-  data.techStacks.forEach((stack) => formData.append('techStacks', stack));
-  formData.append('epics', JSON.stringify(data.epics));
-  formData.append('teamMembers', JSON.stringify(data.teamMembers));
+  // JSON 데이터 구성
+  const requestData = {
+    name: data.name,
+    description: data.description,
+    domain: data.domain,
+    purpose: data.purpose,
+    serviceType: data.serviceType,
+    identifierPrefix: data.workspaceKey,
+    startDate: data.startDate
+      ? data.startDate.toISOString().split('T')[0]
+      : null,
+    endDate: data.endDate ? data.endDate.toISOString().split('T')[0] : null,
+    memberRoles: data.memberRoles, // 🚨 이제 그대로 전송 (Record<string, Role>)
+    workspaceTechStacks: data.techStacks, // 🚨 백엔드 요청대로 필드명 변경 및 활성화
+    epics: epics, // 🚨 재변경: 백엔드 DTO(epics) 확인 -> epics (복수형)
+  };
 
-  // 파일 처리
-  data.specFiles.forEach((file) => formData.append('specFiles', file));
+  // 📝 디버깅 로그 추가
+  console.log('🚀 [API 요청 데이터 확인 - 최종 수정 버전]');
+  console.log('1. JSON 데이터:', JSON.stringify(requestData, null, 2));
+  console.log('2. 파일 개수:', data.specFiles.length);
+  data.specFiles.forEach((file, index) => {
+    console.log(`   - 파일 ${index + 1}:`, file.name, file.size, file.type);
+  });
+
+  // 2. FormData에 데이터 담기
+  // JSON 객체 -> Blob (application/json) -> 'data' 필드
+  formData.append(
+    'data',
+    new Blob([JSON.stringify(requestData)], { type: 'application/json' })
+  );
+
+  // 파일 -> 'files' 필드 (Swagger 기준)
+  data.specFiles.forEach((file) => formData.append('files', file));
 
   const response = await wasApiClient.post<WorkspaceResponse>(
-    '/api/workspaces',
+    '/workspaces',
     formData,
     {
       headers: {

@@ -184,7 +184,7 @@ export default function Step2ProjectType({
           >
             <div className="flex items-center gap-2">
               <RadioGroupItem
-                value="web"
+                value="WEB"
                 id="web"
                 className="text-[var(--figma-forest-primary)]"
               />
@@ -197,41 +197,15 @@ export default function Step2ProjectType({
             </div>
             <div className="flex items-center gap-2">
               <RadioGroupItem
-                value="mobile"
-                id="mobile"
+                value="APP"
+                id="app"
                 className="text-[var(--figma-forest-primary)]"
               />
               <Label
-                htmlFor="mobile"
+                htmlFor="app"
                 className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
               >
-                Mobile App
-              </Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <RadioGroupItem
-                value="desktop"
-                id="desktop"
-                className="text-[var(--figma-forest-primary)]"
-              />
-              <Label
-                htmlFor="desktop"
-                className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
-              >
-                Desktop App
-              </Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <RadioGroupItem
-                value="other"
-                id="serviceOther"
-                className="text-[var(--figma-forest-primary)]"
-              />
-              <Label
-                htmlFor="serviceOther"
-                className="cursor-pointer font-['Pretendard'] font-normal text-[13.2px] leading-[14px] text-[var(--figma-text-cod-gray)]"
-              >
-                기타
+                App
               </Label>
             </div>
           </RadioGroup>
@@ -273,6 +247,7 @@ export default function Step2ProjectType({
                   selected={data.startDate || undefined}
                   onSelect={(date) => onChange({ startDate: date || null })}
                   initialFocus
+                  locale={ko}
                   className="rounded-md border border-[var(--figma-border-mercury)] shadow-lg"
                 />
               </PopoverContent>
@@ -306,6 +281,7 @@ export default function Step2ProjectType({
                   disabled={(date) =>
                     data.startDate ? date < data.startDate : false
                   }
+                  locale={ko}
                   className="rounded-md border border-[var(--figma-border-mercury)] shadow-lg"
                 />
               </PopoverContent>
