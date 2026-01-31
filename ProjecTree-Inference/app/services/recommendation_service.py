@@ -11,6 +11,7 @@ from app.db.repository.tech_repository import TechVocabularyRepository
 from app.db.repository.tech_stack_info_repository import TechStackInfoRepository
 from app.db.repository.node_tech_stack_repository import NodeTechStackRepository
 from app.db.schemas.tech import TechStackInfoCreate, NodeTechStackCreate
+from app.db.models import NodeTechStack
 from app.db.models import TaskNode, AdvanceNode
 from app.agents.enums import TaskType
 
@@ -62,6 +63,19 @@ class RecommendationService:
         elif node.node_type == NodeType.ADVANCE:
             input_data["task_type"] = TaskType.ADVANCE
 
+        # 기존 NodeTechStack 조회 (node_id 기준) - 제외할 기술 스택 목록 생성
+        existing_node_tech_stacks = db.query(NodeTechStack).filter(
+            NodeTechStack.node_id == node.id
+        ).all()
+
+        if existing_node_tech_stacks:
+            # 기존 기술 스택 이름 목록 추출
+            excluded_tech_names = []
+            for existing_nts in existing_node_tech_stacks:
+                if existing_nts.tech_vocabulary:
+                    excluded_tech_names.append(existing_nts.tech_vocabulary.name)
+            input_data["excluded_tech_stacks"] = excluded_tech_names
+
         # recommend_graph를 호출하여 실제 기술 스택 추천 로직 구현
         result = await recommend_graph.ainvoke(
             input_data, config={"callbacks": [langfuse_handler]}
@@ -82,6 +96,20 @@ class RecommendationService:
                 advance_node.comparison = comparison
                 db.commit()
         
+        # 기존 데이터가 있으면 기존 TechStackInfo 삭제 후 새로 생성
+        if existing_node_tech_stacks:
+            for existing_nts in existing_node_tech_stacks:
+                # 연결된 TechStackInfo 삭제
+                if existing_nts.tech_stack_info_id:
+                    existing_tech_info = self.tech_stack_info_repository.get_by_id(
+                        db, existing_nts.tech_stack_info_id
+                    )
+                    if existing_tech_info:
+                        db.delete(existing_tech_info)
+                # NodeTechStack 삭제
+                db.delete(existing_nts)
+            db.commit()
+
         # 추천된 기술 스택 저장 로직
         for tech in tech_list:
             # 1. TechVocabulary 조회 및 생성
