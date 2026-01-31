@@ -50,9 +50,9 @@ def run_expert_node(state: RecommendationState, executor: Any):
     task_description = state.get("node_description")
     feedback = state.get("feedback")
     
-    candidate_info = state.get("current_candidate_info")
     workspace_info = state.get("workspace_info")
     headcount = state.get("headcount")
+    excluded_tech_stacks = state.get("excluded_tech_stacks")
 
     if workspace_info:
         workspace_context = GLOBAL_CONTEXT.format(
@@ -68,15 +68,17 @@ def run_expert_node(state: RecommendationState, executor: Any):
     else:
         workspace_context = "[프로젝트 정보가 없습니다.]"
 
-    if candidate_info:
-        candidate_context = f"""[현재 구현해야할 후보 노드의 정보]
-        이번 작업에서 실제로 구체화 해야할 후보 노드의 정보입니다. 노드의 이름과 설명을 보고 설명을 구체화 해주세요.
-        Name:{candidate_info.name}, Description:{candidate_info.description}
-        """
-    else:
-        candidate_context = ""
     
-    prompt_msg = EXPERT_USER_PROMPT.format(task_type=task_type, user_task=user_task, task_description=task_description, workspace_info=workspace_context, candidate_info=candidate_context)
+    # 제외할 기술 스택 컨텍스트 생성
+    if excluded_tech_stacks and len(excluded_tech_stacks) > 0:
+        excluded_context = f"""[제외할 기술 스택]
+    다음 기술들은 이미 이전에 추천받은 기술입니다. 이 기술들을 제외하고 다른 기술을 추천해 주세요:
+    - {', '.join(excluded_tech_stacks)}
+    """
+    else:
+        excluded_context = ""
+    
+    prompt_msg = EXPERT_USER_PROMPT.format(task_type=task_type, user_task=user_task, task_description=task_description, workspace_info=workspace_context, excluded_tech_stacks=excluded_context)
     
     if feedback:
         prompt_msg += f"\n\n[이전 추천에 대한 피드백]\n{feedback}\n\n위 피드백을 반영하여 다시 추천해주세요."
