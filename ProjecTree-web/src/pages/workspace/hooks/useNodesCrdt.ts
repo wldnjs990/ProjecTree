@@ -73,9 +73,13 @@ export const useNodesCrdt = ({
     const handleSync = (isSynced: boolean) => {
       console.log('싱크', isSynced);
       if (isSynced) {
-        // 서버에 데이터가 없으면 초기 노드로 세팅
-        if (yNodes.size === 0 && initialNodes.length > 0) {
+        // API에서 받은 초기 노드로 Y.js 동기화
+        // (API 데이터를 신뢰하여 Y.js 상태 갱신)
+        if (initialNodes.length > 0) {
           client.yDoc.transact(() => {
+            // 기존 Y.js 데이터 클리어
+            yNodes.clear();
+            // API 데이터로 새로 세팅
             initialNodes.forEach((node) => {
               const yNode = new Y.Map<YNodeValue>();
               const yjsNode = flowNodeToYjsNode(node);

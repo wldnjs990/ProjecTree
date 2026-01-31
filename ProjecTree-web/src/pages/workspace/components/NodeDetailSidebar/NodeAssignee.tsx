@@ -44,9 +44,9 @@ function AssigneeSelect({ value, onChange }: AssigneeSelectProps) {
           <SelectItem key={member.id} value={member.id}>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-[#1C69E3] flex items-center justify-center text-xs text-white">
-                {member.name.slice(0, 2)}
+                {member.name?.slice(0, 2) ?? '??'}
               </div>
-              <span>{member.name}</span>
+              <span>{member.name ?? '알 수 없음'}</span>
             </div>
           </SelectItem>
         ))}
@@ -60,7 +60,8 @@ interface SelectedAssigneeProps {
   assignee: Assignee | null;
 }
 function SelectedAssignee({ assignee }: SelectedAssigneeProps) {
-  if (!assignee) {
+  // assignee가 없거나 name이 없으면 미지정 표시
+  if (!assignee || !assignee.name) {
     return <span className="text-sm text-muted-foreground">미지정</span>;
   }
 

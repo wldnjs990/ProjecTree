@@ -5,6 +5,7 @@ import {
   ChevronUp,
   Plus,
   ArrowLeftRight,
+  Loader2,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -19,6 +20,8 @@ interface AITechRecommendSectionProps {
   isEdit: boolean;
   recommendations: TechRecommendation[];
   comparison?: string;
+  onGenerateTechs?: () => Promise<void>;
+  isGenerating?: boolean;
 }
 
 // 기술 카드 컴포넌트
@@ -211,12 +214,52 @@ function TechCardList({
   );
 }
 
+// 빈 상태 컴포넌트
+function TechEmptyState({
+  onGenerate,
+  isGenerating,
+}: {
+  onGenerate?: () => void;
+  isGenerating?: boolean;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-6 gap-3">
+      <div className="text-center">
+        <p className="text-xs text-[#636363]">아직 추천 기술이 없습니다.</p>
+        <p className="text-[10px] text-[#9CA3AF] mt-1">
+          AI가 적합한 기술을 추천해드립니다.
+        </p>
+      </div>
+      <button
+        onClick={onGenerate}
+        disabled={isGenerating}
+        className="flex items-center justify-center gap-2 px-4 py-2 text-sm text-white bg-[#1C69E3] rounded-lg hover:bg-[#1557c0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isGenerating ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            생성 중...
+          </>
+        ) : (
+          <>
+            <Sparkles className="w-4 h-4" />
+            AI 기술 추천 받기
+          </>
+        )}
+      </button>
+    </div>
+  );
+}
+
 export function AITechRecommendSection({
   recommendations,
   comparison,
+  onGenerateTechs,
+  isGenerating = false,
 }: AITechRecommendSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [showComparison, setShowComparison] = useState(false);
+  const hasRecommendations = recommendations && recommendations.length > 0;
 
   const handleCompareClick = () => {
     setShowComparison(true);
@@ -226,7 +269,6 @@ export function AITechRecommendSection({
     setShowComparison(false);
   };
 
-  //
   const handleAddTech = () => {};
 
   return (
@@ -252,35 +294,65 @@ export function AITechRecommendSection({
       {/* 콘텐츠 */}
       {isExpanded && (
         <div className="px-4 pb-4 space-y-4">
-          {showComparison && comparison ? (
-            <TechComparisonMarkdown comparison={comparison} />
+          {hasRecommendations ? (
+            <>
+              {showComparison && comparison ? (
+                <TechComparisonMarkdown comparison={comparison} />
+              ) : (
+                <TechCardList recommendations={recommendations} />
+              )}
+
+              {/* 액션 버튼 */}
+              <div className="space-y-2">
+                {comparison && (
+                  <button
+                    onClick={
+                      showComparison
+                        ? handleBackToRecommendations
+                        : handleCompareClick
+                    }
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#6363C6] border border-[rgba(99,99,198,0.3)] rounded-lg hover:bg-[rgba(99,99,198,0.05)] transition-colors shadow-sm"
+                  >
+                    <ArrowLeftRight className="w-4 h-4" />
+                    {showComparison ? '돌아가기' : '기술 비교하기'}
+                  </button>
+                )}
+
+                {/* AI 재생성 버튼 */}
+                <button
+                  onClick={onGenerateTechs}
+                  disabled={isGenerating}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      생성 중...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      AI 다시 추천받기
+                    </>
+                  )}
+                </button>
+              </div>
+            </>
           ) : (
-            <TechCardList recommendations={recommendations} />
+            <TechEmptyState
+              onGenerate={onGenerateTechs}
+              isGenerating={isGenerating}
+            />
           )}
 
-          {/* 액션 버튼 */}
-          <div className="space-y-2">
-            {comparison && (
-              <button
-                onClick={
-                  showComparison
-                    ? handleBackToRecommendations
-                    : handleCompareClick
-                }
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#6363C6] border border-[rgba(99,99,198,0.3)] rounded-lg hover:bg-[rgba(99,99,198,0.05)] transition-colors shadow-sm"
-              >
-                <ArrowLeftRight className="w-4 h-4" />
-                {showComparison ? '돌아가기' : '기술 비교하기'}
-              </button>
-            )}
-            <button
-              onClick={handleAddTech}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#6363C6] border border-[rgba(99,99,198,0.3)] rounded-lg hover:bg-[rgba(99,99,198,0.05)] transition-colors shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              직접 추가
-            </button>
-          </div>
+          {/* 직접 추가 버튼 */}
+          <button
+            onClick={handleAddTech}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#6363C6] border border-[rgba(99,99,198,0.3)] rounded-lg hover:bg-[rgba(99,99,198,0.05)] transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            직접 추가
+          </button>
         </div>
       )}
     </div>

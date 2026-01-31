@@ -8,8 +8,8 @@ export function transformServerNode(serverNode: ServerNode): FlowNode {
     id: String(serverNode.id),
     type: serverNode.nodeType,
     position: {
-      x: serverNode.position.xPos,
-      y: serverNode.position.yPos,
+      x: serverNode.position.xpos,
+      y: serverNode.position.ypos,
     },
     parentId:
       serverNode.parentId !== null ? String(serverNode.parentId) : undefined,

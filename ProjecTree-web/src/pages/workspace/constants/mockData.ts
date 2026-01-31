@@ -18,7 +18,7 @@ export const mockNodesApiResponse: NodesApiResponse = {
       id: 1,
       name: 'AI 여행 추천 서비스',
       nodeType: 'PROJECT',
-      position: { xPos: 400, yPos: 50 },
+      position: { xpos: 400, ypos: 50 },
       parentId: null,
       data: {
         priority: 'P0',
@@ -31,7 +31,7 @@ export const mockNodesApiResponse: NodesApiResponse = {
       id: 2,
       name: '사용자 인증',
       nodeType: 'EPIC',
-      position: { xPos: 400, yPos: 180 },
+      position: { xpos: 400, ypos: 180 },
       parentId: 1,
       data: {
         priority: 'P0',
@@ -44,7 +44,7 @@ export const mockNodesApiResponse: NodesApiResponse = {
       id: 3,
       name: '사용자가 로그인한다.',
       nodeType: 'STORY',
-      position: { xPos: 250, yPos: 340 },
+      position: { xpos: 250, ypos: 340 },
       parentId: 2,
       data: {
         priority: 'P1',
@@ -57,7 +57,7 @@ export const mockNodesApiResponse: NodesApiResponse = {
       id: 4,
       name: '프론트엔드 로그인',
       nodeType: 'TASK',
-      position: { xPos: 200, yPos: 470 },
+      position: { xpos: 200, ypos: 470 },
       parentId: 3,
       data: {
         priority: 'P0',
@@ -71,7 +71,7 @@ export const mockNodesApiResponse: NodesApiResponse = {
       id: 5,
       name: '백엔드 로그인',
       nodeType: 'TASK',
-      position: { xPos: 400, yPos: 470 },
+      position: { xpos: 400, ypos: 470 },
       parentId: 3,
       data: {
         priority: 'P1',
@@ -268,7 +268,7 @@ export const mockNodeDetails: Record<number, NodeDetailData> =
 export const mockNodes: Node[] = mockNodesApiResponse.data.map((node) => ({
   id: String(node.id),
   type: node.nodeType || 'TASK',
-  position: { x: node.position.xPos, y: node.position.yPos },
+  position: { x: node.position.xpos, y: node.position.ypos },
   parentId: node.parentId ? String(node.parentId) : undefined,
   data: {
     title: node.name,

@@ -23,6 +23,14 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
 
   const selectedNodeId = useSelectedNodeId();
 
+  // 디버깅용 로그
+  console.log('[NodeDetailSidebar] 상태 확인:', {
+    isOpen,
+    selectedNodeId,
+    nodeDetail: nodeDetail ? '있음' : 'null',
+    nodeListData: nodeListData ? '있음' : 'null',
+  });
+
   // 선택된 노드의 기본 정보 (헤더용)
   const selectedNodeInfo = useMemo(() => {
     if (!selectedNodeId) return undefined;

@@ -16,8 +16,8 @@ export type ServerPriority = 'P0' | 'P1' | 'P2';
 
 /** 서버 응답의 position 형식 */
 export interface ServerPosition {
-  xPos: number;
-  yPos: number;
+  xpos: number;
+  ypos: number;
 }
 
 /** 서버 응답의 노드 data 형식 */
