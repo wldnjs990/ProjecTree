@@ -24,6 +24,7 @@ class TechStackInfoBase(BaseSchema):
     advantage: Optional[str] = None
     description: Optional[str] = None
     disadvantage: Optional[str] = None
+    ref: Optional[str] = None
 
 
 class TechStackInfoCreate(TechStackInfoBase):

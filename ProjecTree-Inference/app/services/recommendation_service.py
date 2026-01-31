@@ -87,6 +87,7 @@ class RecommendationService:
                 advantage=tech.advantage,
                 description=tech.description,
                 disadvantage=tech.disadvantage,
+                ref=tech.ref
             )
             tech_info = self.tech_stack_info_repository.create(
                 db, obj_in=tech_info_create
