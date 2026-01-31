@@ -13,10 +13,14 @@ import { Mic, MicOff, PhoneOff, Loader2 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useVoiceChat } from './useVoiceChat';
-import HiddenAudioPlayer from './components/HiddenAudioPlayer';
-import ParticipantAvatar from './components/ParticipantAvatar';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useVoiceChat } from '../hooks/useVoiceChat';
+import HiddenAudioPlayer from './HiddenAudioPlayer';
+import ParticipantAvatar from './ParticipantAvatar';
 
 type VoiceChatBarProps = {
   isOpen: boolean;
@@ -27,7 +31,7 @@ type VoiceChatBarProps = {
 /**
  * 참여자 아바타 컴포넌트
  */
-export default function VoiceChatBar({
+export function VoiceChatBar({
   isOpen,
   onClose,
   workspaceId,
@@ -128,15 +132,11 @@ export default function VoiceChatBar({
               )}
 
               {/* 에러 메시지 */}
-              {error && (
-                <span className="text-sm text-red-400">{error}</span>
-              )}
+              {error && <span className="text-sm text-red-400">{error}</span>}
             </div>
 
             {/* 구분선 */}
-            {isConnected && (
-              <div className="w-px h-8 bg-slate-700" />
-            )}
+            {isConnected && <div className="w-px h-8 bg-slate-700" />}
 
             {/* 컨트롤 버튼 */}
             <div className="flex items-center gap-2">

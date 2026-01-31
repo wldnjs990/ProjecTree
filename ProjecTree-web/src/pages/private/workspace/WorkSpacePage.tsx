@@ -11,10 +11,10 @@ import { useConnectionStatus, useNodeStore } from './stores/nodeStore';
 import { useNodeDetailEdit, useNodeDetailCrdtObservers } from './hooks';
 import { useParams } from 'react-router';
 import { LeftSidebar } from './components/Sidebar/LeftSidebar';
-import VoiceChatBar from './components/VoiceChat/VoiceChatBar';
 import { getWorkspaceTree, getNodeDetail } from '@/apis/workspace.api';
 import type { ApiNode, NodeData } from './components/NodeDetailSidebar/types';
 import { generateEdges } from './utils/generateEdges';
+import { VoiceChatBar } from '@/features/workspace-voicechat';
 
 // 임시 워크스페이스 ID (백엔드 DB 더미 데이터용)
 const TEMP_WORKSPACE_ID = 8;
@@ -42,7 +42,9 @@ const transformApiNodesToFlowNodes = (apiNodes: ApiNode[]): FlowNode[] => {
 };
 
 export default function WorkSpacePage() {
-  const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
+  const { workspaceId: paramWorkspaceId } = useParams<{
+    workspaceId: string;
+  }>();
   // workspaceId가 없으면 임시 ID 사용
   const workspaceId = paramWorkspaceId || String(TEMP_WORKSPACE_ID);
 

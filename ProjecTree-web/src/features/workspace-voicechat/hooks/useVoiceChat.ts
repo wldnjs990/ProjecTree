@@ -23,7 +23,10 @@ import {
   TrackPublication,
   ConnectionState,
 } from 'livekit-client';
-import type { TrackInfo, UseVoiceChatProps } from './types';
+import type {
+  TrackInfo,
+  UseVoiceChatProps,
+} from '@/features/workspace-voicechat/types/types';
 
 const LIVEKIT_URL = `wss://i14d107.p.ssafy.io/livekit`;
 // import.meta.env.VITE_LIVEKIT_URL ||

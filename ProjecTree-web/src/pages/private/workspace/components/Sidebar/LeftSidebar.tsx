@@ -6,10 +6,9 @@ import {
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
 import { ProjectTreeItem } from './ProjectTreeItem';
-import { ChatPanel } from '@/features/chat/components/ChatPanel';
 import { buildProjectTree } from '@/lib/treeUtils';
+import { ChatPanel } from '@/features/workspace-chat';
 
 interface LeftSidebarProps {
   workspaceId: string;

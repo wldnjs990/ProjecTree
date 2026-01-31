@@ -15,6 +15,9 @@ import { Confirm } from '@/shared/components/Confirm';
 import { ConfirmTrigger } from '@/shared/components/ConfirmTrigger';
 import TechDetailContent from './TechDetailContent';
 import TechDetailTitle from './TechDetailTitle';
+import { useSelectedNodeId } from '../../stores/nodeDetailStore';
+import { getAiNodeTechRecommendation } from '@/apis/node.api';
+import { number } from 'framer-motion';
 
 interface AITechRecommendSectionProps {
   isEdit: boolean;
@@ -222,6 +225,8 @@ function TechEmptyState({
   onGenerate?: () => void;
   isGenerating?: boolean;
 }) {
+  const selectedNodeId = useSelectedNodeId();
+
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-3">
       <div className="text-center">
@@ -231,7 +236,7 @@ function TechEmptyState({
         </p>
       </div>
       <button
-        onClick={onGenerate}
+        onClick={() => getAiNodeTechRecommendation(Number(selectedNodeId))}
         disabled={isGenerating}
         className="flex items-center justify-center gap-2 px-4 py-2 text-sm text-white bg-[#1C69E3] rounded-lg hover:bg-[#1557c0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >

@@ -3,7 +3,7 @@ import { workspaces as mockWorkspaces } from '@/pages/private/workspace-lounge/d
 import {
   mockFetchMessages,
   getMockParticipants,
-} from '../features/chat/types/mockData';
+} from '@/features/workspace-chat/types/mockData';
 
 /**
  * 프론트엔드 mockData를 백엔드 API 형식으로 변환
