@@ -110,11 +110,17 @@ const transformWorkspace = (
  * [API] 내가 속한 워크스페이스 목록 조회
  * @returns 워크스페이스 카드 데이터 배열
  */
+export interface WorkspaceLoungeApiResponse {
+  message: string;
+  data: WorkspaceLoungeResponse[];
+  code: number;
+  success: boolean;
+}
+
 export const getMyWorkspaces = async (): Promise<WorkspaceCardData[]> => {
-  const response = await wasApiClient.get<{
-    status: string;
-    data: WorkspaceLoungeResponse[];
-  }>(`/workspaces/my`);
+  const response = await wasApiClient.get<WorkspaceLoungeApiResponse>(
+    `/workspaces/my`
+  );
 
   return response.data.data.map(transformWorkspace);
 };
