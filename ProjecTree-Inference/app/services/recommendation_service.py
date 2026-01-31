@@ -11,7 +11,7 @@ from app.db.repository.tech_repository import TechVocabularyRepository
 from app.db.repository.tech_stack_info_repository import TechStackInfoRepository
 from app.db.repository.node_tech_stack_repository import NodeTechStackRepository
 from app.db.schemas.tech import TechStackInfoCreate, NodeTechStackCreate
-from app.db.models import TaskNode
+from app.db.models import TaskNode, AdvanceNode
 from app.agents.enums import TaskType
 
 class RecommendationService:
@@ -69,7 +69,19 @@ class RecommendationService:
 
         tech_list = result["tech_list"].techs
         comparison = result["tech_list"].comparison
-
+        
+        # TASK 또는 ADVANCE 노드인 경우 comparison 필드 업데이트
+        if node.node_type == NodeType.TASK:
+            task_node = db.query(TaskNode).filter(TaskNode.node_id == node.id).first()
+            if task_node:
+                task_node.comparison = comparison
+                db.commit()
+        elif node.node_type == NodeType.ADVANCE:
+            advance_node = db.query(AdvanceNode).filter(AdvanceNode.node_id == node.id).first()
+            if advance_node:
+                advance_node.comparison = comparison
+                db.commit()
+        
         # 추천된 기술 스택 저장 로직
         for tech in tech_list:
             # 1. TechVocabulary 조회 및 생성
