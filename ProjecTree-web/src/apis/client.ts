@@ -7,8 +7,8 @@ const BASE_URL =
 
 export const wasApiClient = axios.create({
   baseURL: BASE_URL,
-  // 네트워크 타임아웃 시간(10초)
-  timeout: 10000,
+  // 네트워크 타임아웃 시간(600초 - AI때문에 임시 처리)
+  timeout: 600000,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',

@@ -1,9 +1,14 @@
+import { useState } from 'react';
 import { NodeHeaderSection } from './NodeHeaderSection';
 import { StatusMetaSection } from './StatusMetaSection';
 import { AITechRecommendSection } from './AITechRecommendSection';
 import { AINodeCandidateSection } from './AINodeCandidateSection';
 import { MemoSection } from './MemoSection';
 import { useSelectedNodeDetail, useNodeDetailEdit } from '../../hooks';
+import { useSelectedNodeId } from '../../stores/nodeDetailStore';
+import { useNodeStore } from '../../stores/nodeStore';
+import { generateNodeCandidates } from '@/apis/workspace.api';
+import { postCreateNode } from '@/apis/node.api';
 
 interface NodeDetailContainerProps {
   nodeInfo?: {
@@ -19,8 +24,13 @@ export default function NodeDetailContainer({
 }: NodeDetailContainerProps) {
   // Store에서 상태 및 액션 구독
   const nodeDetail = useSelectedNodeDetail();
+  const selectedNodeId = useSelectedNodeId();
+  const updateNodeDetail = useNodeStore((state) => state.updateNodeDetail);
   const { isEditing, closeSidebar, startEdit, finishEdit } =
     useNodeDetailEdit();
+
+  // AI 생성 로딩 상태
+  const [isGeneratingCandidates, setIsGeneratingCandidates] = useState(false);
 
   if (!nodeDetail) return null;
 
@@ -37,13 +47,35 @@ export default function NodeDetailContainer({
     }
   };
 
-  // 노드 후보 클릭/추가 핸들러 (추후 구현)
-  const handleCandidateClick = () => {
-    console.log('Candidate clicked');
+  // 노드 후보 클릭/추가 핸들러
+  const handleCandidateClick = async (nodeId: number, candidateId: number) => {
+    console.log('노드 생성 시작');
+    // 일단 하드코딩으로 만듬
+    // TODO : 좌표설정 유틸 함수 만들기
+    const requestBody = { xpos: 200, ypos: 200 };
+    const response = await postCreateNode(requestBody, nodeId, candidateId);
+    console.log(response);
   };
 
   const handleCandidateAddManual = () => {
     console.log('Candidate add manual clicked');
+  };
+
+  // AI 노드 후보 생성 핸들러
+  const handleGenerateCandidates = async () => {
+    if (!selectedNodeId) return;
+
+    setIsGeneratingCandidates(true);
+    try {
+      const candidates = await generateNodeCandidates(Number(selectedNodeId));
+      // Zustand store 업데이트
+      updateNodeDetail(Number(selectedNodeId), { candidates });
+      console.log('[NodeDetailContainer] AI 노드 후보 생성 완료:', candidates);
+    } catch (error) {
+      console.error('AI 노드 후보 생성 실패:', error);
+    } finally {
+      setIsGeneratingCandidates(false);
+    }
   };
 
   return (
@@ -63,23 +95,21 @@ export default function NodeDetailContainer({
       {/* 메모 섹션 - store 직접 구독 */}
       <MemoSection />
 
-      {/* AI 기술 추천 섹션 */}
-      {nodeDetail.techs && nodeDetail.techs.length > 0 && (
-        <AITechRecommendSection
-          isEdit={isEditing}
-          recommendations={nodeDetail.techs}
-          comparison={nodeDetail.comparison}
-        />
-      )}
+      {/* AI 기술 추천 섹션 - 항상 표시 */}
+      <AITechRecommendSection
+        isEdit={isEditing}
+        recommendations={nodeDetail.techs || []}
+        comparison={nodeDetail.comparison}
+      />
 
-      {/* AI 다음 노드 추천 섹션 */}
-      {nodeDetail.candidates && nodeDetail.candidates.length > 0 && (
-        <AINodeCandidateSection
-          candidates={nodeDetail.candidates}
-          onCandidateClick={handleCandidateClick}
-          onAddManual={handleCandidateAddManual}
-        />
-      )}
+      {/* AI 다음 노드 추천 섹션 - 항상 표시 */}
+      <AINodeCandidateSection
+        candidates={nodeDetail.candidates || []}
+        onCandidateClick={handleCandidateClick}
+        onAddManual={handleCandidateAddManual}
+        onGenerateCandidates={handleGenerateCandidates}
+        isGenerating={isGeneratingCandidates}
+      />
     </div>
   );
 }

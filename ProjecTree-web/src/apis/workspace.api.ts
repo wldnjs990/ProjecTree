@@ -1,4 +1,109 @@
 import { wasApiClient } from '@/apis/client';
+import type {
+  ApiNode,
+  NodeDetailData,
+} from '@/pages/workspace/components/NodeDetailSidebar/types';
+
+// ===== 워크스페이스 트리 조회 =====
+
+/** 워크스페이스 트리 조회 응답 타입 */
+export interface WorkspaceTreeResponse {
+  message: string;
+  isSuccess: boolean;
+  code: number;
+  data: {
+    tree: ApiNode[];
+  };
+}
+
+/**
+ * [워크스페이스 API] 워크스페이스 노드 트리 조회
+ * @param workspaceId - 워크스페이스 ID
+ */
+export const getWorkspaceTree = async (
+  workspaceId: number
+): Promise<ApiNode[]> => {
+  const response = await wasApiClient.get<WorkspaceTreeResponse>(
+    `/workspaces/${workspaceId}`
+  );
+  return response.data.data.tree;
+};
+
+// ===== 노드 상세정보 조회 =====
+
+/** 노드 상세정보 조회 응답 타입 */
+export interface NodeDetailResponse {
+  message: string;
+  data: NodeDetailData;
+  code: number;
+  success: boolean;
+}
+
+/**
+ * [노드 API] 노드 상세정보 조회
+ * @param nodeId - 노드 ID
+ */
+export const getNodeDetail = async (
+  nodeId: number
+): Promise<NodeDetailData> => {
+  const response = await wasApiClient.get<NodeDetailResponse>(
+    `/nodes/${nodeId}`
+  );
+  return response.data.data;
+};
+
+// ===== 노드 후보 생성 (AI 추천) =====
+
+import type { Candidate } from '@/pages/workspace/components/NodeDetailSidebar/types';
+import type { ApiResponse } from './api.type';
+
+/** 노드 후보 생성 응답 타입 */
+export interface NodeCandidatesResponse {
+  message: string;
+  data: {
+    candidates: Array<{
+      name: string;
+      description: string;
+    }>;
+  };
+  code: number;
+  success: boolean;
+}
+
+/**
+ * [노드 API] AI 노드 후보 생성
+ * @param nodeId - 부모 노드 ID
+ */
+export const generateNodeCandidates = async (
+  nodeId: number
+): Promise<Candidate[]> => {
+  const response = await wasApiClient.post<NodeCandidatesResponse>(
+    `nodes/${nodeId}/candidates`
+  );
+  console.log(response);
+  // API 응답에서 id, taskType이 없으므로 클라이언트에서 임시 생성
+  return response.data.data.candidates.map((c, index) => ({
+    ...c,
+    id: Date.now() + index,
+    taskType: null,
+  }));
+};
+
+export const selectNodeCandidates = async (
+  nodeId: number,
+  candidateId: number,
+  body: { xpos: number; ypos: number }
+): Promise<ApiResponse<{ nodeId: number }>> => {
+  const response = await wasApiClient.post<ApiResponse<{ nodeId: number }>>(
+    `nodes/${nodeId}/candidates/${candidateId}`,
+    body
+  );
+  console.log(response);
+  // API 응답에서 id, taskType이 없으므로 클라이언트에서 임시 생성
+  return response.data;
+};
+
+// ===== 워크스페이스 생성 =====
 
 /**
  * [타입] 프론트엔드 폼 데이터 (기존 유지)
@@ -14,7 +119,7 @@ export interface CreateWorkspaceFormData {
   domain: string;
   purpose: string;
   serviceType: string;
-  subject: string;
+  description: string;
   startDate: Date | null;
   endDate: Date | null;
   specFiles: File[];

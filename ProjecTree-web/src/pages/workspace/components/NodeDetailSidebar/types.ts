@@ -9,8 +9,8 @@ export type Priority = 'P0' | 'P1' | 'P2' | 'P3';
 
 // 노드 목록 API 응답 타입
 export interface NodePosition {
-  xPos: number;
-  yPos: number;
+  xpos: number;
+  ypos: number;
 }
 
 export interface NodeData {
