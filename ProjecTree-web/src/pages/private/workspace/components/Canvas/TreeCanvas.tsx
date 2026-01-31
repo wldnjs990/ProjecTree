@@ -21,7 +21,7 @@ import { StoryNode } from './nodes/StoryNode';
 import { CollabPanel } from './CollabPanel';
 import { MinimapPanel } from './MinimapPanel';
 import { ZoomControls } from './ZoomControls';
-import type { AvatarColor } from '@/components/custom/UserAvatar';
+import type { AvatarColor } from '@/shared/components/UserAvatar';
 import { AdvancedNode, TaskNode } from './nodes';
 import { useNodesCrdt } from '../../hooks/useNodesCrdt';
 import { useCursors } from '../../hooks/useCursors';

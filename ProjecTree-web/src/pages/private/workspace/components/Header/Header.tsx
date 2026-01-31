@@ -4,7 +4,7 @@ import { ProjectDropdown } from './ProjectDropdown';
 import { ViewTabs, type ViewTab } from './ViewTabs';
 import { ActionButtons } from './ActionButtons';
 import { OnlineUsers } from './OnlineUsers';
-import type { AvatarColor } from '@/components/custom/UserAvatar';
+import type { AvatarColor } from '@/shared/components/UserAvatar';
 
 interface OnlineUser {
   id: string;

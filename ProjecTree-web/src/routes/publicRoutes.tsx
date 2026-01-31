@@ -1,11 +1,11 @@
-import LandingPage from '@/pages/LandingPage/LandingPage';
-import WorkspaceOnboardingPage from '@/pages/workspace-onboarding/WorkspaceOnboardingPage';
-import UserOnboardingPage from '@/pages/user-onboarding/UserOnboardingPage';
-import LoginPage from '@/pages/LoginPage';
-import WorkSpacePage from '@/pages/workspace/WorkSpacePage';
-import WorkspaceLoungePage from '@/pages/workspace-lounge/WorkspaceLoungePage';
+import LandingPage from '@/pages/public/LandingPage/LandingPage';
+import LoginPage from '@/pages/public/LoginPage';
+import OAuthCallback from '@/pages/public/OauthCallback';
+import UserOnboardingPage from '@/pages/private/user-onboarding/UserOnboardingPage';
+import WorkSpacePage from '@/pages/private/workspace/WorkSpacePage';
+import WorkspaceLoungePage from '@/pages/private/workspace-lounge/WorkspaceLoungePage';
+import WorkspaceOnboardingPage from '@/pages/private/workspace-onboarding/WorkspaceOnboardingPage';
 import type { RouteObject } from 'react-router';
-import OAuthCallback from '@/pages/OauthCallback';
 
 export const publicRoutes: RouteObject[] = [
   {

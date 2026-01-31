@@ -1,5 +1,5 @@
-import { AvatarGroup } from '@/components/custom/AvatarGroup'
-import type { AvatarColor } from '@/components/custom/UserAvatar'
+import { AvatarGroup } from '@/shared/components/AvatarGroup'
+import type { AvatarColor } from '@/shared/components/UserAvatar'
 
 interface OnlineUser {
   id: string

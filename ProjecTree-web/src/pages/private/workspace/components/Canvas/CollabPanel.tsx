@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { UserAvatar, type AvatarColor } from "@/components/custom/UserAvatar";
+import { UserAvatar, type AvatarColor } from "@/shared/components/UserAvatar";
 
 /**
  * 서버로부터 워크스페이스에 참가한 유저들의 데이터

@@ -1,21 +1,20 @@
 import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { cn } from '@/lib/utils';
-import { StatusTag } from '@/components/custom/StatusTag';
-import { PriorityBadge } from '@/components/custom/PriorityBadge';
-import type { FlowNodeData } from '@/pages/workspace/types/node';
+import { StatusTag } from '@/shared/components/StatusTag';
+import { PriorityBadge } from '@/shared/components/PriorityBadge';
+import type { FlowNodeData } from '@/pages/private/workspace/types/node';
 
-export type EpicNodeType = Node<FlowNodeData, 'EPIC'>;
+export type StoryNodeType = Node<FlowNodeData, 'STORY'>;
 
-function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
+function StoryNodeComponent({ data, selected }: NodeProps<StoryNodeType>) {
   const nodeData = data;
 
   return (
     <div
       className={cn(
-        'relative bg-[#F5F3FF] rounded-2xl border-2 border-[#8B5CF6] shadow-md p-3 min-w-40',
-        selected && 'ring-2 ring-[#8B5CF6] ring-offset-2',
-        'shadow-[0_0_10px_#C5BAF8]'
+        'relative rounded-2xl border-2 border-[#7CCF00] shadow-md p-3 min-w-40',
+        selected && 'ring-2 ring-offset-2 ring-[#7CCF00]'
       )}
     >
       {/* Priority Badge */}
@@ -25,15 +24,16 @@ function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
         </div>
       )}
 
+      {/* Target Handle - Edge color: #2B7FFF (epic→story) */}
       <Handle
         type="target"
         position={Position.Top}
-        className="w-2 h-2 bg-[#8B5CF6] border-2 border-white"
+        className={cn('w-2 h-2 border-2 border-white bg-[#2B7FFF]')}
       />
 
       {/* Tags */}
-      <div className="flex gap-1.5 mb-2">
-        <StatusTag type="EPIC" />
+      <div className="flex flex-wrap gap-1.5 mb-2">
+        <StatusTag type="STORY" />
         <StatusTag type={nodeData.status} />
       </div>
 
@@ -58,14 +58,13 @@ function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
         )}
       </div>
 
-      {/* Source Handle - Edge color: #2B7FFF (epic→story) */}
       <Handle
         type="source"
         position={Position.Bottom}
-        className="w-2 h-2 bg-[#2B7FFF] border-2 border-white"
+        className={cn('w-2 h-2 border-2 border-white bg-[#00D492]')}
       />
     </div>
   );
 }
 
-export const EpicNode = memo(EpicNodeComponent);
+export const StoryNode = memo(StoryNodeComponent);

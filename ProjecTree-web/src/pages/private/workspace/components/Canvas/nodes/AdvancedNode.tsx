@@ -1,13 +1,16 @@
 import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { cn } from '@/lib/utils';
-import { StatusTag } from '@/components/custom/StatusTag';
-import { PriorityBadge } from '@/components/custom/PriorityBadge';
-import type { FlowNodeData } from '@/pages/workspace/types/node';
+import { StatusTag } from '@/shared/components/StatusTag';
+import { PriorityBadge } from '@/shared/components/PriorityBadge';
+import type { FlowNodeData } from '@/pages/private/workspace/types/node';
 
-export type TaskNodeType = Node<FlowNodeData, 'TASK'>;
+export type AdvancedNodeType = Node<FlowNodeData, 'ADVANCE'>;
 
-function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
+function AdvancedNodeComponent({
+  data,
+  selected,
+}: NodeProps<AdvancedNodeType>) {
   const nodeData = data;
 
   const borderColor =
@@ -31,19 +34,19 @@ function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
         </div>
       )}
 
-      {/* Target Handle - Edge color: #00D492 (FE) / #06B6D4 (BE) from story→task */}
+      {/* Target Handle - Edge color: #00D492 (FE) / #0891B2 (BE) from task→advanced */}
       <Handle
         type="target"
         position={Position.Top}
         className={cn(
           'w-2 h-2 border-2 border-white',
-          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#06B6D4]'
+          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#0891B2]'
         )}
       />
 
       {/* Tags */}
       <div className="flex flex-wrap gap-1.5 mb-2">
-        <StatusTag type="TASK" />
+        <StatusTag type="ADVANCE" />
         {nodeData.taskType && <StatusTag type={nodeData.taskType} />}
         <StatusTag type={nodeData.status} />
       </div>
@@ -69,7 +72,7 @@ function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
         )}
       </div>
 
-      {/* Source Handle - Edge color: #00D492 (FE) / #0891B2 (BE) to advanced */}
+      {/* Source Handle - same as target for consistency */}
       <Handle
         type="source"
         position={Position.Bottom}
@@ -82,4 +85,4 @@ function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
   );
 }
 
-export const TaskNode = memo(TaskNodeComponent);
+export const AdvancedNode = memo(AdvancedNodeComponent);

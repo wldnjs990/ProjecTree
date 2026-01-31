@@ -1,9 +1,9 @@
 import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { cn } from '@/lib/utils';
-import { StatusTag } from '@/components/custom/StatusTag';
-import { PriorityBadge } from '@/components/custom/PriorityBadge';
-import type { FlowNodeData } from '@/pages/workspace/types/node';
+import { StatusTag } from '@/shared/components/StatusTag';
+import { PriorityBadge } from '@/shared/components/PriorityBadge';
+import type { FlowNodeData } from '@/pages/private/workspace/types/node';
 
 export type ProjectNodeType = Node<FlowNodeData, 'PROJECT'>;
 

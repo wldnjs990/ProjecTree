@@ -1,5 +1,5 @@
 import type { Node, Edge } from '@xyflow/react';
-import type { AvatarColor } from '@/components/custom/UserAvatar';
+import type { AvatarColor } from '@/shared/components/UserAvatar';
 import type {
   NodesApiResponse,
   NodeDetailApiResponse,

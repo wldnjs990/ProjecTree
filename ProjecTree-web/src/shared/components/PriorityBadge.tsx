@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import type { ServerPriority } from '@/pages/workspace/types/node';
+import type { ServerPriority } from '@/pages/private/workspace/types/node';
 
 interface PriorityBadgeProps {
   priority: ServerPriority;

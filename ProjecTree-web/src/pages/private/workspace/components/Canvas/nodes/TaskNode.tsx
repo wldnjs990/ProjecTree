@@ -1,16 +1,13 @@
 import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { cn } from '@/lib/utils';
-import { StatusTag } from '@/components/custom/StatusTag';
-import { PriorityBadge } from '@/components/custom/PriorityBadge';
-import type { FlowNodeData } from '@/pages/workspace/types/node';
+import { StatusTag } from '@/shared/components/StatusTag';
+import { PriorityBadge } from '@/shared/components/PriorityBadge';
+import type { FlowNodeData } from '@/pages/private/workspace/types/node';
 
-export type AdvancedNodeType = Node<FlowNodeData, 'ADVANCE'>;
+export type TaskNodeType = Node<FlowNodeData, 'TASK'>;
 
-function AdvancedNodeComponent({
-  data,
-  selected,
-}: NodeProps<AdvancedNodeType>) {
+function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
   const nodeData = data;
 
   const borderColor =
@@ -34,19 +31,19 @@ function AdvancedNodeComponent({
         </div>
       )}
 
-      {/* Target Handle - Edge color: #00D492 (FE) / #0891B2 (BE) from task→advanced */}
+      {/* Target Handle - Edge color: #00D492 (FE) / #06B6D4 (BE) from story→task */}
       <Handle
         type="target"
         position={Position.Top}
         className={cn(
           'w-2 h-2 border-2 border-white',
-          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#0891B2]'
+          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#06B6D4]'
         )}
       />
 
       {/* Tags */}
       <div className="flex flex-wrap gap-1.5 mb-2">
-        <StatusTag type="ADVANCE" />
+        <StatusTag type="TASK" />
         {nodeData.taskType && <StatusTag type={nodeData.taskType} />}
         <StatusTag type={nodeData.status} />
       </div>
@@ -72,7 +69,7 @@ function AdvancedNodeComponent({
         )}
       </div>
 
-      {/* Source Handle - same as target for consistency */}
+      {/* Source Handle - Edge color: #00D492 (FE) / #0891B2 (BE) to advanced */}
       <Handle
         type="source"
         position={Position.Bottom}
@@ -85,4 +82,4 @@ function AdvancedNodeComponent({
   );
 }
 
-export const AdvancedNode = memo(AdvancedNodeComponent);
+export const TaskNode = memo(TaskNodeComponent);

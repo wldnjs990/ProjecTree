@@ -23,7 +23,7 @@ import { useMemo, useState, useEffect } from 'react';
 import type { FilterType } from '../types';
 import { getMyWorkspaces } from '@/apis/workspace-lounge.api';
 import { useUserStore } from '@/stores/userStore';
-import { TutorialModal } from '@/components/common/TutorialModal';
+import { TutorialModal } from '@/shared/components/TutorialModal';
 
 // 정렬 옵션 정의
 const sortOptions = [
