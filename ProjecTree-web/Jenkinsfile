@@ -12,6 +12,16 @@ pipeline {
             }
         }
 
+        stage('Copy .env') {
+            steps {
+                dir('ProjecTree-web') {
+                    withCredentials([file(credentialsId: 'frontend-env-file', variable: 'ENV_FILE')]) {
+                        sh 'cp $ENV_FILE .env'
+                    }
+                }
+            }
+        }
+
         stage('Install & Build') {
             steps {
                 sh '''
