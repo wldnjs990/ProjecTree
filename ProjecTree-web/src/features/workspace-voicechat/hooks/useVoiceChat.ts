@@ -137,6 +137,16 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
         setIsConnected(false);
       });
 
+      // 원격 참가자 퇴장 이벤트 (다른 사람이 음성 채팅방을 나갔을 때)
+      newRoom.on(
+        RoomEvent.ParticipantDisconnected,
+        (participant: RemoteParticipant) => {
+          setRemoteTracks((prev) =>
+            prev.filter((t) => t.participantIdentity !== participant.identity)
+          );
+        }
+      );
+
       // 원격 참가자의 트랙 구독 이벤트 (다른 사람이 입장하거나 마이크를 켰을 때)
       newRoom.on(
         RoomEvent.TrackSubscribed,
@@ -214,11 +224,6 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       const token = await getToken(workspaceId, participantName);
 
       // LiveKit 서버에 연결
-      console.log('[VoiceChat] Connecting to LiveKit:', {
-        LIVEKIT_URL,
-        API_URL: APPLICATION_SERVER_URL,
-        roomName: workspaceId,
-      });
       await newRoom.connect(LIVEKIT_URL, token);
 
       // 마이크 활성화 (권한 거부 시에도 연결은 유지)
@@ -259,15 +264,19 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
   const leaveRoom = useCallback(async () => {
     if (room) {
       // 먼저 isLeaving을 true로 설정하여 재연결 방지
+      // 중요: isLeaving은 여기서 false로 설정하지 않음 - onClose() 후 컴포넌트가 언마운트되거나
+      // 다시 입장할 때 resetLeaving()이 호출됨
       setIsLeaving(true);
       setIsConnected(false);
       setIsConnecting(false);
       setRemoteTracks([]);
       try {
         await room.disconnect();
+      } catch (err) {
+        console.error('Failed to disconnect from room:', err);
       } finally {
         setRoom(undefined);
-        setIsLeaving(false);
+        // isLeaving은 true로 유지 - 재연결 방지
       }
     }
   }, [room]);
