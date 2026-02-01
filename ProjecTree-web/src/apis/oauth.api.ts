@@ -1,11 +1,12 @@
 import type { ApiResponse } from './api.type';
 import wasApiClient from './client';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/shared/stores/authStore';
 
 const redirectURL = `${window.location.origin}/oauth/callback`;
 
 const redirectToGoogleOauth = () => {
   const BASE_URL = import.meta.env.VITE_API_URL;
+  alert(`${BASE_URL}oauth2/authorization/google?redirectURL=${redirectURL}`);
   window.location.href = `${BASE_URL}oauth2/authorization/google?redirectURL=${redirectURL}`;
 };
 

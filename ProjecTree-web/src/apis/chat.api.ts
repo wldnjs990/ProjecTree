@@ -2,7 +2,7 @@ import { wasApiClient } from '@/apis/client';
 import type {
   ChatMessage,
   ChatParticipant,
-} from '@/features/chat/types/chat.types';
+} from '@/features/workspace-chat/types/chat.types';
 
 /**
  * [채팅 API] 메시지 조회 (페이지네이션 지원)
