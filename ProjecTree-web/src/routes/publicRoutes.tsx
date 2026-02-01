@@ -1,17 +1,17 @@
-import LandingPage from '@/pages/public/LandingPage/LandingPage';
+import LandingPage from '@/pages/public/LandingPage';
 import LoginPage from '@/pages/public/LoginPage';
 import OAuthCallback from '@/pages/public/OauthCallback';
-import UserOnboardingPage from '@/pages/private/user-onboarding/UserOnboardingPage';
-import WorkSpacePage from '@/pages/private/workspace/WorkSpacePage';
-import WorkspaceLoungePage from '@/pages/private/workspace-lounge/WorkspaceLoungePage';
-import WorkspaceOnboardingPage from '@/pages/private/workspace-onboarding/WorkspaceOnboardingPage';
+import UserOnboardingPage from '@/pages/private/UserOnboardingPage';
+import WorkSpacePage from '@/pages/private/WorkSpacePage';
+import WorkspaceLoungePage from '@/pages/private/WorkspaceLoungePage';
+import WorkspaceOnboardingPage from '@/pages/private/WorkspaceOnboardingPage';
 import type { RouteObject } from 'react-router';
 
 export const publicRoutes: RouteObject[] = [
   {
     path: '/',
     element: <LandingPage />,
-    loader: async () => { },
+    loader: async () => {},
   },
   {
     path: '/workspace-lounge',

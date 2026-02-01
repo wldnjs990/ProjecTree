@@ -3,7 +3,7 @@ import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { cn } from '@/lib/utils';
 import { StatusTag, type TagType } from '@/shared/components/StatusTag';
 import { PriorityBadge } from '@/shared/components/PriorityBadge';
-import type { FlowNodeData } from '@/pages/private/workspace/types/node';
+import type { FlowNodeData } from '@/features/workspace-core';
 
 type Tags = Array<TagType | null | undefined>;
 

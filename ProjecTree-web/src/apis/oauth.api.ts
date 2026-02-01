@@ -6,6 +6,7 @@ const redirectURL = `${window.location.origin}/oauth/callback`;
 
 const redirectToGoogleOauth = () => {
   const BASE_URL = import.meta.env.VITE_API_URL;
+  alert(`${BASE_URL}oauth2/authorization/google?redirectURL=${redirectURL}`);
   window.location.href = `${BASE_URL}oauth2/authorization/google?redirectURL=${redirectURL}`;
 };
 

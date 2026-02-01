@@ -1,4 +1,4 @@
-import type { AwarenessState } from '@/pages/private/workspace/crdt/crdtClient';
+import type { AwarenessState } from '@/features/workspace-core';
 import { useReactFlow } from '@xyflow/react';
 import { MousePointer2 } from 'lucide-react';
 

@@ -1,6 +1,6 @@
 import type { Node, Edge } from '@xyflow/react';
-import type { ProjectItem } from '@/pages/private/workspace/components/Sidebar/ProjectTreeItem';
-import type { ServerNodeType } from '@/pages/private/workspace/types/node';
+import type { ProjectItem } from '@/features/workspace-aside/ProjectTreeItem';
+import type { ServerNodeType } from '@/features/workspace-core';
 
 export function buildProjectTree(nodes: Node[], edges: Edge[]): ProjectItem[] {
   if (!nodes || !edges) return [];

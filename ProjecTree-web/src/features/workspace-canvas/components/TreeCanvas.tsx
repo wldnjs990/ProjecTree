@@ -26,13 +26,17 @@ import {
   StoryNode,
   TaskNode,
 } from './Nodes';
-import { useNodesCrdt } from '../../hooks/useNodesCrdt';
-import { useCursors } from '../../hooks/useCursors';
-import { useUndoRedo } from '../../hooks/useUndoRedo';
-import { useNodes, useEdges } from '../../stores/nodeStore';
-import type { FlowNode } from '../../types/node';
+import {
+  useNodesCrdt,
+  useCursors,
+  useUndoRedo,
+  useNodes,
+  useEdges,
+  type FlowNode,
+} from '@/features/workspace-core';
 import CursorPointers from './CursorPointers';
-import { NodeDetailSidebar } from '../NodeDetailSidebar';
+// TODO: workspace-node-detail feature 생성 후 import 경로 수정
+import { NodeDetailSidebar } from '@/features/workspace-node-detail';
 
 interface OnlineUser {
   id: string;
