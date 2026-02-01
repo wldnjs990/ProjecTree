@@ -2,7 +2,7 @@ package com.ssafy.projectree.global.exception;
 
 import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
-import com.ssafy.projectree.global.cache.CacheType;
+import com.ssafy.projectree.domain.ai.lock.LockType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -46,8 +46,8 @@ public class GlobalExceptionHandler {
     public CommonResponse<Void> handleAiException(AIServiceException e){
         log.error("AI SERVER ERROR : {}", e.getMessage());
         for(Cache cache : caches){
-            if(cache.getName().equals(e.getCacheType().name())){
-                CacheType cacheType = e.getCacheType();
+            if(cache.getName().equals(e.getLockType().name())){
+                LockType lockType = e.getLockType();
                 //TODO
             }
         }
