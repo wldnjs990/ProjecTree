@@ -263,9 +263,12 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       setIsConnected(false);
       setIsConnecting(false);
       setRemoteTracks([]);
-      await room.disconnect();
-      setRoom(undefined);
-      // isLeaving은 여기서 리셋하지 않음 - 다음 입장 시 리셋
+      try {
+        await room.disconnect();
+      } finally {
+        setRoom(undefined);
+        setIsLeaving(false);
+      }
     }
   }, [room]);
 
