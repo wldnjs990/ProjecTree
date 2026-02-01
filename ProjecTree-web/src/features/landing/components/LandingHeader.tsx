@@ -3,13 +3,14 @@ import { TreeDeciduous } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/shared/stores/authStore';
+import { logout } from '@/apis/oauth.api';
 
 export function LandingHeader() {
   const navigate = useNavigate();
-  const { accessToken, setAccessToken } = useAuthStore();
+  const { accessToken } = useAuthStore();
 
   const handleLogout = () => {
-    setAccessToken(null);
+    logout();
   };
 
   return (

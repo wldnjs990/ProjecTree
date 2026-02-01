@@ -1,6 +1,8 @@
 // React 예시 (OAuthCallback.jsx)
+import { getMemberInfo } from '@/apis/member.api';
 import { getToken } from '@/apis/oauth.api';
 import { useSetAccessToken } from '@/shared/stores/authStore';
+import { useSetUser } from '@/shared/stores/userStore';
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -8,8 +10,10 @@ const OAuthCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // auth store selector hook
+  // accessToken 저장
   const setAccessToken = useSetAccessToken();
+  // user 정보 저장
+  const setUser = useSetUser()
 
   useEffect(() => {
     // 1. URL에서 token 파라미터 추출(서버 요청 code값)
@@ -37,8 +41,11 @@ const OAuthCallback = () => {
         // 유저인지 게스트인지 구분
         const isUser = parseJwt(accessToken).role === 'ROLE_USER';
 
-        // 유저라면 메인 페이지 이동, 게스트라면 유저 온보딩 페이지 이동
+        // 유저라면 유저 정보 가져오기 + 메인 페이지 이동
+        // 게스트라면 유저 온보딩 페이지 이동
         if (isUser) {
+          const user = await getMemberInfo()
+          setUser(user)
           navigate('/');
         } else {
           navigate('/user-onboarding');
@@ -48,7 +55,7 @@ const OAuthCallback = () => {
       // 실패 처리
       navigate('/login');
     }
-  }, [searchParams, navigate]);
+  }, [searchParams, navigate, setAccessToken, setUser]);
 
   return <div>로그인 처리 중...</div>;
 };

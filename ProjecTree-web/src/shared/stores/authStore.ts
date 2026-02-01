@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 interface AuthState {
   accessToken: string | null;
   setAccessToken: (accessToken: string | null) => void;
+  clearAccessToken: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -14,6 +15,11 @@ export const useAuthStore = create<AuthState>()(
       setAccessToken: (accessToken) => {
         set({
           accessToken: accessToken,
+        });
+      },
+      clearAccessToken: () => {
+        set({
+          accessToken: null,
         });
       },
     }),
@@ -30,3 +36,6 @@ export const useAccessToken = () => useAuthStore((state) => state.accessToken);
 
 export const useSetAccessToken = () =>
   useAuthStore((state) => state.setAccessToken);
+
+export const useClearAccessToken = () =>
+  useAuthStore((state) => state.clearAccessToken);

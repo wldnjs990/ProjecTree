@@ -1,9 +1,24 @@
 import { useAuthStore } from '@/shared/stores/authStore';
+import { useUserStore } from '@/shared/stores/userStore';
 import axios from 'axios';
-import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import type {
+  AxiosError,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
+import type { AccessTokenPayload, ApiResponse } from './api.type';
 
-const BASE_URL =
-  import.meta.env.VITE_API_URL || 'http://projectree-was:8080/api/';
+const BASE_URL = import.meta.env.DEV ? '/api/' : import.meta.env.VITE_API_URL;
+const MAX_RETRY = 3;
+
+// 재시도 카운트를 포함한 config 타입
+type RequestConfigWithRetry = InternalAxiosRequestConfig & {
+  _retryCount?: number;
+};
+
+// 토큰 갱신 중복 방지
+let isRefreshing = false;
+let pendingRequests: Array<(token: string) => void> = [];
 
 export const wasApiClient = axios.create({
   baseURL: BASE_URL,
@@ -15,6 +30,15 @@ export const wasApiClient = axios.create({
   },
   withCredentials: true,
 });
+
+// 로그아웃 처리
+const handleAuthFailure = () => {
+  useAuthStore.getState().clearAccessToken();
+  useUserStore.getState().clearUser();
+  pendingRequests = [];
+  isRefreshing = false;
+  window.location.href = '/';
+};
 
 // Request Interceptor
 wasApiClient.interceptors.request.use(
@@ -36,7 +60,66 @@ wasApiClient.interceptors.request.use(
 
 // Response Interceptor
 wasApiClient.interceptors.response.use(
-  (response) => {
+  async (response: AxiosResponse) => {
+    const data = response.data as ApiResponse<unknown>;
+    const config = response.config as RequestConfigWithRetry;
+
+    if (data.success) return response;
+
+    // AccessToken 만료 (60408)
+    if (data.code === 60408) {
+      const isRefreshRequest = config.url?.includes('auth/refresh');
+      const retryCount = config._retryCount ?? 0;
+
+      // refresh 요청 실패 또는 재시도 횟수 초과 → 로그아웃
+      if (isRefreshRequest || retryCount >= MAX_RETRY) {
+        handleAuthFailure();
+        return Promise.reject(new Error('인증이 만료되었습니다.'));
+      }
+
+      // 이미 토큰 갱신 중이면 대기열에 추가
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          pendingRequests.push((newToken: string) => {
+            config.headers.Authorization = `Bearer ${newToken}`;
+            config._retryCount = retryCount + 1;
+            resolve(wasApiClient(config));
+          });
+        });
+      }
+
+      isRefreshing = true;
+
+      try {
+        const { data: refreshData } = await wasApiClient.post<
+          ApiResponse<AccessTokenPayload>
+        >('auth/refresh');
+
+        const newToken = refreshData.data.accessToken;
+
+        if (newToken) {
+          useAuthStore.getState().setAccessToken(newToken);
+
+          // 대기 중인 요청들 처리
+          pendingRequests.forEach((callback) => callback(newToken));
+          pendingRequests = [];
+
+          // 원래 요청 재시도
+          config.headers.Authorization = `Bearer ${newToken}`;
+          config._retryCount = retryCount + 1;
+          return wasApiClient(config);
+        } else {
+          handleAuthFailure();
+          return Promise.reject(new Error('토큰 갱신 실패'));
+        }
+      } catch {
+        handleAuthFailure();
+        return Promise.reject(new Error('토큰 갱신 실패'));
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
     return response;
   },
   (error: AxiosError) => {

@@ -5,8 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { checkNicknameDuplicate } from '@/apis/member.api';
-import { patchMemberSignup } from '@/apis/oauth.api';
+import { checkNicknameDuplicate, patchMemberSignup } from '@/apis/member.api';
 import { useSetAccessToken, useAccessToken } from '@/shared/stores/authStore';
 import { parseJwt } from '@/shared/lib/utils';
 
@@ -191,9 +190,7 @@ export function ProfileForm() {
 
           {/* Email Field (Read-only) */}
           <div className="space-y-3 pt-4">
-            <Label className="text-slate-600 font-medium text-sm">
-              이메일
-            </Label>
+            <Label className="text-slate-600 font-medium text-sm">이메일</Label>
             <div className="relative">
               <Input
                 type="text"
