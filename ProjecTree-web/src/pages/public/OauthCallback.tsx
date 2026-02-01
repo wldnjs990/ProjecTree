@@ -1,6 +1,6 @@
 // React 예시 (OAuthCallback.jsx)
 import { getToken } from '@/apis/oauth.api';
-import { useSetAccessToken } from '@/stores/authStore';
+import { useSetAccessToken } from '@/shared/stores/authStore';
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 

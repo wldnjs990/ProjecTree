@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import '@/styles/index.css';
+import '@/shared/styles/index.css';
 
 const USE_MSW = false; // MSW 활성화 (API 연동 테스트용)
 

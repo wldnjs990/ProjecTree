@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import type { ChatMessage } from '../types/chat.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import { MOCK_MY_ID } from '../types/mockData';
 
 interface ChatMessageItemProps {

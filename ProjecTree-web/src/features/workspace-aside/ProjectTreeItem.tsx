@@ -8,7 +8,7 @@ import {
   Cpu,
   Briefcase,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import type { ServerNodeType } from '@/features/workspace-core';
 
 export interface ProjectItem {

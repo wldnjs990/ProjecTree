@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { useAccessToken } from '@/stores/authStore';
+import { useAccessToken } from '@/shared/stores/authStore';
 
 // Digital Firefly Particle Component
 function Firefly({

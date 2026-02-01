@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import { MiniMap } from '@xyflow/react';
 import { useLayoutEffect, useRef, useState } from 'react';
 

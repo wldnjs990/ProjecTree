@@ -6,7 +6,7 @@ import {
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { buildProjectTree } from '@/lib/treeUtils';
+import { buildProjectTree } from '@/shared/lib/treeUtils';
 import { ChatPanel } from '@/features/workspace-chat';
 import { ProjectTreeItem } from '@/features/workspace-aside/ProjectTreeItem';
 

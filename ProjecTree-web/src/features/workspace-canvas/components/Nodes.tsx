@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import { StatusTag, type TagType } from '@/shared/components/StatusTag';
 import { PriorityBadge } from '@/shared/components/PriorityBadge';
 import type { FlowNodeData } from '@/features/workspace-core';

@@ -1,7 +1,7 @@
 import { Plus, Minus, Maximize2, RotateCcw } from 'lucide-react'
 import { useReactFlow } from '@xyflow/react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/lib/utils'
 
 interface ZoomControlsProps {
   className?: string

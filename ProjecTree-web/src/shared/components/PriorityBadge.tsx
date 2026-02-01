@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import type { ServerPriority } from '@/features/workspace-core';
 
 interface PriorityBadgeProps {

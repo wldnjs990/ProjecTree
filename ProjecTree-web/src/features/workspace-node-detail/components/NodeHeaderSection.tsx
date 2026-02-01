@@ -1,5 +1,5 @@
 import { X, Sprout, SquarePen } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import NodeHeaderButton from './NodeHeaderButton';
 import NodeHeaderInfo from './NodeHeaderInfo';
 import { categoryTagStyles, typeTagStyles } from '@/features/workspace-core';

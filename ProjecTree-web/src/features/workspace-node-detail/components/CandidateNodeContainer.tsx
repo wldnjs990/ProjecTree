@@ -2,7 +2,7 @@ import { ArrowLeft, Sprout } from 'lucide-react';
 import NodeHeaderButton from './NodeHeaderButton';
 import NodeHeaderInfo from './NodeHeaderInfo';
 import { categoryTagStyles, typeTagStyles } from '@/features/workspace-core';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 
 interface CandidateNodeSectionProps {
   nodeInfo?: {

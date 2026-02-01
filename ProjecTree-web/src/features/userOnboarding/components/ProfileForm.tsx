@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { checkNicknameDuplicate } from '@/apis/member.api';
 import { patchMemberSignup } from '@/apis/oauth.api';
-import { useSetAccessToken, useAccessToken } from '@/stores/authStore';
-import { parseJwt } from '@/lib/utils';
+import { useSetAccessToken, useAccessToken } from '@/shared/stores/authStore';
+import { parseJwt } from '@/shared/lib/utils';
 
 /**
  * [컴포넌트] 사용자 온보딩 프로필 설정 폼

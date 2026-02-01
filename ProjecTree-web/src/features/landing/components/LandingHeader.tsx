@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { TreeDeciduous } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/shared/stores/authStore';
 
 export function LandingHeader() {
   const navigate = useNavigate();

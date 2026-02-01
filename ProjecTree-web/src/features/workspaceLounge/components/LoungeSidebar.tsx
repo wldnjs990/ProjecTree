@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '@/shared/stores/userStore';
 import { checkNicknameDuplicate, updateNickname, deleteMember } from '@/apis/member.api';
 import {
   Dialog,

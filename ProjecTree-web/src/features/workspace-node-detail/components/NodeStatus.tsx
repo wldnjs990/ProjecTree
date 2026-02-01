@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import type { NodeStatus } from '../types';
 
 // 상태별 스타일 및 라벨

@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import type { RemoteAudioTrack } from 'livekit-client';
 import { Mic, MicOff, PhoneOff, Loader2 } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,

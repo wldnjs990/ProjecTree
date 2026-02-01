@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import { useSelectedNodeDetail, useSelectedNodeListData } from '../hooks';
 import {
   useIsNodeDetailOpen,

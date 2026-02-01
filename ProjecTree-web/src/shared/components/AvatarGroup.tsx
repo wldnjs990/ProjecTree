@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 import { UserAvatar, type AvatarColor } from "./UserAvatar";
 import { Plus } from "lucide-react";
 

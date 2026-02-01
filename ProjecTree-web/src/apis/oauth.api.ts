@@ -1,6 +1,6 @@
 import type { ApiResponse } from './api.type';
 import wasApiClient from './client';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/shared/stores/authStore';
 
 const redirectURL = `${window.location.origin}/oauth/callback`;
 
