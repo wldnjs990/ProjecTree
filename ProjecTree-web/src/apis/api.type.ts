@@ -4,3 +4,7 @@ export interface ApiResponse<T> {
   code: number;
   success: boolean;
 }
+
+export interface AccessTokenPayload {
+  accessToken: string | null;
+}

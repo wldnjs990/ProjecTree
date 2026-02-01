@@ -1,22 +1,14 @@
+import type { MemberInfoResponse } from '@/apis/member.api';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-/**
- * 사용자 정보 인터페이스
- */
-export interface User {
-  memberId: number;
-  nickname: string;
-  email: string;
-}
 
 /**
  * 사용자 상태 인터페이스
  */
 interface UserState {
-  user: User | null;
+  user: MemberInfoResponse | null;
   isAuthenticated: boolean;
-  setUser: (user: User) => void;
+  setUser: (user: MemberInfoResponse) => void;
   clearUser: () => void;
 }
 
@@ -31,7 +23,7 @@ export const useUserStore = create<UserState>()(
       user: null,
       isAuthenticated: false,
 
-      setUser: (user: User) =>
+      setUser: (user: MemberInfoResponse) =>
         set({
           user,
           isAuthenticated: true,

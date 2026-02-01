@@ -1,10 +1,11 @@
 import { wasApiClient } from '@/apis/client';
+import type { AccessTokenPayload } from './api.type';
 
 /**
  * [타입] 회원 기본 정보 응답
  */
 export interface MemberInfoResponse {
-  memberId: number;
+  name: string;
   nickname: string;
   email: string;
 }
@@ -30,12 +31,9 @@ interface ApiResponse<T> {
  * [API] 회원 기본 정보 조회
  * @param id - 회원 ID
  */
-export const getMemberInfo = async (
-  id: number
-): Promise<MemberInfoResponse> => {
-  const response = await wasApiClient.get<ApiResponse<MemberInfoResponse>>(
-    `/members/${id}`
-  );
+export const getMemberInfo = async (): Promise<MemberInfoResponse> => {
+  const response =
+    await wasApiClient.get<ApiResponse<MemberInfoResponse>>(`members/me`);
   return response.data.data;
 };
 
@@ -45,7 +43,7 @@ export const getMemberInfo = async (
  */
 export const getMemberEmail = async (id: number): Promise<string> => {
   const response = await wasApiClient.get<ApiResponse<{ email: string }>>(
-    `/members/${id}/email`
+    `members/${id}/email`
   );
   return response.data.data.email;
 };
@@ -59,7 +57,7 @@ export const updateNickname = async (
   id: number,
   nickname: string
 ): Promise<void> => {
-  await wasApiClient.put(`/members/${id}/nickname`, null, {
+  await wasApiClient.put(`members/${id}/nickname`, null, {
     params: { nickname },
   });
 };
@@ -69,20 +67,34 @@ export const updateNickname = async (
  * @param nickname - 확인할 닉네임
  * @returns 사용 가능 여부
  */
-export const checkNicknameDuplicate = async (
-  nickname: string
-): Promise<boolean> => {
+const checkNicknameDuplicate = async (nickname: string): Promise<boolean> => {
   const response = await wasApiClient.get<ApiResponse<NicknameCheckResponse>>(
-    '/members/nickname-check',
+    'members/nickname-check',
     { params: { nickname } }
   );
   return response.data.data.exist;
 };
 
 /**
+ * [API] 회원 승격
+ * ROLE_GUEST => ROLE_USER로 승격시키는 API
+ * USER로 승격시 accessToken 재발급(payload에 담김)
+ */
+const patchMemberSignup = async (nickname: string): Promise<string | null> => {
+  const { data } = await wasApiClient.patch<ApiResponse<AccessTokenPayload>>(
+    'auth/members/signup',
+    { nickname }
+  );
+
+  return data.data.accessToken;
+};
+
+/**
  * [API] 회원 탈퇴
  * @param id - 회원 ID
  */
-export const deleteMember = async (id: number): Promise<void> => {
-  await wasApiClient.delete(`/members/${id}`);
+const deleteMember = async (id: number): Promise<void> => {
+  await wasApiClient.delete(`members/${id}`);
 };
+
+export { checkNicknameDuplicate, patchMemberSignup, deleteMember };
