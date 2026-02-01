@@ -3,11 +3,11 @@ import { useSelectedNodeDetail, useSelectedNodeListData } from '../hooks';
 import {
   useIsNodeDetailOpen,
   useSelectedNodeId,
+  useNodes,
 } from '@/features/workspace-core';
 import CandidateNodeContainer from './CandidateNodeContainer';
 import NodeDetailContainer from './NodeDetailContainer';
 import { useMemo } from 'react';
-import { mockNodesApiResponse } from '@/features/workspace-core';
 import { motion, AnimatePresence } from 'motion/react';
 
 // 노드 기본 정보 (헤더용) - WorkSpacePage에서 전달받음
@@ -20,6 +20,7 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   const isOpen = useIsNodeDetailOpen();
   const nodeDetail = useSelectedNodeDetail();
   const nodeListData = useSelectedNodeListData();
+  const nodes = useNodes();
 
   const selectedNodeId = useSelectedNodeId();
 
@@ -31,20 +32,18 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
     nodeListData: nodeListData ? '있음' : 'null',
   });
 
-  // 선택된 노드의 기본 정보 (헤더용)
+  // 선택된 노드의 기본 정보 (헤더용) - 실제 nodeStore에서 가져옴
   const selectedNodeInfo = useMemo(() => {
     if (!selectedNodeId) return undefined;
-    const numericId = Number(selectedNodeId);
-    // TODO : 백엔드 API로 실제 연결하기
-    const apiNode = mockNodesApiResponse.data.find((n) => n.id === numericId);
-    if (!apiNode) return undefined;
+    const node = nodes.find((n) => n.id === selectedNodeId);
+    if (!node) return undefined;
     return {
-      name: apiNode.name,
-      nodeType: apiNode.nodeType,
-      identifier: apiNode.data.identifier,
-      taskType: apiNode.data.taskType,
+      name: node.data.title,
+      nodeType: node.type,
+      identifier: node.data.taskId,
+      taskType: node.data.taskType ?? null,
     };
-  }, [selectedNodeId]);
+  }, [selectedNodeId, nodes]);
 
   return (
     <AnimatePresence>

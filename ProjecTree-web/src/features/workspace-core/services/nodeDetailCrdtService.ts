@@ -10,10 +10,11 @@ import type {
   Priority,
   Assignee,
   NodeType,
+  Candidate,
 } from '../types/nodeDetail';
 
 // Y.Map에 저장되는 값 타입
-type YNodeDetailValue = string | number | Assignee | null | undefined;
+type YNodeDetailValue = string | number | Assignee | Candidate[] | null | undefined;
 
 /**
  * 노드 상세 편집 CRDT 서비스 (싱글톤)
@@ -193,6 +194,7 @@ class NodeDetailCrdtService {
       difficult: nodeListData.difficult,
       assignee: nodeDetail.assignee,
       note: nodeDetail.note,
+      candidates: nodeDetail.candidates || [],
       nodeType: nodeType,
     };
 
@@ -206,6 +208,7 @@ class NodeDetailCrdtService {
       yNodeDetail.set('difficult', initialData.difficult);
       yNodeDetail.set('assignee', initialData.assignee);
       yNodeDetail.set('note', initialData.note);
+      yNodeDetail.set('candidates', initialData.candidates);
       yNodeDetail.set('nodeType', initialData.nodeType);
       yNodeDetails.set(selectedNodeId, yNodeDetail);
     });
@@ -256,6 +259,7 @@ class NodeDetailCrdtService {
           difficult: editData.difficult,
           assignee: editData.assignee,
           note: editData.note,
+          candidates: editData.candidates,
         };
         yConfirmed.set(selectedNodeId, confirmedData);
         console.log(
@@ -353,6 +357,7 @@ class NodeDetailCrdtService {
       difficult: (yNodeDetail.get('difficult') as number) || 1,
       assignee: yNodeDetail.get('assignee') as Assignee | null,
       note: (yNodeDetail.get('note') as string) || '',
+      candidates: (yNodeDetail.get('candidates') as Candidate[]) || [],
     };
 
     const store = useNodeDetailStore.getState();

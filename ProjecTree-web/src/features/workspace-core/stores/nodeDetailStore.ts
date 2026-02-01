@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { NodeStatus, Priority, Assignee } from '../types/nodeDetail';
+import type { NodeStatus, Priority, Assignee, Candidate } from '../types/nodeDetail';
 
 // 편집 가능한 노드 상세 필드 타입
 export interface EditableNodeDetail {
@@ -8,6 +8,7 @@ export interface EditableNodeDetail {
   difficult?: number;
   assignee: Assignee | null;
   note: string;
+  candidates?: Candidate[];
 }
 
 interface NodeDetailState {

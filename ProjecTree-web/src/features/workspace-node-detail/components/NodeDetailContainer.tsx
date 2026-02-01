@@ -8,6 +8,7 @@ import { useSelectedNodeDetail, useNodeDetailEdit } from '../hooks';
 import {
   useSelectedNodeId,
   useNodeStore,
+  nodeDetailCrdtService,
 } from '@/features/workspace-core';
 import { generateNodeCandidates } from '@/apis/workspace.api';
 import { postCreateNode } from '@/apis/node.api';
@@ -72,6 +73,12 @@ export default function NodeDetailContainer({
       const candidates = await generateNodeCandidates(Number(selectedNodeId));
       // Zustand store 업데이트
       updateNodeDetail(Number(selectedNodeId), { candidates });
+
+      // CRDT 동기화 (편집 모드일 때 다른 클라이언트에도 반영)
+      if (isEditing) {
+        nodeDetailCrdtService.updateField('candidates', candidates);
+      }
+
       console.log('[NodeDetailContainer] AI 노드 후보 생성 완료:', candidates);
     } catch (error) {
       console.error('AI 노드 후보 생성 실패:', error);
