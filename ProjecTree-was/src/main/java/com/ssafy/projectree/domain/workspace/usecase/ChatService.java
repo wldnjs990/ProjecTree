@@ -1,8 +1,10 @@
 package com.ssafy.projectree.domain.workspace.usecase;
 
 import com.corundumstudio.socketio.SocketIOClient;
+import com.ssafy.projectree.domain.chat.model.entity.ChatLog;
 import com.ssafy.projectree.domain.chat.model.entity.ChatRoom;
-import com.ssafy.projectree.domain.chat.model.repository.ChatRoomRepository;
+import com.ssafy.projectree.domain.chat.usecase.ChatLogService;
+import com.ssafy.projectree.domain.chat.usecase.ChatRoomService;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.usecase.MemberService;
 import com.ssafy.projectree.domain.workspace.api.dto.ChatPayloadDto;
@@ -10,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -20,21 +20,32 @@ import java.util.UUID;
 public class ChatService {
 
     private final MemberService memberService;
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomService chatRoomService;
+    private final ChatLogService chatLogService;
 
     public ChatPayloadDto.MessageReceive process(ChatPayloadDto.MessageSend data, SocketIOClient client) {
-//        Member member = memberService.findByEmail("todo@example.com");
-        // TODO: Member 조회 후 Message에 사용자 ID, name 담기
+        Long memberId = client.get("memberId");
+        Member member = memberService.findById(memberId);
+        ChatRoom chatRoom = chatRoomService.findById(data.getChatRoomId());
+
+        ChatLog chatLog = ChatLog.builder()
+                .chatRoom(chatRoom)
+                .nickname(member.getNickname())
+                .memberId(member.getId())
+                .content(data.getContent())
+                .build();
+
+        chatLogService.save(chatLog);
 
         ChatPayloadDto.MessageReceive message = new ChatPayloadDto.MessageReceive();
-        message.setId(UUID.randomUUID().toString());
-        message.setWorkspaceId(data.getWorkspaceId());
+        message.setId(chatLog.getId());
+        message.setChatRoomId(data.getChatRoomId());
         message.setContent(data.getContent());
-        message.setTimestamp(Instant.now().toString());
-//        message.setSenderId(member.getId().toString());
-//        message.setSenderName(member.getName());
+        message.setTimestamp(chatLog.getCreatedAt().toString());
+        message.setSenderId(member.getId());
+        message.setSenderName(member.getName());
 
-//        log.info("{}님이 전송한 메시지: {}", member.getName(), data.getContent());
+        log.info("{}님이 전송한 메시지: {}", member.getNickname(), data.getContent());
         return message;
     }
 
@@ -43,7 +54,7 @@ public class ChatService {
         String uuid = UUID.randomUUID().toString();
         ChatRoom chatRoom = new ChatRoom(uuid);
 
-        chatRoomRepository.save(chatRoom);
+        chatRoomService.save(chatRoom);
 
         return chatRoom;
     }
