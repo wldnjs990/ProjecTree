@@ -55,7 +55,9 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
                     FROM NodeTree child
                     JOIN ProjectNode pn ON child.ancestor.id = pn.id
                     WHERE pn.workspace.id = :workspaceId
+                    AND pn.deletedAt IS NOT NULL 
                 )
+                AND n.deletedAt IS NOT NULL 
             """)
     List<NodeWithParentSchema> findAllFlatNodesByWorkspace(@Param("workspaceId") Long workspaceId);
 
