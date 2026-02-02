@@ -9,16 +9,16 @@ const redirectURL = `${window.location.origin}/oauth/callback`;
  * 구글 로그인
  */
 const redirectToGoogleOauth = () => {
-  const BASE_URL = import.meta.env.VITE_OAUTH_URL;
-  window.location.href = `${BASE_URL}/oauth2/authorization/google?redirectURL=${redirectURL}`;
+  const BASE_URL = import.meta.env.VITE_API_URL;
+  window.location.href = `${BASE_URL}oauth2/authorization/google?redirectURL=${redirectURL}`;
 };
 
 /**
  * 깃허브 로그인
  */
 const redirectToGithubOauth = () => {
-  const BASE_URL = import.meta.env.VITE_OAUTH_URL;
-  window.location.href = `${BASE_URL}/oauth2/authorization/github?redirectURL=${redirectURL}`;
+  const BASE_URL = import.meta.env.VITE_API_URL;
+  window.location.href = `${BASE_URL}oauth2/authorization/github?redirectURL=${redirectURL}`;
 };
 
 /**
