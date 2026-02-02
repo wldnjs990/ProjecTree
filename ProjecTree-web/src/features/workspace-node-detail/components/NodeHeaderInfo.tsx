@@ -4,7 +4,7 @@ interface NodeHeaderInfoProps {
 }
 export default function NodeHeaderInfo({
   name,
-  description,
+  description: _description,
 }: NodeHeaderInfoProps) {
   // TODO : description 노드 상세정보에서 보여줄지 고민
   return (

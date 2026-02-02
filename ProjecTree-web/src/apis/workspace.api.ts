@@ -123,7 +123,7 @@ export interface CreateWorkspaceFormData {
   specFiles: File[];
   techStacks: number[]; // 🚨 변경: 이름(string) -> ID(number) 목록으로 변경
   epics: Array<{ name: string; description: string }>; // 🚨 변경: ID 제거 (백엔드 X, 프론트엔드도 Index 사용)
-  memberRoles: Array<{ email: string; role: string }>;
+  memberRoles: Record<string, Role>; // 🚨 변경: Map 구조 (이메일 -> 역할)
 }
 
 /**
