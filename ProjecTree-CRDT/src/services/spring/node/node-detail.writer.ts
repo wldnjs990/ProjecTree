@@ -1,4 +1,4 @@
-import { springClient } from "./../../spring/springClient";
+import { springInternalClient } from "../springInternalClient";
 import type { SendNodeDetail } from "../../../domain/node/node.detail";
 
 interface SaveNodeDetailPayload {
@@ -10,7 +10,7 @@ export async function saveNodeDetailToSpring(
   payload: SaveNodeDetailPayload,
 ): Promise<boolean> {
   try {
-    await springClient.patch(
+    await springInternalClient.patch(
       `/api/internal/nodes/${payload.nodeId}/detail`,
       payload.detail,
     );

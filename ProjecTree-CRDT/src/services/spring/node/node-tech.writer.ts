@@ -1,4 +1,4 @@
-import { springClient } from "./../../spring/springClient";
+import { springInternalClient } from "./../../spring/springInternalClient";
 
 interface SaveNodeTechPayload {
   nodeId: number;
@@ -11,10 +11,13 @@ export async function saveNodeTechToSpring(
 ): Promise<boolean> {
   try {
     // TODO: 스프링 restAPI 엔드포인트 성훈님께 물어보기
-    await springClient.post(`/api/internal/nodes/${payload.nodeId}/tech`, {
-      nodeId: payload.nodeId,
-      selectedTechId: payload.selectedTechId,
-    });
+    await springInternalClient.post(
+      `/api/internal/nodes/${payload.nodeId}/tech`,
+      {
+        nodeId: payload.nodeId,
+        selectedTechId: payload.selectedTechId,
+      },
+    );
     return true;
   } catch (error: any) {
     console.error("Spring node tech save failed", {
