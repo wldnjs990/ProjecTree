@@ -59,13 +59,16 @@ export function VoiceChatBar({
     // 이미 연결되어 있거나 연결 중이면 아무것도 하지 않음
     if (isConnected || isConnecting) return;
 
+    // 에러가 있으면 자동 재연결하지 않음 (수동으로 "다시 시도" 클릭 필요)
+    if (error) return;
+
     // 새로 입장하는 경우 isLeaving 리셋
     if (isLeaving) {
       resetLeaving();
     }
 
     joinRoom();
-  }, [isOpen, isConnected, isConnecting, isLeaving, joinRoom, resetLeaving]);
+  }, [isOpen, isConnected, isConnecting, isLeaving, error, joinRoom, resetLeaving]);
 
   // 바 닫을 때 음성 채팅방 퇴장 처리
   const handleClose = async () => {
@@ -192,17 +195,6 @@ export function VoiceChatBar({
                 </>
               )}
 
-              {/* 에러 시 재시도 버튼 */}
-              {error && !isConnecting && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={joinRoom}
-                  className="text-xs"
-                >
-                  다시 시도
-                </Button>
-              )}
             </div>
           </div>
         </div>

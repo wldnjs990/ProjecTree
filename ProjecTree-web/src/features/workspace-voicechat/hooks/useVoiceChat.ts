@@ -28,21 +28,11 @@ import type {
   UseVoiceChatProps,
 } from '@/features/workspace-voicechat/types/types';
 
-const LIVEKIT_URL = `wss://i14d107.p.ssafy.io/livekit`;
-// import.meta.env.VITE_LIVEKIT_URL ||
-// (window.location.hostname === 'localhost'
-//   ? 'ws://localhost:7880'
-//   : `wss://${window.location.hostname}:7880`);
+const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL;
+const APPLICATION_SERVER_URL = import.meta.env.VITE_API_URL;
 
-/**
- * 백엔드 서버 주소
- * - 환경변수 VITE_API_URL 사용 가능
- * - 기본값: http://localhost:8080/
- */
-// const APPLICATION_SERVER_URL =
-//   import.meta.env.VITE_API_URL || 'http://localhost:8080/api/';
-
-const APPLICATION_SERVER_URL = `https://i14d107.p.ssafy.io/api/`;
+/** 음성 채팅방 최대 참가자 수 */
+const MAX_PARTICIPANTS = 10;
 
 export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
   // LiveKit Room 인스턴스
@@ -127,9 +117,10 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       });
 
       // 연결 성공 이벤트
+      // 참고: 초기 연결 시에는 joinRoom에서 참가자 수 체크 후 상태 업데이트
+      //      이 핸들러는 네트워크 재연결 시 상태 동기화용
       newRoom.on(RoomEvent.Connected, () => {
         setIsConnected(true);
-        setIsConnecting(false);
       });
 
       // 연결 해제 이벤트
@@ -225,6 +216,25 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
 
       // LiveKit 서버에 연결
       await newRoom.connect(LIVEKIT_URL, token);
+
+      // 참가자 수 체크 전에 연결 상태 초기화 (Connected 이벤트가 먼저 설정했을 수 있음)
+      // 이렇게 하면 UI 깜빡임 방지
+      setIsConnected(false);
+
+      // 참가자 수 체크 (최대 인원 초과 시 연결 해제)
+      const totalParticipants = newRoom.remoteParticipants.size + 1; // +1 for self
+      if (totalParticipants > MAX_PARTICIPANTS) {
+        await newRoom.disconnect();
+        setError(`음성 채팅방 인원이 가득 찼습니다 (최대 ${MAX_PARTICIPANTS}명)`);
+        setIsConnecting(false);
+        setIsLeaving(true); // 재연결 방지 (바를 닫았다 다시 열면 리셋됨)
+        setRoom(undefined);
+        return;
+      }
+
+      // 참가자 수 체크 통과 - 연결 성공
+      setIsConnected(true);
+      setIsConnecting(false);
 
       // 마이크 활성화 (권한 거부 시에도 연결은 유지)
       try {
