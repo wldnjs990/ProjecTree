@@ -19,6 +19,10 @@ public class WorkspaceTechStackService {
     @Transactional
     public void create(List<Long> ids, Workspace workspace) {
 
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+
         for (Long id : ids) {
             WorkspaceTechStack workspaceTechStack = new WorkspaceTechStack();
             workspaceTechStack.setWorkspace(workspace);
