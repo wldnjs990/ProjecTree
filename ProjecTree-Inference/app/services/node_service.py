@@ -137,8 +137,8 @@ class NodeService:
         description: str,
         task_type=None,
         difficulty: int = None,
-        x_pos: float = None,
-        y_pos: float = None,
+        x_pos: float = 0.0,
+        y_pos: float = 0.0,
     ) -> Node:
         """노드 타입에 따른 노드 생성 (Joined Table Inheritance)"""
         logger.info(
