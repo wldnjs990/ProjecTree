@@ -3,6 +3,7 @@ package com.ssafy.projectree.global.model.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public abstract class BaseEntity {
 
+    @Getter
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime createdAt;

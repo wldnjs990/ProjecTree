@@ -6,17 +6,17 @@ public class ChatPayloadDto {
 
     @Data
     public static class Join {
-        private String workspaceId;
+        private String chatRoomId;
     }
 
     @Data
     public static class Leave {
-        private String workspaceId;
+        private String chatRoomId;
     }
 
     @Data
     public static class MessageSend {
-        private String workspaceId;
+        private String chatRoomId;
         private String content;
     }
 
@@ -26,9 +26,9 @@ public class ChatPayloadDto {
      */
     @Data
     public static class MessageReceive {
-        private String id;
-        private String workspaceId;
-        private String senderId;
+        private Long id;
+        private String chatRoomId;
+        private Long senderId;
         private String senderName;
         private String content;
         private String timestamp;
@@ -36,8 +36,8 @@ public class ChatPayloadDto {
 
     @Data
     public static class Typing {
-        private String workspaceId;
-        private String userId;
+        private String chatRoomId;
+        private String memberId;
         private String userName;
     }
 }

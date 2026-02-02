@@ -20,15 +20,18 @@ public enum ErrorCode {
     NODE_TYPE_NOT_SUPPORT_ERROR(DomainCode.NODE, ExceptionCode.NOT_SUPPORT, "NODE_TYPE_NOT_SUPPORT"),
     JWT_CREATE_FAILURE_ERROR(DomainCode.USER, ExceptionCode.NOT_SUPPORT, "NOT_SUPPORT_USER"),
     TOKEN_EXPIRED(DomainCode.AUTH, ExceptionCode.EXPIRED, "TOKEN_EXPIRED - AccessToken 만료시 해당 에러 발급"),
-    TOKEN_MALFORMED(DomainCode.AUTH, ExceptionCode.MALFORMED, "TOKEN_MALFORMED - 토큰 위조됨" ),
-    TOKEN_INVALID_SIGNATURE(DomainCode.AUTH, ExceptionCode.INVALID,"TOKEN_INVALID_SIGNATURE - 서명 불일치" ),
-    TOKEN_EMPTY(DomainCode.AUTH, ExceptionCode.EMPTY,"TOKEN_EMPTY-토큰 비어있음" ),
-    UN_EXPECTED_TOKEN_VALIDATION(DomainCode.AUTH, ExceptionCode.UN_EXPECTED ,"UN_EXPECTED - 예기치 못한 토큰" ),
+    TOKEN_MALFORMED(DomainCode.AUTH, ExceptionCode.MALFORMED, "TOKEN_MALFORMED - 토큰 위조됨"),
+    TOKEN_INVALID_SIGNATURE(DomainCode.AUTH, ExceptionCode.INVALID, "TOKEN_INVALID_SIGNATURE - 서명 불일치"),
+    TOKEN_EMPTY(DomainCode.AUTH, ExceptionCode.EMPTY, "TOKEN_EMPTY-토큰 비어있음"),
+    UN_EXPECTED_TOKEN_VALIDATION(DomainCode.AUTH, ExceptionCode.UN_EXPECTED, "UN_EXPECTED - 예기치 못한 토큰"),
     WORKSPACE_NOT_FOUND(DomainCode.WORKSPACE, ExceptionCode.NOT_FOUND, "WORKSPACE_NOT_FOUND"),
     TECHSTACK_NOT_FOUND(DomainCode.TECH, ExceptionCode.NOT_FOUND, "TECHSTACK_NOT_FOUND"),
     MEMBER_NOT_FOUND_IN_WORKSPACE(DomainCode.WORKSPACE, ExceptionCode.NOT_FOUND, "MEMBER_NOT_FOUND_IN_WORKSPACE"),
     AUTHENTICATION_REQUIRED(DomainCode.AUTH, ExceptionCode.INVALID, "AUTHENTICATION_REQUIRED"),
     ACCESS_DENIED(DomainCode.AUTH, ExceptionCode.FORBIDDEN, "ACCESS_DENIED");
+    DUPLICATE_REQUEST_ERROR(DomainCode.NORMAL, ExceptionCode.TOO_MANY_REQUEST, "해당 자원은 이미 사용중입니다."),
+    CHATROOM_NOT_FOUND(DomainCode.CHATROOM, ExceptionCode.NOT_FOUND, "CHATROOM_NOT_FOUND");
+
     private final DomainCode domainCode;
     private final ExceptionCode exceptionCode;
     private final String defaultMessage;

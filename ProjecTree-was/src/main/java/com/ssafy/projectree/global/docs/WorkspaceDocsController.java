@@ -126,6 +126,12 @@ public interface WorkspaceDocsController {
                                                   "description": "인증/인가를 통해 사용자의 서비스 이용에 대한 접근을 관리합니다."
                                                 }
                                               ]
+                                              "teamInfo": {
+                                                "chatRoomId": "!@#Cgfidvj1232..",
+                                                "members": [
+                                                    
+                                                ]
+                                              }
                                             }
                                             """
                             )

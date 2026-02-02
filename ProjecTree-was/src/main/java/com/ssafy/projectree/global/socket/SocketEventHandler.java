@@ -1,20 +1,14 @@
 package com.ssafy.projectree.global.socket;
 
-import com.corundumstudio.socketio.AckRequest;
-import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.listener.DataListener;
+import com.ssafy.projectree.domain.auth.jwt.JwtResolver;
+import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.workspace.api.dto.ChatPayloadDto;
 import com.ssafy.projectree.domain.workspace.usecase.ChatService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -23,64 +17,67 @@ public class SocketEventHandler {
 
     private final SocketIOServer socketIOServer;
     private final ChatService chatService;
-    // private final JwtProvider jwtProvider;
+    private final JwtResolver jwtResolver;
 
     @PostConstruct
     public void init() {
         socketIOServer.addConnectListener(client -> {
-//            String accessToken = client.getHandshakeData().getHttpHeaders().get("Authorization").substring(7);
-//            Long userId = jwtProvider.getId(accessToken);
-//            log.info("Client connected: {}", client.getSessionId());
+            try {
+                String header = client.getHandshakeData()
+                        .getHttpHeaders()
+                        .get("Authorization");
+
+                Member member = jwtResolver.resolve(header);
+                client.set("memberId", member.getId());
+                log.info("Member {} connected [session: {}]",
+                        member.getId(), client.getSessionId());
+            } catch (Exception e) {
+                log.error("인증 실패: {}", e.getMessage());
+                client.disconnect();
+            }
         });
 
         socketIOServer.addDisconnectListener(client -> {
-//            log.info("Client disconnected: {}", client.getSessionId());
+            Long memberId = client.get("memberId");
+            log.info("Member {} disconnected [session: {}]",
+                    memberId, client.getSessionId());
         });
 
         socketIOServer.addEventListener("chat:join", ChatPayloadDto.Join.class,
                 (client, data, ackRequest) -> {
-                    Long userId = 1L;
-                    client.set("userId", userId);
-                    log.info("userId: {} 사용자가 {}번 workspace 진입했습니다. [session-id: {}]", userId, data.getWorkspaceId(), client.getSessionId());
-                    client.joinRoom(data.getWorkspaceId());
+                    log.info("memberId: {} 사용자가 [id:{}] 채팅방에 진입했습니다. [session-id: {}]", client.get("memberId"), data.getChatRoomId(), client.getSessionId());
+                    client.joinRoom(data.getChatRoomId());
                 }
         );
 
         socketIOServer.addEventListener("chat:leave", ChatPayloadDto.Leave.class,
                 (client, data, ackRequest) -> {
-                    client.leaveRoom(data.getWorkspaceId());
+                    client.leaveRoom(data.getChatRoomId());
                 }
         );
 
         socketIOServer.addEventListener("message:send", ChatPayloadDto.MessageSend.class,
                 (client, data, ackRequest) -> {
 
-                    Map<String, Object> response = new HashMap<>();
-                    response.put("message", chatService.process(data, client));
+                    ChatPayloadDto.MessageReceive message = chatService.process(data, client);
 
-                    // 방법 1: 클라이언트 수 직접 확인
-                    int clientCount = socketIOServer.getRoomOperations(data.getWorkspaceId())
-                            .getClients()
-                            .size();
-                    log.info("Room {} has {} clients", data.getWorkspaceId(), clientCount);
-
-                    socketIOServer.getRoomOperations(data.getWorkspaceId())
+                    socketIOServer.getRoomOperations(data.getChatRoomId())
                             .getClients().stream()
                             .filter(c -> !c.getSessionId().equals(client.getSessionId()))
-                            .forEach(c -> c.sendEvent("message:receive", response));
+                            .forEach(c -> c.sendEvent("message:receive", message));
                 }
         );
 
         socketIOServer.addEventListener("typing:start", ChatPayloadDto.Typing.class,
                 (client, data, ackRequest) -> {
-                    socketIOServer.getRoomOperations(data.getWorkspaceId())
+                    socketIOServer.getRoomOperations(data.getChatRoomId())
                             .sendEvent("typing:start", data);
                 }
         );
 
         socketIOServer.addEventListener("typing:stop", ChatPayloadDto.Typing.class,
                 (client, data, ackRequest) -> {
-                    socketIOServer.getRoomOperations(data.getWorkspaceId())
+                    socketIOServer.getRoomOperations(data.getChatRoomId())
                             .sendEvent("typing:stop", data);
                 }
         );

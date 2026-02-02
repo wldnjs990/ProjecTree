@@ -4,6 +4,7 @@ import com.ssafy.projectree.domain.chat.model.entity.ChatRoom;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.usecase.EmailService;
 import com.ssafy.projectree.domain.member.usecase.MemberService;
+import com.ssafy.projectree.domain.workspace.api.dto.TeamDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.model.entity.Team;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
@@ -72,10 +73,32 @@ public class TeamService {
     }
 
     public Role getMyRole(Workspace workspace, Member member) {
-        Team team = teamRepository.findByWorkspaceAndMember(workspace, member)
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND_IN_WORKSPACE));
+        Team team = findByWorkspaceAndMember(workspace, member);
 
         return team.getRole();
     }
 
+    public Team findByWorkspaceAndMember(Workspace workspace, Member member) {
+        Team team = teamRepository.findByWorkspaceAndMember(workspace, member)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND_IN_WORKSPACE));
+
+        return team;
+    }
+
+    public List<Team> findAllByWorkspace(Workspace workspace) {
+        List<Team> teams = teamRepository.findByWorkspace(workspace)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND_IN_WORKSPACE));
+
+        return teams;
+    }
+
+    public List<Member> getMembers(List<Team> teams) {
+
+        List<Member> members = new ArrayList<>();
+        for (Team team : teams) {
+            members.add(team.getMember());
+        }
+
+        return members;
+    }
 }

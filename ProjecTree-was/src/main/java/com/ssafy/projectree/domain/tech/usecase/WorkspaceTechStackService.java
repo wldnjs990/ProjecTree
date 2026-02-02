@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WorkspaceTechStackService {
 
-    private final TechVocabularyService techVocabularyService;
+    private final TechStackService techStackService;
     private final WorkspaceTechStackRepository workspaceTechStackRepository;
 
     @Transactional
@@ -22,7 +22,7 @@ public class WorkspaceTechStackService {
         for (Long id : ids) {
             WorkspaceTechStack workspaceTechStack = new WorkspaceTechStack();
             workspaceTechStack.setWorkspace(workspace);
-            workspaceTechStack.setTechVocabulary(techVocabularyService.findById(id));
+            workspaceTechStack.setTechVocabulary(techStackService.findById(id));
 
             workspaceTechStackRepository.save(workspaceTechStack);
         }
