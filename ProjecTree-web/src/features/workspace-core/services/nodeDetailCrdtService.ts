@@ -10,9 +10,10 @@ import type {
   Priority,
   Assignee,
   NodeType,
+  Candidate,
 } from '../types/nodeDetail';
 
-// Y.Map에 저장되는 값 타입
+// Y.Map에 저장되는 값 타입 (candidates는 별도 Y.Map에서 관리)
 type YNodeDetailValue = string | number | Assignee | null | undefined;
 
 /**
@@ -26,6 +27,7 @@ class NodeDetailCrdtService {
 
   private yNodeDetailsRef: Y.Map<Y.Map<YNodeDetailValue>> | null = null;
   private yConfirmedRef: Y.Map<ConfirmedNodeData> | null = null;
+  private yNodeCandidatesRef: Y.Map<Candidate[]> | null = null;
   private cleanupFn: (() => void) | null = null;
   private isInitialized = false;
 
@@ -56,6 +58,7 @@ class NodeDetailCrdtService {
     // Y.Map 참조 가져오기
     const yNodeDetails = client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
     const yConfirmed = client.getYMap<ConfirmedNodeData>('confirmedNodeData');
+    const yNodeCandidates = client.getYMap<Candidate[]>('nodeCandidates');
 
     // 편집 데이터 변경 감지
     const editObserveHandler = () => {
@@ -79,8 +82,24 @@ class NodeDetailCrdtService {
       });
     };
 
+    // Candidates 변경 감지 → nodeStore 업데이트 (즉시 확정, confirm 불필요)
+    const candidatesHandler = (event: Y.YMapEvent<Candidate[]>) => {
+      event.keysChanged.forEach((key) => {
+        const candidates = yNodeCandidates.get(key);
+        if (candidates) {
+          console.log(
+            '[NodeDetailCrdtService] Candidates 수신:',
+            key,
+            candidates
+          );
+          useNodeStore.getState().updateNodeDetail(Number(key), { candidates });
+        }
+      });
+    };
+
     yNodeDetails.observeDeep(editObserveHandler);
     yConfirmed.observe(confirmedObserveHandler);
+    yNodeCandidates.observe(candidatesHandler);
 
     // 기존 데이터 로드 함수
     const loadExistingData = () => {
@@ -129,11 +148,13 @@ class NodeDetailCrdtService {
     this.cleanupFn = () => {
       yNodeDetails.unobserveDeep(editObserveHandler);
       yConfirmed.unobserve(confirmedObserveHandler);
+      yNodeCandidates.unobserve(candidatesHandler);
       client.provider.off('sync', syncHandler);
     };
 
     this.yNodeDetailsRef = yNodeDetails;
     this.yConfirmedRef = yConfirmed;
+    this.yNodeCandidatesRef = yNodeCandidates;
     this.isInitialized = true;
 
     console.log('[NodeDetailCrdtService] 옵저버 초기화 완료');
@@ -149,6 +170,7 @@ class NodeDetailCrdtService {
 
     this.yNodeDetailsRef = null;
     this.yConfirmedRef = null;
+    this.yNodeCandidatesRef = null;
     this.cleanupFn = null;
     this.isInitialized = false;
 
@@ -246,10 +268,8 @@ class NodeDetailCrdtService {
         }
       }
 
-      if (client) {
+      if (client && this.yConfirmedRef && this.yNodeDetailsRef) {
         // 2. 확정 데이터를 Y.Map에 저장 (다른 클라이언트에 브로드캐스트)
-        const yConfirmed =
-          client.getYMap<ConfirmedNodeData>('confirmedNodeData');
         const confirmedData: ConfirmedNodeData = {
           status: editData.status,
           priority: editData.priority,
@@ -257,7 +277,7 @@ class NodeDetailCrdtService {
           assignee: editData.assignee,
           note: editData.note,
         };
-        yConfirmed.set(selectedNodeId, confirmedData);
+        this.yConfirmedRef.set(selectedNodeId, confirmedData);
         console.log(
           '[NodeDetailCrdtService] 확정 데이터 브로드캐스트:',
           selectedNodeId,
@@ -270,9 +290,7 @@ class NodeDetailCrdtService {
           .applyConfirmedData(Number(selectedNodeId), confirmedData);
 
         // 4. 편집 데이터 삭제 (메모리 누수 방지)
-        const yNodeDetails =
-          client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
-        yNodeDetails.delete(selectedNodeId);
+        this.yNodeDetailsRef.delete(selectedNodeId);
       }
 
       store.setIsEditing(false);
@@ -373,6 +391,27 @@ class NodeDetailCrdtService {
         );
       }, 0);
     }
+  }
+
+  /**
+   * Candidates 업데이트 (편집 모드와 무관, 즉시 확정)
+   * - Y.Map에 저장 → 다른 클라이언트에 자동 브로드캐스트
+   * - 로컬 store에도 즉시 반영
+   */
+  updateCandidates(nodeId: string, candidates: Candidate[]): void {
+    const client = getCrdtClient();
+    if (!client || !this.yNodeCandidatesRef) {
+      console.warn('[NodeDetailCrdtService] CRDT 클라이언트가 없습니다.');
+      return;
+    }
+
+    // Y.Map에 저장 (다른 클라이언트에 브로드캐스트)
+    this.yNodeCandidatesRef.set(nodeId, candidates);
+
+    // 로컬 store에도 즉시 반영
+    useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates });
+
+    console.log('[NodeDetailCrdtService] Candidates 업데이트:', nodeId, candidates);
   }
 }
 

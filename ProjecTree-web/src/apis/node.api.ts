@@ -1,4 +1,4 @@
-import type { ApiResponse } from './api.type';
+import type { ApiResponse } from './types';
 import wasApiClient from './client';
 
 interface CreateNodeBody {

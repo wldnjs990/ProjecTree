@@ -6,7 +6,7 @@ import type {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import type { AccessTokenPayload, ApiResponse } from './api.type';
+import type { AccessTokenPayload, ApiResponse } from './types';
 
 const BASE_URL = import.meta.env.DEV ? '/api/' : import.meta.env.VITE_API_URL;
 const MAX_RETRY = 3;
@@ -91,9 +91,10 @@ wasApiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data: refreshData } = await wasApiClient.post<
-          ApiResponse<AccessTokenPayload>
-        >('auth/refresh');
+        const { data: refreshData } =
+          await wasApiClient.post<ApiResponse<AccessTokenPayload>>(
+            'auth/refresh'
+          );
 
         const newToken = refreshData.data.accessToken;
 

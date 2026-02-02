@@ -1,5 +1,5 @@
 import { wasApiClient } from '@/apis/client';
-import type { AccessTokenPayload } from './api.type';
+import type { AccessTokenPayload } from './types';
 
 /**
  * [타입] 회원 기본 정보 응답

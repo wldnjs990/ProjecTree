@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { NodeStatus, Priority, Assignee } from '../types/nodeDetail';
 
 // 편집 가능한 노드 상세 필드 타입
+// candidates는 별도 Y.Map에서 관리
 export interface EditableNodeDetail {
   status: NodeStatus;
   priority?: Priority;
