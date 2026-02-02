@@ -223,7 +223,6 @@ function TechCardList({
 
 // 빈 상태 컴포넌트
 function TechEmptyState({
-  onGenerate,
   isGenerating,
 }: {
   onGenerate?: () => void;
