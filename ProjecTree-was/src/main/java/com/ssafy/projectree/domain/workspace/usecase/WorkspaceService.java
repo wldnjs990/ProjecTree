@@ -1,11 +1,8 @@
 package com.ssafy.projectree.domain.workspace.usecase;
 
 import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
-import com.ssafy.projectree.domain.file.model.entity.FileProperty;
 import com.ssafy.projectree.domain.file.usecase.FileService;
-import com.ssafy.projectree.domain.file.usecase.S3Service;
 import com.ssafy.projectree.domain.member.model.entity.Member;
-import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
 import com.ssafy.projectree.domain.node.usecase.NodeService;
 import com.ssafy.projectree.domain.tech.usecase.WorkspaceTechStackService;
@@ -21,6 +18,7 @@ import com.ssafy.projectree.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -70,6 +68,7 @@ public class WorkspaceService {
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.WORKSPACE_NOT_FOUND, "존재하지 않는 워크 스페이스입니다."));
     }
 
+    @Transactional
     public void create(Member member, WorkspaceDto.Insert dto, List<MultipartFile> multipartFiles) throws IOException {
         // 워크 스페이스 생성
         Workspace workspace = Workspace.builder()
