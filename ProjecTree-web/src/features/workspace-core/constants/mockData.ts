@@ -107,6 +107,7 @@ export const mockNodeDetailApiResponses: Record<number, NodeDetailApiResponse> =
             description:
               "사용자의 위치 권한을 요청하고 현재 좌표(위도/경도)를 가져와 추천 UI를 초기화한다. 화면에는 '지금 바로 입장 가능' 배너, 근처(500m) 식당 목록, 각 항목에 거리, 예상 혼잡도 상태(아이콘), '즉시 입장 가능' 태그를 표시한다.",
             taskType: 'FE',
+            isSelected: false,
           },
           {
             id: 102,
@@ -114,6 +115,7 @@ export const mockNodeDetailApiResponses: Record<number, NodeDetailApiResponse> =
             description:
               'OAuth2 기반 소셜 로그인(Google, Kakao, Naver) 버튼 및 인증 플로우를 구현합니다.',
             taskType: 'FE',
+            isSelected: false,
           },
         ],
         techs: [
@@ -177,6 +179,7 @@ export const mockNodeDetailApiResponses: Record<number, NodeDetailApiResponse> =
             description:
               'JWT 토큰의 유효성을 검사하는 미들웨어를 구현합니다. 만료 시간, 서명 검증 등을 처리합니다.',
             taskType: 'BE',
+            isSelected: false,
           },
           {
             id: 202,
@@ -184,6 +187,7 @@ export const mockNodeDetailApiResponses: Record<number, NodeDetailApiResponse> =
             description:
               'Access Token 만료 시 Refresh Token을 이용한 토큰 갱신 메커니즘을 구현합니다.',
             taskType: 'BE',
+            isSelected: false,
           },
         ],
         techs: [
@@ -219,6 +223,7 @@ export const mockNodeDetailApiResponses: Record<number, NodeDetailApiResponse> =
             name: '소셜 로그인 기능',
             description: 'OAuth2 기반 소셜 로그인 (Google, Kakao, Naver)',
             taskType: null,
+            isSelected: false,
           },
         ],
         techs: [],
