@@ -53,10 +53,12 @@ class CandidateService:
             # Pydantic 객체를 딕셔너리로 변환
             candidates_dict = [candidate.model_dump() for candidate in candidates_data]
             
-            self.candidate_repository.create_multiple(db, node.id, candidates_dict)
+            # DB에 저장하고 ID가 포함된 결과를 받음
+            saved_candidates = self.candidate_repository.create_multiple(db, node.id, candidates_dict)
             logger.info(f"[CandidateService] 후보 노드 DB 저장 완료 - node_id: {request.node_id}")
             
-            return CandidateGenerateResponse(candidates=candidates_dict)
+            # DB에서 반환된 ID 포함 데이터로 응답
+            return CandidateGenerateResponse(candidates=saved_candidates)
             
         except Exception as e:
             logger.error(f"[CandidateService] 후보 노드 생성 실패 - node_id: {request.node_id}")

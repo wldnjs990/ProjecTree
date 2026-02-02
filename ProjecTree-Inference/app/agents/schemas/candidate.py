@@ -1,9 +1,10 @@
 from app.agents.enums import TaskType
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
 class Candidate(BaseModel):
+    id: Optional[int] = Field(None, description="후보 노드의 DB ID (생성 후 할당)")
     name: str = Field(description="후보 노드의 이름")
     description: str = Field(description="후보 노드의 설명")
     summary: str = Field(
