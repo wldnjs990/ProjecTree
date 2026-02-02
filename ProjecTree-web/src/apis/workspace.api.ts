@@ -1,8 +1,5 @@
 import { wasApiClient } from '@/apis/client';
-import type {
-  ApiNode,
-  NodeDetailData,
-} from '@/features/workspace-core';
+import type { ApiNode, NodeDetailData } from '@/features/workspace-core';
 
 // ===== 워크스페이스 트리 조회 =====
 
@@ -55,7 +52,7 @@ export const getNodeDetail = async (
 // ===== 노드 후보 생성 (AI 추천) =====
 
 import type { Candidate } from '@/features/workspace-core';
-import type { ApiResponse } from './api.type';
+import type { ApiResponse } from './types';
 
 /** 노드 후보 생성 응답 타입 */
 export interface NodeCandidatesResponse {

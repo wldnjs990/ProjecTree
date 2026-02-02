@@ -1,5 +1,5 @@
 import { useUserStore } from '@/shared/stores/userStore';
-import type { AccessTokenPayload, ApiResponse } from './api.type';
+import type { AccessTokenPayload, ApiResponse } from './types';
 import wasApiClient from './client';
 import { useAuthStore } from '@/shared/stores/authStore';
 
