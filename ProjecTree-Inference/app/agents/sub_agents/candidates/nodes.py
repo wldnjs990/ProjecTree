@@ -2,7 +2,7 @@ from langchain.agents.structured_output import ProviderStrategy
 from app.agents.sub_agents.candidates.state import CandidateNodeState
 from app.agents.enums import NodeType
 from langchain.agents import create_agent
-
+from app.agents.tools.validator import validate_description, validate_summary
 from langchain_core.messages import HumanMessage
 from app.core.llm import openai_nano_llm, openai_mini_llm
 from app.agents.schemas.candidate import CandidateList, TaskCandidateList
@@ -19,7 +19,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 llm = openai_mini_llm
-tools = []
+tools = [validate_summary]
 
 
 def create_candidate_agent(system_prompt: str, response_format):

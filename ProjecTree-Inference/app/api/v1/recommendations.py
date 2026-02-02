@@ -2,10 +2,14 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+import logging
+import traceback
 
 from app.api.schemas.recommendations import TechStackRecommendRequest, TechStackRecommendResponse
 from app.services.recommendation_service import RecommendationService
 from app.core.dependencies import get_recommendation_service, get_db
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/recommendations", tags=["Recommendations"])
 
@@ -32,14 +36,22 @@ async def recommend_tech_stack(
     적합한 기술 스택을 추천하고 비교 분석을 제공합니다.
     recommend_graph를 활용하여 LLM 기반 추천을 수행합니다.
     """
+    logger.info(f"[Recommendations API] 기술 스택 추천 요청 시작 - node_id: {request.node_id}")
     try:
-        return await service.recommend_tech_stack(db=db, request=request)
+        result = await service.recommend_tech_stack(db=db, request=request)
+        logger.info(f"[Recommendations API] 기술 스택 추천 성공 - node_id: {request.node_id}, 추천된 기술 수: {len(result.techs)}")
+        return result
     except NotImplementedError as e:
+        logger.warning(f"[Recommendations API] 서비스 미구현 - node_id: {request.node_id}, error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
             detail=str(e)
         )
     except Exception as e:
+        logger.error(f"[Recommendations API] 기술 스택 추천 중 오류 발생 - node_id: {request.node_id}")
+        logger.error(f"[Recommendations API] Error Type: {type(e).__name__}")
+        logger.error(f"[Recommendations API] Error Message: {str(e)}")
+        logger.error(f"[Recommendations API] Traceback:\n{traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"기술 스택 추천 중 오류 발생: {str(e)}"

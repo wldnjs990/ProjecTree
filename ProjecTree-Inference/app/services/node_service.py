@@ -115,6 +115,8 @@ class NodeService:
             node_id=created_node.id,
             parent_id=request.parent_id,
             candidate_id=request.candidate_id,
+            x_pos=request.x_pos,
+            y_pos=request.y_pos,
         )
 
     def _get_child_node_type(self, parent_node_type: NodeType) -> NodeType:
