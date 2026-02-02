@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { Layers, Lock, CheckCircle2, AlertCircle, Sprout } from 'lucide-react';
+import { useNavigate, Link } from 'react-router';
+import {
+  Layers,
+  Lock,
+  CheckCircle2,
+  AlertCircle,
+  Sprout,
+  Home,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { checkNicknameDuplicate, patchMemberSignup } from '@/apis/member.api';
+import { patchMemberSignup, getMemberInfo } from '@/apis/member.api';
 import { useSetAccessToken, useAccessToken } from '@/shared/stores/authStore';
 import { parseJwt } from '@/shared/lib/utils';
 
@@ -15,6 +22,7 @@ import { parseJwt } from '@/shared/lib/utils';
  */
 export function ProfileForm() {
   const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
   const [isChecking, setIsChecking] = useState(false);
   const [isValid, setIsValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -24,23 +32,33 @@ export function ProfileForm() {
   const setAccessToken = useSetAccessToken();
   const accessToken = useAccessToken();
 
-  // 토큰 유효성 및 권한 검사 (페이지 진입 시)
+  // 토큰 유효성 및 권한 검사 & 이메일 조회
   useEffect(() => {
     if (!accessToken) {
-      alert('로그인이 필요한 페이지입니다.');
+      // 토큰이 없으면 로그인 페이지로 이동 (Alert 없이 자연스럽게)
       navigate('/login');
       return;
     }
 
-    // Role 확인: ROLE_USER라면 이미 온보딩 완료한 유저이므로 라운지로 이동
+    // Role 확인
     const { role } = parseJwt(accessToken);
     if (role === 'ROLE_USER') {
       alert('이미 가입된 회원입니다.');
       navigate('/workspace-lounge');
+      return;
     }
+
+    // 이메일 정보 가져오기 (멤버 정보 조회)
+    getMemberInfo()
+      .then((info) => {
+        setEmail(info.email);
+      })
+      .catch((err) => {
+        console.error('회원 정보 조회 실패:', err);
+      });
   }, [accessToken, navigate]);
 
-  // 닉네임 유효성 검사 및 중복 확인 (Debounce 500ms)
+  // 닉네임 유효성 검사 (Local Validation only)
   useEffect(() => {
     if (!nickname) {
       setIsValid(false);
@@ -64,42 +82,32 @@ export function ProfileForm() {
       return;
     }
 
-    const checkDuplicate = async () => {
-      setIsChecking(true);
-      setErrorMessage('');
-      setSuccessMessage('');
-
-      try {
-        const isDuplicate = await checkNicknameDuplicate(nickname);
-        if (isDuplicate) {
-          setIsValid(false);
-          setErrorMessage('이미 사용 중인 닉네임입니다.');
-        } else {
-          setIsValid(true);
-          setSuccessMessage('사용 가능한 닉네임입니다.');
-        }
-      } catch (error) {
-        console.error('중복 확인 에러:', error);
-        setIsValid(false);
-        setErrorMessage('중복 확인 중 오류가 발생했습니다.');
-      } finally {
-        setIsChecking(false);
-      }
-    };
-
-    const timer = setTimeout(checkDuplicate, 500);
-
-    return () => clearTimeout(timer);
+    // 모든 로컬 검사 통과 시 성공 상태 설정
+    setIsValid(true);
+    setSuccessMessage('사용 가능한 닉네임 형식입니다.');
+    setErrorMessage('');
   }, [nickname]);
 
   const handleSave = async () => {
-    const updatedAccessToken = await patchMemberSignup(nickname);
-    if (!updatedAccessToken) {
-      console.error('토큰을 못 받았습니다.');
-      return;
+    try {
+      if (!isValid || isChecking) return;
+
+      setIsChecking(true);
+      const updatedAccessToken = await patchMemberSignup(nickname);
+
+      if (!updatedAccessToken) {
+        throw new Error('토큰을 받지 못했습니다.');
+      }
+
+      setAccessToken(updatedAccessToken);
+      navigate('/workspace-lounge');
+    } catch (error) {
+      console.error('가입 처리 중 오류:', error);
+      setErrorMessage('가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+      setIsValid(false);
+    } finally {
+      setIsChecking(false);
     }
-    setAccessToken(updatedAccessToken);
-    navigate('/workspace-lounge');
   };
 
   return (
@@ -111,13 +119,20 @@ export function ProfileForm() {
         transition={{ duration: 0.6, ease: 'easeOut' }}
       >
         {/* Mobile Header */}
-        <div className="lg:hidden flex items-center gap-2 mb-8">
+        <div className="lg:hidden flex items-center gap-3 mb-8">
           <div className="bg-[#0f4c3a] p-2 rounded-lg">
             <Layers className="text-white h-6 w-6" />
           </div>
           <span className="text-2xl font-bold text-[#0f4c3a] tracking-tight">
             ProjecTree
           </span>
+          <Link
+            to="/"
+            className="p-1 -mr-1 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors ml-auto"
+            aria-label="홈으로 이동"
+          >
+            <Home className="w-6 h-6" />
+          </Link>
         </div>
 
         <div className="space-y-2">
@@ -125,19 +140,24 @@ export function ProfileForm() {
             프로필 설정 <Sprout className="text-green-600 h-8 w-8" />
           </h2>
           <p className="text-slate-500 text-lg tracking-tight">
-            서비스에서 사용할 기본 정보를 입력해주세요.
+            서비스에서 사용할 기본 정보를 입력해주세요
           </p>
         </div>
 
         <div className="space-y-6">
           {/* Nickname Field */}
           <div className="space-y-3">
-            <Label
-              htmlFor="nickname"
-              className="text-slate-600 font-medium text-sm"
-            >
-              닉네임
-            </Label>
+            <div className="flex justify-between items-center">
+              <Label
+                htmlFor="nickname"
+                className="text-slate-600 font-medium text-sm"
+              >
+                닉네임
+              </Label>
+              <span className="text-xs text-slate-400 font-mono">
+                {nickname.length} / 16
+              </span>
+            </div>
             <div className="group relative">
               <div className="relative">
                 <Input
@@ -181,7 +201,7 @@ export function ProfileForm() {
                   </p>
                 ) : (
                   <p className="text-xs text-slate-400">
-                    * 한글, 영문, 숫자, 언더스코어(_) 사용 가능 (최대 16자)
+                    * 한글, 영문, 숫자, 언더스코어(_) 사용 가능
                   </p>
                 )}
               </div>
@@ -194,14 +214,14 @@ export function ProfileForm() {
             <div className="relative">
               <Input
                 type="text"
-                value="user@ssafy.com"
+                value={email || '이메일 정보를 불러오는 중...'}
                 readOnly
                 className="h-12 bg-slate-50 text-slate-500 border-slate-200 pl-11 shadow-inner"
               />
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-5 w-5" />
             </div>
             <p className="text-xs text-slate-400 pl-1">
-              * 이메일은 변경할 수 없습니다.
+              * 로그인된 계정의 이메일 정보입니다
             </p>
           </div>
 
