@@ -10,10 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -24,18 +21,21 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ChatLog extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "chat_room_id", nullable = false)
-	private ChatRoom chatRoom;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_room_id", nullable = false)
+    private ChatRoom chatRoom;
 
-	@Column(name = "user_name", nullable = false)
-	private String userName;
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
 
-	@Column(columnDefinition = "TEXT", nullable = false)
-	private String content;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String content;
 }
 
