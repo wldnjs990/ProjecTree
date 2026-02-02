@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -95,12 +95,8 @@ function useProfileDialogState(nickname: string) {
 
 function ProfileDialog({
   nickname,
-  setNickname,
-  onDeleteSuccess,
 }: {
   nickname: string;
-  setNickname: (next: string) => void;
-  onDeleteSuccess?: () => void;
 }) {
   const navigate = useNavigate();
   const updateStoreNickname = useUpdateNickname();
@@ -122,12 +118,6 @@ function ProfileDialog({
     if (!editing || !temp) {
       setIsValid(false);
       setErrorMessage('');
-      return;
-    }
-
-    if (temp.length > 16) {
-      setIsValid(false);
-      setErrorMessage('닉네임은 16자 이내여야 합니다.');
       return;
     }
 
@@ -156,24 +146,23 @@ function ProfileDialog({
 
     try {
       await updateNickname(next);
-      setNickname(next);
       updateStoreNickname(next);
       setEditing(false);
     } catch (_error) {
       setErrorMessage('닉네임 변경에 실패했습니다.');
     }
-  }, [temp, setNickname, updateStoreNickname, setEditing, isValid]);
+  }, [temp, updateStoreNickname, setEditing, isValid]);
 
   const handleDeleteAccount = useCallback(async () => {
     try {
       await deleteMember();
       setOpen(false);
-      if (onDeleteSuccess) onDeleteSuccess();
-      navigate('/login');
+      await logout(); // accessToken + user 모두 정리
+      navigate('/'); // 홈으로 이동
     } catch (_error) {
       alert('회원 탈퇴에 실패했습니다. 다시 시도해주세요.');
     }
-  }, [setOpen, onDeleteSuccess, navigate]);
+  }, [setOpen, navigate]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -218,13 +207,16 @@ function ProfileDialog({
                   <Input
                     id="nickname"
                     value={temp}
-                    onChange={(e) => setTemp(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 16) {
+                        setTemp(e.target.value);
+                      }
+                    }}
                     className={cn(
                       'bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-[var(--figma-neon-green)]/40 focus:border-[var(--figma-neon-green)] rounded-xl transition-colors duration-300 hover:bg-white/60',
                       errorMessage &&
                       'border-red-300 focus:border-red-400 focus:ring-red-100'
                     )}
-                    maxLength={16}
                     autoFocus
                   />
                   <Button
@@ -244,12 +236,15 @@ function ProfileDialog({
                     저장
                   </Button>
                 </div>
-                <div className="h-4 flex items-center pl-1">
-                  {errorMessage && (
+                <div className="h-4 flex items-center justify-between pl-1 pr-1">
+                  {errorMessage ? (
                     <p className="text-xs text-red-500 font-medium">
                       {errorMessage}
                     </p>
+                  ) : (
+                    <span />
                   )}
+                  <span className="text-xs text-zinc-400">{temp.length}/16</span>
                 </div>
               </div>
             ) : (
@@ -307,7 +302,7 @@ function ProfileDialog({
                   </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteAccount}
-                    className="bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg rounded-xl"
+                    className="border border-zinc-200 text-zinc-600 hover:bg-zinc-200 bg-zinc-100 rounded-xl"
                   >
                     탈퇴하기
                   </AlertDialogAction>
@@ -321,6 +316,33 @@ function ProfileDialog({
   );
 }
 
+// 로딩 스켈레톤 컴포넌트
+function SidebarSkeleton({ collapsed }: { collapsed: boolean }) {
+  return (
+    <aside
+      className={cn(
+        'group/sidebar flex flex-col border-r border-white/60 bg-gradient-to-b from-white/70 via-white/50 to-white/30 backdrop-blur-2xl shadow-[1px_0_30px_0_rgba(31,38,135,0.07)] transition-all duration-500 ease-out z-20 relative',
+        collapsed ? 'w-16' : 'w-75'
+      )}
+    >
+      {/* Profile Skeleton */}
+      <div className={cn(
+        'flex items-center gap-3 border-b border-white/20 p-3',
+        collapsed && 'flex-col gap-2 p-2'
+      )}>
+        <div className="h-9 w-9 rounded-full bg-zinc-200/60 animate-pulse" />
+        {!collapsed && <div className="h-5 w-20 bg-zinc-200/60 rounded animate-pulse" />}
+      </div>
+      {/* Nav Skeleton */}
+      <div className="flex-1 p-3 space-y-2">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-10 bg-zinc-200/40 rounded-xl animate-pulse" />
+        ))}
+      </div>
+    </aside>
+  );
+}
+
 export function LoungeSidebar({
   collapsed,
   onToggle,
@@ -328,13 +350,39 @@ export function LoungeSidebar({
   onFilterChange,
 }: SidebarProps) {
   const navigate = useNavigate();
-  const { user, clearUser } = useUserStore();
-  const [nickname, setNickname] = useState(user?.nickname || '사용자');
+  const { user } = useUserStore();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const initialLetter = useMemo(
-    () => nickname.trim().charAt(0) || '?',
-    [nickname]
-  );
+  // 타임아웃 후 리다이렉트
+  useEffect(() => {
+    if (user) {
+      setIsLoading(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (!user) {
+        navigate('/login');
+      }
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [user, navigate]);
+
+  // 로딩 중이고 user 없으면 스켈레톤
+  if (!user && isLoading) {
+    return <SidebarSkeleton collapsed={collapsed} />;
+  }
+
+  // user 없고 로딩 끝났으면 null (리다이렉트 중)
+  if (!user) {
+    return null;
+  }
+
+  // user 확정 - 닉네임 직접 사용
+  const nickname = user.nickname;
+  const initialLetter = nickname?.trim().charAt(0) || '?';
 
   return (
     <aside
@@ -346,7 +394,7 @@ export function LoungeSidebar({
       {/* Floating Toggle Button */}
       <button
         onClick={onToggle}
-        className="absolute -right-3 top-9 h-6 w-6 rounded-full bg-white border border-[var(--figma-forest-bg)] shadow-md flex items-center justify-center text-[var(--figma-forest-accent)] hover:text-[var(--figma-tech-green)] hover:scale-110 hover:border-[var(--figma-forest-accent)] transition-all z-50 outline-none focus:ring-2 focus:ring-[var(--figma-forest-bg)] opacity-0 group-hover/sidebar:opacity-100"
+        className="absolute -right-3 top-15 h-6 w-6 rounded-full bg-white border border-[var(--figma-forest-bg)] shadow-md flex items-center justify-center text-[var(--figma-forest-accent)] hover:text-[var(--figma-tech-green)] hover:scale-110 hover:border-[var(--figma-forest-accent)] transition-all z-50 outline-none focus:ring-2 focus:ring-[var(--figma-forest-bg)] opacity-0 group-hover/sidebar:opacity-100"
         aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
       >
         {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
@@ -354,30 +402,71 @@ export function LoungeSidebar({
       {/* User Profile */}
       <div
         className={cn(
-          'flex items-center gap-3 border-b border-white/20 p-4',
+          'flex items-center justify-between border-b border-white/20 p-3',
           collapsed && 'flex-col gap-2 p-2'
         )}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--figma-forest-bg)] to-emerald-50 text-[var(--figma-tech-green)] text-sm font-bold shadow-inner ring-1 ring-[var(--figma-forest-accent)]/30">
-          {initialLetter}
-        </div>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button
+              className={cn(
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 group',
+                'hover:bg-white/70 hover:shadow-sm hover:backdrop-blur-md',
+                collapsed && 'flex-col gap-1'
+              )}
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--figma-forest-bg)] to-emerald-50 text-[var(--figma-tech-green)] text-sm font-bold shadow-inner ring-1 ring-[var(--figma-forest-accent)]/30">
+                {initialLetter}
+              </div>
+              {!collapsed && (
+                <span
+                  className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px]"
+                  title={nickname}
+                >
+                  {nickname}
+                </span>
+              )}
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="
+            bg-white/92
+            backdrop-blur-2xl
+            border border-white/60
+            rounded-3xl
+            shadow-2xl
+            z-[1001]
+            p-0
+            overflow-hidden
+          ">
+            <AlertDialogHeader className="p-6">
+              <AlertDialogTitle className="text-zinc-900 font-bold">
+                로그아웃 하시겠습니까?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-zinc-500">
+                로그아웃하면 다시 로그인해야 합니다.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-100">
+              <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
+                취소
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async () => {
+                  await logout();
+                  useUserStore.getState().clearUser();
+                  navigate('/login');
+                }}
+                className="border border-zinc-200 text-zinc-600 hover:bg-zinc-200 bg-zinc-100 rounded-xl"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                로그아웃
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-        {collapsed ? (
-          <div className="w-full flex justify-center"></div>
-        ) : (
-          <div className="flex flex-1 items-center justify-between overflow-hidden">
-            <span className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis px-1">
-              {nickname}
-            </span>
-
-            {user && (
-              <ProfileDialog
-                nickname={nickname}
-                setNickname={setNickname}
-                onDeleteSuccess={clearUser}
-              />
-            )}
-          </div>
+        {!collapsed && (
+          <ProfileDialog nickname={nickname} />
         )}
       </div>
 
@@ -421,35 +510,14 @@ export function LoungeSidebar({
       </nav>
 
       {/* Footer */}
-      <div className={cn(
-        'border-t border-white/20 p-3 flex items-center',
-        collapsed ? 'justify-center' : 'justify-between'
-      )}>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50/50 transition-colors"
+      <div className="border-t border-white/20 p-3 flex justify-center">
+        <button
+          className="flex w-full items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-sm text-zinc-400 hover:text-emerald-600 hover:bg-white/70 hover:shadow-sm transition-all duration-300"
           onClick={() => navigate('/')}
         >
           <TreeDeciduous className="h-4 w-4" />
-          {!collapsed && <span className="ml-2">홈</span>}
-        </Button>
-
-        {!collapsed && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-zinc-400 hover:text-red-500 hover:bg-red-50/50 transition-colors"
-            onClick={async () => {
-              await logout();
-              useUserStore.getState().clearUser();
-              navigate('/login');
-            }}
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="ml-2">로그아웃</span>
-          </Button>
-        )}
+          {!collapsed && <span>홈으로 가기</span>}
+        </button>
       </div>
     </aside>
   );
