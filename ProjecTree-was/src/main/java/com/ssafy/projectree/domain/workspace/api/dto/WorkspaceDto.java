@@ -143,5 +143,7 @@ public class WorkspaceDto {
 
         private List<FunctionSpecificationDto.EpicInfo> epics;
 
+        private TeamDto.Info teamInfo;
+
     }
 }
