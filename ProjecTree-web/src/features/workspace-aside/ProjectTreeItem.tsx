@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { ServerNodeType } from '@/features/workspace-core';
+import { useNodeDetailStore } from '@/features/workspace-core';
 
 export interface ProjectItem {
   id: string;
@@ -39,6 +40,8 @@ export function ProjectTreeItem({
   onSelect,
   selectedId,
 }: ProjectTreeItemProps) {
+  const openSidebar = useNodeDetailStore((state) => state.openSidebar);
+
   const [isOpen, setIsOpen] = useState(true);
   const IconConfig = TYPE_ICONS[item.type];
   const Icon = IconConfig.icon;
@@ -51,6 +54,8 @@ export function ProjectTreeItem({
   };
 
   const handleClick = () => {
+    // 상세 사이드바 열기 (fitView는 TreeCanvas에서 처리)
+    openSidebar(item.id);
     onSelect?.(item);
   };
 

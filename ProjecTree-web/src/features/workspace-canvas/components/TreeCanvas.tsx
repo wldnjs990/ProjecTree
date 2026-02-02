@@ -12,6 +12,7 @@ import {
   ReactFlowProvider,
   applyNodeChanges,
   type EdgeChange,
+  useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -32,6 +33,7 @@ import {
   useUndoRedo,
   useNodes,
   useEdges,
+  useSelectedNodeId,
   type FlowNode,
 } from '@/features/workspace-core';
 import CursorPointers from './CursorPointers';
@@ -71,6 +73,8 @@ function TreeCanvasInner({
   onlineUsers,
   onNodeClick,
 }: TreeCanvasProps) {
+  const { fitView } = useReactFlow();
+
   // 노드 CRDT 훅 (Y.js 노드 동기화)
   const { handleNodeDragStop } = useNodesCrdt({ initialNodes });
 
@@ -83,6 +87,7 @@ function TreeCanvasInner({
   // Zustand 스토어에서 노드/엣지 가져오기
   const storeNodes = useNodes();
   const storeEdges = useEdges();
+  const selectedNodeId = useSelectedNodeId();
 
   // ReactFlow 로컬 상태 (드래그 중 즉시 반영용)
   const [nodes, setNodes] = useNodesState(storeNodes);
@@ -106,6 +111,17 @@ function TreeCanvasInner({
     }
   }, [storeEdges, setEdges]);
 
+  // 사이드바에서 노드 선택 시 해당 노드로 포커스 이동
+  useEffect(() => {
+    if (selectedNodeId) {
+      fitView({
+        nodes: [{ id: selectedNodeId }],
+        duration: 300,
+        padding: 0.3,
+      });
+    }
+  }, [selectedNodeId, fitView]);
+
   // 노드 변경 핸들러 (드래그 중 로컬 즉시 반영)
   const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -117,9 +133,13 @@ function TreeCanvasInner({
   // 노드 클릭 핸들러
   const handleNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
+      fitView({
+        nodes: [{ id: node.id }],
+        duration: 300,
+      });
       onNodeClick?.(node.id);
     },
-    [onNodeClick]
+    [onNodeClick, fitView]
   );
 
   // 간선 변경 핸들러
