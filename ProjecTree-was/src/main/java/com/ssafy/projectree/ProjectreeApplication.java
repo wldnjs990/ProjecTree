@@ -3,7 +3,9 @@ package com.ssafy.projectree;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.retry.annotation.EnableRetry;
 
+@EnableRetry // 이 어노테이션 필수
 @SpringBootApplication
 @EnableJpaAuditing
 public class ProjectreeApplication {

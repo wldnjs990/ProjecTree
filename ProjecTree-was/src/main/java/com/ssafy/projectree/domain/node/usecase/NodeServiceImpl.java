@@ -219,7 +219,6 @@ public class NodeServiceImpl implements NodeService {
 
         Long workspaceId = projectNode.getWorkspace().getId();
 
-        //ToDo: candidate id에 대한 락 구현 - Redis 캐시 연동 이후
         AiNodeCreateDto.Response response = inferenceService.createNode(AiNodeCreateDto.Request.builder()
                 .candidateId(candidateId)
                 .parentId(parentId)
