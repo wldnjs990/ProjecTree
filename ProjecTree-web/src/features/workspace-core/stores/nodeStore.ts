@@ -8,10 +8,10 @@ import type {
   NodeStatus,
   Priority,
   Assignee,
-  Candidate,
 } from '../types/nodeDetail';
 
 // 확정된 노드 데이터 (편집 완료 후 브로드캐스트되는 데이터)
+// candidates는 별도 Y.Map에서 관리
 export interface ConfirmedNodeData {
   // NodeData에서 (노드 목록)
   status: NodeStatus;
@@ -20,7 +20,6 @@ export interface ConfirmedNodeData {
   // NodeDetailData에서 (상세 API)
   assignee: Assignee | null;
   note: string;
-  candidates?: Candidate[];
 }
 
 interface NodeState {
@@ -143,7 +142,7 @@ export const useNodeStore = create<NodeState>((set) => ({
               taskType: null,
             } as NodeData),
       },
-      // nodeDetails 업데이트 (assignee, note, candidates)
+      // nodeDetails 업데이트 (assignee, note) - candidates는 별도 Y.Map에서 관리
       nodeDetails: {
         ...state.nodeDetails,
         [nodeId]: state.nodeDetails[nodeId]
@@ -151,15 +150,13 @@ export const useNodeStore = create<NodeState>((set) => ({
               ...state.nodeDetails[nodeId],
               assignee: data.assignee,
               note: data.note,
-              candidates:
-                data.candidates ?? state.nodeDetails[nodeId].candidates,
             }
           : ({
               id: nodeId,
               assignee: data.assignee,
               note: data.note,
               description: '',
-              candidates: data.candidates ?? [],
+              candidates: [],
               techs: [],
               comparison: '',
             } as NodeDetailData),

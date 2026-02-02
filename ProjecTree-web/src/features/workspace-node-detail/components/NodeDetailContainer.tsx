@@ -74,10 +74,9 @@ export default function NodeDetailContainer({
       // Zustand store 업데이트
       updateNodeDetail(Number(selectedNodeId), { candidates });
 
-      // CRDT 동기화 (편집 모드일 때 다른 클라이언트에도 반영)
-      if (isEditing) {
-        nodeDetailCrdtService.updateField('candidates', candidates);
-      }
+      // CRDT 동기화 (편집 모드와 무관하게 항상 동기화)
+      nodeDetailCrdtService.updateCandidates(selectedNodeId, candidates);
+      nodeDetailCrdtService.confirmCandidates(selectedNodeId);
 
       console.log('[NodeDetailContainer] AI 노드 후보 생성 완료:', candidates);
     } catch (error) {

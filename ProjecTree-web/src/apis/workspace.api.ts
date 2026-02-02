@@ -78,11 +78,12 @@ export const generateNodeCandidates = async (
     `nodes/${nodeId}/candidates`
   );
   console.log(response);
-  // API 응답에서 id, taskType이 없으므로 클라이언트에서 임시 생성
+  // API 응답에서 id, taskType, isSelected가 없으므로 클라이언트에서 초기화
   return response.data.data.candidates.map((c, index) => ({
     ...c,
     id: Date.now() + index,
     taskType: null,
+    isSelected: false,
   }));
 };
 
