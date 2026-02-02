@@ -2,8 +2,11 @@ package com.ssafy.projectree.domain.ai.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ssafy.projectree.domain.ai.dto.schemas.AiCandidateSchema;
-import lombok.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 

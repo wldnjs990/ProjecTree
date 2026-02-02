@@ -1,5 +1,4 @@
-package com.ssafy.projectree.global.logging; // 패키지 경로는 적절히 조정하세요
-
+package com.ssafy.projectree.global.logging;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryContext;
