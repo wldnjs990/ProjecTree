@@ -1,12 +1,9 @@
 package com.ssafy.projectree.domain.workspace.usecase;
 
 import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
-import com.ssafy.projectree.domain.file.model.entity.FileProperty;
 import com.ssafy.projectree.domain.file.usecase.FileService;
-import com.ssafy.projectree.domain.file.usecase.S3Service;
 import com.ssafy.projectree.domain.member.api.dto.MemberDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
-import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
 import com.ssafy.projectree.domain.node.usecase.NodeService;
 import com.ssafy.projectree.domain.tech.usecase.WorkspaceTechStackService;
@@ -89,7 +86,7 @@ public class WorkspaceService {
         workspaceRepository.save(workspace);
 
         // 워크 스페이스의 기획 문서 저장
-        if (!multipartFiles.isEmpty()) {
+        if (multipartFiles != null && !multipartFiles.isEmpty()) {
             fileService.uploadFiles(multipartFiles, workspace);
         }
 
@@ -101,7 +98,7 @@ public class WorkspaceService {
 
         // 프로젝트 노드 생성
         ProjectNode projectNode = nodeService.createProjectNode(workspace);
-        
+
         // 에픽 노드 생성
         nodeService.createEpicNodes(workspace, projectNode, dto.getEpics());
 
