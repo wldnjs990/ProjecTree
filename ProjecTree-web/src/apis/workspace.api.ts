@@ -227,7 +227,7 @@ export const createWorkspace = async (
     formData,
     {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': undefined,
       },
     }
   );

@@ -28,21 +28,11 @@ import type {
   UseVoiceChatProps,
 } from '@/features/workspace-voicechat/types/types';
 
-const LIVEKIT_URL = `wss://i14d107.p.ssafy.io/livekit`;
-// import.meta.env.VITE_LIVEKIT_URL ||
-// (window.location.hostname === 'localhost'
-//   ? 'ws://localhost:7880'
-//   : `wss://${window.location.hostname}:7880`);
+const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL;
+const APPLICATION_SERVER_URL = import.meta.env.VITE_API_URL;
 
-/**
- * 백엔드 서버 주소
- * - 환경변수 VITE_API_URL 사용 가능
- * - 기본값: http://localhost:8080/
- */
-// const APPLICATION_SERVER_URL =
-//   import.meta.env.VITE_API_URL || 'http://localhost:8080/api/';
-
-const APPLICATION_SERVER_URL = `https://i14d107.p.ssafy.io/api/`;
+/** 음성 채팅방 최대 참가자 수 */
+const MAX_PARTICIPANTS = 10;
 
 export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
   // LiveKit Room 인스턴스
@@ -127,15 +117,26 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       });
 
       // 연결 성공 이벤트
+      // 참고: 초기 연결 시에는 joinRoom에서 참가자 수 체크 후 상태 업데이트
+      //      이 핸들러는 네트워크 재연결 시 상태 동기화용
       newRoom.on(RoomEvent.Connected, () => {
         setIsConnected(true);
-        setIsConnecting(false);
       });
 
       // 연결 해제 이벤트
       newRoom.on(RoomEvent.Disconnected, () => {
         setIsConnected(false);
       });
+
+      // 원격 참가자 퇴장 이벤트 (다른 사람이 음성 채팅방을 나갔을 때)
+      newRoom.on(
+        RoomEvent.ParticipantDisconnected,
+        (participant: RemoteParticipant) => {
+          setRemoteTracks((prev) =>
+            prev.filter((t) => t.participantIdentity !== participant.identity)
+          );
+        }
+      );
 
       // 원격 참가자의 트랙 구독 이벤트 (다른 사람이 입장하거나 마이크를 켰을 때)
       newRoom.on(
@@ -214,12 +215,26 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       const token = await getToken(workspaceId, participantName);
 
       // LiveKit 서버에 연결
-      console.log('[VoiceChat] Connecting to LiveKit:', {
-        LIVEKIT_URL,
-        API_URL: APPLICATION_SERVER_URL,
-        roomName: workspaceId,
-      });
       await newRoom.connect(LIVEKIT_URL, token);
+
+      // 참가자 수 체크 전에 연결 상태 초기화 (Connected 이벤트가 먼저 설정했을 수 있음)
+      // 이렇게 하면 UI 깜빡임 방지
+      setIsConnected(false);
+
+      // 참가자 수 체크 (최대 인원 초과 시 연결 해제)
+      const totalParticipants = newRoom.remoteParticipants.size + 1; // +1 for self
+      if (totalParticipants > MAX_PARTICIPANTS) {
+        await newRoom.disconnect();
+        setError(`음성 채팅방 인원이 가득 찼습니다 (최대 ${MAX_PARTICIPANTS}명)`);
+        setIsConnecting(false);
+        setIsLeaving(true); // 재연결 방지 (바를 닫았다 다시 열면 리셋됨)
+        setRoom(undefined);
+        return;
+      }
+
+      // 참가자 수 체크 통과 - 연결 성공
+      setIsConnected(true);
+      setIsConnecting(false);
 
       // 마이크 활성화 (권한 거부 시에도 연결은 유지)
       try {
@@ -259,13 +274,20 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
   const leaveRoom = useCallback(async () => {
     if (room) {
       // 먼저 isLeaving을 true로 설정하여 재연결 방지
+      // 중요: isLeaving은 여기서 false로 설정하지 않음 - onClose() 후 컴포넌트가 언마운트되거나
+      // 다시 입장할 때 resetLeaving()이 호출됨
       setIsLeaving(true);
       setIsConnected(false);
       setIsConnecting(false);
       setRemoteTracks([]);
-      await room.disconnect();
-      setRoom(undefined);
-      // isLeaving은 여기서 리셋하지 않음 - 다음 입장 시 리셋
+      try {
+        await room.disconnect();
+      } catch (err) {
+        console.error('Failed to disconnect from room:', err);
+      } finally {
+        setRoom(undefined);
+        // isLeaving은 true로 유지 - 재연결 방지
+      }
     }
   }, [room]);
 

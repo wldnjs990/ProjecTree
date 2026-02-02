@@ -50,14 +50,10 @@ export const getMemberEmail = async (id: number): Promise<string> => {
 
 /**
  * [API] 닉네임 변경
- * @param id - 회원 ID
  * @param nickname - 새 닉네임
  */
-export const updateNickname = async (
-  id: number,
-  nickname: string
-): Promise<void> => {
-  await wasApiClient.put(`members/${id}/nickname`, null, {
+export const updateNickname = async (nickname: string): Promise<void> => {
+  await wasApiClient.put(`members/me/nickname`, null, {
     params: { nickname },
   });
 };
@@ -91,10 +87,9 @@ const patchMemberSignup = async (nickname: string): Promise<string | null> => {
 
 /**
  * [API] 회원 탈퇴
- * @param id - 회원 ID
  */
-const deleteMember = async (id: number): Promise<void> => {
-  await wasApiClient.delete(`members/${id}`);
+const deleteMember = async (): Promise<void> => {
+  await wasApiClient.delete(`members/me`);
 };
 
 export { checkNicknameDuplicate, patchMemberSignup, deleteMember };
