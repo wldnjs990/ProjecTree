@@ -8,7 +8,7 @@ import type {
 } from 'axios';
 import type { AccessTokenPayload, ApiResponse } from './types';
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.DEV ? '/api/' : import.meta.env.VITE_API_URL;
 const MAX_RETRY = 3;
 
 // 재시도 카운트를 포함한 config 타입
