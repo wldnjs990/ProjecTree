@@ -9,6 +9,7 @@ interface UserState {
   user: MemberInfoResponse | null;
   isAuthenticated: boolean;
   setUser: (user: MemberInfoResponse) => void;
+  updateNickname: (nickname: string) => void;
   clearUser: () => void;
 }
 
@@ -29,6 +30,11 @@ export const useUserStore = create<UserState>()(
           isAuthenticated: true,
         }),
 
+      updateNickname: (nickname: string) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, nickname } : null,
+        })),
+
       clearUser: () =>
         set({
           user: null,
@@ -47,6 +53,8 @@ export const useUserStore = create<UserState>()(
 
 export const useUser = () => useUserStore((state) => state.user);
 export const useSetUser = () => useUserStore((state) => state.setUser);
+export const useUpdateNickname = () =>
+  useUserStore((state) => state.updateNickname);
 export const useClearUser = () => useUserStore((state) => state.clearUser);
 export const useIsAuthenticated = () =>
   useUserStore((state) => state.isAuthenticated);

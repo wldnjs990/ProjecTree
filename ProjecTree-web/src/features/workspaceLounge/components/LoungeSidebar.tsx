@@ -4,8 +4,8 @@ import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useUserStore } from '@/shared/stores/userStore';
-import { checkNicknameDuplicate, updateNickname, deleteMember } from '@/apis/member.api';
+import { useUserStore, useUpdateNickname } from '@/shared/stores/userStore';
+import { updateNickname, deleteMember } from '@/apis/member.api';
 import {
   Dialog,
   DialogContent,
@@ -93,15 +93,14 @@ function useProfileDialogState(nickname: string) {
 function ProfileDialog({
   nickname,
   setNickname,
-  memberId,
   onDeleteSuccess,
 }: {
   nickname: string;
   setNickname: (next: string) => void;
-  memberId: number;
   onDeleteSuccess?: () => void;
 }) {
   const navigate = useNavigate();
+  const updateStoreNickname = useUpdateNickname();
   const {
     open,
     setOpen,
@@ -115,21 +114,17 @@ function ProfileDialog({
 
   const [isValid, setIsValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
     if (!editing || !temp) {
       setIsValid(false);
       setErrorMessage('');
-      setSuccessMessage('');
       return;
     }
 
     if (temp.length > 16) {
       setIsValid(false);
       setErrorMessage('닉네임은 16자 이내여야 합니다.');
-      setSuccessMessage('');
       return;
     }
 
@@ -137,42 +132,17 @@ function ProfileDialog({
     if (!regex.test(temp)) {
       setIsValid(false);
       setErrorMessage('한글, 영문, 숫자, 언더스코어(_)만 사용할 수 있습니다.');
-      setSuccessMessage('');
       return;
     }
 
     if (temp === nickname) {
       setIsValid(true);
       setErrorMessage('');
-      setSuccessMessage('');
       return;
     }
 
-    const checkDuplicateNickname = async () => {
-      setIsChecking(true);
-      setErrorMessage('');
-      setSuccessMessage('');
-
-      try {
-        const isAvailable = await checkNicknameDuplicate(temp);
-
-        if (isAvailable) {
-          setIsValid(true);
-          setSuccessMessage('사용 가능한 닉네임입니다.');
-        } else {
-          setIsValid(false);
-          setErrorMessage('이미 사용 중인 닉네임입니다.');
-        }
-      } catch (_error) {
-        setErrorMessage('확인 중 오류가 발생했습니다.');
-        setIsValid(false);
-      } finally {
-        setIsChecking(false);
-      }
-    };
-
-    const timer = setTimeout(checkDuplicateNickname, 500);
-    return () => clearTimeout(timer);
+    setIsValid(true);
+    setErrorMessage('');
   }, [temp, editing, nickname]);
 
   const handleSave = useCallback(async () => {
@@ -182,24 +152,25 @@ function ProfileDialog({
     if (next.length === 0) return;
 
     try {
-      await updateNickname(memberId, next);
+      await updateNickname(next);
       setNickname(next);
+      updateStoreNickname(next);
       setEditing(false);
     } catch (_error) {
       setErrorMessage('닉네임 변경에 실패했습니다.');
     }
-  }, [temp, memberId, setNickname, setEditing, isValid]);
+  }, [temp, setNickname, updateStoreNickname, setEditing, isValid]);
 
   const handleDeleteAccount = useCallback(async () => {
     try {
-      await deleteMember(memberId);
+      await deleteMember();
       setOpen(false);
       if (onDeleteSuccess) onDeleteSuccess();
       navigate('/login');
     } catch (_error) {
       alert('회원 탈퇴에 실패했습니다. 다시 시도해주세요.');
     }
-  }, [memberId, setOpen, onDeleteSuccess, navigate]);
+  }, [setOpen, onDeleteSuccess, navigate]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -248,9 +219,7 @@ function ProfileDialog({
                     className={cn(
                       'bg-white/80 border-white/60 focus:ring-2 focus:ring-[var(--figma-neon-green)]/40 focus:border-[var(--figma-neon-green)] rounded-xl backdrop-blur-sm',
                       errorMessage &&
-                      'border-red-300 focus:border-red-400 focus:ring-red-100',
-                      successMessage &&
-                      'border-emerald-300 focus:border-emerald-400 focus:ring-emerald-100'
+                      'border-red-300 focus:border-red-400 focus:ring-red-100'
                     )}
                     maxLength={16}
                     autoFocus
@@ -266,21 +235,16 @@ function ProfileDialog({
                   <Button
                     size="sm"
                     onClick={handleSave}
-                    disabled={!isValid || isChecking}
+                    disabled={!isValid}
                     className="bg-[var(--figma-neon-green)] hover:bg-[var(--figma-neon-green)]/90 text-[var(--figma-tech-green)] font-bold shadow-sm hover:shadow-[0_0_15px_rgba(74,222,128,0.4)] disabled:opacity-50 transition-all rounded-xl"
                   >
-                    {isChecking ? '...' : '저장'}
+                    저장
                   </Button>
                 </div>
                 <div className="h-4 flex items-center pl-1">
                   {errorMessage && (
                     <p className="text-xs text-red-500 font-medium">
                       {errorMessage}
-                    </p>
-                  )}
-                  {successMessage && (
-                    <p className="text-xs text-emerald-600 font-medium">
-                      {successMessage}
                     </p>
                   )}
                 </div>
@@ -415,7 +379,6 @@ export function LoungeSidebar({
               <ProfileDialog
                 nickname={nickname}
                 setNickname={setNickname}
-                memberId={user.memberId}
                 onDeleteSuccess={clearUser}
               />
             )}
