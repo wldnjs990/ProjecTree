@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Layers } from 'lucide-react';
+import { HomeButtonWithConfirm } from './HomeButtonWithConfirm';
 
 /**
  * [컴포넌트] 사용자 온보딩 좌측 브랜드 패널
@@ -49,7 +50,7 @@ export function BrandPanel() {
         }}
       />
 
-      {/* Logo */}
+      {/* Logo Area */}
       <div className="flex items-center gap-3 z-10">
         <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm">
           <Layers className="text-white h-7 w-7" />
@@ -57,6 +58,7 @@ export function BrandPanel() {
         <span className="text-2xl font-bold text-white tracking-tight">
           ProjecTree
         </span>
+        <HomeButtonWithConfirm className="-mr-2 hover:bg-white/10 text-white/70 hover:text-white ml-auto" />
       </div>
 
       {/* Hero Content */}
@@ -68,12 +70,12 @@ export function BrandPanel() {
       >
         <h1 className="text-5xl font-bold text-white mb-6 leading-tight tracking-tight break-keep">
           함께 성장할 <br />
-          <span className="text-green-300">첫 걸음</span>을 떼어보세요.
+          <span className="text-green-300">첫 걸음</span>을 떼어보세요
         </h1>
         <p className="text-green-100 text-lg leading-relaxed tracking-tight break-keep">
-          프로필을 설정하고 팀원들과 더 나은 협업을 시작하세요.
+          프로필을 설정하고 팀원들과 더 나은 협업을 시작하세요
           <br />
-          작은 씨앗이 모여 숲이 됩니다.
+          작은 씨앗이 모여 숲이 됩니다
         </p>
       </motion.div>
 
