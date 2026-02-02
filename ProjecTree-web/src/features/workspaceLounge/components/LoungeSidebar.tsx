@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useUserStore, useUpdateNickname } from '@/shared/stores/userStore';
 import { updateNickname, deleteMember } from '@/apis/member.api';
+import { logout } from '@/apis/oauth.api';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,11 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
   FolderOpen,
   UserStar,
   Users,
@@ -33,6 +39,7 @@ import {
   ChevronRight,
   Settings,
   Pencil,
+  LogOut,
 } from 'lucide-react';
 
 import type { FilterType } from '../types';
@@ -187,7 +194,7 @@ function ProfileDialog({
 
       <DialogContent className="
         sm:max-w-106.25
-        bg-white/92
+        bg-white
         backdrop-blur-2xl
         border border-white/60
         shadow-[0_20px_48px_-12px_rgba(0,0,0,0.12)]
@@ -196,14 +203,14 @@ function ProfileDialog({
         p-0
         overflow-hidden
       ">
-        <DialogHeader className="p-6 pb-0">
+        <DialogHeader className="p-6 pb-0 bg-white">
           <DialogTitle className="text-[var(--figma-tech-green)] text-xl font-bold tracking-tight">프로필 정보</DialogTitle>
           <DialogDescription className="text-zinc-500">
             계정 정보를 확인하고 수정할 수 있습니다.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4">
+        <div className="py-4 bg-white">
           <div className="grid gap-2">
             <Label htmlFor="nickname" className="text-zinc-700 px-6 text-xs font-bold uppercase tracking-wider opacity-70">
               닉네임
@@ -217,7 +224,7 @@ function ProfileDialog({
                     value={temp}
                     onChange={(e) => setTemp(e.target.value)}
                     className={cn(
-                      'bg-white/80 border-white/60 focus:ring-2 focus:ring-[var(--figma-neon-green)]/40 focus:border-[var(--figma-neon-green)] rounded-xl backdrop-blur-sm',
+                      'bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-[var(--figma-neon-green)]/40 focus:border-[var(--figma-neon-green)] rounded-xl transition-colors duration-300 hover:bg-white/60',
                       errorMessage &&
                       'border-red-300 focus:border-red-400 focus:ring-red-100'
                     )}
@@ -251,7 +258,7 @@ function ProfileDialog({
               </div>
             ) : (
               <div className="px-6">
-                <div className="flex items-center justify-between rounded-xl border border-white/60 bg-white/60 px-3 py-2 h-10 mb-8 backdrop-blur-sm">
+                <div className="flex items-center justify-between rounded-xl border-transparent bg-white/50 shadow-sm px-3 py-2 h-10 mb-8 hover:bg-white/60 transition-colors duration-300">
                   <span className="text-zinc-800 font-medium">{nickname}</span>
                   <Button
                     variant="ghost"
@@ -269,23 +276,14 @@ function ProfileDialog({
         </div>
 
         <div className="border-t border-zinc-100 bg-zinc-50/30 p-6 pt-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-bold text-zinc-900">회원 탈퇴</p>
-              <p className="text-[12px] text-zinc-500">
-                계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
-              </p>
-            </div>
-
+          <div className="flex justify-end">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600 bg-white focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl transition-colors"
+                <button
+                  className="text-sm text-zinc-400 hover:text-zinc-500 transition-colors"
                 >
                   탈퇴하기
-                </Button>
+                </button>
               </AlertDialogTrigger>
 
               <AlertDialogContent className="
@@ -307,7 +305,7 @@ function ProfileDialog({
                     영구적으로 삭제됩니다.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter className="p-6 pt-5 bg-zinc-50/50 border-t border-zinc-100">
+                <AlertDialogFooter className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-100">
                   <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
                     취소
                   </AlertDialogCancel>
@@ -333,6 +331,7 @@ export function LoungeSidebar({
   currentFilter,
   onFilterChange,
 }: SidebarProps) {
+  const navigate = useNavigate();
   const { user, clearUser } = useUserStore();
   const [nickname, setNickname] = useState(user?.nickname || '사용자');
 
@@ -371,9 +370,28 @@ export function LoungeSidebar({
           <div className="w-full flex justify-center"></div>
         ) : (
           <div className="flex flex-1 items-center justify-between overflow-hidden">
-            <span className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis px-1">
-              {nickname}
-            </span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="h-auto p-0 hover:bg-transparent font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis px-1">
+                  {nickname}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-40 p-1" align="start">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
+                  onClick={async () => {
+                    await logout();
+                    useUserStore.getState().clearUser();
+                    navigate('/login');
+                  }}
+                >
+                  <LogOut className="mr-2 h-3.5 w-3.5" />
+                  로그아웃
+                </Button>
+              </PopoverContent>
+            </Popover>
 
             {user && (
               <ProfileDialog
