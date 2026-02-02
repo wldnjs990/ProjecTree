@@ -28,7 +28,6 @@ class NodeDetailCrdtService {
   private yNodeDetailsRef: Y.Map<Y.Map<YNodeDetailValue>> | null = null;
   private yConfirmedRef: Y.Map<ConfirmedNodeData> | null = null;
   private yNodeCandidatesRef: Y.Map<Candidate[]> | null = null;
-  private yConfirmedCandidatesRef: Y.Map<Candidate[]> | null = null;
   private cleanupFn: (() => void) | null = null;
   private isInitialized = false;
 
@@ -60,8 +59,6 @@ class NodeDetailCrdtService {
     const yNodeDetails = client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
     const yConfirmed = client.getYMap<ConfirmedNodeData>('confirmedNodeData');
     const yNodeCandidates = client.getYMap<Candidate[]>('nodeCandidates');
-    const yConfirmedCandidates =
-      client.getYMap<Candidate[]>('confirmedCandidates');
 
     // 편집 데이터 변경 감지
     const editObserveHandler = () => {
@@ -85,18 +82,13 @@ class NodeDetailCrdtService {
       });
     };
 
-    // Candidates 편집 데이터 변경 감지
-    const candidatesEditHandler = () => {
-      this.syncCandidatesFromYjs();
-    };
-
-    // 확정된 Candidates 변경 감지 → nodeStore 업데이트
-    const confirmedCandidatesHandler = (event: Y.YMapEvent<Candidate[]>) => {
+    // Candidates 변경 감지 → nodeStore 업데이트 (즉시 확정, confirm 불필요)
+    const candidatesHandler = (event: Y.YMapEvent<Candidate[]>) => {
       event.keysChanged.forEach((key) => {
-        const candidates = yConfirmedCandidates.get(key);
+        const candidates = yNodeCandidates.get(key);
         if (candidates) {
           console.log(
-            '[NodeDetailCrdtService] 확정 Candidates 수신:',
+            '[NodeDetailCrdtService] Candidates 수신:',
             key,
             candidates
           );
@@ -107,8 +99,7 @@ class NodeDetailCrdtService {
 
     yNodeDetails.observeDeep(editObserveHandler);
     yConfirmed.observe(confirmedObserveHandler);
-    yNodeCandidates.observe(candidatesEditHandler);
-    yConfirmedCandidates.observe(confirmedCandidatesHandler);
+    yNodeCandidates.observe(candidatesHandler);
 
     // 기존 데이터 로드 함수
     const loadExistingData = () => {
@@ -157,15 +148,13 @@ class NodeDetailCrdtService {
     this.cleanupFn = () => {
       yNodeDetails.unobserveDeep(editObserveHandler);
       yConfirmed.unobserve(confirmedObserveHandler);
-      yNodeCandidates.unobserve(candidatesEditHandler);
-      yConfirmedCandidates.unobserve(confirmedCandidatesHandler);
+      yNodeCandidates.unobserve(candidatesHandler);
       client.provider.off('sync', syncHandler);
     };
 
     this.yNodeDetailsRef = yNodeDetails;
     this.yConfirmedRef = yConfirmed;
     this.yNodeCandidatesRef = yNodeCandidates;
-    this.yConfirmedCandidatesRef = yConfirmedCandidates;
     this.isInitialized = true;
 
     console.log('[NodeDetailCrdtService] 옵저버 초기화 완료');
@@ -182,7 +171,6 @@ class NodeDetailCrdtService {
     this.yNodeDetailsRef = null;
     this.yConfirmedRef = null;
     this.yNodeCandidatesRef = null;
-    this.yConfirmedCandidatesRef = null;
     this.cleanupFn = null;
     this.isInitialized = false;
 
@@ -406,7 +394,9 @@ class NodeDetailCrdtService {
   }
 
   /**
-   * Candidates 업데이트 (편집 모드와 무관하게 동작)
+   * Candidates 업데이트 (편집 모드와 무관, 즉시 확정)
+   * - Y.Map에 저장 → 다른 클라이언트에 자동 브로드캐스트
+   * - 로컬 store에도 즉시 반영
    */
   updateCandidates(nodeId: string, candidates: Candidate[]): void {
     const client = getCrdtClient();
@@ -415,42 +405,13 @@ class NodeDetailCrdtService {
       return;
     }
 
+    // Y.Map에 저장 (다른 클라이언트에 브로드캐스트)
     this.yNodeCandidatesRef.set(nodeId, candidates);
+
+    // 로컬 store에도 즉시 반영
+    useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates });
+
     console.log('[NodeDetailCrdtService] Candidates 업데이트:', nodeId, candidates);
-  }
-
-  /**
-   * Candidates 확정 (DB 저장 및 브로드캐스트)
-   */
-  confirmCandidates(nodeId: string): void {
-    const client = getCrdtClient();
-    if (!client || !this.yNodeCandidatesRef || !this.yConfirmedCandidatesRef) {
-      return;
-    }
-
-    const candidates = this.yNodeCandidatesRef.get(nodeId);
-    if (candidates) {
-      this.yConfirmedCandidatesRef.set(nodeId, candidates);
-
-      // 로컬 store에도 반영
-      useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates });
-
-      console.log('[NodeDetailCrdtService] Candidates 확정:', nodeId, candidates);
-    }
-  }
-
-  /**
-   * Y.js에서 candidates 동기화
-   */
-  private syncCandidatesFromYjs(): void {
-    const { selectedNodeId } = useNodeDetailStore.getState();
-    if (!this.yNodeCandidatesRef || !selectedNodeId) return;
-
-    const candidates = this.yNodeCandidatesRef.get(selectedNodeId);
-    if (candidates) {
-      // nodeStore에 직접 업데이트
-      useNodeStore.getState().updateNodeDetail(Number(selectedNodeId), { candidates });
-    }
   }
 }
 

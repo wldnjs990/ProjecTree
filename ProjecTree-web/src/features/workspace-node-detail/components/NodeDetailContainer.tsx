@@ -7,7 +7,6 @@ import { MemoSection } from './MemoSection';
 import { useSelectedNodeDetail, useNodeDetailEdit } from '../hooks';
 import {
   useSelectedNodeId,
-  useNodeStore,
   nodeDetailCrdtService,
 } from '@/features/workspace-core';
 import { generateNodeCandidates } from '@/apis/workspace.api';
@@ -28,7 +27,6 @@ export default function NodeDetailContainer({
   // Store에서 상태 및 액션 구독
   const nodeDetail = useSelectedNodeDetail();
   const selectedNodeId = useSelectedNodeId();
-  const updateNodeDetail = useNodeStore((state) => state.updateNodeDetail);
   const { isEditing, closeSidebar, startEdit, finishEdit } =
     useNodeDetailEdit();
 
@@ -71,12 +69,9 @@ export default function NodeDetailContainer({
     setIsGeneratingCandidates(true);
     try {
       const candidates = await generateNodeCandidates(Number(selectedNodeId));
-      // Zustand store 업데이트
-      updateNodeDetail(Number(selectedNodeId), { candidates });
 
-      // CRDT 동기화 (편집 모드와 무관하게 항상 동기화)
+      // CRDT 동기화 (Y.Map + 로컬 store 모두 업데이트)
       nodeDetailCrdtService.updateCandidates(selectedNodeId, candidates);
-      nodeDetailCrdtService.confirmCandidates(selectedNodeId);
 
       console.log('[NodeDetailContainer] AI 노드 후보 생성 완료:', candidates);
     } catch (error) {
