@@ -307,7 +307,7 @@ function ProfileDialog({
                     영구적으로 삭제됩니다.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter className="p-6 pt-2 bg-zinc-50/50 border-t border-zinc-100">
+                <AlertDialogFooter className="p-6 pt-5 bg-zinc-50/50 border-t border-zinc-100">
                   <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
                     취소
                   </AlertDialogCancel>
