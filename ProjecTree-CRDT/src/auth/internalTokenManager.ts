@@ -26,7 +26,6 @@ function getExpiredAt(token: string): number {
 }
 
 async function requestNewToken(): Promise<string> {
-  console.log("Requesting new internal token from Spring...");
   const res = await axios.post(
     `${SPRING_BASE_URL}/api/auth/internal/token`,
     {},
@@ -38,7 +37,6 @@ async function requestNewToken(): Promise<string> {
     },
   );
 
-  console.log("Internal token response received", { data: res.data });
   const token = res.data?.data?.token;
   if (!token) {
     throw new Error("Internal token 발급 실패");
@@ -46,19 +44,12 @@ async function requestNewToken(): Promise<string> {
 
   cachedToken = token;
   expiredAt = getExpiredAt(token);
-  console.log(
-    `New internal token acquired, expires at ${new Date(expiredAt).toISOString()}`,
-  );
-
   return token;
 }
 
 export async function getInternalToken(): Promise<string> {
   const now = Date.now();
 
-  console.log("Checking internal token validity...", {
-    cachedToken: cachedToken,
-  });
   if (cachedToken && now < expiredAt - 30_000) {
     return cachedToken;
   }
