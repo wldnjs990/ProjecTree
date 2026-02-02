@@ -85,7 +85,8 @@ public class DataInitializer {
 
                     String[] columns = line.split(",");
                     if (columns.length > 0) {
-                        String tagName = columns[0].replace("", "").trim();
+                        String tagName = columns[0].replace(" ", "")
+                                .replace("\"", "").trim();
                         // 객체 생성만 하고 리스트에 담음
                         TechVocabulary vocab = new TechVocabulary();
                         vocab.setName(tagName);
