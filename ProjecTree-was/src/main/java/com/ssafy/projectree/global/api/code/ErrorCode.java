@@ -26,8 +26,9 @@ public enum ErrorCode {
     UN_EXPECTED_TOKEN_VALIDATION(DomainCode.AUTH, ExceptionCode.UN_EXPECTED ,"UN_EXPECTED - 예기치 못한 토큰" ),
     WORKSPACE_NOT_FOUND(DomainCode.WORKSPACE, ExceptionCode.NOT_FOUND, "WORKSPACE_NOT_FOUND"),
     TECHSTACK_NOT_FOUND(DomainCode.TECH, ExceptionCode.NOT_FOUND, "TECHSTACK_NOT_FOUND"),
-    MEMBER_NOT_FOUND_IN_WORKSPACE(DomainCode.WORKSPACE, ExceptionCode.NOT_FOUND, "MEMBER_NOT_FOUND_IN_WORKSPACE");
-
+    MEMBER_NOT_FOUND_IN_WORKSPACE(DomainCode.WORKSPACE, ExceptionCode.NOT_FOUND, "MEMBER_NOT_FOUND_IN_WORKSPACE"),
+    AUTHENTICATION_REQUIRED(DomainCode.AUTH, ExceptionCode.INVALID, "AUTHENTICATION_REQUIRED"),
+    ACCESS_DENIED(DomainCode.AUTH, ExceptionCode.FORBIDDEN, "ACCESS_DENIED");
     private DomainCode domainCode;
     private ExceptionCode exceptionCode;
     private String defaultMessage;
