@@ -5,49 +5,55 @@ import forestImage from '@/assets/images/forest.jpg';
 
 export function LoginIntro() {
   return (
-    <div
-      className="hidden lg:flex flex-col justify-between w-1/2 min-w-[500px] max-w-[800px] p-16 relative overflow-hidden"
-      style={{
-        backgroundImage: `linear-gradient(rgba(15, 76, 58, 0.85), rgba(15, 76, 58, 0.85)), url(${forestImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      {/* Logo */}
-      <Link
-        to="/"
-        className="flex items-center gap-3 z-10 hover:opacity-80 transition-opacity cursor-pointer"
-      >
-        <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm">
-          <Layers className="text-white h-7 w-7" />
+    <div className="hidden lg:flex flex-col justify-between w-1/2 min-w-[500px] max-w-[800px] p-16 relative overflow-hidden">
+      {/* Background Image */}
+      <img
+        src={forestImage}
+        alt="Forest Background"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      />
+
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-[#0f4c3a]/85 z-0" />
+
+      {/* Content Container (z-10 to sit above background) */}
+      <div className="flex flex-col justify-between h-full z-10 relative">
+        {/* Logo */}
+        <Link
+          to="/"
+          className="flex items-center gap-3 z-10 hover:opacity-80 transition-opacity cursor-pointer"
+        >
+          <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm">
+            <Layers className="text-white h-7 w-7" />
+          </div>
+          <span className="text-2xl font-bold text-white tracking-tight">
+            ProjecTree
+          </span>
+        </Link>
+
+        {/* Hero Section - Vertically Centered */}
+        <motion.div
+          className="z-10 flex flex-col justify-center h-full max-w-xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+        >
+          <h1 className="text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight tracking-tight break-keep">
+            생각의 씨앗을
+            <br />
+            거대한 숲으로
+          </h1>
+          <p className="text-gray-300 text-lg lg:text-xl leading-relaxed tracking-tight break-keep max-w-lg">
+            작은 아이디어들이 모여 울창한 숲을 이루기까지,
+            <br />
+            ProjecTree가 당신의 모든 과정을 함께합니다.
+          </p>
+        </motion.div>
+
+        {/* Footer/Copyright */}
+        <div className="z-10 text-gray-400 text-sm tracking-tight">
+          © 2026 ProjecTree. All rights reserved.
         </div>
-        <span className="text-2xl font-bold text-white tracking-tight">
-          ProjecTree
-        </span>
-      </Link>
-
-      {/* Hero Section - Vertically Centered */}
-      <motion.div
-        className="z-10 flex flex-col justify-center h-full max-w-xl"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
-      >
-        <h1 className="text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight tracking-tight break-keep">
-          생각의 씨앗을
-          <br />
-          거대한 숲으로
-        </h1>
-        <p className="text-gray-300 text-lg lg:text-xl leading-relaxed tracking-tight break-keep max-w-lg">
-          작은 아이디어들이 모여 울창한 숲을 이루기까지,
-          <br />
-          ProjecTree가 당신의 모든 과정을 함께합니다.
-        </p>
-      </motion.div>
-
-      {/* Footer/Copyright */}
-      <div className="z-10 text-gray-400 text-sm tracking-tight">
-        © 2026 ProjecTree. All rights reserved.
       </div>
 
       {/* Abstract Background Decoration */}
