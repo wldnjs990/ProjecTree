@@ -4,6 +4,7 @@ import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
 import com.ssafy.projectree.domain.file.model.entity.FileProperty;
 import com.ssafy.projectree.domain.file.usecase.FileService;
 import com.ssafy.projectree.domain.file.usecase.S3Service;
+import com.ssafy.projectree.domain.member.api.dto.MemberDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
@@ -14,6 +15,7 @@ import com.ssafy.projectree.domain.workspace.api.dto.TeamDto;
 import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.model.entity.FunctionSpecification;
+import com.ssafy.projectree.domain.workspace.model.entity.Team;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.workspace.model.repository.WorkspaceRepository;
 import com.ssafy.projectree.global.api.code.ErrorCode;
@@ -26,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -127,10 +130,24 @@ public class WorkspaceService {
             );
         }
 
+        List<Team> teams = teamService.findAllByWorkspace(workspace);
+        List<Member> members = teamService.getMembers(teams);
+
+        List<MemberDto.Info> memberInfos = members.stream()
+                .map(MemberDto.Info::from)
+                .collect(Collectors.toList());
+
+        TeamDto.Info teamInfo = TeamDto.Info.builder()
+                .chatRoomId(teams.get(0).getChatRoom().getId())
+                .memberInfos(memberInfos)
+                .build();
+
         return WorkspaceDto.Detail.builder()
                 .nodeTree(nodeService.getNodeTree(workspaceId))
                 .files(files)
-                .epics(epics).build();
+                .epics(epics)
+                .teamInfo(teamInfo)
+                .build();
     }
 
 }
