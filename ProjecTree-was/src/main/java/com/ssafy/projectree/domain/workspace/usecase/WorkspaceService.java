@@ -20,6 +20,7 @@ import com.ssafy.projectree.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -70,6 +71,7 @@ public class WorkspaceService {
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.WORKSPACE_NOT_FOUND, "존재하지 않는 워크 스페이스입니다."));
     }
 
+    @Transactional
     public void create(Member member, WorkspaceDto.Insert dto, List<MultipartFile> multipartFiles) throws IOException {
         // 워크 스페이스 생성
         Workspace workspace = Workspace.builder()

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -77,8 +78,10 @@ public interface WorkspaceDocsController {
             @ApiResponse(responseCode = "200", description = "Successfully Completed"),
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    CommonResponse<?> create(Member member, WorkspaceDto.Insert dto, List<MultipartFile> multipartFiles) throws IOException;
-
+    CommonResponse<?> create(Member member,
+                             @RequestPart(value = "data") WorkspaceDto.Insert dto,
+                             @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles
+    ) throws IOException;
     @Operation(summary = "워크 스페이스 수정 API", description = "워크 스페이스 정보를 수정합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successfully Completed"),

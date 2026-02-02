@@ -11,4 +11,9 @@ public class JwtProperties {
     public static final String ROLE = "role";
     public static final String USERID = "id";
     public static final String TOKEN_TYPE = "tokenType";
+
+    public static final String INTERNAL_ROLE = "ROLE_INTERNAL";
+    public static final String SERVICE_TOKEN_TYPE = "SERVICE";
+    public static final String SERVICE_SUBJECT = "crdt-node";
+    public static final long SERVICE_TOKEN_EXPIRE_TIME = 1000L * 60 * 15;
 }
