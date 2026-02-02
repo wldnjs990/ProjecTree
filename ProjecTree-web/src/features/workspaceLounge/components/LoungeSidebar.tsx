@@ -27,11 +27,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
   FolderOpen,
   UserStar,
   Users,
@@ -40,6 +35,7 @@ import {
   Settings,
   Pencil,
   LogOut,
+  TreeDeciduous,
 } from 'lucide-react';
 
 import type { FilterType } from '../types';
@@ -370,28 +366,9 @@ export function LoungeSidebar({
           <div className="w-full flex justify-center"></div>
         ) : (
           <div className="flex flex-1 items-center justify-between overflow-hidden">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" className="h-auto p-0 hover:bg-transparent font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis px-1">
-                  {nickname}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-40 p-1" align="start">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
-                  onClick={async () => {
-                    await logout();
-                    useUserStore.getState().clearUser();
-                    navigate('/login');
-                  }}
-                >
-                  <LogOut className="mr-2 h-3.5 w-3.5" />
-                  로그아웃
-                </Button>
-              </PopoverContent>
-            </Popover>
+            <span className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis px-1">
+              {nickname}
+            </span>
 
             {user && (
               <ProfileDialog
@@ -442,6 +419,38 @@ export function LoungeSidebar({
           })}
         </ul>
       </nav>
+
+      {/* Footer */}
+      <div className={cn(
+        'border-t border-white/20 p-3 flex items-center',
+        collapsed ? 'justify-center' : 'justify-between'
+      )}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50/50 transition-colors"
+          onClick={() => navigate('/')}
+        >
+          <TreeDeciduous className="h-4 w-4" />
+          {!collapsed && <span className="ml-2">홈</span>}
+        </Button>
+
+        {!collapsed && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-zinc-400 hover:text-red-500 hover:bg-red-50/50 transition-colors"
+            onClick={async () => {
+              await logout();
+              useUserStore.getState().clearUser();
+              navigate('/login');
+            }}
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="ml-2">로그아웃</span>
+          </Button>
+        )}
+      </div>
     </aside>
   );
 }
