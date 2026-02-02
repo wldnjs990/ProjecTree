@@ -43,10 +43,11 @@ public class InferenceServiceImpl implements InferenceService {
     @Retryable(
             retryFor = {HttpServerErrorException.class, ResourceAccessException.class}, // 이 예외들에 대해서만 재시도
             maxAttempts = 3,  // 최대 3회 시도
-            backoff = @Backoff(delay = 1000) // 재시도 간격 1초
+            backoff = @Backoff(delay = 1000), // 재시도 간격 1초
+            listeners = "retryLoggingListener" // << 여기에 추가
     )
     public AiCandidateCreateDto.Response createCandidate(AiCandidateCreateDto.Request request) {
-
+        log.info("Candidate create start {}", request);
         String uriString = UriComponentsBuilder.fromUriString(serverUrl)
                 .path(pathPrefix)
                 .path(candidatePath)
@@ -62,16 +63,18 @@ public class InferenceServiceImpl implements InferenceService {
     }
     @Recover
     public AiCandidateCreateDto.Response recoverCandidate(RuntimeException e, AiCandidateCreateDto.Request request) {
-        log.error("Candidate 생성 3회 재시도 실패: node_id={}", request.getNodeId());
+        log.error("Candidate 생성 3회 재시도 실패: node_id={}", request.getNodeId(), e);
         // 여기서 최종적으로 커스텀 예외를 던집니다.
-        throw new AIServiceException(ErrorCode.CANDIDATE_GENERATE_ERROR, request.getNodeId(), LockType.CANDIDATE, e.getMessage());
+        throw new AIServiceException(ErrorCode.CANDIDATE_GENERATE_ERROR, request.getNodeId(), LockType.CANDIDATE, e.toString());
     }
 
     @Override
     @Retryable(
             retryFor = {HttpServerErrorException.class, ResourceAccessException.class},
             maxAttempts = 3,
-            backoff = @Backoff(delay = 1000)
+            backoff = @Backoff(delay = 1000),
+            listeners = "retryLoggingListener" // << 여기에 추가
+
     )
     public AiNodeCreateDto.Response createNode(AiNodeCreateDto.Request request) {
         return restClient.post().uri(UriComponentsBuilder.fromUriString(serverUrl)
@@ -87,8 +90,8 @@ public class InferenceServiceImpl implements InferenceService {
     }
     @Recover
     public AiNodeCreateDto.Response recoverNode(RuntimeException e, AiNodeCreateDto.Request request) {
-        log.error("Node 생성 3회 재시도 실패: candidate_id={}", request.getCandidateId());
-        throw new AIServiceException(ErrorCode.NODE_GENERATE_ERROR, request.getCandidateId(), LockType.NODE, e.getMessage());
+        log.error("Node 생성 3회 재시도 실패: candidate_id={}", request.getCandidateId(), e);
+        throw new AIServiceException(ErrorCode.NODE_GENERATE_ERROR, request.getCandidateId(), LockType.NODE, e.toString());
     }
 
 
@@ -96,7 +99,9 @@ public class InferenceServiceImpl implements InferenceService {
     @Retryable(
             retryFor = {HttpServerErrorException.class, ResourceAccessException.class},
             maxAttempts = 3,
-            backoff = @Backoff(delay = 1000)
+            backoff = @Backoff(delay = 1000),
+            listeners = "retryLoggingListener" // << 여기에 추가
+
     )
     public AiTechRecommendDto.Response recommendTechStack(AiTechRecommendDto.Request request) {
         return restClient.post().uri(UriComponentsBuilder.fromUriString(serverUrl)
@@ -112,8 +117,8 @@ public class InferenceServiceImpl implements InferenceService {
     }
     @Recover
     public AiTechRecommendDto.Response recoverTech(RuntimeException e, AiTechRecommendDto.Request request) {
-        log.error("Tech 추천 3회 재시도 실패: node_id={}", request.getNodeId());
-        throw new AIServiceException(ErrorCode.TECH_RECOMMEND_ERROR, request.getNodeId(), LockType.TECH, e.getMessage());
+        log.error("Tech 추천 3회 재시도 실패: node_id={}", request.getNodeId(), e);
+        throw new AIServiceException(ErrorCode.TECH_RECOMMEND_ERROR, request.getNodeId(), LockType.TECH, e.toString());
     }
 
 }

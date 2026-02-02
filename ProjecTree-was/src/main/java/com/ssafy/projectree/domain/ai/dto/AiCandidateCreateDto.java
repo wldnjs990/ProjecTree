@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +15,7 @@ public class AiCandidateCreateDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @ToString
     public static class Request{
         @JsonProperty("node_id")
         private Long nodeId;
