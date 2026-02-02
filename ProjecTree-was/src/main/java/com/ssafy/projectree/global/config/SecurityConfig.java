@@ -46,7 +46,7 @@ public class SecurityConfig {
     public SecurityFilterChain internalSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/internal/**")
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )

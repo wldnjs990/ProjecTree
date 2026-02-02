@@ -43,9 +43,9 @@ public class InternalJwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        /**
-         * 인증을 받기위해 인증 받지 않은 Authentication 객체 생성
-         * principal에 authHeader 적재.
+        /*
+          인증을 받기위해 인증 받지 않은 Authentication 객체 생성
+          principal에 authHeader 적재.
          */
         Authentication unAuth = makeUnAuthToken(authHeader);
 
