@@ -78,7 +78,13 @@ def run_expert_node(state: RecommendationState, executor: Any):
     else:
         excluded_context = ""
     
-    prompt_msg = EXPERT_USER_PROMPT.format(task_type=task_type, user_task=user_task, task_description=task_description, workspace_info=workspace_context, excluded_tech_stacks=excluded_context)
+    prompt_msg = EXPERT_USER_PROMPT.format(
+        task_type=task_type, 
+        user_task=user_task, 
+        task_description=task_description, 
+        workspace_info=workspace_context, 
+        excluded_tech_stacks=excluded_context,
+    )
     
     if feedback:
         prompt_msg += f"\n\n[이전 추천에 대한 피드백]\n{feedback}\n\n위 피드백을 반영하여 다시 추천해주세요."

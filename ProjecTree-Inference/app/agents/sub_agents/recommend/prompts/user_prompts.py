@@ -8,8 +8,6 @@ EXPERT_USER_PROMPT = """
 
 {workspace_info}
 
-{candidate_info}
-
 {excluded_tech_stacks}
 
 [요청 사항]

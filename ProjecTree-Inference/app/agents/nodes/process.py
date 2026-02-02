@@ -1,9 +1,9 @@
 from app.agents.states.state import NodeState
 from app.core.llm import openai_mini_llm, opendai_reasoning_llm
+from app.agents.tools.validator import validate_description, validate_summary
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ProviderStrategy
 from langchain_core.messages import HumanMessage
-from app.agents.schemas.analysis import TaskAnalysis
 from app.agents.prompts.system.global_context import GLOBAL_CONTEXT
 from app.agents.prompts.system.process_prompts import (
     EPIC_PROCESS_PROMPT,
@@ -80,7 +80,7 @@ async def _process_node(
         # 2. Agent 생성 (매번 생성하는 비용이 크다면 캐싱 고려 가능하지만, Context 관리가 더 중요함)
         agent = create_agent(
             llm,
-            tools=[],
+            tools=[validate_description],
             system_prompt=system_prompt,
             response_format=ProviderStrategy(schema),
         )

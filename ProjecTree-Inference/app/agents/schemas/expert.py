@@ -9,7 +9,9 @@ class TechRecommandation(BaseModel):
     description: str = Field(description="한글로 설명한 해당 기술에 대한 설명")    
     ref: str = Field(description="해당 기술에 대한 웹 검색 도구의 문서 URL")
     recommendation_score: int = Field(
-        description="추천 점수 (1-5). 기술 목록 내에서 '상위 순위'를 나타내는 유일한(Unique) 정수여야 하며, 다른 기술과 중복될 수 없음."
+        description="추천 점수 (1-5). 기술 목록 내에서 '상위 순위'를 나타내는 유일한(Unique) 정수여야 하며, 다른 기술과 중복될 수 없음.",
+        ge=1,
+        le=5
     )
 
 class TechList(BaseModel):
