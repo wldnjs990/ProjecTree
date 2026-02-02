@@ -10,7 +10,6 @@ export async function saveNodeTechToSpring(
   payload: SaveNodeTechPayload,
 ): Promise<boolean> {
   try {
-    // TODO: 스프링 restAPI 엔드포인트 성훈님께 물어보기
     await springInternalClient.post(
       `/api/internal/nodes/${payload.nodeId}/tech`,
       {

@@ -44,6 +44,11 @@ async function requestNewToken(): Promise<string> {
 
   cachedToken = token;
   expiredAt = getExpiredAt(token);
+  console.log(
+    `[InternalTokenManager] New token acquired, expires at ${new Date(
+      expiredAt,
+    ).toISOString()}`,
+  );
   return token;
 }
 
