@@ -29,9 +29,9 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND_IN_WORKSPACE(DomainCode.WORKSPACE, ExceptionCode.NOT_FOUND, "MEMBER_NOT_FOUND_IN_WORKSPACE"),
     AUTHENTICATION_REQUIRED(DomainCode.AUTH, ExceptionCode.INVALID, "AUTHENTICATION_REQUIRED"),
     ACCESS_DENIED(DomainCode.AUTH, ExceptionCode.FORBIDDEN, "ACCESS_DENIED");
-    private DomainCode domainCode;
-    private ExceptionCode exceptionCode;
-    private String defaultMessage;
+    private final DomainCode domainCode;
+    private final ExceptionCode exceptionCode;
+    private final String defaultMessage;
 
     //10001
     public int status() {

@@ -12,6 +12,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -40,6 +43,14 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         } catch (IllegalArgumentException e) {
             // 4. 토큰이 없는 경우 등
             setErrorResponse(response, ErrorCode.TOKEN_EMPTY);
+        } catch (BadCredentialsException | InsufficientAuthenticationException e) {
+            // 인증 실패
+            setErrorResponse(response, ErrorCode.AUTHENTICATION_REQUIRED);
+
+        } catch (AccessDeniedException e) {
+            // 권한 부족
+            setErrorResponse(response, ErrorCode.ACCESS_DENIED);
+
         } catch (JwtException e) {
             // 5. 그 외 JWT 관련 에러
             setErrorResponse(response, ErrorCode.UN_EXPECTED_TOKEN_VALIDATION);
