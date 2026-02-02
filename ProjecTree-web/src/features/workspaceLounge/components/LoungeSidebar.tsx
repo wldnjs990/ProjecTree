@@ -268,7 +268,7 @@ function ProfileDialog({
           </div>
         </div>
 
-        <div className="border-t border-zinc-100 bg-zinc-50/50 p-6 pt-5">
+        <div className="border-t border-zinc-100 bg-zinc-50/30 p-6 pt-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-bold text-zinc-900">회원 탈퇴</p>
