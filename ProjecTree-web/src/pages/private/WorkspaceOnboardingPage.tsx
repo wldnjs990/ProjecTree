@@ -10,6 +10,7 @@ import {
   Step5TeamInvite,
   Step6EpicSetup,
   Step7Loading,
+  ONBOARDING_TEXTS,
 } from '@/features/workspace-onboarding';
 import { createWorkspace } from '@/apis/workspace.api';
 import type { Role } from '@/apis/workspace.api';
@@ -18,6 +19,9 @@ export default function WorkspaceOnboardingPage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const currentStepLabel =
+    ONBOARDING_TEXTS.steps.find((step) => step.number === currentStep)?.label ??
+    '';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -152,7 +156,12 @@ export default function WorkspaceOnboardingPage() {
         {/* Mobile Header */}
         <div className="lg:hidden w-full absolute top-0 left-0 p-4 bg-[var(--figma-tech-green)] text-white flex justify-between z-50">
           <span className="font-bold">ProjecTree</span>
-          <span>{currentStep}/6</span>
+          <div className="flex items-center gap-6">
+            <span className="text-sm font-medium text-white/80">
+              {currentStepLabel}
+            </span>
+            <span>{currentStep}/6</span>
+          </div>
         </div>
 
         <div className="w-full max-w-[500px] h-[600px] flex flex-col justify-between relative z-20">
