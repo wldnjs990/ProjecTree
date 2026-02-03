@@ -148,10 +148,7 @@ export default function WorkspaceOnboardingPage() {
       </div>
 
       {/* Right Side (Content) with Diagonal Split */}
-      <div
-        className="w-full lg:w-[70%] bg-white relative flex flex-col items-center justify-center p-8 lg:px-24 lg:py-12 shadow-2xl"
-        style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 100%, 0% 100%)' }}
-      >
+      <div className="onboarding-right-panel w-full lg:w-[70%] bg-white relative flex flex-col items-center justify-center p-8 lg:px-24 lg:py-12 shadow-2xl">
         {/* Mobile Header */}
         <div className="lg:hidden w-full absolute top-0 left-0 p-4 bg-[var(--figma-tech-green)] text-white flex justify-between z-50">
           <span className="font-bold">ProjecTree</span>
