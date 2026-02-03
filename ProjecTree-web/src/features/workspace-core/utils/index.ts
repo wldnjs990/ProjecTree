@@ -3,6 +3,9 @@ export {
   findChildNodes,
   findAllDescendants,
   findRootNode,
+  getAutoLayoutedNodes,
+  type LayoutDirection,
+  type AutoLayoutOptions,
 } from './generateEdges';
 
 export {
