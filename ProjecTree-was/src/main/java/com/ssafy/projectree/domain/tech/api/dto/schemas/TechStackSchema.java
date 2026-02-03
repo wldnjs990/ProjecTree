@@ -17,4 +17,5 @@ public class TechStackSchema {
     private String description;
     private String ref;
     private Integer recommendScore;
+    private boolean isSelected;
 }
