@@ -47,8 +47,11 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
   // useState 사용 - React 렌더링 사이클과 동기화 (UI 상태 반영)
   const [isLeaving, setIsLeaving] = useState(false);
 
-  // 마이크 활성화 상태
-  const [isMicEnabled, setIsMicEnabled] = useState(true);
+  // 마이크 활성화 상태 (초기값 false - 권한 확인 후 true로 변경)
+  const [isMicEnabled, setIsMicEnabled] = useState(false);
+
+  // 마이크 권한 거부 상태 (모달 표시용)
+  const [micPermissionDenied, setMicPermissionDenied] = useState(false);
 
   // 에러 메시지
   const [error, setError] = useState<string | null>(null);
@@ -239,9 +242,11 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       // 마이크 활성화 (권한 거부 시에도 연결은 유지)
       try {
         await newRoom.localParticipant.setMicrophoneEnabled(true);
+        setIsMicEnabled(true); // 성공 시에만 true로 설정
       } catch (micErr) {
         console.warn('Microphone permission denied:', micErr);
         setIsMicEnabled(false);
+        setMicPermissionDenied(true); // 모달 표시
         // 마이크 권한 거부는 치명적 에러가 아니므로 연결은 유지
       }
     } catch (err) {
@@ -306,6 +311,7 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
         if (err instanceof Error && err.name === 'NotAllowedError') {
           console.warn('Microphone permission denied');
           setIsMicEnabled(false);
+          setMicPermissionDenied(true); // 모달 표시
         }
       }
     }
@@ -329,6 +335,11 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
     setIsLeaving(false);
   }, []);
 
+  // 마이크 권한 거부 상태 리셋 함수 (모달 닫기용)
+  const resetMicPermissionDenied = useCallback(() => {
+    setMicPermissionDenied(false);
+  }, []);
+
   return {
     room, // LiveKit Room 인스턴스
     remoteTracks, // 원격 참가자 오디오 트랙 목록
@@ -344,5 +355,7 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
     leaveRoom, // 방 나가기 함수
     toggleMicrophone, // 마이크 토글 함수
     resetLeaving, // isLeaving 리셋 함수
+    micPermissionDenied, // 마이크 권한 거부 상태 (모달 표시용)
+    resetMicPermissionDenied, // 마이크 권한 거부 상태 리셋 함수
   };
 }

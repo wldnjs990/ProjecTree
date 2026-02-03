@@ -21,6 +21,7 @@ import {
 import { useVoiceChat } from '../hooks/useVoiceChat';
 import HiddenAudioPlayer from './HiddenAudioPlayer';
 import ParticipantAvatar from './ParticipantAvatar';
+import { MicPermissionAlert } from './MicPermissionAlert';
 
 type VoiceChatBarProps = {
   isOpen: boolean;
@@ -49,6 +50,8 @@ export function VoiceChatBar({
     leaveRoom,
     toggleMicrophone,
     resetLeaving,
+    micPermissionDenied,
+    resetMicPermissionDenied,
   } = useVoiceChat({ workspaceId });
 
   // 바가 열릴 때 자동으로 음성 채팅방 입장
@@ -83,6 +86,12 @@ export function VoiceChatBar({
 
   return (
     <>
+      {/* 마이크 권한 거부 알림 모달 */}
+      <MicPermissionAlert
+        isOpen={micPermissionDenied}
+        onClose={resetMicPermissionDenied}
+      />
+
       {/* 원격 참가자 오디오 재생 (숨김) */}
       {remoteTracks.map((track) => {
         const audioTrack = track.trackPublication.audioTrack;
