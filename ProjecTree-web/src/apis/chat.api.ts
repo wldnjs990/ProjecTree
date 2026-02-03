@@ -19,7 +19,7 @@ export const fetchMessages = async (
   const response = await wasApiClient.get<{
     status: string;
     data: ChatMessage[];
-  }>(`/api/chat/${workspaceId}/messages`, {
+  }>(`chat/${workspaceId}/messages`, {
     params: options,
   });
 
@@ -38,7 +38,7 @@ export const fetchParticipants = async (
   const response = await wasApiClient.get<{
     status: string;
     data: ChatParticipant[];
-  }>(`/api/chat/${workspaceId}/participants`);
+  }>(`chat/${workspaceId}/participants`);
 
   // axios response.data를 그대로 반환 = { status: 'success', data: ChatParticipant[] }
   return response.data;

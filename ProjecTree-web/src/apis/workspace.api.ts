@@ -148,28 +148,33 @@ export interface TechStackItem {
  * [가짜 API] 기술 스택 목록 조회
  * (백엔드가 /api/tech-stacks 만들면, axios 호출로 교체 예정)
  */
-export const getTechStacks = async (): Promise<TechStackItem[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // 🟢 가짜 데이터 (ID, Name만 넘김)
-      resolve([
-        { id: 1, name: 'React' },
-        { id: 2, name: 'Vue' },
-        { id: 3, name: 'Angular' },
-        { id: 4, name: 'Spring Boot' },
-        { id: 5, name: 'Django' },
-        { id: 6, name: 'Node.js' },
-        { id: 7, name: 'MySQL' },
-        { id: 8, name: 'PostgreSQL' },
-        { id: 9, name: 'MongoDB' },
-        { id: 10, name: 'Docker' },
-        { id: 11, name: 'Kubernetes' },
-        { id: 12, name: 'AWS' },
-        { id: 13, name: 'Next.js' },
-        { id: 14, name: 'NestJS' },
-      ]);
-    }, 300); // 0.3초 로딩 흉내
+/**
+ * [API] 기술 스택 검색 (자동완성)
+ * @param keyword 검색어
+ */
+export const getTechStacks = async (
+  keyword: string = ''
+): Promise<TechStackItem[]> => {
+  console.log('📡 [API] getTechStacks 호출됨, keyword:', keyword);
+  if (!keyword.trim()) return [];
+
+  const response = await wasApiClient.get<{
+    message: string;
+    code: number;
+    isSuccess: boolean;
+    data: Array<{
+      id: number;
+      name: string;
+    }>;
+  }>('/tech-stacks/autocomplete', {
+    params: { keyword },
   });
+
+  console.log('✅ [API] getTechStacks 응답:', response.data);
+  return response.data.data.map((item) => ({
+    id: item.id,
+    name: item.name,
+  }));
 };
 
 /**
