@@ -1,6 +1,5 @@
 package com.ssafy.projectree.global.api.code;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

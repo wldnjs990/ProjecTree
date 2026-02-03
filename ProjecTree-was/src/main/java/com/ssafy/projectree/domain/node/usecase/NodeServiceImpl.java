@@ -104,6 +104,7 @@ public class NodeServiceImpl implements NodeService {
                                 .name(candidate.getName())
                                 .description(candidate.getDescription())
                                 .summary(candidate.getSummary())
+                                .isSelected(candidate.isSelected())
                                 .build())
                         .toList())
                 .techs(techStacks.stream()

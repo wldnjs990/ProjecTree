@@ -23,4 +23,7 @@ public class CandidateSchema {
 
     @Schema(description = "후보자 관련 설명 요약", example = "백엔드 경력 3년")
     private String summary;
+
+    @Schema(description = "후보노드의 선택 여부", example = "true")
+    private boolean isSelected;
 }
