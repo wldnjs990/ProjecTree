@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Download, Notebook, BookOpen, CheckSquare, Pin } from 'lucide-react';
 import type { Node, Edge } from '@xyflow/react';
 import { transformNodesForSpecView, useNodes, useEdges } from '@/features/workspace-core';
 import { EpicGroup } from './EpicGroup';
@@ -81,46 +81,52 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
         </Button>
       </div>
 
-      {/* Header row */}
-      <div
-        className={`py-3 px-4 bg-white/60 backdrop-blur-sm border-b border-white/30 text-xs font-semibold text-zinc-600 shadow-sm ${specGridCols}`}
-      >
-        <span className="text-center">유형</span>
-        <span className="text-center">우선순위</span>
-        <span className="text-center">기능명</span>
-        <span className="text-center">상태</span>
-        <span className="text-center">복잡도</span>
-        <span className="text-center">담당자</span>
-      </div>
+      {/* Content area with horizontal scroll */}
+      <div className="flex-1 overflow-x-auto overflow-y-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-white/30 [&::-webkit-scrollbar-thumb]:bg-zinc-300/50 [&::-webkit-scrollbar-thumb]:hover:bg-zinc-400/60 [&::-webkit-scrollbar-thumb]:rounded-full">
+        <div className="min-w-[1140px]">
+          {/* Header row */}
+          <div
+            className={`py-3 px-4 bg-white/60 backdrop-blur-sm border-b border-white/30 text-xs font-semibold text-zinc-600 shadow-sm ${specGridCols}`}
+          >
+            <span className="text-center">유형</span>
+            <span className="text-center">우선순위</span>
+            <span className="text-center">기능명</span>
+            <span className="text-center">상태</span>
+            <span className="text-center">복잡도</span>
+            <span className="text-center">담당자</span>
+          </div>
 
-      {/* Hierarchical list */}
-      <div className="flex-1 overflow-auto">
-        <Accordion type="multiple" defaultValue={[]} className="w-full">
-          {hierarchy.map((epic) => (
-            <EpicGroup
-              key={epic.id}
-              epic={epic}
-              stories={epic.stories}
-              onNodeClick={onNodeClick}
-              StoryGroupComponent={(props) => (
-                <StoryGroup {...props} TaskGroupComponent={TaskGroup} />
-              )}
-            />
-          ))}
-        </Accordion>
+          {/* Hierarchical list */}
+          <Accordion type="multiple" defaultValue={[]} className="w-full">
+            {hierarchy.map((epic) => (
+              <EpicGroup
+                key={epic.id}
+                epic={epic}
+                stories={epic.stories}
+                onNodeClick={onNodeClick}
+                StoryGroupComponent={(props) => (
+                  <StoryGroup {...props} TaskGroupComponent={TaskGroup} />
+                )}
+              />
+            ))}
+          </Accordion>
+        </div>
       </div>
 
       {/* Footer */}
       <div className="h-12 border-t border-white/20 bg-white/40 backdrop-blur-md flex items-center justify-between px-4 text-sm text-zinc-600 shadow-sm">
-        <span className="font-medium">총 {filteredNodes.length}개 항목</span>
-        <div className="flex items-center gap-4">
+        <span className="font-medium flex-shrink-0">
+          <span className="md:hidden">{filteredNodes.length}개</span>
+          <span className="hidden md:inline">총 {filteredNodes.length}개 항목</span>
+        </span>
+        <div className="flex items-center gap-2 md:gap-4">
           <div className="flex items-center gap-1.5">
-            <div
-              className="w-2 h-2 rounded-full bg-violet-500"
+            <Notebook
+              className="w-4 h-4 text-violet-600"
               aria-hidden="true"
             />
             <span>
-              에픽{' '}
+              <span className="hidden md:inline">에픽{' '}</span>
               {
                 transformedNodes.filter(
                   (n) => (n.data as unknown as NodeData).level === 1
@@ -129,12 +135,12 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div
-              className="w-2 h-2 rounded-full bg-lime-500"
+            <BookOpen
+              className="w-4 h-4 text-lime-600"
               aria-hidden="true"
             />
             <span>
-              스토리{' '}
+              <span className="hidden md:inline">스토리{' '}</span>
               {
                 transformedNodes.filter(
                   (n) => (n.data as unknown as NodeData).level === 2
@@ -143,12 +149,12 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div
-              className="w-2 h-2 rounded-full bg-sky-500"
+            <CheckSquare
+              className="w-4 h-4 text-sky-600"
               aria-hidden="true"
             />
             <span>
-              태스크{' '}
+              <span className="hidden md:inline">태스크{' '}</span>
               {
                 transformedNodes.filter(
                   (n) => (n.data as unknown as NodeData).level === 3
@@ -157,12 +163,12 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div
-              className="w-2 h-2 rounded-full bg-gray-400"
+            <Pin
+              className="w-4 h-4 text-gray-500"
               aria-hidden="true"
             />
             <span>
-              어드밴스{' '}
+              <span className="hidden md:inline">어드밴스{' '}</span>
               {
                 transformedNodes.filter(
                   (n) => (n.data as unknown as NodeData).level === 4

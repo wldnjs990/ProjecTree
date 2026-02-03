@@ -1,14 +1,14 @@
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { ChevronRight } from 'lucide-react';
+import { ChevronDown, Notebook } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { Node } from '@xyflow/react';
+import { UserAvatar } from '@/shared/components/UserAvatar';
 import {
   statusBadge,
   statusLabel,
@@ -37,76 +37,88 @@ export function EpicGroup({
 }: EpicGroupProps) {
   const data = epic.data as unknown as NodeData;
 
+  const epicContent = (
+    <div
+      aria-label={`에픽: ${data.label}`}
+      className={cn(
+        'py-3 px-4 bg-violet-50/70 hover:bg-violet-100/80 backdrop-blur-sm transition-all duration-300 motion-reduce:transition-none border-b border-violet-200/50 shadow-sm',
+        'items-center text-left w-full',
+        specGridCols
+      )}
+    >
+      <div className={cn('flex items-center gap-2', indentLevel.EPIC)}>
+        {stories.length > 0 ? (
+          <div className="cursor-pointer hover:bg-violet-200 rounded transition-colors">
+            <ChevronDown
+              className="w-4 h-4 text-violet-500 transition-transform duration-200 -rotate-90 group-data-[state=open]:rotate-0"
+              aria-hidden="true"
+            />
+          </div>
+        ) : (
+          <div className="w-4" />
+        )}
+        <Notebook
+          className="w-4 h-4 text-violet-600"
+          aria-hidden="true"
+        />
+        <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-violet-100 text-violet-700">
+          에픽
+        </span>
+      </div>
+      <div className="flex justify-center">
+        <Badge
+          className={cn(
+            'text-[10px] font-medium border w-10 justify-center',
+            priorityBadge[data.priority]
+          )}
+        >
+          {data.priority}
+        </Badge>
+      </div>
+      <div className="flex justify-center">
+        <span
+          className="font-medium text-sm truncate cursor-pointer hover:underline inline-block"
+          onClick={(e) => {
+            e.stopPropagation();
+            onNodeClick?.(epic.id);
+          }}
+        >
+          {data.label}
+        </span>
+      </div>
+      <div className="flex justify-center">
+        <Badge
+          className={cn('text-xs font-normal w-12 justify-center border', statusBadge[data.status])}
+        >
+          {statusLabel[data.status]}
+        </Badge>
+      </div>
+      <div className="flex justify-center" />
+      <div className="flex justify-center">
+        {data.assignee ? (
+          <UserAvatar
+            initials={data.assignee.initials}
+            color={data.assignee.color}
+            size="sm"
+          />
+        ) : null}
+      </div>
+    </div>
+  );
+
+  if (stories.length === 0) {
+    return epicContent;
+  }
+
   return (
     <AccordionItem value={epic.id} className="border-b-0">
       <AccordionTrigger
         className={cn(
-          'hover:no-underline p-0 [&>svg:last-child]:hidden',
+          'group hover:no-underline p-0 [&>svg:last-child]:hidden',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2'
         )}
       >
-        <div
-          aria-label={`에픽: ${data.label}`}
-          className={cn(
-            'py-3 px-4 bg-violet-50 hover:bg-violet-100 transition-colors motion-reduce:transition-none border-b border-violet-200',
-            'items-center text-left w-full',
-            specGridCols
-          )}
-        >
-          <div className={cn('flex items-center gap-2', indentLevel.EPIC)}>
-            <div className="cursor-pointer hover:bg-violet-200 rounded p-0.5 transition-colors">
-              <ChevronRight
-                className="w-4 h-4 text-violet-500 transition-transform duration-200 group-data-[state=open]:rotate-90"
-                aria-hidden="true"
-              />
-            </div>
-            <div
-              className="w-2 h-2 rounded-full bg-violet-500"
-              aria-hidden="true"
-            />
-            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-violet-100 text-violet-700">
-              에픽
-            </span>
-          </div>
-          <div className="flex justify-center">
-            <Badge
-              className={cn(
-                'text-[10px] font-medium border',
-                priorityBadge[data.priority]
-              )}
-            >
-              {data.priority}
-            </Badge>
-          </div>
-          <div className="flex justify-center">
-            <span
-              className="font-semibold text-sm truncate cursor-pointer hover:underline inline-block"
-              onClick={(e) => {
-                e.stopPropagation();
-                onNodeClick?.(epic.id);
-              }}
-            >
-              {data.label}
-            </span>
-          </div>
-          <div className="flex justify-center">
-            <Badge
-              className={cn('text-xs font-normal w-12 justify-center', statusBadge[data.status])}
-            >
-              {statusLabel[data.status]}
-            </Badge>
-          </div>
-          <div className="flex justify-center" />
-          <div className="flex justify-center">
-            {data.assignee ? (
-              <Avatar className="w-5 h-5">
-                <AvatarFallback className="text-[9px] bg-primary text-primary-foreground">
-                  {data.assignee.initials}
-                </AvatarFallback>
-              </Avatar>
-            ) : null}
-          </div>
-        </div>
+        {epicContent}
       </AccordionTrigger>
       <AccordionContent className="pb-0">
         <Accordion type="multiple" defaultValue={[]} className="w-full">
