@@ -356,6 +356,7 @@ public class NodeServiceImpl implements NodeService {
         return NodeSchema.convertToSchema(node, parentId);
     }
 
+
     @Override
     public void deleteNode(Long nodeId) {
         Node node = nodeRepository.findById(nodeId)
