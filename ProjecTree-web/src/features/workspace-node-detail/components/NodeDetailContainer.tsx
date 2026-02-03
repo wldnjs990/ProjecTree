@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NodeHeaderSection } from './NodeHeaderSection';
 import { StatusMetaSection } from './StatusMetaSection';
 import { AITechRecommendSection } from './AITechRecommendSection';
@@ -8,6 +8,7 @@ import { useSelectedNodeDetail, useNodeDetailEdit } from '../hooks';
 import {
   useSelectedNodeId,
   nodeDetailCrdtService,
+  useNodeDetailStore,
 } from '@/features/workspace-core';
 import { generateNodeCandidates } from '@/apis/workspace.api';
 import { postCreateNode } from '@/apis/node.api';
@@ -29,9 +30,20 @@ export default function NodeDetailContainer({
   const selectedNodeId = useSelectedNodeId();
   const { isEditing, closeSidebar, startEdit, finishEdit } =
     useNodeDetailEdit();
+  const setSelectedTechId = useNodeDetailStore(
+    (state) => state.setSelectedTechId
+  );
 
   // AI 생성 로딩 상태
   const [isGeneratingCandidates, setIsGeneratingCandidates] = useState(false);
+
+  // 노드 상세 접근 시 선택된 기술스택 ID 설정
+  useEffect(() => {
+    if (nodeDetail?.techs) {
+      const selectedTech = nodeDetail.techs.find((tech) => tech.selected);
+      setSelectedTechId(selectedTech?.id ?? null);
+    }
+  }, [nodeDetail?.techs, setSelectedTechId]);
 
   if (!nodeDetail) return null;
 

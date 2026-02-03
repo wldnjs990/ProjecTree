@@ -15,7 +15,12 @@ import { Confirm } from '@/shared/components/Confirm';
 import { ConfirmTrigger } from '@/shared/components/ConfirmTrigger';
 import TechDetailContent from './TechDetailContent';
 import TechDetailTitle from './TechDetailTitle';
-import { useSelectedNodeId, getCrdtClient } from '@/features/workspace-core';
+import {
+  useSelectedNodeId,
+  getCrdtClient,
+  useSelectedTechId,
+  useNodeDetailStore,
+} from '@/features/workspace-core';
 import { getAiNodeTechRecommendation } from '@/apis/node.api';
 
 interface AITechRecommendSectionProps {
@@ -25,7 +30,6 @@ interface AITechRecommendSectionProps {
   onGenerateTechs?: () => Promise<void>;
   isGenerating?: boolean;
 }
-
 
 // 기술 카드 컴포넌트
 function TechCard({
@@ -182,10 +186,9 @@ function TechCardList({
   recommendations: TechRecommendation[];
 }) {
   const selectedNodeId = useSelectedNodeId();
-  const [selectedTechId, setSelectedTechId] = useState<number | null>(
-    recommendations.find((r) => r.recommendationScore >= 4)?.id ||
-      recommendations[0]?.id ||
-      null
+  const selectedTechId = useSelectedTechId();
+  const setSelectedTechId = useNodeDetailStore(
+    (state) => state.setSelectedTechId
   );
 
   // 기술 선택 핸들러
@@ -204,7 +207,10 @@ function TechCardList({
     // CRDT 서버에 이벤트 전송 및 YMap 브로드캐스트
     client.selectNodeTech(selectedNodeId, techId);
     setSelectedTechId(techId);
-    console.log('[TechCardList] 기술스택 선택:', { nodeId: selectedNodeId, techId });
+    console.log('[TechCardList] 기술스택 선택:', {
+      nodeId: selectedNodeId,
+      techId,
+    });
   };
 
   return (

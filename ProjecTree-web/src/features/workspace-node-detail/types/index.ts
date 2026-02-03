@@ -60,6 +60,7 @@ export interface TechRecommendation {
   description: string;
   ref: string;
   recommendationScore: number;
+  selected: boolean;
 }
 
 export interface NodeDetailData {

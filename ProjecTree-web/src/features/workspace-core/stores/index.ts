@@ -25,5 +25,6 @@ export {
   useEditData,
   useIsSaving,
   useEditField,
+  useSelectedTechId,
   type EditableNodeDetail,
 } from './nodeDetailStore';
