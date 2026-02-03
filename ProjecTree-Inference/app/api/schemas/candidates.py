@@ -1,7 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
 from app.agents.enums import NodeType
-from app.agents.schemas.candidate import Candidate
+from app.agents.candidates.schemas.candidate import Candidate
 
 
 
