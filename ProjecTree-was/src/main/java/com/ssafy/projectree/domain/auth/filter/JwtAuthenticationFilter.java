@@ -1,7 +1,6 @@
 package com.ssafy.projectree.domain.auth.filter;
 
 
-import com.ssafy.projectree.domain.auth.jwt.JwtProvider;
 import com.ssafy.projectree.domain.auth.provider.JwtAuthenticationProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -61,5 +60,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private Authentication makeUnAuthToken(String data) {
         return new UsernamePasswordAuthenticationToken(data, null);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getServletPath().startsWith("/internal");
     }
 }

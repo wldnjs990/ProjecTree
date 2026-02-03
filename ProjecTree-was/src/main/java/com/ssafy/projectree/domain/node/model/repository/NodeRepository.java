@@ -22,8 +22,6 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
             n.yPos = :y
             where n.id = :id
             """)
-        // TODO workspaceId 값을 추가로 받게되면 주석 해제
-        // and n.workspace.id = :workspaceId
     void updatePosition(Long id, /*Long workspaceId,*/ double x, double y);
 
 

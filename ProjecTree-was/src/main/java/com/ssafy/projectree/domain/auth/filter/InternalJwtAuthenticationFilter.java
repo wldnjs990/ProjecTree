@@ -1,6 +1,6 @@
 package com.ssafy.projectree.domain.auth.filter;
 
-import com.ssafy.projectree.domain.auth.provider.JwtAuthenticationProvider;
+import com.ssafy.projectree.domain.auth.provider.InternalJwtAuthenticationProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ import java.io.IOException;
 @Slf4j
 public class InternalJwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtAuthenticationProvider provider;
+    private final InternalJwtAuthenticationProvider provider;
 
     @Override
     protected void doFilterInternal(
@@ -39,6 +39,7 @@ public class InternalJwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
         if (!StringUtils.hasText(authHeader)) {
+            log.error("Internal token required");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Internal token required");
             return;
         }

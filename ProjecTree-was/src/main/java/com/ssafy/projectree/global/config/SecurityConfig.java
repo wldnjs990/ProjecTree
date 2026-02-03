@@ -45,7 +45,9 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain internalSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/internal/**")
+                .securityMatcher(request ->
+                        request.getServletPath().startsWith("/internal")
+                )
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -81,6 +83,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
                                 .requestMatchers("/auth/internal/token").permitAll()
+                                .requestMatchers("/internal/**").permitAll()
                                 .requestMatchers("/auth/members/signup").hasAuthority(AuthRole.ROLE_GUEST.name())
                                 .requestMatchers("/", "/login/**", "/oauth2/**").permitAll()
                                 .anyRequest().permitAll())
