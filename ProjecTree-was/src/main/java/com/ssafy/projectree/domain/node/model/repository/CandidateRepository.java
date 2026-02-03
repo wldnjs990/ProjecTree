@@ -12,11 +12,19 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
 
     List<Candidate> findByParent(Node parent);
 
-    @Modifying
+    @Modifying(clearAutomatically = true) // 이 옵션 추가 권장
     @Query("""
              update Candidate c 
              set c.deletedAt = CURRENT_TIMESTAMP
              where c.parent.id = :parentId
             """)
     void deleteByParentId(Long parentId);
+
+    @Modifying(clearAutomatically = true) // 이 옵션 추가 권장
+    @Query("""
+        update Candidate c
+        set c.isSelected = false, c.derivationNode = null
+        where c.derivationNode.id = :nodeId 
+    """)
+    void disConnectDerivation(Long nodeId);
 }
