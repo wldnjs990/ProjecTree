@@ -29,7 +29,7 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
 
 
     @Query("""
-                SELECT 
+                SELECT
                     n.id as id,
                     n.name as name,
                     TYPE(n) as nodeType,
@@ -38,8 +38,8 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
                     n.priority as priority,
                     n.xPos as xPos,
                     n.yPos as yPos,
-                    nt.ancestor.id as parentId,  
-                    COALESCE( tn.difficult, an.difficult) as difficult,   
+                    nt.ancestor.id as parentId,
+                    COALESCE( tn.difficult, an.difficult) as difficult,
                     tn.type as taskType
                 FROM Node n
                 LEFT JOIN NodeTree nt 
@@ -55,7 +55,9 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
                     FROM NodeTree child
                     JOIN ProjectNode pn ON child.ancestor.id = pn.id
                     WHERE pn.workspace.id = :workspaceId
+                    AND pn.deletedAt IS NULL 
                 )
+                AND n.deletedAt IS NULL 
             """)
     List<NodeWithParentSchema> findAllFlatNodesByWorkspace(@Param("workspaceId") Long workspaceId);
 
