@@ -8,6 +8,16 @@ import os
 import uvicorn
 from app.api.v1 import api_router
 from app.core.config import settings
+import logging
+from fastapi import Request
+from fastapi.responses import JSONResponse
+import traceback
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 # FastAPI 앱 인스턴스 생성
 app = FastAPI(
@@ -67,6 +77,21 @@ app.add_middleware(
 
 # API 라우터 등록
 app.include_router(api_router)
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """모든 예외를 잡아서 로깅하고 500 에러를 반환합니다."""
+    # 에러 로그 상세 기록
+    logging.error(f"Global Exception Handler Caught: {str(exc)}")
+    logging.error(f"Request: {request.method} {request.url}")
+    logging.error(f"Client: {request.client.host if request.client else 'Unknown'}")
+    logging.error(traceback.format_exc())
+
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal Server Error", "error": str(exc)},
+    )
 
 
 @app.get("/", tags=["Health"])

@@ -1,0 +1,1 @@
+# Candidates domain schemas package

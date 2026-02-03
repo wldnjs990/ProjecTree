@@ -40,9 +40,12 @@ deploy_to_aws:
     - docker pull $DOCKER_IMAGE_FULL_NAME
     
     - docker stop inference-app || true
+    
     - docker rm inference-app || true
     
-    - docker run -d --name inference-app --env-file $AI_ENV -p 8000:8000 $DOCKER_IMAGE_FULL_NAME
+    - docker network create app-network || true
+    
+    - docker run -d --name inference-app --network app-network --env-file $AI_ENV -p 8000:8000 $DOCKER_IMAGE_FULL_NAME    
     
     - docker image prune -f
     

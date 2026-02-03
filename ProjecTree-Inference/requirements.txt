@@ -134,7 +134,7 @@ Pygments @ file:///home/conda/feedstock_root/build_artifacts/pygments_1750615794
 PyJWT==2.10.1
 pyparsing==3.3.1
 pypdf==4.3.1
-pyppeteer==2.0.0
+playwright
 python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_python-dateutil_1751104122/work
 python-dotenv==1.2.1
 python-multipart==0.0.21

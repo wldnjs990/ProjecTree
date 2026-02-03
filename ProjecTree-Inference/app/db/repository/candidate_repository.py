@@ -26,6 +26,7 @@ class CandidateRepository(BaseRepository[Candidate, CandidateCreate, CandidateUp
                 node_id=node_id,
                 name=candidate_data.get("name"),
                 description=candidate_data.get("description"),
+                summary=candidate_data.get("summary"),
                 is_selected=False
             )
             db.add(new_candidate)
@@ -42,6 +43,7 @@ class CandidateRepository(BaseRepository[Candidate, CandidateCreate, CandidateUp
                 "node_id": candidate.node_id,
                 "name": candidate.name,
                 "description": candidate.description,
+                "summary": candidate.summary,
                 "is_selected": candidate.is_selected
             })
         
