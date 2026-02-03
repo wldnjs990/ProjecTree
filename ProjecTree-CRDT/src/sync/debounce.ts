@@ -36,6 +36,10 @@ export async function flushWorkspace(workspaceId: string) {
     pendingPositions.delete(workspaceId);
   } catch (error) {
     // 다음 debounce / room empty / SIGTERM 때 재시도
-    console.warn("[flushWorkspace] 실패 → pending 유지", { workspaceId });
+    console.warn(
+      "[flushWorkspace] 실패 → pending 유지",
+      { workspaceId },
+      new Date().toISOString(),
+    );
   }
 }

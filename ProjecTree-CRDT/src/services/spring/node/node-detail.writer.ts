@@ -16,11 +16,15 @@ export async function saveNodeDetailToSpring(
     );
     return true;
   } catch (error: any) {
-    console.error("Spring 저장 실패", {
-      nodeId: payload.nodeId,
-      message: error?.message,
-      response: error?.response?.data,
-    });
+    console.error(
+      "Spring 저장 실패",
+      {
+        nodeId: payload.nodeId,
+        message: error?.message,
+        response: error?.response?.data,
+      },
+      new Date().toISOString(),
+    );
     return false;
   }
 }
