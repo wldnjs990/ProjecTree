@@ -1,6 +1,7 @@
 """
 Generate candidate nodes.
 """
+
 from langchain.agents.structured_output import ProviderStrategy
 from app.agents.candidates.state import CandidateNodeState
 from app.agents.enums import NodeType
@@ -75,7 +76,7 @@ def generate_candidates(state: CandidateNodeState) -> CandidateNodeState:
     # 피드백이 있으면 프롬프트에 추가 (재시도 시)
     if feedback and retry_count > 0:
         prompt_msg += f"\n\n**이전 시도 피드백 (재시도 {retry_count}회차)**\n{feedback}\n\n위 피드백을 반영하여 다시 생성해주세요."
-    
+
     executor = None
     if node_type == NodeType.PROJECT:
         executor = project_agent
