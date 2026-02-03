@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ChevronLeft } from 'lucide-react';
+import { ArrowLeft, ChevronLeft } from 'lucide-react';
 import {
   Stepper,
   Step1BasicInfo,
@@ -265,8 +265,9 @@ export default function WorkspaceOnboardingPage() {
       {/* Back Button (Absolute) */}
       <button
         onClick={() => navigate('/workspace-lounge')}
-        className="absolute bottom-12 left-12 z-50 text-[var(--figma-neon-green)]/60 hover:text-[var(--figma-neon-green)] transition-colors font-medium text-sm"
+        className="absolute bottom-12 left-12 z-50 inline-flex items-center gap-2 text-[var(--figma-neon-green)]/60 hover:text-[var(--figma-neon-green)] transition-colors font-medium text-sm"
       >
+        <ArrowLeft className="h-4 w-4" />
         돌아가기
       </button>
     </div>
