@@ -181,13 +181,18 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       });
 
       // 원격 참가자 트랙 음소거 이벤트
+      // 중요: 로컬 참가자(나 자신)의 이벤트는 무시해야 함
       newRoom.on(
         RoomEvent.TrackMuted,
         (publication: TrackPublication, participant: Participant) => {
+          // 로컬 참가자의 트랙은 무시 (원격 참가자만 처리)
+          if (participant.isLocal) return;
+
           if (publication.kind === Track.Kind.Audio) {
             setRemoteTracks((prev) =>
               prev.map((t) =>
-                t.participantIdentity === participant.identity
+                // trackSid로 정확한 트랙만 매칭
+                t.trackPublication.trackSid === publication.trackSid
                   ? { ...t, isMuted: true }
                   : t
               )
@@ -200,10 +205,14 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       newRoom.on(
         RoomEvent.TrackUnmuted,
         (publication: TrackPublication, participant: Participant) => {
+          // 로컬 참가자의 트랙은 무시 (원격 참가자만 처리)
+          if (participant.isLocal) return;
+
           if (publication.kind === Track.Kind.Audio) {
             setRemoteTracks((prev) =>
               prev.map((t) =>
-                t.participantIdentity === participant.identity
+                // trackSid로 정확한 트랙만 매칭
+                t.trackPublication.trackSid === publication.trackSid
                   ? { ...t, isMuted: false }
                   : t
               )
@@ -239,15 +248,20 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       setIsConnected(true);
       setIsConnecting(false);
 
-      // 마이크 활성화 (권한 거부 시에도 연결은 유지)
+      // 마이크 활성화 (권한 거부 시 연결 해제)
       try {
         await newRoom.localParticipant.setMicrophoneEnabled(true);
-        setIsMicEnabled(true); // 성공 시에만 true로 설정
+        setIsMicEnabled(true);
       } catch (micErr) {
-        console.warn('Microphone permission denied:', micErr);
+        console.warn('Microphone permission denied, disconnecting:', micErr);
         setIsMicEnabled(false);
         setMicPermissionDenied(true); // 모달 표시
-        // 마이크 권한 거부는 치명적 에러가 아니므로 연결은 유지
+        // 권한 거부 시 연결 해제 (다른 참가자 UI 오염 방지)
+        await newRoom.disconnect();
+        setIsConnected(false);
+        setIsConnecting(false);
+        setRoom(undefined);
+        return;
       }
     } catch (err) {
       console.error('Connection error:', err);
@@ -307,15 +321,59 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
         await room.localParticipant.setMicrophoneEnabled(newState);
         setIsMicEnabled(newState);
       } catch (err) {
-        // 마이크 권한 거부 시 에러 처리
+        // 마이크 권한 거부 시 연결 해제
         if (err instanceof Error && err.name === 'NotAllowedError') {
-          console.warn('Microphone permission denied');
+          console.warn('Microphone permission denied, disconnecting');
           setIsMicEnabled(false);
           setMicPermissionDenied(true); // 모달 표시
+          // 연결 해제
+          await room.disconnect();
+          setIsConnected(false);
+          setRemoteTracks([]);
+          setRoom(undefined);
         }
       }
     }
   }, [room, isMicEnabled]);
+
+  /**
+   * 브라우저 마이크 권한 변경 감지
+   * - 통화 중 브라우저 설정에서 마이크 권한을 차단하면 자동으로 연결 해제
+   * - navigator.permissions API를 사용하여 권한 상태 변경을 모니터링
+   */
+  useEffect(() => {
+    if (!room || !isConnected) return;
+
+    let permissionStatus: PermissionStatus | null = null;
+
+    const handlePermissionChange = () => {
+      if (permissionStatus?.state === 'denied') {
+        console.warn('Microphone permission revoked during call, disconnecting');
+        setIsMicEnabled(false);
+        setMicPermissionDenied(true);
+        setIsConnected(false);
+        setRemoteTracks([]);
+        room.disconnect();
+        setRoom(undefined);
+      }
+    };
+
+    navigator.permissions
+      .query({ name: 'microphone' as PermissionName })
+      .then((status) => {
+        permissionStatus = status;
+        permissionStatus.addEventListener('change', handlePermissionChange);
+      })
+      .catch(() => {
+        // navigator.permissions API를 지원하지 않는 브라우저 (무시)
+      });
+
+    return () => {
+      if (permissionStatus) {
+        permissionStatus.removeEventListener('change', handlePermissionChange);
+      }
+    };
+  }, [room, isConnected]);
 
   /**
    * 컴포넌트 언마운트 시 자동으로 연결 해제

@@ -12,6 +12,7 @@ export function ActionButtons({
   onSettingsClick,
   onVoiceCallClick,
   onInviteClick,
+  isVoiceChatActive,
 }: ActionButtonsProps) {
   return (
     <TooltipProvider>
@@ -38,15 +39,19 @@ export function ActionButtons({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2.5 gap-1.5 text-[#636363]"
+              className="h-8 px-2.5 gap-1.5 text-[#636363] relative"
               onClick={onVoiceCallClick}
             >
               <Phone className="h-4 w-4" />
               <span className="text-sm font-medium">음성 통화</span>
+              {/* 통화 중 표시 (초록색 점) */}
+              {isVoiceChatActive && (
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
+              )}
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>팀 음성 통화 시작</p>
+            <p>{isVoiceChatActive ? '음성 통화 중' : '팀 음성 통화 시작'}</p>
           </TooltipContent>
         </Tooltip>
 
