@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useUserStore, useUpdateNickname } from '@/shared/stores/userStore';
 import { updateNickname, deleteMember } from '@/apis/member.api';
+import { logout } from '@/apis/oauth.api';
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,8 @@ import {
   ChevronRight,
   Settings,
   Pencil,
+  LogOut,
+  TreeDeciduous,
 } from 'lucide-react';
 
 import type { FilterType } from '../types';
@@ -92,12 +95,8 @@ function useProfileDialogState(nickname: string) {
 
 function ProfileDialog({
   nickname,
-  setNickname,
-  onDeleteSuccess,
 }: {
   nickname: string;
-  setNickname: (next: string) => void;
-  onDeleteSuccess?: () => void;
 }) {
   const navigate = useNavigate();
   const updateStoreNickname = useUpdateNickname();
@@ -119,12 +118,6 @@ function ProfileDialog({
     if (!editing || !temp) {
       setIsValid(false);
       setErrorMessage('');
-      return;
-    }
-
-    if (temp.length > 16) {
-      setIsValid(false);
-      setErrorMessage('닉네임은 16자 이내여야 합니다.');
       return;
     }
 
@@ -153,24 +146,23 @@ function ProfileDialog({
 
     try {
       await updateNickname(next);
-      setNickname(next);
       updateStoreNickname(next);
       setEditing(false);
     } catch (_error) {
       setErrorMessage('닉네임 변경에 실패했습니다.');
     }
-  }, [temp, setNickname, updateStoreNickname, setEditing, isValid]);
+  }, [temp, updateStoreNickname, setEditing, isValid]);
 
   const handleDeleteAccount = useCallback(async () => {
     try {
       await deleteMember();
       setOpen(false);
-      if (onDeleteSuccess) onDeleteSuccess();
-      navigate('/login');
+      await logout(); // accessToken + user 모두 정리
+      navigate('/'); // 홈으로 이동
     } catch (_error) {
       alert('회원 탈퇴에 실패했습니다. 다시 시도해주세요.');
     }
-  }, [setOpen, onDeleteSuccess, navigate]);
+  }, [setOpen, navigate]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -187,7 +179,7 @@ function ProfileDialog({
 
       <DialogContent className="
         sm:max-w-106.25
-        bg-white/92
+        bg-white
         backdrop-blur-2xl
         border border-white/60
         shadow-[0_20px_48px_-12px_rgba(0,0,0,0.12)]
@@ -196,14 +188,14 @@ function ProfileDialog({
         p-0
         overflow-hidden
       ">
-        <DialogHeader className="p-6 pb-0">
+        <DialogHeader className="p-6 pb-0 bg-white">
           <DialogTitle className="text-[var(--figma-tech-green)] text-xl font-bold tracking-tight">프로필 정보</DialogTitle>
           <DialogDescription className="text-zinc-500">
             계정 정보를 확인하고 수정할 수 있습니다.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4">
+        <div className="py-4 bg-white">
           <div className="grid gap-2">
             <Label htmlFor="nickname" className="text-zinc-700 px-6 text-xs font-bold uppercase tracking-wider opacity-70">
               닉네임
@@ -215,13 +207,16 @@ function ProfileDialog({
                   <Input
                     id="nickname"
                     value={temp}
-                    onChange={(e) => setTemp(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 16) {
+                        setTemp(e.target.value);
+                      }
+                    }}
                     className={cn(
-                      'bg-white/80 border-white/60 focus:ring-2 focus:ring-[var(--figma-neon-green)]/40 focus:border-[var(--figma-neon-green)] rounded-xl backdrop-blur-sm',
+                      'bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-[var(--figma-neon-green)]/40 focus:border-[var(--figma-neon-green)] rounded-xl transition-colors duration-300 hover:bg-white/60',
                       errorMessage &&
                       'border-red-300 focus:border-red-400 focus:ring-red-100'
                     )}
-                    maxLength={16}
                     autoFocus
                   />
                   <Button
@@ -241,17 +236,20 @@ function ProfileDialog({
                     저장
                   </Button>
                 </div>
-                <div className="h-4 flex items-center pl-1">
-                  {errorMessage && (
+                <div className="h-4 flex items-center justify-between pl-1 pr-1">
+                  {errorMessage ? (
                     <p className="text-xs text-red-500 font-medium">
                       {errorMessage}
                     </p>
+                  ) : (
+                    <span />
                   )}
+                  <span className="text-xs text-zinc-400">{temp.length}/16</span>
                 </div>
               </div>
             ) : (
               <div className="px-6">
-                <div className="flex items-center justify-between rounded-xl border border-white/60 bg-white/60 px-3 py-2 h-10 mb-8 backdrop-blur-sm">
+                <div className="flex items-center justify-between rounded-xl border-transparent bg-white/50 shadow-sm px-3 py-2 h-10 mb-8 hover:bg-white/60 transition-colors duration-300">
                   <span className="text-zinc-800 font-medium">{nickname}</span>
                   <Button
                     variant="ghost"
@@ -268,24 +266,15 @@ function ProfileDialog({
           </div>
         </div>
 
-        <div className="border-t border-zinc-100 bg-zinc-50/50 p-6 pt-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-bold text-zinc-900">회원 탈퇴</p>
-              <p className="text-[12px] text-zinc-500">
-                계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다.
-              </p>
-            </div>
-
+        <div className="border-t border-zinc-100 bg-zinc-50/30 p-6 pt-5">
+          <div className="flex justify-end">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-red-100 text-red-500 hover:bg-red-50 hover:text-red-600 bg-white focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl transition-colors"
+                <button
+                  className="text-sm text-zinc-400 hover:text-zinc-500 transition-colors"
                 >
                   탈퇴하기
-                </Button>
+                </button>
               </AlertDialogTrigger>
 
               <AlertDialogContent className="
@@ -307,13 +296,13 @@ function ProfileDialog({
                     영구적으로 삭제됩니다.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter className="p-6 pt-2 bg-zinc-50/50 border-t border-zinc-100">
+                <AlertDialogFooter className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-100">
                   <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
                     취소
                   </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteAccount}
-                    className="bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg rounded-xl"
+                    className="border border-zinc-200 text-zinc-600 hover:bg-zinc-200 bg-zinc-100 rounded-xl"
                   >
                     탈퇴하기
                   </AlertDialogAction>
@@ -327,19 +316,73 @@ function ProfileDialog({
   );
 }
 
+// 로딩 스켈레톤 컴포넌트
+function SidebarSkeleton({ collapsed }: { collapsed: boolean }) {
+  return (
+    <aside
+      className={cn(
+        'group/sidebar flex flex-col border-r border-white/60 bg-gradient-to-b from-white/70 via-white/50 to-white/30 backdrop-blur-2xl shadow-[1px_0_30px_0_rgba(31,38,135,0.07)] transition-all duration-500 ease-out z-20 relative',
+        collapsed ? 'w-16' : 'w-75'
+      )}
+    >
+      {/* Profile Skeleton */}
+      <div className={cn(
+        'flex items-center gap-3 border-b border-white/20 p-3',
+        collapsed && 'flex-col gap-2 p-2'
+      )}>
+        <div className="h-9 w-9 rounded-full bg-zinc-200/60 animate-pulse" />
+        {!collapsed && <div className="h-5 w-20 bg-zinc-200/60 rounded animate-pulse" />}
+      </div>
+      {/* Nav Skeleton */}
+      <div className="flex-1 p-3 space-y-2">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-10 bg-zinc-200/40 rounded-xl animate-pulse" />
+        ))}
+      </div>
+    </aside>
+  );
+}
+
 export function LoungeSidebar({
   collapsed,
   onToggle,
   currentFilter,
   onFilterChange,
 }: SidebarProps) {
-  const { user, clearUser } = useUserStore();
-  const [nickname, setNickname] = useState(user?.nickname || '사용자');
+  const navigate = useNavigate();
+  const { user } = useUserStore();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const initialLetter = useMemo(
-    () => nickname.trim().charAt(0) || '?',
-    [nickname]
-  );
+  // 타임아웃 후 리다이렉트
+  useEffect(() => {
+    if (user) {
+      setIsLoading(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (!user) {
+        navigate('/login');
+      }
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [user, navigate]);
+
+  // 로딩 중이고 user 없으면 스켈레톤
+  if (!user && isLoading) {
+    return <SidebarSkeleton collapsed={collapsed} />;
+  }
+
+  // user 없고 로딩 끝났으면 null (리다이렉트 중)
+  if (!user) {
+    return null;
+  }
+
+  // user 확정 - 닉네임 직접 사용
+  const nickname = user.nickname;
+  const initialLetter = nickname?.trim().charAt(0) || '?';
 
   return (
     <aside
@@ -351,7 +394,7 @@ export function LoungeSidebar({
       {/* Floating Toggle Button */}
       <button
         onClick={onToggle}
-        className="absolute -right-3 top-9 h-6 w-6 rounded-full bg-white border border-[var(--figma-forest-bg)] shadow-md flex items-center justify-center text-[var(--figma-forest-accent)] hover:text-[var(--figma-tech-green)] hover:scale-110 hover:border-[var(--figma-forest-accent)] transition-all z-50 outline-none focus:ring-2 focus:ring-[var(--figma-forest-bg)] opacity-0 group-hover/sidebar:opacity-100"
+        className="absolute -right-3 top-15 h-6 w-6 rounded-full bg-white border border-[var(--figma-forest-bg)] shadow-md flex items-center justify-center text-[var(--figma-forest-accent)] hover:text-[var(--figma-tech-green)] hover:scale-110 hover:border-[var(--figma-forest-accent)] transition-all z-50 outline-none focus:ring-2 focus:ring-[var(--figma-forest-bg)] opacity-0 group-hover/sidebar:opacity-100"
         aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
       >
         {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
@@ -359,30 +402,71 @@ export function LoungeSidebar({
       {/* User Profile */}
       <div
         className={cn(
-          'flex items-center gap-3 border-b border-white/20 p-4',
+          'flex items-center justify-between border-b border-white/20 p-3',
           collapsed && 'flex-col gap-2 p-2'
         )}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--figma-forest-bg)] to-emerald-50 text-[var(--figma-tech-green)] text-sm font-bold shadow-inner ring-1 ring-[var(--figma-forest-accent)]/30">
-          {initialLetter}
-        </div>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button
+              className={cn(
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 group',
+                'hover:bg-white/70 hover:shadow-sm hover:backdrop-blur-md',
+                collapsed && 'flex-col gap-1'
+              )}
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--figma-forest-bg)] to-emerald-50 text-[var(--figma-tech-green)] text-sm font-bold shadow-inner ring-1 ring-[var(--figma-forest-accent)]/30">
+                {initialLetter}
+              </div>
+              {!collapsed && (
+                <span
+                  className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px]"
+                  title={nickname}
+                >
+                  {nickname}
+                </span>
+              )}
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="
+            bg-white/92
+            backdrop-blur-2xl
+            border border-white/60
+            rounded-3xl
+            shadow-2xl
+            z-[1001]
+            p-0
+            overflow-hidden
+          ">
+            <AlertDialogHeader className="p-6">
+              <AlertDialogTitle className="text-zinc-900 font-bold">
+                로그아웃 하시겠습니까?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-zinc-500">
+                로그아웃하면 다시 로그인해야 합니다.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-100">
+              <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
+                취소
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async () => {
+                  await logout();
+                  useUserStore.getState().clearUser();
+                  navigate('/login');
+                }}
+                className="border border-zinc-200 text-zinc-600 hover:bg-zinc-200 bg-zinc-100 rounded-xl"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                로그아웃
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-        {collapsed ? (
-          <div className="w-full flex justify-center"></div>
-        ) : (
-          <div className="flex flex-1 items-center justify-between overflow-hidden">
-            <span className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis px-1">
-              {nickname}
-            </span>
-
-            {user && (
-              <ProfileDialog
-                nickname={nickname}
-                setNickname={setNickname}
-                onDeleteSuccess={clearUser}
-              />
-            )}
-          </div>
+        {!collapsed && (
+          <ProfileDialog nickname={nickname} />
         )}
       </div>
 
@@ -424,6 +508,17 @@ export function LoungeSidebar({
           })}
         </ul>
       </nav>
+
+      {/* Footer */}
+      <div className="border-t border-white/20 p-3 flex justify-center">
+        <button
+          className="flex w-full items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-sm text-zinc-400 hover:text-emerald-600 hover:bg-white/70 hover:shadow-sm transition-all duration-300"
+          onClick={() => navigate('/')}
+        >
+          <TreeDeciduous className="h-4 w-4" />
+          {!collapsed && <span>홈으로 가기</span>}
+        </button>
+      </div>
     </aside>
   );
 }
