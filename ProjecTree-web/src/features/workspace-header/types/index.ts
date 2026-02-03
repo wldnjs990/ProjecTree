@@ -17,12 +17,14 @@ export interface HeaderProps {
   onSettingsClick?: () => void;
   onVoiceCallClick?: () => void;
   onInviteClick?: () => void;
+  isVoiceChatActive?: boolean;
 }
 
 export interface ActionButtonsProps {
   onSettingsClick?: () => void;
   onVoiceCallClick?: () => void;
   onInviteClick?: () => void;
+  isVoiceChatActive?: boolean;
 }
 
 export interface LogoProps {

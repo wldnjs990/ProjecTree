@@ -14,6 +14,7 @@ export function Header({
   onSettingsClick,
   onVoiceCallClick,
   onInviteClick,
+  isVoiceChatActive,
 }: HeaderProps) {
   return (
     <header className="flex items-center justify-between h-14 px-4 bg-white border-b border-[#EEEEEE] z-50">
@@ -33,6 +34,7 @@ export function Header({
           onSettingsClick={onSettingsClick}
           onVoiceCallClick={onVoiceCallClick}
           onInviteClick={onInviteClick}
+          isVoiceChatActive={isVoiceChatActive}
         />
 
         <Separator orientation="vertical" className="h-6 mx-1" />
