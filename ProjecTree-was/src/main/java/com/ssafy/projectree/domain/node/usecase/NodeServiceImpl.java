@@ -368,5 +368,6 @@ public class NodeServiceImpl implements NodeService {
 
         nodeRepository.deleteNodeAndDescendants(nodeId);
         candidateRepository.deleteByParentId(nodeId);
+        candidateRepository.disConnectDerivation(nodeId);
     }
 }
