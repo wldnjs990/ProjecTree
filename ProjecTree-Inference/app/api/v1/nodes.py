@@ -15,7 +15,7 @@ router = APIRouter(prefix="/nodes", tags=["Nodes"])
 
 
 @router.post(
-    "/create",
+    "",
     response_model=NodeCreateResponse,
     summary="노드 생성",
     description="워크스페이스에 새로운 노드를 생성합니다. 메인 그래프를 활용하여 노드 생성 워크플로우를 실행합니다.",

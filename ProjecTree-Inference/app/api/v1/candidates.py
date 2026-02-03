@@ -11,11 +11,11 @@ from app.core.dependencies import get_candidate_service, get_db
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/candidates", tags=["Candidates"])
+router = APIRouter(prefix="/candidate", tags=["Candidates"])
 
 
 @router.post(
-    "/generate",
+    "",
     response_model=CandidateGenerateResponse,
     summary="후보 노드 생성",
     description="현재 노드 정보를 기반으로 하위 후보 노드들을 생성합니다.",

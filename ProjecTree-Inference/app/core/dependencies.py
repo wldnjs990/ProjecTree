@@ -30,6 +30,7 @@ from app.db.repository.node_tech_stack_repository import (
 from app.services.candidate_service import CandidateService
 from app.services.recommendation_service import RecommendationService
 from app.services.node_service import NodeService
+from app.services.portfolio_service import PortfolioService
 
 
 # ==================== Database Dependencies ====================
@@ -107,3 +108,9 @@ def get_node_service() -> NodeService:
         node_repository=node_repository,
         candidate_repository=candidate_repository,
     )
+
+
+@lru_cache()
+def get_portfolio_service() -> PortfolioService:
+    """PortfolioService 싱글톤 인스턴스 제공"""
+    return PortfolioService()

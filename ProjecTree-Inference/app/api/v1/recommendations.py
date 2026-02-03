@@ -11,11 +11,11 @@ from app.core.dependencies import get_recommendation_service, get_db
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/recommendations", tags=["Recommendations"])
+router = APIRouter(prefix="/tech-stack", tags=["TechStack"])
 
 
 @router.post(
-    "/tech-stack",
+    "",
     response_model=TechStackRecommendResponse,
     summary="기술 스택 추천",
     description="노드 정보를 기반으로 적합한 기술 스택을 추천합니다.",
