@@ -115,6 +115,7 @@ public class NodeServiceImpl implements NodeService {
                                 .description(techStack.getTechStackInfo().getDescription())
                                 .ref(techStack.getTechStackInfo().getRef())
                                 .recommendScore(techStack.getTechStackInfo().getRecommendation())
+                                .isSelected(techStack.getTechStackInfo().isSelected())
                                 .build())
                         .toList())
                 .comparison(comparison)
