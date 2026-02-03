@@ -2,6 +2,7 @@ import express from "express";
 import { WebSocketServer } from "ws";
 import { handleConnection } from "./ws/connection";
 import springRouter from "./api/internal-spring.router.ts";
+import aiRouter from "./api/internal-ai.router";
 
 export function startServer() {
   const PORT = Number(process.env.PORT) || 8898;
@@ -18,6 +19,7 @@ export function startServer() {
 
   // REST 라우터 연결
   app.use("/internal", springRouter);
+  app.use("/internal/ai", aiRouter);
 
   app.listen(HTTP_PORT, () => {
     console.log(`REST 서버 시작 ${HTTP_PORT}`);
