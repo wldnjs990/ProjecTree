@@ -37,6 +37,22 @@ public class JwtProvider {
         return new Jwt(access, refresh);
     }
 
+    public String generateInternalToken() {
+        Date expiredDate = new Date();
+        expiredDate.setTime(expiredDate.getTime() + SERVICE_TOKEN_EXPIRE_TIME);
+
+        SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+
+        return Jwts.builder()
+                .claim(USERID, SERVICE_SUBJECT)
+                .claim(ROLE, INTERNAL_ROLE)       // 내부 권한
+                .claim(TOKEN_TYPE, SERVICE_TOKEN_TYPE)
+                .issuedAt(new Date())
+                .expiration(expiredDate)
+                .signWith(secretKey)
+                .compact();
+    }
+
     private String create(OAuth2User member, long time, String tokenType) {
 
         Date expiredDate = new Date();

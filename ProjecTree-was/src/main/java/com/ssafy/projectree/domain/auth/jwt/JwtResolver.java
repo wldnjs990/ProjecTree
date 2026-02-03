@@ -1,6 +1,7 @@
 package com.ssafy.projectree.domain.auth.jwt;
 
 import com.ssafy.projectree.domain.auth.enums.AuthRole;
+import com.ssafy.projectree.domain.auth.provider.InternalPrincipal;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.global.model.enums.OAuthProvider;
 import io.jsonwebtoken.Claims;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -52,6 +54,24 @@ public class JwtResolver {
 
     }
 
+    public InternalPrincipal resolveServiceToken(String header) {
+        String token = extractTokenFromHeader(header);
+        Claims claims = getClaims(token);
+
+        if (!SERVICE_TOKEN_TYPE.equals(claims.get(TOKEN_TYPE, String.class))) {
+            throw new BadCredentialsException("Service 토큰이 아닙니다.");
+        }
+
+        if (!INTERNAL_ROLE.equals(claims.get(ROLE, String.class))) {
+            throw new BadCredentialsException("Internal 권한이 아닙니다.");
+        }
+
+        if (!SERVICE_SUBJECT.equals(claims.get(USERID, String.class))) {
+            throw new BadCredentialsException("Internal subject가 아닙니다.");
+        }
+
+        return new InternalPrincipal(SERVICE_SUBJECT);
+    }
 
     private String extractTokenFromHeader(String header) {
         if (header.startsWith(TOKEN_PREFIX)) {

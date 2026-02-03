@@ -255,6 +255,11 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public void createEpicNodes(Workspace workspace, Node projectNode, List<FunctionSpecificationDto.EpicInfo> epics) {
 
+        // 에픽 정보가 없으면 아무 작업도 하지 않는다.
+        if (epics == null || epics.isEmpty()) {
+            return;
+        }
+
         for (FunctionSpecificationDto.EpicInfo info : epics) {
 
             EpicNode epicNode = new EpicNode();

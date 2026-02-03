@@ -1,11 +1,9 @@
 package com.ssafy.projectree.domain.workspace.usecase;
 
 import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
-import com.ssafy.projectree.domain.file.model.entity.FileProperty;
 import com.ssafy.projectree.domain.file.usecase.FileService;
-import com.ssafy.projectree.domain.file.usecase.S3Service;
+import com.ssafy.projectree.domain.member.api.dto.MemberDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
-import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
 import com.ssafy.projectree.domain.node.usecase.NodeService;
 import com.ssafy.projectree.domain.tech.usecase.WorkspaceTechStackService;
@@ -14,6 +12,7 @@ import com.ssafy.projectree.domain.workspace.api.dto.TeamDto;
 import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.model.entity.FunctionSpecification;
+import com.ssafy.projectree.domain.workspace.model.entity.Team;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.workspace.model.repository.WorkspaceRepository;
 import com.ssafy.projectree.global.api.code.ErrorCode;
@@ -21,11 +20,13 @@ import com.ssafy.projectree.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -70,6 +71,7 @@ public class WorkspaceService {
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.WORKSPACE_NOT_FOUND, "존재하지 않는 워크 스페이스입니다."));
     }
 
+    @Transactional
     public void create(Member member, WorkspaceDto.Insert dto, List<MultipartFile> multipartFiles) throws IOException {
         // 워크 스페이스 생성
         Workspace workspace = Workspace.builder()
@@ -86,7 +88,7 @@ public class WorkspaceService {
         workspaceRepository.save(workspace);
 
         // 워크 스페이스의 기획 문서 저장
-        if (!multipartFiles.isEmpty()) {
+        if (multipartFiles != null && !multipartFiles.isEmpty()) {
             fileService.uploadFiles(multipartFiles, workspace);
         }
 
@@ -98,7 +100,7 @@ public class WorkspaceService {
 
         // 프로젝트 노드 생성
         ProjectNode projectNode = nodeService.createProjectNode(workspace);
-        
+
         // 에픽 노드 생성
         nodeService.createEpicNodes(workspace, projectNode, dto.getEpics());
 
@@ -113,6 +115,11 @@ public class WorkspaceService {
     public WorkspaceDto.Detail details(Member member, Long workspaceId) {
 
         Workspace workspace = findById(workspaceId);
+        Team team = teamService.findByWorkspaceAndMember(workspace, member);
+
+        if (team == null || !team.getWorkspace().equals(workspace)) {
+            throw new BusinessLogicException(ErrorCode.WORKSPACE_NOT_FOUND);
+        }
 
         List<FileReadDto.Response> files = fileService.findByWorkspaceId(workspace);
 
@@ -127,10 +134,24 @@ public class WorkspaceService {
             );
         }
 
+        List<Team> teams = teamService.findAllByWorkspace(workspace);
+        List<Member> members = teamService.getMembers(teams);
+
+        List<MemberDto.Info> memberInfos = members.stream()
+                .map(MemberDto.Info::from)
+                .collect(Collectors.toList());
+
+        TeamDto.Info teamInfo = TeamDto.Info.builder()
+                .chatRoomId(teams.get(0).getChatRoom().getId())
+                .memberInfos(memberInfos)
+                .build();
+
         return WorkspaceDto.Detail.builder()
                 .nodeTree(nodeService.getNodeTree(workspaceId))
                 .files(files)
-                .epics(epics).build();
+                .epics(epics)
+                .teamInfo(teamInfo)
+                .build();
     }
 
 }

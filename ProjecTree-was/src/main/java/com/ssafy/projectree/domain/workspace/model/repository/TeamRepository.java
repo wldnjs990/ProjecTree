@@ -27,4 +27,5 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     """)
     boolean isParticipant(@Param("workspace") Workspace workspace, @Param("member") Member member);
 
+    Optional<List<Team>> findByWorkspace(Workspace workspace);
 }

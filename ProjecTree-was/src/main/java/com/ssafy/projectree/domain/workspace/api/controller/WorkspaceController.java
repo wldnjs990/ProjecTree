@@ -30,15 +30,12 @@ public class WorkspaceController implements WorkspaceDocsController {
     }
 
     @Override
-    public CommonResponse<String> create(
-            @AuthenticationPrincipal Member member,
-            @RequestPart(value = "data") WorkspaceDto.Insert dto,
-            @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles
-    ) throws IOException {
+    public CommonResponse<String> create(@AuthenticationPrincipal Member member,
+                                         @RequestPart(value = "data") WorkspaceDto.Insert dto,
+                                         @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles) throws IOException {
         workspaceService.create(member, dto, multipartFiles);
         return CommonResponse.success(SuccessCode.SUCCESS, "워크 스페이스 생성에 성공하였습니다.");
     }
-
     @Override
     public CommonResponse<?> update(@AuthenticationPrincipal Member member,
                                     @RequestPart(value = "data") WorkspaceDto.Insert dto,
