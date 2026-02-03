@@ -24,29 +24,41 @@ export default function Step4TechStack({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  // 선택된 기술의 이름 매핑을 위한 상태 (검색 결과에 없어도 표시하기 위함)
+  const [selectedTechMap, setSelectedTechMap] = useState<Map<number, string>>(
+    new Map()
+  );
+
+  // 검색어 입력 시 API 조회
   useEffect(() => {
-    const loadData = async () => {
+    const fetchTechs = async () => {
+      if (!searchTerm.trim()) {
+        setTechOptions([]);
+        return;
+      }
       try {
-        const stacks = await getTechStacks();
-        setTechOptions(stacks);
+        const results = await getTechStacks(searchTerm);
+        setTechOptions(results);
       } catch (error) {
-        console.error('기술 스택 로딩 실패:', error);
+        console.error('기술 스택 검색 실패:', error);
       }
     };
-    loadData();
-  }, []);
 
-  const filteredTechs = techOptions
-    .filter(
-      (tech) =>
-        tech.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !data.techStacks.includes(tech.id)
-    )
-    .slice(0, 10);
+    const timer = setTimeout(fetchTechs, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const filteredTechs = techOptions.filter(
+    (tech) => !data.techStacks.includes(tech.id)
+  );
 
   const handleAdd = (techEntry: TechStackItem) => {
     if (!data.techStacks.includes(techEntry.id)) {
       onChange({ techStacks: [...data.techStacks, techEntry.id] });
+      // 이름 매핑 저장
+      setSelectedTechMap((prev) =>
+        new Map(prev).set(techEntry.id, techEntry.name)
+      );
       setSearchTerm('');
       setShowSuggestions(false);
       setSelectedIndex(0);
@@ -87,7 +99,11 @@ export default function Step4TechStack({
   };
 
   const getTechName = (id: number) => {
-    return techOptions.find((t) => t.id === id)?.name || `Unknown(${id})`;
+    return (
+      selectedTechMap.get(id) ||
+      techOptions.find((t) => t.id === id)?.name ||
+      `Tech ${id}`
+    );
   };
 
   return (
@@ -109,8 +125,7 @@ export default function Step4TechStack({
           <Label
             htmlFor="techSearch"
             className="font-['Pretendard'] font-medium text-[13.1px] leading-[14px] text-[var(--figma-text-cod-gray)]"
-          >
-          </Label>
+          ></Label>
           <Input
             id="techSearch"
             placeholder="사용할 기술스택 검색 (React, Spring...)"
