@@ -10,10 +10,12 @@ export async function saveNodeDetailToSpring(
   payload: SaveNodeDetailPayload,
 ): Promise<boolean> {
   try {
-    await springInternalClient.patch(
+    const result = await springInternalClient.patch(
       `/api/internal/nodes/${payload.nodeId}/detail`,
       payload.detail,
     );
+
+    console.log("Spring response: ", result.data.success);
     return true;
   } catch (error: any) {
     console.error(
