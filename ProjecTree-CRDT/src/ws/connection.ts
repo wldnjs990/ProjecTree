@@ -1,21 +1,22 @@
 import { WebSocket } from "ws";
 import type { IncomingMessage } from "http";
-import { getOrCreateRoom } from "./room-registry";
+import { getOrCreateRoom, removeRoomIfEmpty } from "./room-registry";
 import { bindYDocConnection } from "../yjs/ydoc-gateway";
 import { handleMessage, onClientDisconnected } from "./handlers";
 
 export function handleConnection(ws: WebSocket, req: IncomingMessage) {
-  const room = req.url?.slice(1) || "default";
+  const workspaceId = req.url?.slice(1) || "default";
 
-  bindYDocConnection(ws, req, room);
+  bindYDocConnection(ws, req, workspaceId);
 
-  const { clients } = getOrCreateRoom(room);
+  const { clients } = getOrCreateRoom(workspaceId);
   clients.add(ws);
 
-  ws.on("message", (data) => handleMessage(ws, data as Buffer, room, clients));
+  ws.on("message", (data) => handleMessage(ws, data as Buffer, workspaceId));
 
   ws.on("close", () => {
     clients.delete(ws);
-    onClientDisconnected(room);
+    onClientDisconnected(workspaceId);
+    removeRoomIfEmpty(workspaceId);
   });
 }
