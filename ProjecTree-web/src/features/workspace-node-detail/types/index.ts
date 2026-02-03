@@ -49,7 +49,8 @@ export interface Candidate {
   name: string;
   description: string;
   taskType: TaskType;
-  isSelected: boolean;
+  selected: boolean;
+  summary: string;
 }
 
 export interface TechRecommendation {

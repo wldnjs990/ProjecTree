@@ -33,6 +33,9 @@ export default function NodeDetailContainer({
   const setSelectedTechId = useNodeDetailStore(
     (state) => state.setSelectedTechId
   );
+  const setSelectedCandidateIds = useNodeDetailStore(
+    (state) => state.setSelectedCandidateIds
+  );
 
   // AI 생성 로딩 상태
   const [isGeneratingCandidates, setIsGeneratingCandidates] = useState(false);
@@ -44,6 +47,16 @@ export default function NodeDetailContainer({
       setSelectedTechId(selectedTech?.id ?? null);
     }
   }, [nodeDetail?.techs, setSelectedTechId]);
+
+  // 노드 상세 접근 시 선택된 후보 노드 ID 목록 설정
+  useEffect(() => {
+    if (nodeDetail?.candidates) {
+      const selectedIds = nodeDetail.candidates
+        .filter((candidate) => candidate.selected)
+        .map((candidate) => candidate.id);
+      setSelectedCandidateIds(selectedIds);
+    }
+  }, [nodeDetail?.candidates, setSelectedCandidateIds]);
 
   if (!nodeDetail) return null;
 
