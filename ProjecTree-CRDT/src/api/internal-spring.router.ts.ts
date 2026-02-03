@@ -5,13 +5,13 @@ import {
   type IncomingNodePayload,
 } from "../domain/node/nodePayload";
 import { getYDocByRoom } from "../yjs/ydoc-gateway";
-const internalRouter: Router = Router();
+const springRouter: Router = Router();
 
-internalRouter.get("/health", (req: Request, res: Response) => {
+springRouter.get("/health", (req: Request, res: Response) => {
   res.status(200).json({ status: "ok" });
 });
 
-internalRouter.post(
+springRouter.post(
   "/workspaces/:workspaceId/nodes",
   (req: Request, res: Response) => {
     const { workspaceId } = req.params;
@@ -62,4 +62,4 @@ internalRouter.post(
   },
 );
 
-export default internalRouter;
+export default springRouter;
