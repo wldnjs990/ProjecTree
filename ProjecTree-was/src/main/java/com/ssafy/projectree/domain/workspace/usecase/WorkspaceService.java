@@ -114,7 +114,12 @@ public class WorkspaceService {
 
     public WorkspaceDto.Detail details(Member member, Long workspaceId) {
 
-        Workspace workspace = findByIdAndWorkspace(workspaceId, member);
+        Workspace workspace = findById(workspaceId);
+        Team team = teamService.findByWorkspaceAndMember(workspace, member);
+
+        if (team == null || !team.getWorkspace().equals(workspace)) {
+            throw new BusinessLogicException(ErrorCode.WORKSPACE_NOT_FOUND);
+        }
 
         List<FileReadDto.Response> files = fileService.findByWorkspaceId(workspace);
 
@@ -147,16 +152,6 @@ public class WorkspaceService {
                 .epics(epics)
                 .teamInfo(teamInfo)
                 .build();
-    }
-
-    private Workspace findByIdAndWorkspace(Long id, Member member) {
-
-        Workspace workspace = workspaceRepository.findByIdAndMember(id, member);
-        if (workspace == null) {
-            throw new BusinessLogicException(ErrorCode.WORKSPACE_NOT_FOUND);
-        }
-
-        return workspace;
     }
 
 }
