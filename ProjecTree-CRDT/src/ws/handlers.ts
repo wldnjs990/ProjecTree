@@ -117,6 +117,6 @@ export function onClientDisconnected(workspaceId: string) {
   if (!room || room.size > 0) return;
   // 남은 위치 변경 즉시 저장
   flushWorkspace(workspaceId).catch((err) =>
-    console.error("flush on room empty failed", err),
+    console.error("flush on room empty failed", err, new Date().toISOString()),
   );
 }

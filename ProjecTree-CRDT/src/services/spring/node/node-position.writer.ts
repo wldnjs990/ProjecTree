@@ -19,10 +19,14 @@ export async function sendBatchToSpring(
   try {
     if (!payload.nodes || payload.nodes.length === 0) return;
 
-    console.log("[sendBatchToSpring] 위치 저장 요청", {
-      workspaceId: payload.workspaceId,
-      nodeCount: payload.nodes.length,
-    });
+    console.log(
+      "[sendBatchToSpring] 위치 저장 요청",
+      {
+        workspaceId: payload.workspaceId,
+        nodeCount: payload.nodes.length,
+      },
+      new Date().toISOString(),
+    );
     await springInternalClient.patch(
       `/api/internal/workspaces/${payload.workspaceId}/nodes/positions`,
       {
@@ -30,12 +34,16 @@ export async function sendBatchToSpring(
       },
     );
   } catch (error: any) {
-    console.error("Spring batch 위치 저장 실패", {
-      workspaceId: payload.workspaceId,
-      nodeCount: payload.nodes?.length,
-      message: error?.message,
-      response: error?.response?.data,
-    });
+    console.error(
+      "Spring batch 위치 저장 실패",
+      {
+        workspaceId: payload.workspaceId,
+        nodeCount: payload.nodes?.length,
+        message: error?.message,
+        response: error?.response?.data,
+      },
+      new Date().toISOString(),
+    );
 
     throw error;
   }

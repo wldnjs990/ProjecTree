@@ -19,13 +19,17 @@ export async function saveNodeTechToSpring(
     );
     return true;
   } catch (error: any) {
-    console.error("Spring node tech save failed", {
-      nodeId: payload.nodeId,
-      selectedTechId: payload.selectedTechId,
-      requestId: payload.requestId,
-      message: error?.message,
-      response: error?.response?.data,
-    });
+    console.error(
+      "Spring node tech save failed",
+      {
+        nodeId: payload.nodeId,
+        selectedTechId: payload.selectedTechId,
+        requestId: payload.requestId,
+        message: error?.message,
+        response: error?.response?.data,
+      },
+      new Date().toISOString(),
+    );
     return false;
   }
 }
