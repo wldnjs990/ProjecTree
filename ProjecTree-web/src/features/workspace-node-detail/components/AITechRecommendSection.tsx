@@ -15,7 +15,7 @@ import { Confirm } from '@/shared/components/Confirm';
 import { ConfirmTrigger } from '@/shared/components/ConfirmTrigger';
 import TechDetailContent from './TechDetailContent';
 import TechDetailTitle from './TechDetailTitle';
-import { useSelectedNodeId } from '@/features/workspace-core';
+import { useSelectedNodeId, getCrdtClient } from '@/features/workspace-core';
 import { getAiNodeTechRecommendation } from '@/apis/node.api';
 
 interface AITechRecommendSectionProps {
@@ -26,10 +26,6 @@ interface AITechRecommendSectionProps {
   isGenerating?: boolean;
 }
 
-// 기술 선택 핸들러 (모듈 레벨)
-const onSelectTech = (techId: number) => {
-  console.log('Tech selected:', techId);
-};
 
 // 기술 카드 컴포넌트
 function TechCard({
@@ -185,11 +181,31 @@ function TechCardList({
 }: {
   recommendations: TechRecommendation[];
 }) {
-  const [selectedTechId] = useState<number | null>(
+  const selectedNodeId = useSelectedNodeId();
+  const [selectedTechId, setSelectedTechId] = useState<number | null>(
     recommendations.find((r) => r.recommendationScore >= 4)?.id ||
       recommendations[0]?.id ||
       null
   );
+
+  // 기술 선택 핸들러
+  const handleSelectTech = (techId: number) => {
+    if (!selectedNodeId) {
+      console.warn('[TechCardList] 선택된 노드가 없습니다.');
+      return;
+    }
+
+    const client = getCrdtClient();
+    if (!client) {
+      console.warn('[TechCardList] CRDT 클라이언트가 초기화되지 않았습니다.');
+      return;
+    }
+
+    // CRDT 서버에 이벤트 전송 및 YMap 브로드캐스트
+    client.selectNodeTech(selectedNodeId, techId);
+    setSelectedTechId(techId);
+    console.log('[TechCardList] 기술스택 선택:', { nodeId: selectedNodeId, techId });
+  };
 
   return (
     <>
@@ -212,7 +228,7 @@ function TechCardList({
             description="선택한 기술을 확정하시겠습니까?"
             cancelText="닫기"
             actionText="확정"
-            onAction={() => onSelectTech(tech.id)}
+            onAction={() => handleSelectTech(tech.id)}
             isConfirmed={selectedTechId === tech.id}
           />
         ))}
