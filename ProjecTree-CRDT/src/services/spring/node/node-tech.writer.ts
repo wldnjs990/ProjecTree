@@ -10,13 +10,15 @@ export async function saveNodeTechToSpring(
   payload: SaveNodeTechPayload,
 ): Promise<boolean> {
   try {
-    await springInternalClient.post(
+    const result = await springInternalClient.post(
       `/api/internal/nodes/${payload.nodeId}/tech`,
       {
         nodeId: payload.nodeId,
         selectedTechId: payload.selectedTechId,
       },
     );
+
+    console.log("Spring response: ", result.data.success);
     return true;
   } catch (error: any) {
     console.error(

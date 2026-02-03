@@ -27,12 +27,14 @@ export async function sendBatchToSpring(
       },
       new Date().toISOString(),
     );
-    await springInternalClient.patch(
+    const result = await springInternalClient.patch(
       `/api/internal/workspaces/${payload.workspaceId}/nodes/positions`,
       {
         nodes: payload.nodes,
       },
     );
+
+    console.log("Spring response: ", result.data.success);
   } catch (error: any) {
     console.error(
       "Spring batch 위치 저장 실패",
