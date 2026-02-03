@@ -46,15 +46,16 @@ public class PortfolioService {
     @Transactional(readOnly = true)
     public PortfolioDto.Response findPortfolio(Long workspaceId) {
         Member currentMember = SecurityUtils.getCurrentMember();
-        Portfolio portfolio = portfolioRepository.findByWorkspaceIdAndMemberId(currentMember.getId(), workspaceId).orElseThrow(() -> new BusinessLogicException(ErrorCode.PORTFOLIO_NOT_FOUND));
+        Portfolio portfolio = portfolioRepository.findByWorkspaceIdAndMemberId(currentMember.getId(), workspaceId).orElseThrow(() -> new BusinessLogicException(ErrorCode.PORTFOLIO_NOT_FOUND,
+                "아직 포트폴리오가 생성되지 않았습니다. 포트폴리오 생성을 먼저 진행해주세요."));
         return PortfolioDto.Response.builder().id(portfolio.getId()).content(portfolio.getContent()).build();
     }
 
     public PortfolioDto.Response modifyPortfolio(PortfolioDto.Request request) {
         Member currentMember = SecurityUtils.getCurrentMember();
         Portfolio portfolio = portfolioRepository.findById(request.getId()).orElseThrow(() -> new BusinessLogicException(ErrorCode.PORTFOLIO_NOT_FOUND));
-        if(!portfolio.getMember().getId().equals(currentMember.getId())){
-            throw new BusinessLogicException(ErrorCode.PORTFOLIO_INVALID_ACCESS_ERROR,"본인만 포트폴리오를 조회 할 수 있습니다.");
+        if (!portfolio.getMember().getId().equals(currentMember.getId())) {
+            throw new BusinessLogicException(ErrorCode.PORTFOLIO_INVALID_ACCESS_ERROR, "본인만 포트폴리오를 조회 할 수 있습니다.");
         }
         portfolio.setContent(request.getContent());
         Portfolio save = portfolioRepository.save(portfolio);
