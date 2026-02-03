@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Node, Edge } from '@xyflow/react';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { getWorkspaceTree, getNodeDetail } from '@/apis/workspace.api';
 import { Header, type ViewTab } from '@/features/workspace-header';
 import { TreeCanvas } from '@/features/workspace-canvas';
@@ -51,6 +51,7 @@ export default function WorkSpacePage() {
   const { workspaceId: paramWorkspaceId } = useParams<{
     workspaceId: string;
   }>();
+  const navigate = useNavigate();
   // workspaceId가 없으면 임시 ID 사용
   const workspaceId = paramWorkspaceId || String(TEMP_WORKSPACE_ID);
 
@@ -99,12 +100,27 @@ export default function WorkSpacePage() {
         });
         console.log('[WorkSpacePage] nodeListData 저장:', nodeListDataMap);
         setNodeListData(nodeListDataMap);
-      } catch (error) {
+      } catch (error: any) {
         console.error('워크스페이스 데이터 로드 실패:', error);
+
+        const errorCode = error.response?.data?.errorCode;
+
+        if (errorCode === 'WORKSPACE_NOT_FOUND') {
+          alert('워크스페이스에 접근할 수 없습니다');
+          navigate('/workspaces');
+          return;
+        }
+
+        if (error.response?.status === 403 || error.response?.status === 404) {
+          // 권한 없음 또는 워크스페이스 없음
+          alert('접근 권한이 없습니다');
+          navigate('/workspaces'); // 목록으로 이동
+        }
       } finally {
         setIsLoading(false);
       }
     };
+    // ...
 
     loadWorkspaceData();
 

@@ -1,3 +1,5 @@
+import { useAuthStore } from '@/shared/stores/authStore';
+import { useUserStore } from '@/shared/stores/userStore';
 import { useEffect, useCallback } from 'react';
 import { chatSocket } from '../services/chatSocket';
 import { useChatStore } from '../store/chatStore';
@@ -14,21 +16,22 @@ export const useWebSocket = (workspaceId: string | null) => {
     (state) => state.updateParticipantStatus
   );
   const setConnected = useChatStore((state) => state.setConnected);
-
-  // Store actions are stable, but we can verify this by not including them in dependency arrays or wrapping them if needed.
-  // Zustand actions are stable by identity.
+  // chatRoomId 가져오기
+  const chatRoomId = useChatStore((state) =>
+    workspaceId ? state.chatRoomIds[workspaceId] : null
+  );
 
   // WebSocket 연결
   useEffect(() => {
-    //TODO: 실제 JWT 토큰 가져오기 (예: localStorage, Context 등)
-    const token = localStorage.getItem('authToken') || '';
+    // 실제 JWT 토큰 가져오기 (AuthStore)
+    const token = useAuthStore.getState().accessToken || '';
 
     const socket = chatSocket.connect(token);
 
     // 연결 상태 업데이트
     socket.on('connect', () => {
-      if (workspaceId) chatSocket.joinWorkspace(workspaceId);
-      else throw new Error('Workspace ID 가 등록되지 않았습니다.');
+      // workspaceId가 있더라도 chatRoomId가 아직 없을 수 있음 (비동기 로드)
+      // chatRoomId가 생기면 아래 useEffect에서 join함
       setConnected(true);
     });
 
@@ -42,20 +45,17 @@ export const useWebSocket = (workspaceId: string | null) => {
     };
   }, [setConnected]);
 
-  // 워크스페이스 입장/퇴장
+  // 채팅방 입장/퇴장 (chatRoomId 변경 시)
   useEffect(() => {
-    if (!workspaceId) return;
-    // setActiveWorkspace(workspaceId);
+    if (!chatRoomId) return;
+
+    chatSocket.joinChatRoom(chatRoomId);
+    console.log(`📡 Joined Chat Room: ${chatRoomId}`);
 
     return () => {
-      chatSocket.leaveWorkspace(workspaceId);
-      // 언마운트 시 setActiveWorkspace(null)을 호출하면,
-      // 워크스페이스 변경 시 (A -> B) A해제(null) -> B설정(id) 과정에서 불필요한 업데이트가 발생할 수 있음.
-      // 여기서는 cleanup에서 state를 초기화하지 않거나, 신중하게 처리해야 함.
-      // setActiveWorkspace(null); // 주석 처리하여 테스트
+      chatSocket.leaveChatRoom(chatRoomId);
     };
-    // setActiveWorkspace is stable from zustand
-  }, [workspaceId]);
+  }, [chatRoomId]);
 
   // 이벤트 리스너 등록
   useEffect(() => {
@@ -69,15 +69,15 @@ export const useWebSocket = (workspaceId: string | null) => {
 
     // 타이핑 시작
     const handleTypingStart = (data: TypingPayload) => {
-      if (data.workspaceId === workspaceId) {
-        setTyping(workspaceId, data.userId, true);
+      if (data.workspaceId === workspaceId || data.chatRoomId === chatRoomId) {
+        setTyping(workspaceId, data.memberId, true);
       }
     };
 
     // 타이핑 종료
     const handleTypingStop = (data: TypingPayload) => {
-      if (data.workspaceId === workspaceId) {
-        setTyping(workspaceId, data.userId, false);
+      if (data.workspaceId === workspaceId || data.chatRoomId === chatRoomId) {
+        setTyping(workspaceId, data.memberId, false);
       }
     };
 
@@ -111,28 +111,41 @@ export const useWebSocket = (workspaceId: string | null) => {
       chatSocket.off('user:offline', handleUserOffline);
       chatSocket.off('error', handleError);
     };
-  }, [workspaceId, addMessage, setTyping, updateParticipantStatus]);
+  }, [workspaceId, chatRoomId, addMessage, setTyping, updateParticipantStatus]);
 
   // 메시지 전송
   const sendMessage = useCallback(
     (content: string) => {
-      if (!workspaceId || !content.trim()) return;
-      chatSocket.sendMessage(workspaceId, content.trim());
+      if (!chatRoomId || !content.trim()) return;
+      chatSocket.sendMessage(chatRoomId, content.trim());
     },
-    [workspaceId]
+    [chatRoomId]
   );
 
   // 타이핑 시작
   const startTyping = useCallback(() => {
-    if (!workspaceId) return;
-    chatSocket.startTyping(workspaceId);
-  }, [workspaceId]);
+    if (!chatRoomId) return;
+    const user = useUserStore.getState().user;
+    if (user) {
+      chatSocket.startTyping(
+        chatRoomId,
+        user.memberId?.toString() || user.id?.toString() || '',
+        user.nickname || user.name
+      );
+    }
+  }, [chatRoomId]);
 
   // 타이핑 종료
   const stopTyping = useCallback(() => {
-    if (!workspaceId) return;
-    chatSocket.stopTyping(workspaceId);
-  }, [workspaceId]);
+    if (!chatRoomId) return;
+    const user = useUserStore.getState().user;
+    if (user) {
+      chatSocket.stopTyping(
+        chatRoomId,
+        user.memberId?.toString() || user.id?.toString() || ''
+      );
+    }
+  }, [chatRoomId]);
 
   return {
     sendMessage,

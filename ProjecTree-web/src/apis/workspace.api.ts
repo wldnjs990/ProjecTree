@@ -99,6 +99,53 @@ export const selectNodeCandidates = async (
   console.log(response);
   // API 응답에서 id, taskType이 없으므로 클라이언트에서 임시 생성
   return response.data;
+  // API 응답에서 id, taskType이 없으므로 클라이언트에서 임시 생성
+  return response.data;
+};
+
+// ===== 워크스페이스 상세 조회 =====
+
+export interface WorkspaceDetailData {
+  nodeTree: { tree: ApiNode[] };
+  files: Array<{
+    id: number;
+    orginFileName: string;
+    contentType: string;
+    path: string;
+    size: number;
+  }>;
+  epics: Array<{ name: string; description: string }>;
+  teamInfo: {
+    chatRoomId: string;
+    memberInfos: Array<{
+      memberId: number;
+      name: string;
+      nickname: string;
+      email: string;
+      role: 'OWNER' | 'EDITOR' | 'VIEWER';
+    }>;
+  };
+}
+
+export interface WorkspaceDetailResponse {
+  message: string;
+  data: WorkspaceDetailData;
+  code: number;
+  success: boolean;
+}
+
+/**
+ * [워크스페이스 API] 워크스페이스 상세 조회
+ * @param workspaceId - 워크스페이스 ID
+ */
+export const getWorkspaceDetail = async (
+  workspaceId: number
+): Promise<WorkspaceDetailData> => {
+  const response = await wasApiClient.get<WorkspaceDetailResponse>(
+    `/workspaces`,
+    { params: { workspaceId } }
+  );
+  return response.data.data;
 };
 
 // ===== 워크스페이스 생성 =====

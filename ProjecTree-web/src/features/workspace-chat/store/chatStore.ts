@@ -11,6 +11,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   messages: {},
   participants: {},
   activeWorkspaceId: null,
+  chatRoomIds: {}, // 워크스페이스 ID -> 채팅방 ID 매핑
   typingUsers: {},
   unreadCounts: {},
   isConnected: false,
@@ -129,6 +130,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
   // 연결 상태 설정
   setConnected: (isConnected: boolean) => {
     set({ isConnected });
+  },
+
+  // 채팅방 ID 설정
+  setChatRoomId: (workspaceId: string, chatRoomId: string) => {
+    set((state) => ({
+      chatRoomIds: {
+        ...state.chatRoomIds,
+        [workspaceId]: chatRoomId,
+      },
+    }));
   },
 
   // 워크스페이스 메시지 초기화

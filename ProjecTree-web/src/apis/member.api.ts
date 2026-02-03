@@ -5,6 +5,8 @@ import type { AccessTokenPayload } from './types';
  * [타입] 회원 기본 정보 응답
  */
 export interface MemberInfoResponse {
+  memberId: number;
+  id: number;
   name: string;
   nickname: string;
   email: string;
