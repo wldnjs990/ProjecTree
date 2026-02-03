@@ -1,14 +1,14 @@
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import type { ReactElement } from 'react';
 
 interface ConfirmProps {
@@ -32,27 +32,29 @@ export function Confirm({
   isConfirmed = false,
 }: ConfirmProps) {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
+    <Dialog>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
           {content && <hr />}
           {content}
           <hr />
           {!isConfirmed && (
-            <AlertDialogDescription>{description}</AlertDialogDescription>
+            <DialogDescription>{description}</DialogDescription>
           )}
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">{cancelText}</Button>
+          </DialogClose>
           {!isConfirmed && (
-            <AlertDialogAction onClick={onAction}>
-              {actionText}
-            </AlertDialogAction>
+            <DialogClose asChild>
+              <Button onClick={onAction}>{actionText}</Button>
+            </DialogClose>
           )}
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -22,12 +22,13 @@ const postCreateNode = async (
 
 interface AiNodeRecommendationResponse {
   techs: {
+    id: number;
     name: string;
     advantage: string;
-    disadvantage: string;
+    disAdvantage: string;
     description: string;
     ref: string;
-    recommendation_score: number;
+    recommendScore: number;
   };
   comparison: string;
 }

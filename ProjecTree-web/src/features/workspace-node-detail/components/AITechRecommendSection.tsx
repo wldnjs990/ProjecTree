@@ -40,7 +40,7 @@ function TechCard({
   isSelected: boolean;
 }) {
   // 추천 점수가 4점 이상이면 AI 추천 태그 붙여줌
-  const isHighRecommended = tech.recommendationScore >= 4;
+  const isHighRecommended = tech.recommendScore >= 4;
 
   return (
     <div
@@ -55,7 +55,7 @@ function TechCard({
       <div className="flex items-start justify-between mb-1.5">
         <span className="text-sm font-medium text-[#0B0B0B]">{tech.name}</span>
         {isHighRecommended && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-medium text-[#1C69E3] bg-[rgba(28,105,227,0.1)] border border-[rgba(28,105,227,0.2)] rounded-md">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-medium text-[#1C69E3] bg-[rgba(28,105,227,0.1)] border border-[rgba(28,105,227,0.2)] rounded-md whitespace-nowrap">
             <Sparkles className="w-3 h-3" />
             AI 추천
           </span>
@@ -74,9 +74,9 @@ function TechCard({
             +{tech.advantage.slice(0, 30)}...
           </span>
         )}
-        {tech.disadvantage && (
+        {tech.disAdvantage && (
           <span className="px-1.5 py-0.5 text-[9px] rounded bg-[#F8F8F8] text-[#C10007]">
-            -{tech.disadvantage.slice(0, 30)}...
+            -{tech.disAdvantage.slice(0, 30)}...
           </span>
         )}
       </div>
@@ -227,7 +227,7 @@ function TechCardList({
             title={
               <TechDetailTitle
                 name={tech.name}
-                recommendationScore={tech.recommendationScore}
+                recommendScore={tech.recommendScore}
               />
             }
             content={<TechDetailContent tech={tech} />}

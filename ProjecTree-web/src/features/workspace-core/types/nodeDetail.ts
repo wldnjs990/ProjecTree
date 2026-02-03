@@ -56,10 +56,10 @@ export interface TechRecommendation {
   id: number;
   name: string;
   advantage: string;
-  disadvantage: string;
+  disAdvantage: string;
   description: string;
   ref: string;
-  recommendationScore: number;
+  recommendScore: number;
   selected: boolean;
 }
 
