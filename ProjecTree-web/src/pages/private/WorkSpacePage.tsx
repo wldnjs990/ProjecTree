@@ -133,7 +133,8 @@ export default function WorkSpacePage() {
   const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');
 
   // 음성 채팅 상태
-  const [isVoiceChatOpen, setIsVoiceChatOpen] = useState(false);
+  const [isVoiceChatActive, setIsVoiceChatActive] = useState(false); // 연결 활성화 상태
+  const [isVoiceChatBarVisible, setIsVoiceChatBarVisible] = useState(false); // UI 표시 상태
 
   // Event handlers
   const handleSettingsClick = () => {
@@ -141,7 +142,20 @@ export default function WorkSpacePage() {
   };
 
   const handleVoiceCallClick = () => {
-    setIsVoiceChatOpen((prev) => !prev);
+    if (!isVoiceChatActive) {
+      // 처음 연결: 연결 시작 + UI 표시
+      setIsVoiceChatActive(true);
+      setIsVoiceChatBarVisible(true);
+    } else {
+      // 이미 연결된 상태: UI만 토글 (연결 유지)
+      setIsVoiceChatBarVisible((prev) => !prev);
+    }
+  };
+
+  // 음성 채팅 완전 종료 (나가기 버튼)
+  const handleVoiceChatClose = () => {
+    setIsVoiceChatActive(false);
+    setIsVoiceChatBarVisible(false);
   };
 
   const handleInviteClick = () => {
@@ -179,6 +193,7 @@ export default function WorkSpacePage() {
         onSettingsClick={handleSettingsClick}
         onVoiceCallClick={handleVoiceCallClick}
         onInviteClick={handleInviteClick}
+        isVoiceChatActive={isVoiceChatActive}
       />
 
       {/* Main Content */}
@@ -223,8 +238,9 @@ export default function WorkSpacePage() {
 
       {/* 음성 채팅 바 */}
       <VoiceChatBar
-        isOpen={isVoiceChatOpen}
-        onClose={() => setIsVoiceChatOpen(false)}
+        isActive={isVoiceChatActive}
+        isVisible={isVoiceChatBarVisible}
+        onClose={handleVoiceChatClose}
         workspaceId={workspaceId || 'default'}
       />
     </div>

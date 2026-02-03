@@ -21,10 +21,12 @@ import {
 import { useVoiceChat } from '../hooks/useVoiceChat';
 import HiddenAudioPlayer from './HiddenAudioPlayer';
 import ParticipantAvatar from './ParticipantAvatar';
+import { MicPermissionAlert } from './MicPermissionAlert';
 
 type VoiceChatBarProps = {
-  isOpen: boolean;
-  onClose: () => void;
+  isActive: boolean; // 연결 활성화 상태 (백그라운드 연결 유지)
+  isVisible: boolean; // UI 표시 상태 (최소화/보이기)
+  onClose: () => void; // 완전 종료 (연결 해제)
   workspaceId: string;
 };
 
@@ -32,7 +34,8 @@ type VoiceChatBarProps = {
  * 참여자 아바타 컴포넌트
  */
 export function VoiceChatBar({
-  isOpen,
+  isActive,
+  isVisible,
   onClose,
   workspaceId,
 }: VoiceChatBarProps) {
@@ -49,18 +52,23 @@ export function VoiceChatBar({
     leaveRoom,
     toggleMicrophone,
     resetLeaving,
+    micPermissionDenied,
+    resetMicPermissionDenied,
   } = useVoiceChat({ workspaceId });
 
-  // 바가 열릴 때 자동으로 음성 채팅방 입장
+  // 음성 채팅이 활성화될 때 자동으로 음성 채팅방 입장
   useEffect(() => {
-    // 바가 닫혀있으면 아무것도 하지 않음
-    if (!isOpen) return;
+    // 비활성화 상태면 아무것도 하지 않음
+    if (!isActive) return;
 
     // 이미 연결되어 있거나 연결 중이면 아무것도 하지 않음
     if (isConnected || isConnecting) return;
 
-    // 에러가 있으면 자동 재연결하지 않음 (수동으로 "다시 시도" 클릭 필요)
+    // 에러가 있으면 자동 재연결하지 않음
     if (error) return;
+
+    // 마이크 권한 거부 상태면 재연결하지 않음
+    if (micPermissionDenied) return;
 
     // 새로 입장하는 경우 isLeaving 리셋
     if (isLeaving) {
@@ -68,7 +76,7 @@ export function VoiceChatBar({
     }
 
     joinRoom();
-  }, [isOpen, isConnected, isConnecting, isLeaving, error, joinRoom, resetLeaving]);
+  }, [isActive, isConnected, isConnecting, isLeaving, error, micPermissionDenied, joinRoom, resetLeaving]);
 
   // 바 닫을 때 음성 채팅방 퇴장 처리
   const handleClose = async () => {
@@ -78,12 +86,21 @@ export function VoiceChatBar({
     await leaveRoom();
   };
 
-  // 바가 닫혀있으면 렌더링하지 않음
-  if (!isOpen) return null;
+  // 비활성화 상태면 완전히 렌더링하지 않음
+  if (!isActive) return null;
 
   return (
     <>
-      {/* 원격 참가자 오디오 재생 (숨김) */}
+      {/* 마이크 권한 거부 알림 모달 */}
+      <MicPermissionAlert
+        isOpen={micPermissionDenied}
+        onClose={() => {
+          resetMicPermissionDenied();
+          onClose(); // isActive를 false로 리셋하여 완전 종료
+        }}
+      />
+
+      {/* 원격 참가자 오디오 재생 (숨김) - UI가 숨겨져도 항상 재생 */}
       {remoteTracks.map((track) => {
         const audioTrack = track.trackPublication.audioTrack;
         if (!audioTrack) return null;
@@ -95,7 +112,8 @@ export function VoiceChatBar({
         );
       })}
 
-      {/* 컴팩트 플로팅 바 */}
+      {/* 컴팩트 플로팅 바 - isVisible이 true일 때만 표시 */}
+      {isVisible && (
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
         <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl px-4 py-3">
           <div className="flex items-center gap-4">
@@ -199,6 +217,7 @@ export function VoiceChatBar({
           </div>
         </div>
       </div>
+      )}
     </>
   );
 }

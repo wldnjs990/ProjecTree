@@ -4,6 +4,7 @@ import type { Node } from '@xyflow/react';
 import { getCrdtClient, type YNodeValue } from '../crdt/crdtClient';
 import { useConnectionStatus, useNodeStore } from '../stores';
 import type { FlowNode, FlowNodeData, YjsNode } from '../types/node';
+import type { NodeData } from '../types/nodeDetail';
 import { flowNodeToYjsNode, yjsNodeToFlowNode } from '../utils/nodeTransform';
 
 interface UseNodesCrdtOptions {
@@ -26,6 +27,7 @@ export const useNodesCrdt = ({
 
   // Zustand 스토어 액션
   const setNodes = useNodeStore((state) => state.setNodes);
+  const setNodeListData = useNodeStore((state) => state.setNodeListData);
   const updateNodePosition = useNodeStore((state) => state.updateNodePosition);
 
   // Y.Map에서 노드 배열로 변환 후 전역 스토어 업데이트
@@ -35,9 +37,14 @@ export const useNodesCrdt = ({
 
     // 스토어에 저장할 노드 리스트
     const nodes: FlowNode[] = [];
+    // nodeListData도 함께 구성 (O(1) 조회용)
+    const nodeListDataMap: Record<number, NodeData> = {};
+
     yNodesRef.current.forEach((yNode, nodeId) => {
       // 현재 노드의 부모id
       const rawParentId = yNode.get('parentId');
+      const data = yNode.get('data') as FlowNodeData;
+
       // 전역변수에 저장할 노드 생성
       const yjsNode: YjsNode = {
         id: nodeId,
@@ -48,14 +55,23 @@ export const useNodesCrdt = ({
             ? undefined
             : (rawParentId as string | undefined),
         position: yNode.get('position') as { x: number; y: number },
-        data: yNode.get('data') as YjsNode['data'],
+        data,
       };
       nodes.push(yjsNodeToFlowNode(yjsNode));
+
+      // nodeListData 구성 (FlowNodeData → NodeData 변환)
+      nodeListDataMap[Number(nodeId)] = {
+        identifier: data.taskId?.replace('#', '') || '',
+        taskType: data.taskType ?? null,
+        status: data.status,
+        priority: data.priority,
+        difficult: data.difficult,
+      };
     });
 
-    console.log(nodes);
     setNodes(nodes);
-  }, [setNodes]);
+    setNodeListData(nodeListDataMap);
+  }, [setNodes, setNodeListData]);
 
   // Y.Map 초기화 및 구독
   useEffect(() => {

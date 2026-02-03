@@ -188,6 +188,48 @@ class CrdtClient {
   }
 
   /**
+   * 노드 기술스택 선택 이벤트를 CRDT 서버로 전송 및 YMap 브로드캐스트
+   * @param nodeId 노드 ID
+   * @param selectedTechId 선택된 기술스택 ID
+   */
+  selectNodeTech(nodeId: string, selectedTechId: number): string | null {
+    const requestId = crypto.randomUUID();
+
+    // YMap에 선택된 기술스택 저장 (브로드캐스트)
+    const selectedNodeTechs = this.getYMap<number>('selectedNodeTechs');
+    selectedNodeTechs.set(nodeId, selectedTechId);
+
+    // CRDT 서버에 이벤트 전송
+    const ws = this.provider.ws;
+    const message = JSON.stringify({
+      type: 'select_node_tech',
+      requestId,
+      nodeId,
+      selectedTechId,
+    });
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(message);
+      console.log('[CRDT] 노드 기술스택 선택 요청 전송:', {
+        requestId,
+        nodeId,
+        selectedTechId,
+      });
+      return requestId;
+    }
+
+    console.warn('[CRDT] WebSocket이 연결되지 않아 기술스택 선택 요청 실패');
+    return null;
+  }
+
+  /**
+   * 선택된 노드 기술스택 YMap 가져오기
+   */
+  getSelectedNodeTechs(): Y.Map<number> {
+    return this.getYMap<number>('selectedNodeTechs');
+  }
+
+  /**
    * 싱글톤 인스턴스 가져오기
    */
   static getInstance(): CrdtClient | null {
