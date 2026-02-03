@@ -23,11 +23,11 @@ public class SocketEventHandler {
     public void init() {
         socketIOServer.addConnectListener(client -> {
             try {
-                String header = client.getHandshakeData()
-                        .getHttpHeaders()
-                        .get("Authorization");
+                String token = client.getHandshakeData()
+                        .getAuthToken()
+                        .toString();
 
-                Member member = jwtResolver.resolve(header);
+                Member member = jwtResolver.resolve(token);
                 client.set("memberId", member.getId());
                 log.info("Member {} connected [session: {}]",
                         member.getId(), client.getSessionId());
