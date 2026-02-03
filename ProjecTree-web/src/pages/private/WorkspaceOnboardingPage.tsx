@@ -19,9 +19,10 @@ export default function WorkspaceOnboardingPage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const steps = ONBOARDING_TEXTS.steps;
+  const totalSteps = steps.length;
   const currentStepLabel =
-    ONBOARDING_TEXTS.steps.find((step) => step.number === currentStep)?.label ??
-    '';
+    steps.find((step) => step.number === currentStep)?.label ?? '';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -160,11 +161,24 @@ export default function WorkspaceOnboardingPage() {
             <span className="text-sm font-medium text-white/80">
               {currentStepLabel}
             </span>
-            <span>{currentStep}/6</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-white">
+                0{currentStep}
+              </span>
+              <div className="h-[2px] w-10 bg-white/20">
+                <div
+                  className="h-full bg-[var(--figma-neon-green)] transition-all duration-300"
+                  style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                />
+              </div>
+              <span className="text-sm font-bold text-white/60">
+                0{totalSteps}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="w-full max-w-[500px] h-[600px] flex flex-col justify-between relative z-20">
+        <div className="w-full max-w-[500px] h-[600px] flex flex-col justify-between relative z-20 pt-16 lg:pt-0">
           {isLoading ? (
             <div className="h-full w-full flex items-center justify-center">
               <Step7Loading />
@@ -174,17 +188,19 @@ export default function WorkspaceOnboardingPage() {
               {/* Top Section: Indicator + Form */}
               <div className="w-full">
                 {/* Step Indicator */}
-                <div className="flex items-center gap-2 mb-8">
+                <div className="hidden lg:flex items-center gap-2 mb-8">
                   <span className="text-[var(--figma-tech-green)] font-bold text-lg">
                     0{currentStep}
                   </span>
                   <div className="h-[2px] w-12 bg-gray-200">
                     <div
                       className="h-full bg-[var(--figma-neon-green)] transition-all duration-300"
-                      style={{ width: `${(currentStep / 6) * 100}%` }}
+                      style={{ width: `${(currentStep / totalSteps) * 100}%` }}
                     />
                   </div>
-                  <span className="text-gray-300 font-medium text-lg">06</span>
+                  <span className="text-gray-300 font-medium text-lg">
+                    0{totalSteps}
+                  </span>
                 </div>
 
                 {/* Form Container with Input Override */}
