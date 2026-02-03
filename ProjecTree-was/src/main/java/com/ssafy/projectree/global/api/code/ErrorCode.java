@@ -15,6 +15,7 @@ public enum ErrorCode {
     CANDIDATE_GENERATE_ERROR(DomainCode.CANDIDATE, ExceptionCode.FAILURE, "CANDIDATE_GENERATE_ERROR"),
     NODE_GENERATE_ERROR(DomainCode.NODE, ExceptionCode.FAILURE, "NODE_GENERATE_ERROR"),
     TECH_RECOMMEND_ERROR(DomainCode.TECH, ExceptionCode.FAILURE, "TECH_FAILURE"),
+    PORTFOLIO_GENERATE_ERROR(DomainCode.PORTFOLIO, ExceptionCode.FAILURE, "PORTFOLIO_GENERATE_ERROR"),
     CANDIDATE_NOT_FOUND_ERROR(DomainCode.CANDIDATE, ExceptionCode.NOT_FOUND, "CANDIDATE_NOT_FOUND"),
     NODE_NOT_FOUND_ERROR(DomainCode.NODE, ExceptionCode.NOT_FOUND, "NODE_NOT_FOUND_ERROR"),
     NODE_TYPE_NOT_SUPPORT_ERROR(DomainCode.NODE, ExceptionCode.NOT_SUPPORT, "NODE_TYPE_NOT_SUPPORT"),
@@ -30,7 +31,10 @@ public enum ErrorCode {
     AUTHENTICATION_REQUIRED(DomainCode.AUTH, ExceptionCode.INVALID, "AUTHENTICATION_REQUIRED"),
     ACCESS_DENIED(DomainCode.AUTH, ExceptionCode.FORBIDDEN, "ACCESS_DENIED"),
     DUPLICATE_REQUEST_ERROR(DomainCode.NORMAL, ExceptionCode.TOO_MANY_REQUEST, "해당 자원은 이미 사용중입니다."),
-    CHATROOM_NOT_FOUND(DomainCode.CHATROOM, ExceptionCode.NOT_FOUND, "CHATROOM_NOT_FOUND");
+    CHATROOM_NOT_FOUND(DomainCode.CHATROOM, ExceptionCode.NOT_FOUND, "CHATROOM_NOT_FOUND"),
+    INVALIDATED_USER_ERROR(DomainCode.USER, ExceptionCode.INVALID , "인증된 사용자만 이용할 수 있습니다."),
+    PORTFOLIO_NOT_FOUND(DomainCode.PORTFOLIO, ExceptionCode.NOT_FOUND ,"포트폴리오를 찾을 수 없습니다."),
+    PORTFOLIO_INVALID_ACCESS_ERROR(DomainCode.PORTFOLIO, ExceptionCode.INVALID, "비정상적인 포트폴리오 접근입니다.");
 
     private final DomainCode domainCode;
     private final ExceptionCode exceptionCode;

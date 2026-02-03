@@ -2,6 +2,7 @@ package com.ssafy.projectree.domain.ai.service;
 
 import com.ssafy.projectree.domain.ai.dto.AiCandidateCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiNodeCreateDto;
+import com.ssafy.projectree.domain.ai.dto.AiPortfolioGenerateDto;
 import com.ssafy.projectree.domain.ai.dto.AiTechRecommendDto;
 import com.ssafy.projectree.domain.ai.lock.LockType;
 import com.ssafy.projectree.domain.ai.lock.utils.LockService;
@@ -38,6 +39,8 @@ public class InferenceServiceImpl implements InferenceService {
     private String nodePath;
     @Value("${inference-server.recommend-tech-path}")
     private String recommendPath;
+    @Value("${inference-server.generate-portfolio-path}")
+    private String portfolioPath;
 
     @Override
     @Retryable(
@@ -61,6 +64,7 @@ public class InferenceServiceImpl implements InferenceService {
                 .toEntity(AiCandidateCreateDto.Response.class)
                 .getBody();
     }
+
     @Recover
     public AiCandidateCreateDto.Response recoverCandidate(RuntimeException e, AiCandidateCreateDto.Request request) {
         log.error("Candidate 생성 3회 재시도 실패: node_id={}", request.getNodeId(), e);
@@ -88,6 +92,7 @@ public class InferenceServiceImpl implements InferenceService {
                 .toEntity(AiNodeCreateDto.Response.class)
                 .getBody();
     }
+
     @Recover
     public AiNodeCreateDto.Response recoverNode(RuntimeException e, AiNodeCreateDto.Request request) {
         log.error("Node 생성 3회 재시도 실패: candidate_id={}", request.getCandidateId(), e);
@@ -115,10 +120,37 @@ public class InferenceServiceImpl implements InferenceService {
                 .toEntity(AiTechRecommendDto.Response.class)
                 .getBody();
     }
+
     @Recover
     public AiTechRecommendDto.Response recoverTech(RuntimeException e, AiTechRecommendDto.Request request) {
         log.error("Tech 추천 3회 재시도 실패: node_id={}", request.getNodeId(), e);
         throw new AIServiceException(ErrorCode.TECH_RECOMMEND_ERROR, request.getNodeId(), LockType.TECH, e.toString());
+    }
+
+    @Override
+    @Retryable(
+            retryFor = {HttpServerErrorException.class, ResourceAccessException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000),
+            listeners = "retryLoggingListener"
+    )
+    public AiPortfolioGenerateDto.Response generatePortfolio(AiPortfolioGenerateDto.Request request) {
+        return restClient.post().uri(UriComponentsBuilder.fromUriString(serverUrl)
+                        .path(pathPrefix)
+                        .path(portfolioPath)
+                        .build()
+                        .toUriString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .toEntity(AiPortfolioGenerateDto.Response.class)
+                .getBody();
+    }
+
+    @Recover
+    public AiPortfolioGenerateDto.Response recoverPortfolio(RuntimeException e, AiPortfolioGenerateDto.Request request) {
+        log.error("Portfolio 생성 3회 재시도 실패: projectTitle={}", request.getProjectTitle(), e);
+        throw new AIServiceException(ErrorCode.PORTFOLIO_GENERATE_ERROR, 0L, LockType.PORTFOLIO, e.toString());
     }
 
 }
