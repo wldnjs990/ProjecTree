@@ -37,7 +37,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
         <div
           aria-label={`태스크: ${data.label}`}
           className={cn(
-            'py-3 bg-sky-50 hover:bg-sky-100 transition-colors motion-reduce:transition-none border-b border-sky-200',
+            'py-3 px-4 bg-sky-50 hover:bg-sky-100 transition-colors motion-reduce:transition-none border-b border-sky-200',
             'items-center text-left w-full',
             specGridCols
           )}
@@ -84,7 +84,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
           </div>
           <div className="flex justify-center">
             <Badge
-              className={cn('text-xs font-normal', statusBadge[data.status])}
+              className={cn('text-xs font-normal w-12 justify-center', statusBadge[data.status])}
             >
               {statusLabel[data.status]}
             </Badge>
@@ -127,7 +127,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
               key={advanced.id}
               aria-label={`어드밴스: ${advancedData.label}`}
               className={cn(
-                'py-3 bg-gray-50 hover:bg-gray-100 transition-colors motion-reduce:transition-none border-b border-gray-200',
+                'py-3 px-4 bg-gray-50 hover:bg-gray-100 transition-colors motion-reduce:transition-none border-b border-gray-200',
                 'grid items-center',
                 specGridCols
               )}
@@ -173,7 +173,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
               <div className="flex justify-center">
                 <Badge
                   className={cn(
-                    'text-xs font-normal',
+                    'text-xs font-normal w-12 justify-center',
                     statusBadge[advancedData.status]
                   )}
                 >

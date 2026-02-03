@@ -48,7 +48,7 @@ export function StoryGroup({
         <div
           aria-label={`스토리: ${data.label}`}
           className={cn(
-            'py-3 bg-lime-50 hover:bg-lime-100 transition-colors motion-reduce:transition-none border-b border-lime-200',
+            'py-3 px-4 bg-lime-50 hover:bg-lime-100 transition-colors motion-reduce:transition-none border-b border-lime-200',
             'items-center text-left w-full',
             specGridCols
           )}
@@ -95,7 +95,7 @@ export function StoryGroup({
           </div>
           <div className="flex justify-center">
             <Badge
-              className={cn('text-xs font-normal', statusBadge[data.status])}
+              className={cn('text-xs font-normal w-12 justify-center', statusBadge[data.status])}
             >
               {statusLabel[data.status]}
             </Badge>

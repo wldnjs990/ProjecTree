@@ -5,7 +5,7 @@ import { transformNodesForSpecView, useNodes, useEdges } from '@/features/worksp
 import { EpicGroup } from './EpicGroup';
 import { StoryGroup } from './StoryGroup';
 import { TaskGroup } from './TaskGroup';
-import { specGridCols } from '../constants/specConfig';
+import { specGridCols, mockFeatureSpecNodes, mockFeatureSpecEdges } from '../constants';
 import type { NodeData, FeatureSpecViewProps } from '../types';
 import { Accordion } from '@/components/ui/accordion';
 
@@ -49,8 +49,17 @@ function groupNodesByHierarchy(nodes: Node[], edges: Edge[] = []) {
 
 export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
   // Zustand 스토어에서 노드/엣지 가져오기
-  const nodes = useNodes();
-  const edges = useEdges();
+  const realNodes = useNodes();
+  const realEdges = useEdges();
+
+  // 개발 환경에서 실제 데이터가 없으면 목데이터 사용
+  const nodes = import.meta.env.DEV && realNodes.length === 0
+    ? mockFeatureSpecNodes
+    : realNodes;
+
+  const edges = import.meta.env.DEV && realEdges.length === 0
+    ? mockFeatureSpecEdges
+    : realEdges;
 
   // 데이터 변환
   const transformedNodes = transformNodesForSpecView(nodes);
@@ -60,10 +69,13 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
   );
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-transparent">
       {/* Toolbar */}
-      <div className="h-14 border-b border-border flex items-center justify-end px-4 gap-4">
-        <Button variant="outline" size="sm" className="gap-1.5 bg-transparent">
+      <div className="h-14 border-b border-zinc-200/60 bg-white/70 backdrop-blur-xl flex items-center justify-end px-4 gap-4 sticky top-0 z-10 transition-all duration-300 shadow-sm">
+        <Button
+          variant="outline"
+          className="gap-2 bg-white/50 border-white/20 shadow-sm text-zinc-700 hover:bg-white/80 transition-all duration-300 rounded-xl backdrop-blur-sm text-sm font-medium h-9 px-4"
+        >
           <Download className="w-4 h-4" aria-hidden="true" />
           내보내기
         </Button>
@@ -71,7 +83,7 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
 
       {/* Header row */}
       <div
-        className={`py-2 bg-muted/50 border-b text-xs font-medium text-muted-foreground ${specGridCols}`}
+        className={`py-3 px-4 bg-white/60 backdrop-blur-sm border-b border-white/30 text-xs font-semibold text-zinc-600 shadow-sm ${specGridCols}`}
       >
         <span className="text-center">유형</span>
         <span className="text-center">우선순위</span>
@@ -99,8 +111,8 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
       </div>
 
       {/* Footer */}
-      <div className="h-12 border-t border-border flex items-center justify-between px-4 text-sm text-muted-foreground">
-        <span>총 {filteredNodes.length}개 항목</span>
+      <div className="h-12 border-t border-white/20 bg-white/40 backdrop-blur-md flex items-center justify-between px-4 text-sm text-zinc-600 shadow-sm">
+        <span className="font-medium">총 {filteredNodes.length}개 항목</span>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <div

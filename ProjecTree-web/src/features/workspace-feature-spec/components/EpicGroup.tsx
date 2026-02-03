@@ -48,7 +48,7 @@ export function EpicGroup({
         <div
           aria-label={`에픽: ${data.label}`}
           className={cn(
-            'py-3 bg-violet-50 hover:bg-violet-100 transition-colors motion-reduce:transition-none border-b border-violet-200',
+            'py-3 px-4 bg-violet-50 hover:bg-violet-100 transition-colors motion-reduce:transition-none border-b border-violet-200',
             'items-center text-left w-full',
             specGridCols
           )}
@@ -91,7 +91,7 @@ export function EpicGroup({
           </div>
           <div className="flex justify-center">
             <Badge
-              className={cn('text-xs font-normal', statusBadge[data.status])}
+              className={cn('text-xs font-normal w-12 justify-center', statusBadge[data.status])}
             >
               {statusLabel[data.status]}
             </Badge>
