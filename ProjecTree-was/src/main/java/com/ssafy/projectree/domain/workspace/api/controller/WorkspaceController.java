@@ -1,5 +1,6 @@
 package com.ssafy.projectree.domain.workspace.api.controller;
 
+import com.ssafy.projectree.domain.member.api.dto.MemberRoleDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.domain.workspace.usecase.WorkspaceService;
@@ -9,9 +10,7 @@ import com.ssafy.projectree.global.docs.WorkspaceDocsController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -49,4 +48,19 @@ public class WorkspaceController implements WorkspaceDocsController {
     public CommonResponse<?> details(Member member, Long workspaceId) {
         return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.details(member, workspaceId));
     }
+
+    @GetMapping("/workspaces/{workspace-id}/members/role")
+    public CommonResponse<MemberRoleDto.Response> getWorkspaceMemberRole(
+            @PathVariable("workspace-id") Long workspaceId){
+        return CommonResponse.success(SuccessCode.SUCCESS, null);
+    }
+
+    @PatchMapping("/workspaces/{workspace-id}/members/role")
+    public CommonResponse<MemberRoleDto.Response> patchWorkspaceMemberRole(
+            @PathVariable(name = "workspace-id") Long workspaceId
+            ,@RequestBody MemberRoleDto.Request request){
+        return CommonResponse.success(SuccessCode.UPDATED, null);
+
+    }
+
 }

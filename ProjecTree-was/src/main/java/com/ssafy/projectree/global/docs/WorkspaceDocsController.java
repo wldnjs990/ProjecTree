@@ -96,45 +96,39 @@ public interface WorkspaceDocsController {
                     description = "Successfully Completed",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = WorkspaceDto.Detail.class),
-                            examples = @ExampleObject(
-                                    name = "워크 스페이스 상세 조회 API 응답 예시",
-                                    value = """
-                                            {
-                                              "nodeTree": {
-                                                "tree": [
-                                                  {
-                                                    "id": 1,
-                                                    "name": "프로젝트 루트",
-                                                    "nodeType": "PROJECT",
-                                                    ...
-                                                  }
-                                                ]
-                                              },
-                                              "files": [
-                                                {
-                                                  "id": 1,
-                                                  "orginFileName": "AI여행_기능명세서.pdf",
-                                                  "contentType": "application/pdf",
-                                                  "path": "s3://testbucket/test/AI여행기능명세서.pdf",
-                                                  "size": 10042314
-                                                }
-                                              ],
-                                              "epics": [
-                                                {
-                                                  "name": "인증/인가",
-                                                  "description": "인증/인가를 통해 사용자의 서비스 이용에 대한 접근을 관리합니다."
-                                                }
-                                              ]
-                                              "teamInfo": {
-                                                "chatRoomId": "!@#Cgfidvj1232..",
-                                                "members": [
-                                                    
-                                                ]
-                                              }
-                                            }
-                                            """
-                            )
+                            schema = @Schema(implementation = WorkspaceDto.Detail.class)
+//                            examples = @ExampleObject(
+//                                    name = "워크 스페이스 상세 조회 API 응답 예시",
+//                                    value = """
+//                                            {
+//                                              "nodeTree": {
+//                                                "tree": [
+//                                                  {
+//                                                    "id": 1,
+//                                                    "name": "프로젝트 루트",
+//                                                    "nodeType": "PROJECT",
+//                                                    ...
+//                                                  }
+//                                                ]
+//                                              },
+//                                              "files": [
+//                                                {
+//                                                  "id": 1,
+//                                                  "orginFileName": "AI여행_기능명세서.pdf",
+//                                                  "contentType": "application/pdf",
+//                                                  "path": "s3://testbucket/test/AI여행기능명세서.pdf",
+//                                                  "size": 10042314
+//                                                }
+//                                              ],
+//                                              "epics": [
+//                                                {
+//                                                  "name": "인증/인가",
+//                                                  "description": "인증/인가를 통해 사용자의 서비스 이용에 대한 접근을 관리합니다."
+//                                                }
+//                                              ]
+//                                            }
+//                                            """
+//                            )
                     )),
     })
     @GetMapping()
