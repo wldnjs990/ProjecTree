@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ChevronLeft } from 'lucide-react';
+import { ArrowLeft, ChevronLeft } from 'lucide-react';
 import {
   Stepper,
   Step1BasicInfo,
@@ -10,6 +10,7 @@ import {
   Step5TeamInvite,
   Step6EpicSetup,
   Step7Loading,
+  ONBOARDING_TEXTS,
 } from '@/features/workspace-onboarding';
 import { createWorkspace } from '@/apis/workspace.api';
 import type { Role } from '@/apis/workspace.api';
@@ -18,6 +19,10 @@ export default function WorkspaceOnboardingPage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const steps = ONBOARDING_TEXTS.steps;
+  const totalSteps = steps.length;
+  const currentStepLabel =
+    steps.find((step) => step.number === currentStep)?.label ?? '';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -148,17 +153,32 @@ export default function WorkspaceOnboardingPage() {
       </div>
 
       {/* Right Side (Content) with Diagonal Split */}
-      <div
-        className="w-full lg:w-[70%] bg-white relative flex flex-col items-center justify-center p-8 lg:px-24 lg:py-12 shadow-2xl"
-        style={{ clipPath: 'polygon(10% 0, 100% 0, 100% 100%, 0% 100%)' }}
-      >
+      <div className="onboarding-right-panel w-full lg:w-[70%] bg-white relative flex flex-col items-center justify-center p-8 lg:px-24 lg:py-12 shadow-2xl">
         {/* Mobile Header */}
         <div className="lg:hidden w-full absolute top-0 left-0 p-4 bg-[var(--figma-tech-green)] text-white flex justify-between z-50">
           <span className="font-bold">ProjecTree</span>
-          <span>{currentStep}/6</span>
+          <div className="flex items-center gap-6">
+            <span className="text-sm font-medium text-white/80">
+              {currentStepLabel}
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-white">
+                0{currentStep}
+              </span>
+              <div className="h-[2px] w-10 bg-white/20">
+                <div
+                  className="h-full bg-[var(--figma-neon-green)] transition-all duration-300"
+                  style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                />
+              </div>
+              <span className="text-sm font-bold text-white/60">
+                0{totalSteps}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="w-full max-w-[500px] h-[600px] flex flex-col justify-between relative z-20">
+        <div className="w-full max-w-[500px] h-[600px] flex flex-col justify-between relative z-20 pt-16 lg:pt-0">
           {isLoading ? (
             <div className="h-full w-full flex items-center justify-center">
               <Step7Loading />
@@ -168,17 +188,19 @@ export default function WorkspaceOnboardingPage() {
               {/* Top Section: Indicator + Form */}
               <div className="w-full">
                 {/* Step Indicator */}
-                <div className="flex items-center gap-2 mb-8">
+                <div className="hidden lg:flex items-center gap-2 mb-8">
                   <span className="text-[var(--figma-tech-green)] font-bold text-lg">
                     0{currentStep}
                   </span>
                   <div className="h-[2px] w-12 bg-gray-200">
                     <div
                       className="h-full bg-[var(--figma-neon-green)] transition-all duration-300"
-                      style={{ width: `${(currentStep / 6) * 100}%` }}
+                      style={{ width: `${(currentStep / totalSteps) * 100}%` }}
                     />
                   </div>
-                  <span className="text-gray-300 font-medium text-lg">06</span>
+                  <span className="text-gray-300 font-medium text-lg">
+                    0{totalSteps}
+                  </span>
                 </div>
 
                 {/* Form Container with Input Override */}
@@ -265,8 +287,9 @@ export default function WorkspaceOnboardingPage() {
       {/* Back Button (Absolute) */}
       <button
         onClick={() => navigate('/workspace-lounge')}
-        className="absolute bottom-12 left-12 z-50 text-[var(--figma-neon-green)]/60 hover:text-[var(--figma-neon-green)] transition-colors font-medium text-sm"
+        className="absolute bottom-12 left-12 z-50 inline-flex items-center gap-2 text-[var(--figma-neon-green)]/60 hover:text-[var(--figma-neon-green)] transition-colors font-medium text-sm"
       >
+        <ArrowLeft className="h-4 w-4" />
         돌아가기
       </button>
     </div>
