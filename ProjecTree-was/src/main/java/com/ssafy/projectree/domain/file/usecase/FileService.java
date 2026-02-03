@@ -46,7 +46,7 @@ public class FileService {
                 .stream()
                 .map(file -> FileReadDto.Response.builder()
                         .id(file.getId())
-                        .orginFileName(file.getOriginFileName())
+                        .originFileName(file.getOriginFileName())
                         .contentType(file.getContentType())
                         .path(file.getPath())
                         .size(file.getSize())

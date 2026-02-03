@@ -1,9 +1,6 @@
 package com.ssafy.projectree.domain.member.api.controller;
 
-import com.ssafy.projectree.domain.member.api.dto.MemberEmailReadDto;
-import com.ssafy.projectree.domain.member.api.dto.MemberNicknameReadDto;
-import com.ssafy.projectree.domain.member.api.dto.MemberNicknameUpdateDto;
-import com.ssafy.projectree.domain.member.api.dto.MemberReadDto;
+import com.ssafy.projectree.domain.member.api.dto.*;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.usecase.MemberService;
 import com.ssafy.projectree.global.api.code.SuccessCode;
@@ -46,4 +43,5 @@ public class MemberController implements MemberDocsController {
         memberService.deleteMember(principal.getId());
         return CommonResponse.success(SuccessCode.REMOVED, null);
     }
+
 }
