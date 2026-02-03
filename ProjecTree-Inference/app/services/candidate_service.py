@@ -1,5 +1,5 @@
 from app.api.schemas.candidates import CandidateGenerateRequest, CandidateGenerateResponse
-from app.agents.sub_agents.candidates.graph import candidate_graph
+from app.agents.candidates.graph import candidate_graph
 from app.db.repository.node_repository import NodeRepository
 from app.agents.enums import NodeType
 from app.db.repository.candidate_repository import CandidateRepository

@@ -2,7 +2,7 @@ from app.api.schemas.recommendations import (
     TechStackRecommendRequest,
     TechStackRecommendResponse,
 )
-from app.agents.sub_agents.recommend.graph import recommend_graph
+from app.agents.recommend.graph import recommend_graph
 from app.db.repository.node_repository import NodeRepository
 from sqlalchemy.orm import Session
 from app.core.log import langfuse_handler
