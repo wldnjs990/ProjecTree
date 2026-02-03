@@ -10,7 +10,13 @@ import com.ssafy.projectree.global.docs.WorkspaceDocsController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -36,6 +42,7 @@ public class WorkspaceController implements WorkspaceDocsController {
         workspaceService.create(member, dto, multipartFiles);
         return CommonResponse.success(SuccessCode.SUCCESS, "워크 스페이스 생성에 성공하였습니다.");
     }
+
     @Override
     public CommonResponse<?> update(@AuthenticationPrincipal Member member,
                                     @RequestPart(value = "data") WorkspaceDto.Insert dto,
@@ -45,20 +52,20 @@ public class WorkspaceController implements WorkspaceDocsController {
     }
 
     @Override
-    public CommonResponse<?> details(Member member, Long workspaceId) {
+    public CommonResponse<?> details(@AuthenticationPrincipal Member member, Long workspaceId) {
         return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.details(member, workspaceId));
     }
 
-    @GetMapping("/workspaces/{workspace-id}/members/role")
+    @GetMapping("/{workspace-id}/members/role")
     public CommonResponse<MemberRoleDto.Response> getWorkspaceMemberRole(
-            @PathVariable("workspace-id") Long workspaceId){
+            @PathVariable("workspace-id") Long workspaceId) {
         return CommonResponse.success(SuccessCode.SUCCESS, null);
     }
 
-    @PatchMapping("/workspaces/{workspace-id}/members/role")
+    @PatchMapping("/{workspace-id}/members/role")
     public CommonResponse<MemberRoleDto.Response> patchWorkspaceMemberRole(
-            @PathVariable(name = "workspace-id") Long workspaceId
-            ,@RequestBody MemberRoleDto.Request request){
+            @PathVariable(name = "workspace-id") Long workspaceId,
+            @RequestBody MemberRoleDto.Request request) {
         return CommonResponse.success(SuccessCode.UPDATED, null);
 
     }
