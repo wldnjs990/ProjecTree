@@ -1,13 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Node, Edge } from '@xyflow/react';
-import { useParams } from 'react-router';
-import { getWorkspaceTree, getNodeDetail } from '@/apis/workspace.api';
+import { useParams, useNavigate } from 'react-router';
+import {
+  getWorkspaceTree,
+  getNodeDetail,
+  getWorkspaceDetail,
+} from '@/apis/workspace.api';
 import { Header, type ViewTab } from '@/features/workspace-header';
 import { TreeCanvas } from '@/features/workspace-canvas';
 import { FeatureSpecView } from '@/features/workspace-feature-spec';
 import { TechStackStatusView } from '@/features/workspace-tech-status';
 import { LeftSidebar } from '@/features/workspace-aside';
-import { VoiceChatBar } from '@/features/workspace-voicechat';
+import { VoiceChatBar, MicPermissionAlert } from '@/features/workspace-voicechat';
 import {
   type FlowNode,
   type ApiNode,
@@ -16,6 +20,7 @@ import {
   destroyCrdtClient,
   useConnectionStatus,
   useNodeStore,
+  useWorkspaceStore,
   generateEdges,
   mockUsers,
   useNodeDetailCrdtObservers,
@@ -51,6 +56,7 @@ export default function WorkSpacePage() {
   const { workspaceId: paramWorkspaceId } = useParams<{
     workspaceId: string;
   }>();
+  const navigate = useNavigate();
   // workspaceId가 없으면 임시 ID 사용
   const workspaceId = paramWorkspaceId || String(TEMP_WORKSPACE_ID);
 
@@ -60,6 +66,9 @@ export default function WorkSpacePage() {
   // Zustand store 액션
   const setNodeListData = useNodeStore((state) => state.setNodeListData);
   const updateNodeDetail = useNodeStore((state) => state.updateNodeDetail);
+  const setWorkspaceDetail = useWorkspaceStore(
+    (state) => state.setWorkspaceDetail
+  );
 
   // 노드 상세 편집 Hook
   const { openSidebar, closeSidebar, selectedNodeId } = useNodeDetailEdit();
@@ -81,6 +90,11 @@ export default function WorkSpacePage() {
         // workspaceId params를 받아 crdt 인스턴스 생성
         if (workspaceId) initCrdtClient(workspaceId);
 
+        // 워크스페이스 상세 정보 조회 및 스토어 저장
+        const workspaceDetail = await getWorkspaceDetail(Number(workspaceId));
+        setWorkspaceDetail(workspaceDetail);
+        console.log('[WorkSpacePage] workspaceDetail 저장:', workspaceDetail);
+
         // 워크스페이스 트리 데이터 API 호출
         const apiNodes = await getWorkspaceTree(Number(workspaceId));
 
@@ -99,12 +113,27 @@ export default function WorkSpacePage() {
         });
         console.log('[WorkSpacePage] nodeListData 저장:', nodeListDataMap);
         setNodeListData(nodeListDataMap);
-      } catch (error) {
+      } catch (error: any) {
         console.error('워크스페이스 데이터 로드 실패:', error);
+
+        const errorCode = error.response?.data?.errorCode;
+
+        if (errorCode === 'WORKSPACE_NOT_FOUND') {
+          alert('워크스페이스에 접근할 수 없습니다');
+          navigate('/workspaces');
+          return;
+        }
+
+        if (error.response?.status === 403 || error.response?.status === 404) {
+          // 권한 없음 또는 워크스페이스 없음
+          alert('접근 권한이 없습니다');
+          navigate('/workspaces'); // 목록으로 이동
+        }
       } finally {
         setIsLoading(false);
       }
     };
+    // ...
 
     loadWorkspaceData();
 
@@ -119,22 +148,31 @@ export default function WorkSpacePage() {
   // 음성 채팅 상태
   const [isVoiceChatActive, setIsVoiceChatActive] = useState(false); // 연결 활성화 상태
   const [isVoiceChatBarVisible, setIsVoiceChatBarVisible] = useState(false); // UI 표시 상태
+  const [micPermissionDenied, setMicPermissionDenied] = useState(false); // 마이크 권한 거부 상태
 
   // Event handlers
   const handleSettingsClick = () => {
     console.log('Settings clicked');
   };
 
-  const handleVoiceCallClick = () => {
+  const handleVoiceCallClick = useCallback(async () => {
     if (!isVoiceChatActive) {
-      // 처음 연결: 연결 시작 + UI 표시
+      // 마이크 권한을 먼저 확인 — 권한 없으면 VoiceChatBar를 마운트하지 않음
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach((track) => track.stop());
+      } catch {
+        setMicPermissionDenied(true);
+        return;
+      }
+      // 권한 확인 후 연결 시작 + UI 표시
       setIsVoiceChatActive(true);
       setIsVoiceChatBarVisible(true);
     } else {
       // 이미 연결된 상태: UI만 토글 (연결 유지)
       setIsVoiceChatBarVisible((prev) => !prev);
     }
-  };
+  }, [isVoiceChatActive]);
 
   // 음성 채팅 완전 종료 (나가기 버튼)
   const handleVoiceChatClose = () => {
@@ -219,6 +257,12 @@ export default function WorkSpacePage() {
           )}
         </main>
       </div>
+
+      {/* 마이크 권한 거부 알림 (VoiceChatBar 마운트 전 단계) */}
+      <MicPermissionAlert
+        isOpen={micPermissionDenied}
+        onClose={() => setMicPermissionDenied(false)}
+      />
 
       {/* 음성 채팅 바 */}
       <VoiceChatBar
