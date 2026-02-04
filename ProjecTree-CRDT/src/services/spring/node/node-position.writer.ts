@@ -34,7 +34,7 @@ export async function sendBatchToSpring(
       },
     );
 
-    console.log("Spring response: ", result.data.success);
+    console.log("[Update Position] Spring response: ", result.data.success);
   } catch (error: any) {
     console.error(
       "Spring batch 위치 저장 실패",
