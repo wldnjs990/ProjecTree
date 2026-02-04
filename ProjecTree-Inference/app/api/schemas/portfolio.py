@@ -18,7 +18,7 @@ class UserTaskSchema(BaseModel):
     task_description: str = Field(..., alias="taskDescription", description="작업 설명")
     task_note: Optional[str] = Field(None, alias="taskNote", description="작업 노트/메모")
     tech_stack: Optional[TaskTechStackSchema] = Field(None, alias="techStack", description="사용된 기술 스택")
-
+    comparison: Optional[str] = Field(None, alias="comparison", description="기술 스택 비교")
     class Config:
         populate_by_name = True
 
@@ -28,6 +28,9 @@ class PortfolioGenerateRequest(BaseModel):
     project_title: str = Field(..., alias="projectTitle", description="프로젝트 제목")
     project_description: str = Field(..., alias="projectDescription", description="프로젝트 설명")
     project_head_count: int = Field(..., alias="projectHeadCount", description="프로젝트 인원수")
+    project_start_date: Optional[str] = Field(None, alias="projectStartDate", description="프로젝트 시작일")
+    project_end_date: Optional[str] = Field(None, alias="projectEndDate", description="프로젝트 종료일")
+    project_tech_stack: Optional[List[str]] = Field(None, alias="projectTechStack", description="프로젝트 기술 스택 리스트")
     user_task_schemas: List[UserTaskSchema] = Field(
         default_factory=list, 
         alias="userTaskSchemas",

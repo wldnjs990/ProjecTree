@@ -1,28 +1,22 @@
 """포트폴리오 생성 Agent 노드"""
 
 from app.agents.portfolio.state import PortfolioState
+from app.agents.portfolio.schemas.portfolio import PortfolioOutput
 from app.agents.portfolio.tools.analyze import analyze_task_distribution
-from app.agents.portfolio.tools.search import search_tech_description
-from app.agents.portfolio.prompts.system_prompts import PORTFOLIO_AGENT_SYSTEM_PROMPT
-from app.agents.portfolio.prompts.user_prompts import PORTFOLIO_USER_PROMPT, format_tasks_for_prompt
-from app.core.llm import openai_mini_llm
-from deepagents import create_deep_agent
-from pydantic import BaseModel, Field
+from app.agents.portfolio.prompts.system.portfolio_system import PORTFOLIO_AGENT_SYSTEM_PROMPT
+from app.agents.portfolio.prompts.user.portfolio_user import PORTFOLIO_USER_PROMPT, format_tasks_for_prompt
+from app.core.llm import openai_nano_llm
+from langchain.agents import create_agent
+from langchain_core.runnables import RunnableConfig
 import logging
 
 logger = logging.getLogger(__name__)
 
 # 도구 목록
-tools = [analyze_task_distribution, search_tech_description]
+tools = [analyze_task_distribution]
 
 
-class PortfolioOutput(BaseModel):
-    """포트폴리오 생성 결과"""
-    portfolio_content: str = Field(description="마크다운 형식의 포트폴리오 내용")
-    summary: str = Field(description="포트폴리오 한 줄 요약")
-
-
-def generate_portfolio_node(state: PortfolioState) -> PortfolioState:
+def generate_portfolio_node(state: PortfolioState, config: RunnableConfig) -> PortfolioState:
     """포트폴리오 생성 Agent 노드"""
     logger.info(f"[Portfolio] 포트폴리오 생성 시작 - project: {state.get('project_title')}")
     
@@ -32,23 +26,29 @@ def generate_portfolio_node(state: PortfolioState) -> PortfolioState:
         formatted_tasks = format_tasks_for_prompt(user_tasks)
         
         # 사용자 프롬프트 구성
+        tech_stack_list = state.get("project_tech_stack", []) or []
+        tech_stack_str = ", ".join(tech_stack_list) if tech_stack_list else "정보 없음"
+        
         user_prompt = PORTFOLIO_USER_PROMPT.format(
             project_title=state.get("project_title", ""),
             project_description=state.get("project_description", ""),
+            project_start_date=state.get("project_start_date", "정보 없음"),
+            project_end_date=state.get("project_end_date", "정보 없음"),
+            project_tech_stack=tech_stack_str,
             project_head_count=state.get("project_head_count", 1),
             formatted_tasks=formatted_tasks
         )
         
         # DeepAgent 생성 및 실행
-        agent = create_deep_agent(
-            openai_mini_llm,
-            tools,
+        agent = create_agent(
+            model=openai_nano_llm,
+            tools=tools,
             system_prompt=PORTFOLIO_AGENT_SYSTEM_PROMPT,
         )
         
         response = agent.invoke({
             "messages": [("user", user_prompt)]
-        })
+        }, config=config)
         
         # 응답에서 포트폴리오 내용 추출
         messages = response.get("messages", [])

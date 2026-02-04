@@ -62,6 +62,9 @@ class PortfolioService:
                     "project_title": request.project_title,
                     "project_description": request.project_description,
                     "project_head_count": request.project_head_count,
+                    "project_start_date": request.project_start_date,
+                    "project_end_date": request.project_end_date,
+                    "project_tech_stack": request.project_tech_stack,
                     "user_tasks": user_tasks,
                     "retry_count": 0
                 },
