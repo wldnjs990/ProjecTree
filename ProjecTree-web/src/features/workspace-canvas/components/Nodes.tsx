@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import type { FlowNodeData } from '@/features/workspace-core';
-import { useIsCreatingNode } from '@/features/workspace-core';
+import { useIsCreatingNode, useNodes } from '@/features/workspace-core';
 
 /** 노드 고정 크기 상수 */
 export const NODE_DIMENSIONS = {
@@ -275,12 +275,25 @@ function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
 
 // Advance 노드
 export type AdvanceNodeType = Node<FlowNodeData, 'ADVANCE'>;
-function AdvanceNodeComponent({ data, selected }: NodeProps<AdvanceNodeType>) {
+function AdvanceNodeComponent({
+  id,
+  data,
+  selected,
+}: NodeProps<AdvanceNodeType>) {
   const nodeData = data;
+  const nodes = useNodes();
+  const currentNode = nodes.find((node) => node.id === id);
+  const parentNode = currentNode?.parentId
+    ? nodes.find((node) => node.id === currentNode.parentId)
+    : undefined;
+  const parentTaskType = parentNode?.data.taskType ?? nodeData.taskType;
 
   const borderColor =
-    nodeData.taskType === 'FE' ? 'border-[#F97316]' : 'border-[#6366F1]';
-  const bgColor = nodeData.taskType === 'FE' ? 'bg-[#FFF7ED]' : 'bg-[#EEF2FF]';
+    parentTaskType === 'FE' ? 'border-[#F97316]' : 'border-[#6366F1]';
+  const bgColor =
+    parentTaskType === 'FE' ? 'bg-[#FFF7ED]' : 'bg-[#EEF2FF]';
+  const handleColor =
+    parentTaskType === 'FE' ? 'bg-[#F97316]' : 'bg-[#6366F1]';
 
   return (
     <div
@@ -290,7 +303,7 @@ function AdvanceNodeComponent({ data, selected }: NodeProps<AdvanceNodeType>) {
         bgColor,
         borderColor,
         selected && 'ring-2 ring-offset-2',
-        nodeData.taskType === 'FE' ? 'ring-[#F97316]' : 'ring-[#6366F1]'
+        parentTaskType === 'FE' ? 'ring-[#F97316]' : 'ring-[#6366F1]'
       )}
     >
       <PriorityBadgeSlot priority={nodeData.priority} />
@@ -298,10 +311,7 @@ function AdvanceNodeComponent({ data, selected }: NodeProps<AdvanceNodeType>) {
       <Handle
         type="target"
         position={Position.Top}
-        className={cn(
-          'w-2 h-2 border-2 border-white',
-          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#0891B2]'
-        )}
+        className={cn('w-2 h-2 border-2 border-white', handleColor)}
       />
 
       <NodeTags
@@ -316,10 +326,7 @@ function AdvanceNodeComponent({ data, selected }: NodeProps<AdvanceNodeType>) {
       <Handle
         type="source"
         position={Position.Bottom}
-        className={cn(
-          'w-2 h-2 border-2 border-white',
-          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#0891B2]'
-        )}
+        className={cn('w-2 h-2 border-2 border-white', handleColor)}
       />
     </div>
   );
