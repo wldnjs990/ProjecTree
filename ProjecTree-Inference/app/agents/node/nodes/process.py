@@ -4,6 +4,7 @@ from app.agents.tools.validator import validate_description, validate_summary
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ProviderStrategy
 from langchain_core.messages import HumanMessage
+from langchain_core.runnables import RunnableConfig
 from app.agents.prompts.system.global_context import GLOBAL_CONTEXT
 from app.agents.node.prompts.system.process_prompts import (
     EPIC_PROCESS_PROMPT,
@@ -25,7 +26,6 @@ from app.agents.node.schemas.process import (
     AdvanceProcessResult,
 )
 from typing import Type, Any
-from langchain_core.runnables import Runnable
 
 llm = opendai_reasoning_llm
 
@@ -35,6 +35,7 @@ async def _process_node(
     user_prompt: str,
     system_prompt: str,
     schema: Type[BaseNodeProcessResult],
+    config: RunnableConfig = None,
 ) -> NodeState:
     """공통 노드 처리 로직 (비동기)"""
     workspace_info = state.get("workspace_info")
@@ -84,9 +85,10 @@ async def _process_node(
             response_format=ProviderStrategy(schema),
         )
 
-        # 3. 비동기 실행 (ainvoke)
+        # 3. 비동기 실행 (ainvoke) with config for callbacks
         response = await agent.ainvoke(
-            {"messages": [HumanMessage(content=formatted_user_prompt)]}
+            {"messages": [HumanMessage(content=formatted_user_prompt)]},
+            config=config
         )
         result = response.get("structured_response")
 
@@ -103,26 +105,26 @@ async def _process_node(
         return {"generated_node": None, "last_error": str(e)}
 
 
-async def epic_node_process(state: NodeState) -> NodeState:
+async def epic_node_process(state: NodeState, config: RunnableConfig = None) -> NodeState:
     return await _process_node(
-        state, EPIC_USER_PROMPT, EPIC_PROCESS_PROMPT, EpicProcessResult
+        state, EPIC_USER_PROMPT, EPIC_PROCESS_PROMPT, EpicProcessResult, config
     )
 
 
-async def story_node_process(state: NodeState) -> NodeState:
+async def story_node_process(state: NodeState, config: RunnableConfig = None) -> NodeState:
     return await _process_node(
-        state, STORY_USER_PROMPT, STORY_PROCESS_PROMPT, StoryProcessResult
+        state, STORY_USER_PROMPT, STORY_PROCESS_PROMPT, StoryProcessResult, config
     )
 
 
-async def task_node_process(state: NodeState) -> NodeState:
+async def task_node_process(state: NodeState, config: RunnableConfig = None) -> NodeState:
     """Candidate와 부모 정보를 기반으로 상세 태스크 정보를 생성합니다."""
     return await _process_node(
-        state, TASK_USER_PROMPT, TASK_PROCESS_PROMPT, TaskProcessResult
+        state, TASK_USER_PROMPT, TASK_PROCESS_PROMPT, TaskProcessResult, config
     )
 
 
-async def advance_node_process(state: NodeState) -> NodeState:
+async def advance_node_process(state: NodeState, config: RunnableConfig = None) -> NodeState:
     return await _process_node(
-        state, ADVANCE_USER_PROMPT, ADVANCE_PROCESS_PROMPT, AdvanceProcessResult
+        state, ADVANCE_USER_PROMPT, ADVANCE_PROCESS_PROMPT, AdvanceProcessResult, config
     )
