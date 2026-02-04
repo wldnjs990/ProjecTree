@@ -3,6 +3,7 @@
 from app.api.schemas.portfolio import PortfolioGenerateRequest, PortfolioGenerateResponse
 from app.agents.portfolio.graph import portfolio_graph
 from app.core.log import langfuse_handler
+from app.core.callback import get_portfolio_stream_handler
 import logging
 import traceback
 
@@ -68,7 +69,7 @@ class PortfolioService:
                     "user_tasks": user_tasks,
                     "retry_count": 0
                 },
-                config={"callbacks": [langfuse_handler]}
+                config={"callbacks": [langfuse_handler, get_portfolio_stream_handler(request.workspace_id, request.member_id)]}
             )
             logger.info(f"[PortfolioService] portfolio_graph 호출 완료")
             
