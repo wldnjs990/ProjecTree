@@ -23,14 +23,11 @@ public class SocketEventHandler {
     public void init() {
         socketIOServer.addConnectListener(client -> {
             try {
-                String token = client.getHandshakeData()
-                        .getAuthToken()
-                        .toString();
+                String token = client.getHandshakeData().getSingleUrlParam("token");
 
                 Member member = jwtResolver.resolve(token);
                 client.set("memberId", member.getId());
-                log.info("Member {} connected [session: {}]",
-                        member.getId(), client.getSessionId());
+                log.info("Member {} connected [session: {}]", member.getId(), client.getSessionId());
             } catch (Exception e) {
                 log.error("인증 실패: {}", e.getMessage());
                 client.disconnect();
@@ -60,6 +57,10 @@ public class SocketEventHandler {
                 (client, data, ackRequest) -> {
 
                     ChatPayloadDto.MessageReceive message = chatService.process(data, client);
+
+                    String chatRoomId = data.getChatRoomId();
+                    Long memberId = client.get("memberId");
+                    log.info("memberId: {}번 사용자가 [id:{}] 채팅방에서 메세지[{}]를 전송했습니다.", memberId, chatRoomId, data.getContent());
 
                     socketIOServer.getRoomOperations(data.getChatRoomId())
                             .getClients().stream()
