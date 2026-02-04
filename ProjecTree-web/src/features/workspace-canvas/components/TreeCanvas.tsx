@@ -174,6 +174,8 @@ function TreeCanvasInner({
         fitView
         fitViewOptions={fitviewOptions}
         proOptions={proOptions}
+        minZoom={0.1}
+        maxZoom={2}
         className="bg-canvas relative"
       >
         <Background

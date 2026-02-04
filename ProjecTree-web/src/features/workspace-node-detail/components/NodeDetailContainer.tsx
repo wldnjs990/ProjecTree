@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NodeHeaderSection } from './NodeHeaderSection';
 import { StatusMetaSection } from './StatusMetaSection';
 import { AITechRecommendSection } from './AITechRecommendSection';
@@ -8,6 +8,7 @@ import { useSelectedNodeDetail, useNodeDetailEdit } from '../hooks';
 import {
   useSelectedNodeId,
   nodeDetailCrdtService,
+  useNodeDetailStore,
 } from '@/features/workspace-core';
 import { generateNodeCandidates } from '@/apis/workspace.api';
 import { postCreateNode } from '@/apis/node.api';
@@ -29,9 +30,33 @@ export default function NodeDetailContainer({
   const selectedNodeId = useSelectedNodeId();
   const { isEditing, closeSidebar, startEdit, finishEdit } =
     useNodeDetailEdit();
+  const setSelectedTechId = useNodeDetailStore(
+    (state) => state.setSelectedTechId
+  );
+  const setSelectedCandidateIds = useNodeDetailStore(
+    (state) => state.setSelectedCandidateIds
+  );
 
   // AI 생성 로딩 상태
   const [isGeneratingCandidates, setIsGeneratingCandidates] = useState(false);
+
+  // 노드 상세 접근 시 선택된 기술스택 ID 설정
+  useEffect(() => {
+    if (nodeDetail?.techs) {
+      const selectedTech = nodeDetail.techs.find((tech) => tech.selected);
+      setSelectedTechId(selectedTech?.id ?? null);
+    }
+  }, [nodeDetail?.techs, setSelectedTechId]);
+
+  // 노드 상세 접근 시 선택된 후보 노드 ID 목록 설정
+  useEffect(() => {
+    if (nodeDetail?.candidates) {
+      const selectedIds = nodeDetail.candidates
+        .filter((candidate) => candidate.selected)
+        .map((candidate) => candidate.id);
+      setSelectedCandidateIds(selectedIds);
+    }
+  }, [nodeDetail?.candidates, setSelectedCandidateIds]);
 
   if (!nodeDetail) return null;
 

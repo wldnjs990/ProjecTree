@@ -36,7 +36,7 @@ export default function TechDetailContent({ tech }: TechDetailProps) {
         <div>
           <p className="text-sm font-medium text-red-800 mb-1">단점</p>
           <p className="text-sm text-red-700 leading-relaxed">
-            {tech.disadvantage}
+            {tech.disAdvantage}
           </p>
         </div>
       </div>
@@ -46,10 +46,10 @@ export default function TechDetailContent({ tech }: TechDetailProps) {
         href={tech.ref}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors mt-2"
+        className="flex flex-1 items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors mt-2 w-full max-w-full"
       >
-        <ExternalLink className="w-4 h-4" />
-        <span className="truncate">{tech.ref}</span>
+        <ExternalLink className="w-4 h-4 shrink-0" />
+        <span className=" max-w-100 truncate min-w-0">{tech.ref}</span>
       </a>
     </div>
   );

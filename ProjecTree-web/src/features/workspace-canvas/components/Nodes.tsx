@@ -3,7 +3,18 @@ import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
 import { cn } from '@/shared/lib/utils';
 import { StatusTag, type TagType } from '@/shared/components/StatusTag';
 import { PriorityBadge } from '@/shared/components/PriorityBadge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { FlowNodeData } from '@/features/workspace-core';
+
+/** 노드 고정 크기 상수 */
+export const NODE_DIMENSIONS = {
+  width: 180,
+  height: 100,
+} as const;
 
 type Tags = Array<TagType | null | undefined>;
 
@@ -86,9 +97,24 @@ function NodeTitle({
   className?: string;
 }) {
   return (
-    <p className={cn('text-sm font-medium text-[#0B0B0B]', className)}>
-      {title}
-    </p>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <p
+          className={cn(
+            'text-sm font-medium text-[#0B0B0B] line-clamp-2 cursor-default',
+            className
+          )}
+        >
+          {title}
+        </p>
+      </TooltipTrigger>
+      <TooltipContent
+        side="top"
+        className="max-w-[280px] bg-zinc-800 text-white px-3 py-2 rounded-lg shadow-lg"
+      >
+        <p className="text-sm">{title}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -100,7 +126,8 @@ function ProjectNodeComponent({ data, selected }: NodeProps<ProjectNodeType>) {
   return (
     <div
       className={cn(
-        'relative bg-[#F5F3FF] rounded-2xl border-2 border-[#90A1B9] shadow-md p-3 min-w-40',
+        'relative bg-[#F5F3FF] rounded-2xl border-2 border-[#90A1B9] shadow-md p-3',
+        'w-[180px]',
         selected && 'ring-2 ring-[#90A1B9] ring-offset-2'
       )}
     >
@@ -127,7 +154,8 @@ function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
   return (
     <div
       className={cn(
-        'relative bg-[#F5F3FF] rounded-2xl border-2 border-[#8B5CF6] shadow-md p-3 min-w-40',
+        'relative bg-[#F5F3FF] rounded-2xl border-2 border-[#8B5CF6] shadow-md p-3',
+        'w-[180px]',
         selected && 'ring-2 ring-[#8B5CF6] ring-offset-2',
         'shadow-[0_0_10px_#C5BAF8]'
       )}
@@ -163,7 +191,8 @@ function StoryNodeComponent({ data, selected }: NodeProps<StoryNodeType>) {
   return (
     <div
       className={cn(
-        'relative rounded-2xl border-2 border-[#7CCF00] shadow-md p-3 min-w-40',
+        'relative rounded-2xl border-2 border-[#7CCF00] shadow-md p-3',
+        'w-[180px]',
         selected && 'ring-2 ring-offset-2 ring-[#7CCF00]'
       )}
     >
@@ -202,7 +231,8 @@ function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
   return (
     <div
       className={cn(
-        'relative rounded-2xl border-2 shadow-md p-3 min-w-40',
+        'relative rounded-2xl border-2 shadow-md p-3',
+        'w-[180px]',
         bgColor,
         borderColor,
         selected && 'ring-2 ring-offset-2',
@@ -253,7 +283,8 @@ function AdvanceNodeComponent({ data, selected }: NodeProps<AdvanceNodeType>) {
   return (
     <div
       className={cn(
-        'relative rounded-2xl border-2 shadow-md p-3 min-w-40',
+        'relative rounded-2xl border-2 shadow-md p-3',
+        'w-[180px]',
         bgColor,
         borderColor,
         selected && 'ring-2 ring-offset-2',
