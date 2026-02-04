@@ -25,7 +25,7 @@ public class TechStackService {
     }
 
     public List<TechVocabularyDto> searchTechVocabulary(String keyword) {
-        return techVocabularyRepository.findTop10ByNameStartingWithIgnoreCaseOrderByNameAsc(keyword).stream()
+        return techVocabularyRepository.findTop10ByNameStartingWithIgnoreCaseOrderByIdAsc(keyword).stream()
                 .map(TechVocabularyDto::from)
                 .collect(Collectors.toList());
     }
