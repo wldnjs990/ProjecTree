@@ -82,6 +82,8 @@ class CrdtClient {
     if (!ws) return;
 
     ws.addEventListener('message', (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
+      console.log('[CRDT] 메시지 수신:', data);
       // y-websocket 바이너리 메시지는 무시 (CRDT 동기화용)
       if (event.data instanceof ArrayBuffer || event.data instanceof Blob) {
         return;
