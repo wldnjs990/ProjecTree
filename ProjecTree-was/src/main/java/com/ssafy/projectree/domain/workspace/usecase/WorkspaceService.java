@@ -135,9 +135,8 @@ public class WorkspaceService {
         }
 
         List<Team> teams = teamService.findAllByWorkspace(workspace);
-        List<Member> members = teamService.getMembers(teams);
 
-        List<MemberDto.Info> memberInfos = members.stream()
+        List<MemberDto.Info> memberInfos = teams.stream()
                 .map(MemberDto.Info::from)
                 .collect(Collectors.toList());
 
