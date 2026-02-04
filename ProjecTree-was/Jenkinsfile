@@ -42,7 +42,7 @@ pipeline {
                 sh '''
                     docker stop projectree-was || true
                     docker rm projectree-was || true
-                    docker run -d --name projectree-was --network app-network -p 8081:8080 projectree-was
+                    docker run -d --name projectree-was --network app-network -p 8081:8080 -p 7092:7092 projectree-was
                 '''
             }
         }
