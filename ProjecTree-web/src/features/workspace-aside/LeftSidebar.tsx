@@ -35,7 +35,7 @@ export function LeftSidebar({
     <aside className={className}>
       <ResizablePanelGroup
         orientation="vertical"
-        className="flex flex-col h-full w-full rounded-none border-r bg-white"
+        className="flex flex-col h-full w-full rounded-none bg-white"
       >
         {/* Top Panel: Project Explorer */}
         <ResizablePanel defaultSize={50} minSize={20}>

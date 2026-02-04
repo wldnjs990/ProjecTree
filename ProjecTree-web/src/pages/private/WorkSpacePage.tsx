@@ -208,7 +208,7 @@ export default function WorkSpacePage() {
     <div className="flex flex-col h-screen w-screen overflow-hidden">
       {/* Header */}
       <Header
-        projectName="AI 여행 추천 서비스"
+        projectName="AI 여행 추천 서비스 (매우 긴 이름을 테스트 중입니다)"
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onlineUsers={mockUsers}
@@ -225,7 +225,7 @@ export default function WorkSpacePage() {
         <LeftSidebar
           workspaceId={workspaceId}
           workspaceName="AI 여행 추천 서비스"
-          className="h-full border-r border-[#EEEEEE] w-75 flex-none z-50"
+          className="h-full border-r border-zinc-300/60 w-75 flex-none z-50"
           nodes={nodes as Node[]}
           edges={edges}
         />

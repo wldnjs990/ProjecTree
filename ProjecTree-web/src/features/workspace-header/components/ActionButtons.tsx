@@ -23,7 +23,7 @@ export function ActionButtons({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2.5 gap-1.5 text-[#636363]"
+              className="h-8 px-2.5 gap-1.5 text-[#636363] hover:bg-white/60 hover:shadow-sm transition-all duration-200"
               onClick={onSettingsClick}
             >
               <Settings className="h-4 w-4" />
@@ -40,7 +40,7 @@ export function ActionButtons({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2.5 gap-1.5 text-[#636363] relative"
+              className="h-8 px-2.5 gap-1.5 text-[#636363] hover:bg-white/60 hover:shadow-sm transition-all duration-200 relative"
               onClick={onVoiceCallClick}
             >
               <Phone className="h-4 w-4" />
@@ -67,7 +67,7 @@ export function ActionButtons({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 px-2.5 gap-1.5 text-[#636363]"
+              className="h-8 px-2.5 gap-1.5 text-[#636363] hover:bg-white/60 hover:shadow-sm transition-all duration-200"
               onClick={onInviteClick}
             >
               <UserPlus className="h-4 w-4" />

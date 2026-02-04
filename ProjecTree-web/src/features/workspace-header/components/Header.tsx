@@ -18,14 +18,14 @@ export function Header({
   isVoiceChatBarVisible,
 }: HeaderProps) {
   return (
-    <header className="flex items-center justify-between h-14 px-4 bg-white border-b border-[#EEEEEE] z-50">
+    <header className="flex items-center justify-between h-14 px-4 bg-white/95 backdrop-blur-sm border-b border-zinc-300/60 z-50">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <Logo />
           <ProjectDropdown projectName={projectName} />
         </div>
 
-        <Separator orientation="vertical" className="h-6" />
+        <Separator orientation="vertical" className="h-6 bg-zinc-200/60" />
 
         <ViewTabs activeTab={activeTab} onTabChange={onTabChange} />
       </div>
@@ -39,7 +39,7 @@ export function Header({
           isVoiceChatBarVisible={isVoiceChatBarVisible}
         />
 
-        <Separator orientation="vertical" className="h-6 mx-1" />
+        <Separator orientation="vertical" className="h-6 mx-1 bg-zinc-200/60" />
 
         <OnlineUsers users={onlineUsers} onInviteClick={onInviteClick} />
       </div>
