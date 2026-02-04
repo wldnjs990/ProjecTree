@@ -4,8 +4,8 @@ import { saveNodeDetailToSpring } from "../services/spring/node/node-detail.writ
 import { saveNodeTechToSpring } from "../services/spring/node/node-tech.writer";
 import type { EditableNodeDetail } from "../domain/node/node.detail";
 import { toSendNodeDetail } from "../domain/node/node.detail";
-import { addPendingPosition } from "../sync/pending-store";
-import { flushWorkspace, scheduleFlush } from "../sync/debounce";
+import { addPendingPosition } from "./sync/pending-store";
+import { flushWorkspace, scheduleFlush } from "./sync/debounce";
 import { getRoom } from "./room-registry";
 import { deleteNodeToSpring } from "../services/spring/node/node-delete.writer";
 
