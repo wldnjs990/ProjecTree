@@ -3,6 +3,7 @@ package com.ssafy.projectree.global.docs;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.CustomNodeDto;
+import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
@@ -156,6 +157,39 @@ public interface NodeDocsController {
     CommonResponse<TechStackRecommendDto.Response> recommendTechStack(
             @Parameter(description = "노드 ID", example = "1")
             @PathVariable(name = "node-id") Long nodeId
+    );
+
+    @Operation(
+            summary = "노드 커스텀 기술 스택 추가",
+            description = "특정 노드에 사용자가 직접 기술 스택을 추가합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "기술 스택 추가 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 노드 또는 기술 스택"),
+            @ApiResponse(responseCode = "401", description = "인증 실패")
+    })
+    CommonResponse<Void> createCustomTechStack(
+            @Parameter(description = "기술 스택을 추가할 노드 ID", example = "1")
+            @PathVariable Long nodeId,
+
+            @RequestBody
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "커스텀 기술 스택 생성 정보",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = CustomTechCreateDto.Request.class),
+                            examples = @ExampleObject(
+                                    name = "요청 예시",
+                                    value = """
+                                        {
+                                          "workspaceId": 10,
+                                          "techVocaId": 5
+                                        }
+                                        """
+                            )
+                    )
+            )
+            CustomTechCreateDto.Request request
     );
 
     @Operation(
