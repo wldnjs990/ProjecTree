@@ -4,6 +4,7 @@ from app.db.repository.node_repository import NodeRepository
 from app.agents.enums import NodeType
 from app.db.repository.candidate_repository import CandidateRepository
 from sqlalchemy.orm import Session
+from app.core.callback import get_stream_handler
 from app.core.log import langfuse_handler
 import logging
 import traceback
@@ -23,7 +24,8 @@ class CandidateService:
     async def generate_candidates(
         self, 
         db: Session,
-        request: CandidateGenerateRequest
+        request: CandidateGenerateRequest,
+        workspace_id: int,
     ) -> CandidateGenerateResponse:
         logger.info(f"[CandidateService] 후보 노드 생성 시작 - node_id: {request.node_id}")
         
@@ -41,7 +43,7 @@ class CandidateService:
                 "current_node_name": node.name,
                 "current_node_description": node.description,
             }, config={
-                "callbacks": [langfuse_handler]
+                "callbacks": [langfuse_handler, get_stream_handler(workspace_id=workspace_id, node_id=node.id)]
             })
             logger.info(f"[CandidateService] candidate_graph 호출 완료")
             

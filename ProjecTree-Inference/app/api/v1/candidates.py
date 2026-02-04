@@ -37,7 +37,7 @@ async def generate_candidates(
     """
     logger.info(f"[Candidates API] 후보 노드 생성 요청 시작 - node_id: {request.node_id}, candidate_count: {request.candidate_count}")
     try:
-        result = await service.generate_candidates(db=db, request=request)
+        result = await service.generate_candidates(db=db, request=request, workspace_id=request.workspace_id)
         logger.info(f"[Candidates API] 후보 노드 생성 성공 - node_id: {request.node_id}, 생성된 후보 수: {len(result.candidates)}")
         return result
     except NotImplementedError as e:

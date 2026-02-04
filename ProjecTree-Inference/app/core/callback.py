@@ -1,159 +1,242 @@
-from langchain.callbacks.base import BaseCallbackHandler
+from langchain_core.callbacks import AsyncCallbackHandler
 from app.agents.candidates.schemas.candidate import CandidateList
 from app.agents.recommend.schemas.expert import TechList
+from app.core.node_messages import get_node_config, is_tracked_node
+from typing import Any, Dict, Optional
+from uuid import UUID
 import logging
+from app.core.crdt_client import get_crdt_client
 
 logger = logging.getLogger(__name__)
 
 
-class DeepAgentStreamHandler(BaseCallbackHandler):
-    # 노드 이름과 카테고리 매핑
-    NODE_CATEGORY_MAP = {
-        "generate_candidates": "CANDIDATE",
-        "sub_node_info_create": "NODE",
-        "tech_stack_integrator": "TECH",
-    }
+class AgentStreamHandler(AsyncCallbackHandler):
+    """
+    LangGraph 노드 실행을 추적하고 클라이언트에 진행 상태를 전송하는 핸들러.
+    
+    주요 기능:
+    - on_chain_start/end: 노드 시작/완료 시점 메시지 전송
+    - run_id 기반으로 실행 컨텍스트 추적
+    """
 
-    def __init__(self, session_id: str, crdt_client):
-        self.session_id = session_id
+    def __init__(self, crdt_client, workspace_id: int, node_id: int):
+        """
+        AgentStreamHandler 초기화.
+        
+        Args:
+            crdt_client: CRDT 클라이언트 인스턴스
+            workspace_id: 워크스페이스 ID
+            node_id: 노드 ID
+        """
         self.crdt_client = crdt_client
+        self.workspace_id = workspace_id
+        self.node_id = node_id
         self.tool_call_count = 0
+        # run_id -> node_name 매핑으로 실행 컨텍스트 추적
+        self.active_nodes: Dict[UUID, str] = {}
+        # run_id -> inputs 저장 (on_chain_end에서 사용)
+        self.run_inputs: Dict[UUID, Dict[str, Any]] = {}
+        # run_id -> tool_name 저장 (on_tool_end에서 사용)
+        self.active_tool_runs: Dict[UUID, Optional[str]] = {}
 
-    async def on_llm_start(self, serialized, prompts, **kwargs):
-        await self.crdt_client.send(
-            {
-                "type": "agent_thinking",
-                "message": "🧠 AI가 분석 중...",
-                "session_id": self.session_id,
-            }
-        )
+    def _get_node_name(
+        self, serialized: Optional[Dict[str, Any]], kwargs: Dict[str, Any]
+    ) -> Optional[str]:
+        """
+        노드 이름을 추출합니다.
+        """
+        # kwargs에서 직접 name 확인 (v0.3+ 대응)
+        node_name = kwargs.get("name")
+        
+        # serialized에서 name 확인 (기존 방식)
+        if not node_name and serialized:
+            node_name = serialized.get("name")
+        
+        return node_name
 
-    async def on_chain_end(self, outputs, **kwargs):
+    async def on_chain_start(
+        self,
+        serialized: Optional[Dict[str, Any]],
+        inputs: Dict[str, Any],
+        *,
+        run_id: UUID,
+        **kwargs: Any,
+    ) -> None:
+        """체인(노드) 실행 시작 시 호출"""
+        # 1. 노드 이름 식별
+        node_name = self._get_node_name(serialized, kwargs)
+        
+        # 2. 추적 대상 노드인지 확인
+        if not is_tracked_node(node_name):
+            return
+        
+        # 3. 실행 컨텍스트 저장
+        self.active_nodes[run_id] = node_name
+        self.run_inputs[run_id] = inputs
+        
+        # 4. 노드 설정 조회 및 시작 메시지 전송
+        config = get_node_config(node_name)
+        if config:
+            logger.debug(f"Node started: {node_name}, run_id: {run_id}")
+            
+            await self.crdt_client.send({
+                "body": {
+                    "workspaceId": self.workspace_id,
+                    "nodeId": self.node_id,
+                    "category": config.category,
+                    "content": config.start_msg,
+                },
+            })
+
+    async def on_chain_end(
+        self,
+        outputs: Dict[str, Any],
+        *,
+        run_id: UUID,
+        **kwargs: Any,
+    ) -> None:
         """체인(노드) 실행 종료 시 호출"""
-        serialized = kwargs.get("serialized", {})
-        node_name = serialized.get("name") if serialized else None
+        # 저장된 노드 정보 가져오기
+        node_name = self.active_nodes.pop(run_id, None)
+        
+        # 추적 대상 노드가 아니면 종료
+        if not node_name:
+            return
+        
+        config = get_node_config(node_name)
+        if not config:
+            return
+        
+        logger.debug(f"Node ended: {node_name}, run_id: {run_id}")
+        
+        # 카테고리별 완료 메시지 생성
+        content = self._build_completion_message(node_name, config, outputs)
+        
+        await self.crdt_client.send({
+            "body": {
+                "workspaceId": self.workspace_id,
+                "nodeId": self.node_id,
+                "category": config.category,
+                "content": content,
+            },
+        })
 
-        # kwargs의 parent_run_id 등을 통해 정확한 노드를 식별해야 할 수도 있지만,
-        # LangGraph에서는 보통 노드 함수 이름이 name으로 전달됨.
-        # 만약 serialized가 없거나 name이 없다면, run object를 확인해야 할 수도 있음.
-        # 여기서는 간단히 kwargs에 넘어오는 inputs/outputs를 활용.
+    def _build_completion_message(
+        self, node_name: str, config: Any, outputs: Dict[str, Any]
+    ) -> str:
+        """노드별 완료 메시지를 생성합니다."""
+        if node_name == "generate_candidates":
+            candidates = outputs.get("candidates") if outputs else None
+            if isinstance(candidates, CandidateList) and candidates.candidates:
+                return f"{len(candidates.candidates)}개의 후보 노드 생성 완료"
+            return config.end_msg
+        
+        elif node_name == "tech_stack_integrator":
+            tech_list = outputs.get("tech_list") if outputs else None
+            if isinstance(tech_list, TechList) and tech_list.techs:
+                tech_names = ", ".join([t.name for t in tech_list.techs])
+                return f"기술 스택 통합 완료: {tech_names}"
+            return config.end_msg
+        
+        return config.end_msg
 
-        # NOTE: LangGraph nodes execution triggers on_chain_end.
-        # However, getting the exact node name might depend on how LangChain/LangGraph instrument it.
-        # If 'name' is not available directly, we might need run_id mapping or check inputs/output structure.
-        # Assuming we can filter by the mapped names.
+    async def on_llm_start(
+        self,
+        serialized: Optional[Dict[str, Any]],
+        prompts: Any,
+        **kwargs: Any,
+    ) -> None:
+        """LLM 호출 시작 시 호출 - 여기서는 아무 작업도 하지 않음"""
+        pass
 
-        # 하지만 LangGraph의 노드 실행은 'Chain' 실행으로 잡히지 않을 수 있음(RunnableLambda 등).
-        # serialized.get('name')이 노드 이름('generate_candidates' 등)과 일치한다고 가정하고 구현.
-        # 실제 런타임에서 name이 다르게 넘어올 경우 수정 필요.
+    async def on_chat_model_start(
+        self,
+        serialized: Dict[str, Any],
+        messages: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Chat 모델 호출 시작 시 호출"""
+        model_name = serialized.get("name", "") if serialized else ""
+        logger.debug(f"Chat model started: {model_name}")
+        
+        await self.crdt_client.send({
+            "body": {
+                "workspaceId": self.workspace_id,
+                "nodeId": self.node_id,
+                "category": "CANDIDATE",
+                "content": "🤖 AI가 분석 중입니다...",
+            },
+        })
 
-        # 대안: inputs/outputs의 구조를 보고 판단하거나,
-        # LangGraph의 경우 Config를 통해 name을 전달받지 않으므로,
-        # 가장 확실한 건 run.name을 확인하는 것인데 BaseCallbackHandler에서는 run object를 직접 받지 않음 (v0.2+).
-        # v0.1 호환성을 위해 run object가 kwargs에 있을 수 있음.
-
-        # 여기서는 안전하게직접 주입된 node 이름을 사용하거나,
-        # 맵핑된 키가 name에 포함되는지 확인.
-
-        # 디버깅을 위해 로깅
-        # logger.info(f"Chain End: {node_name}, Outputs: {outputs.keys() if outputs else 'None'}")
-
-        if node_name in self.NODE_CATEGORY_MAP:
-            category = self.NODE_CATEGORY_MAP[node_name]
-            inputs = kwargs.get("inputs", {})
-
-            # State 추출
-            if not inputs:
-                return
-
-            workspace_id = str(inputs.get("workspace_id", ""))
-
-            # Category별 node_id 및 content 결정
-            target_node_id = ""
-            content = ""
-
-            if category == "CANDIDATE":
-                # Candidate generation
-                target_node_id = str(inputs.get("current_node_id", ""))
-
-                # outputs에서 결과 확인
-                candidates = None
-                if outputs and "candidates" in outputs:
-                    candidates = outputs["candidates"]
-
-                if isinstance(candidates, CandidateList) and candidates.candidates:
-                    content = f"{len(candidates.candidates)}개의 후보 노드 생성 완료"
-                else:
-                    content = "후보 노드 생성 완료 (개수 확인 불가)"
-
-            elif category == "NODE":
-                # Sub node creation logic
-                target_node_id = str(inputs.get("parent_id", ""))
-                content = "서브 노드 생성 프로세스 시작"
-
-            elif category == "TECH":
-                # Tech stack integration
-                # RecommendedState doesn't explicit have node_id, use empty string or infer
-                target_node_id = str(inputs.get("node_id", ""))  # State에 없을 수 있음
-
-                tech_list = None
-                if outputs and "tech_list" in outputs:
-                    tech_list = outputs["tech_list"]
-
-                if isinstance(tech_list, TechList) and tech_list.techs:
-                    content = f"기술 스택 통합 완료: {', '.join([t.name for t in tech_list.techs])}"
-                else:
-                    content = "기술 스택 통합 완료"
-
-            if category:
-                await self.crdt_client.send(
-                    {
-                        "type": "process_update",
-                        "method": "POST",
-                        "path": "internal/ai/messages",
-                        "body": {
-                            "workspaceId": workspace_id,
-                            "nodeId": target_node_id,
-                            "category": category,
-                            "content": content,
-                        },
-                        "session_id": self.session_id,
-                    }
-                )
-
-    async def on_tool_start(self, serialized, input_str, **kwargs):
-        tool_name = serialized.get("name", "도구")
+    async def on_tool_start(
+        self,
+        serialized: Dict[str, Any],
+        input_str: str,
+        *,
+        run_id: UUID,
+        **kwargs: Any,
+    ) -> None:
+        """도구 실행 시작 시 호출"""
+        tool_name = serialized.get("name", "unknown")
         self.tool_call_count += 1
+        self.active_tool_runs[run_id] = tool_name
+        
+        # 도구별 메시지 생성
+        tool_messages = {
+            "tavily_search_results_json": "🔍 웹에서 정보를 검색 중입니다...",
+            "validate_summary": "✅ 요약 내용을 검증 중입니다...",
+        }
+        content = tool_messages.get(tool_name, f"🔧 {tool_name} 도구를 실행 중입니다...")
+        
+        await self.crdt_client.send({
+            "body": {
+                "workspaceId": self.workspace_id,
+                "nodeId": self.node_id,
+                "category": "CANDIDATE",
+                "content": content,
+            },
+        })
 
-        # 도구별 한글 메시지
-        if tool_name == "restricted_search":
-            message = f"🔍 '{input_str[:30]}...' 웹에서 검색 중... ({self.tool_call_count}번째)"
-        else:
-            message = f"🔧 {tool_name} 실행 중..."
+    async def on_tool_end(
+        self,
+        output: Any,
+        *,
+        run_id: UUID,
+        **kwargs: Any,
+    ) -> None:
+        """도구 실행 완료 시 호출 - 여기서는 아무 작업도 하지 않음"""
+        self.active_tool_runs.pop(run_id, None)
 
-        await self.crdt_client.send(
-            {
-                "type": "tool_call",
-                "message": message,
-                "tool": tool_name,
-                "session_id": self.session_id,
-            }
-        )
+    async def on_tool_error(
+        self,
+        error: BaseException,
+        *,
+        run_id: UUID,
+        **kwargs: Any,
+    ) -> None:
+        """도구 실행 오류 시 호출 - 여기서는 아무 작업도 하지 않음"""
+        self.active_tool_runs.pop(run_id, None)
+        logger.error(f"Tool error: {error}")
 
-    async def on_tool_end(self, output, **kwargs):
-        await self.crdt_client.send(
-            {
-                "type": "tool_complete",
-                "message": "✅ 검색 완료, 결과 분석 중...",
-                "session_id": self.session_id,
-            }
-        )
+    async def on_agent_finish(self, finish: Any, **kwargs: Any) -> None:
+        """에이전트 완료 시 호출 - 여기서는 아무 작업도 하지 않음"""
+        pass
 
-    async def on_agent_finish(self, finish, **kwargs):
-        await self.crdt_client.send(
-            {
-                "type": "agent_complete",
-                "message": "🎉 기술 스택 분석 완료!",
-                "session_id": self.session_id,
-            }
-        )
+
+def get_stream_handler(workspace_id: int, node_id: int) -> AgentStreamHandler:
+    """
+    AgentStreamHandler 인스턴스를 반환합니다.
+    매 호출마다 새 인스턴스 생성 (event loop 문제 방지).
+    
+    Args:
+        workspace_id: 워크스페이스 ID
+        node_id: 노드 ID
+    
+    Returns:
+        AgentStreamHandler 인스턴스.
+    """
+    return AgentStreamHandler(
+        crdt_client=get_crdt_client(),
+        workspace_id=workspace_id,
+        node_id=node_id
+    )

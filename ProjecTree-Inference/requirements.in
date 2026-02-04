@@ -22,6 +22,6 @@ pdfminer-six==20251230
 pdfplumber==0.11.9
 pip-chill==1.0.3
 psycopg2==2.9.11
-playwright
+pyppeteer==2.0.0
 socksio==1.0.0
 tomli==2.0.1

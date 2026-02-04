@@ -3,6 +3,7 @@ Generate candidate nodes.
 """
 
 from langchain.agents.structured_output import ProviderStrategy
+from langchain_core.runnables import RunnableConfig
 from app.agents.candidates.state import CandidateNodeState
 from app.agents.enums import NodeType
 from langchain.agents import create_agent
@@ -40,7 +41,7 @@ story_agent = create_candidate_agent(STORY_SYS, CandidateList)
 task_agent = create_candidate_agent(TASK_SYS, CandidateList)
 
 
-def generate_candidates(state: CandidateNodeState) -> CandidateNodeState:
+def generate_candidates(state: CandidateNodeState, config: RunnableConfig = None) -> CandidateNodeState:
     """후보 노드를 생성하는 노드"""
     node_type = state.get("current_node_type", "")
     node_name = state.get("current_node_name", "")
@@ -88,8 +89,11 @@ def generate_candidates(state: CandidateNodeState) -> CandidateNodeState:
         executor = task_agent
     if executor:
         try:
-            # Invoke agent. The agent should call the tool.
-            response = executor.invoke({"messages": [HumanMessage(content=prompt_msg)]})
+            # Invoke agent with config (callbacks are passed through config)
+            response = executor.invoke(
+                {"messages": [HumanMessage(content=prompt_msg)]},
+                config=config
+            )
             output = response.get("structured_response")
             if output:
                 return {"candidates": output}
