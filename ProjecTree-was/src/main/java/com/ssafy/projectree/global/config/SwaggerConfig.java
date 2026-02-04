@@ -23,7 +23,7 @@ public class SwaggerConfig {
                 .group("ProjecTree API v1")
                 .pathsToMatch(paths)
                 .addOpenApiCustomizer(openApi -> openApi.servers(List.of(
-                        new Server().url("https://i14d107.p.ssafy.io/api").description("Production"),
+//                        new Server().url("https://i14d107.p.ssafy.io/api").description("Production"),
                         new Server().url("http://localhost:8080/api").description("Local")
                 )))
                 .build();
