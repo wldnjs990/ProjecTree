@@ -2,6 +2,7 @@ package com.ssafy.projectree.global.socket;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import com.ssafy.projectree.domain.auth.jwt.JwtResolver;
+import com.ssafy.projectree.domain.chat.usecase.ChatLogService;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.workspace.api.dto.ChatPayloadDto;
 import com.ssafy.projectree.domain.workspace.usecase.ChatService;
@@ -9,6 +10,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -18,6 +21,7 @@ public class SocketEventHandler {
     private final SocketIOServer socketIOServer;
     private final ChatService chatService;
     private final JwtResolver jwtResolver;
+    private final ChatLogService chatLogService;
 
     @PostConstruct
     public void init() {
@@ -44,7 +48,12 @@ public class SocketEventHandler {
                 (client, data, ackRequest) -> {
                     log.info("memberId: {} 사용자가 [id:{}] 채팅방에 진입했습니다. [session-id: {}]", client.get("memberId"), data.getChatRoomId(), client.getSessionId());
                     client.joinRoom(data.getChatRoomId());
+
+                    List<ChatPayloadDto.MessageReceive> logs = chatLogService.history(data.getChatRoomId());
+                    client.sendEvent("chat:history", logs);
+                    log.info("[id:{}] 채팅방의 채팅 기록을 전달합니다.", data.getChatRoomId());
                 }
+
         );
 
         socketIOServer.addEventListener("chat:leave", ChatPayloadDto.Leave.class,
