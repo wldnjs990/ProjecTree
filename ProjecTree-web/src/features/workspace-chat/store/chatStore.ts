@@ -26,12 +26,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   // 메시지 추가
   addMessage: (workspaceId: string, message: ChatMessage) => {
-    set((state) => ({
-      messages: {
-        ...state.messages,
-        [workspaceId]: [...(state.messages[workspaceId] || []), message],
-      },
-    }));
+    set((state) => {
+      const currentMessages = state.messages[workspaceId] || [];
+      // 중복 체크
+      if (currentMessages.some((m) => m.id === message.id)) {
+        return state;
+      }
+
+      return {
+        messages: {
+          ...state.messages,
+          [workspaceId]: [...currentMessages, message],
+        },
+      };
+    });
 
     // 현재 활성 워크스페이스가 아니면 읽지 않은 메시지 카운트 증가
     const { activeWorkspaceId } = get();
@@ -47,12 +55,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   // 메시지 목록 설정 (히스토리 로드 시)
   setMessages: (workspaceId: string, messages: ChatMessage[]) => {
-    set((state) => ({
-      messages: {
-        ...state.messages,
-        [workspaceId]: messages,
-      },
-    }));
+    set((state) => {
+      // Map을 사용하여 ID 중복 제거
+      const messageMap = new Map();
+      messages.forEach((m) => messageMap.set(m.id, m));
+
+      return {
+        messages: {
+          ...state.messages,
+          [workspaceId]: Array.from(messageMap.values()),
+        },
+      };
+    });
   },
 
   // 메시지 읽음 처리 (카운트만 감소)
@@ -156,15 +170,29 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const { activeWorkspaceId } = get();
     if (!activeWorkspaceId) return;
 
-    set((state) => ({
-      messages: {
-        ...state.messages,
-        [activeWorkspaceId]: [
-          ...messages,
-          ...(state.messages[activeWorkspaceId] || []),
-        ],
-      },
-    }));
+    set((state) => {
+      const existingMessages = state.messages[activeWorkspaceId] || [];
+      const newMessages = messages;
+
+      // Map을 사용하여 ID 중복 제거 (기존 메시지 우선)
+      const messageMap = new Map();
+
+      // 새 메시지(과거) 먼저 넣고
+      newMessages.forEach((m) => messageMap.set(m.id, m));
+      // 기존 메시지(최신) 덮어쓰기 (혹시 겹치면 기존 상태 유지)
+      existingMessages.forEach((m) => messageMap.set(m.id, m));
+
+      // 다시 배열로 변환 (시간순 정렬되어 있다고 가정하거나 정렬 필요할 수 있음)
+      // 보통 서버에서 정렬해 주므로 값만 추출
+      // Map은 삽입 순서를 기억하므로 newMessages -> existingMessages 순서 유지됨
+
+      return {
+        messages: {
+          ...state.messages,
+          [activeWorkspaceId]: Array.from(messageMap.values()),
+        },
+      };
+    });
   },
 
   // 🆕 페이지네이션: 상태 설정

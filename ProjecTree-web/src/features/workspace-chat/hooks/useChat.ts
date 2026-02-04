@@ -2,26 +2,66 @@ import { useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { useWebSocket } from './useWebSocket';
 import { chatSocket } from '../services/chatSocket';
-import { fetchMessages, fetchParticipants } from '@/apis/chat.api';
+// import { fetchMessages, fetchParticipants } from '@/apis/chat.api';
 import { CHAT_PAGINATION_CONFIG } from '../types/mockData';
 import { useUserStore } from '@/shared/stores/userStore';
 import { useWorkspaceStore } from '@/features/workspace-core';
+import { useAuthStore } from '@/shared/stores/authStore';
 
 export const useChat = (workspaceId: string) => {
   const { startTyping, stopTyping, isConnected } = useWebSocket(workspaceId);
+
+  // ... (sendMessage logic remains)
+
+  // 🛠️ User ID Repair Logic (JWT fallback)
+  // userStore에 ID가 없는 경우(API 응답 누락 등) 토큰에서 강제로 복구
+  useEffect(() => {
+    const user = useUserStore.getState().user;
+
+    // ID가 마땅히 없으면 (memberId도 없고 id도 없으면)
+    if (user && !user.memberId && !user.id) {
+      const token = useAuthStore.getState().accessToken;
+      if (token) {
+        try {
+          // JWT 파싱
+          const payload = token.split('.')[1];
+          const decoded = JSON.parse(
+            atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
+          );
+
+          // ID 추출 (sub, memberId, userId 등)
+          const extractedId =
+            decoded.memberId || decoded.sub || decoded.userId || decoded.id;
+
+          if (extractedId) {
+            console.log(
+              '🛠️ [useChat] Repairing missing user ID from token:',
+              extractedId
+            );
+            useUserStore.getState().setUser({
+              ...user,
+              memberId: Number(extractedId), // 숫자로 변환 시도
+              id: Number(extractedId),
+            });
+          }
+        } catch (e) {
+          console.warn('⚠️ [useChat] Failed to repair user ID from token:', e);
+        }
+      }
+    }
+  }, []);
 
   const sendMessage = (content: string) => {
     if (!workspaceId || !content.trim()) return;
 
     // 현재 로그인한 사용자 정보 가져오기
     const currentUser = useUserStore.getState().user;
-    console.log('[DEBUG] sendMessage currentUser:', currentUser);
 
     if (!currentUser) return;
 
-    // 1. 소켓 전송
     // workspaceId가 아니라 실제 chatRoomId를 사용해야 함
-    const chatRoomId = useChatStore.getState().chatRoomIds[workspaceId];
+    const chatRoomId =
+      useWorkspaceStore.getState().workspaceDetail?.teamInfo?.chatRoomId;
     if (chatRoomId) {
       chatSocket.sendMessage(chatRoomId, content.trim());
     } else {
@@ -74,6 +114,9 @@ export const useChat = (workspaceId: string) => {
   );
   const pagination = useChatStore((state) => state.pagination);
 
+  // Workspace Detail 구독 (Reactive)
+  const workspaceDetail = useWorkspaceStore((state) => state.workspaceDetail);
+
   //TODO: 메시지 히스토리 로드 (REST API)
   useEffect(() => {
     // fetchMessageHistory(workspaceId);
@@ -87,8 +130,8 @@ export const useChat = (workspaceId: string) => {
 
   useEffect(() => {
     // 현재 워크스페이스가 초기화되었는지 확인
-    if (initializedRef.current === workspaceId) {
-      return;
+    if (initializedRef.current === workspaceId && workspaceDetail) {
+      // workspaceDetail이 변경되었을 수도 있으므로 체크 필요하면 여기서
     }
 
     // 활성 워크스페이스 설정
@@ -96,40 +139,29 @@ export const useChat = (workspaceId: string) => {
 
     // 🆕 페이지네이션 기반 초기 로드 (API 사용)
     const initializeChat = async () => {
+      // workspaceDetail이 없으면 대기 (Re-render 될 때 다시 실행됨)
+      if (!workspaceDetail) {
+        console.log('⏳ [useChat] Waiting for workspaceDetail...');
+        return;
+      }
+
+      console.log('📦 [useChat] initializeChat with detail:', workspaceDetail);
+
+      // chatRoomId 설정
+      let chatRoomId = '';
+      if (workspaceDetail.teamInfo?.chatRoomId) {
+        chatRoomId = workspaceDetail.teamInfo.chatRoomId;
+        useChatStore.getState().setChatRoomId(workspaceId, chatRoomId);
+        console.log('✅ [useChat] ChatRoomId synced to store:', chatRoomId);
+      } else {
+        console.warn('⚠️ [useChat] chatRoomId missing in workspaceDetail');
+        return;
+      }
+
       if (pagination.initialLoaded) return;
 
       try {
         setPaginationState({ isLoading: true });
-
-        // 1. 워크스페이스 상세 정보는 이미 Store에 로드되어 있다고 가정 (WorkSpacePage에서 처리)
-        // Store에서 데이터 가져오기
-        const workspaceStore = useWorkspaceStore.getState();
-        const workspaceDetail = workspaceStore.workspaceDetail;
-
-        console.log(
-          '📦 [useChat] Getting workspace detail from STORE:',
-          workspaceDetail
-        );
-
-        let chatRoomId = '';
-
-        if (workspaceDetail?.teamInfo?.chatRoomId) {
-          chatRoomId = workspaceDetail.teamInfo.chatRoomId;
-          useChatStore.getState().setChatRoomId(workspaceId, chatRoomId);
-          console.log('✅ [useChat] ChatRoomId set in store:', chatRoomId);
-        } else {
-          // 아직 로드되지 않았거나 없을 수 있음.
-          // 만약 WorkSpacePage가 먼저 실행되었다면 있어야 함.
-          // 여기서 없으면, WorkSpacePage의 로딩을 기다려야 할 수도 있음.
-          // 일단은 없으면 패스 (이후 useEffect 의존성 등으로 다시 시도하게 하거나 해야 함)
-          console.warn(
-            '⚠️ [useChat] chatRoomId not found workspaceDetail (might be loading or empty):',
-            workspaceDetail
-          );
-
-          // Retry logic needed? Or assume it will re-render if we subscribe?
-          // For now, if null, we just stop here.
-        }
 
         // 2. 메시지 로드 (chatRoomId가 있을 때만 요청)
         let messages: any[] = [];
@@ -156,7 +188,6 @@ export const useChat = (workspaceId: string) => {
         });
       } catch (error) {
         console.warn('[useChat] 초기화 실패:', error);
-        // 실패 시 빈 목록으로 초기화
         setPaginationState({
           hasMore: false,
           isLoading: false,
@@ -168,46 +199,57 @@ export const useChat = (workspaceId: string) => {
 
     initializeChat();
 
-    // 참여자 목록 로드 (API 사용)
-    const loadParticipants = async () => {
-      if (participants.length === 0) {
-        try {
-          // Store에서 chatRoomId 가져오기 (initializeChat이 설정했을 수 있음)
-          // 하지만 비동기 이슈가 있을 수 있으므로, initializeChat 이후에 실행되거나
-          // 여기서도 없으면 못 가져옴.
-          // 일단 workspaceId로 chatRoomId를 조회하는 API가 따로 없으므로(getWorkspaceDetail 제외),
-          // Store에 있는 것을 우선 시도.
-          const chatRoomId = useChatStore.getState().chatRoomIds[workspaceId];
+    // 참여자 목록 로드 (workspaceDetail 기반으로 초기화)
+    const loadParticipants = () => {
+      // 이미 로드되었으면 패스 (단, workspaceDetail이 업데이트되었을 수 있으므로 체크)
+      if (participants.length > 0) return;
 
-          if (!chatRoomId) return; // ChatRoomId 없으면 스킵
+      const memberInfos = workspaceDetail?.teamInfo?.memberInfos;
+      if (memberInfos) {
+        console.log(
+          '👥 [useChat] Loading participants from workspaceDetail:',
+          memberInfos
+        );
 
-          const response = await fetchParticipants(chatRoomId);
+        const mappedParticipants: any[] = memberInfos.map((m: any) => {
+          // Safety check for ID
+          const rawId = m.memberId || m.member_id || m.id;
+          const safeId = rawId ? rawId.toString() : `unknown-${Math.random()}`;
 
-          // response = { status: 'success', data: ChatParticipant[] }
-          const participantsList = response.data || [];
+          return {
+            id: safeId,
+            name: m.nickname || m.name || 'Unknown', // 닉네임 우선
+            email: m.email || '',
+            role:
+              m.role === 'OWNER'
+                ? 'owner'
+                : m.role === 'EDITOR'
+                  ? 'admin'
+                  : 'member',
+            isOnline: false, // 초기값 false, 소켓으로 업데이트
+            isTyping: false,
+          };
+        });
 
-          useChatStore
-            .getState()
-            .setParticipants(workspaceId, participantsList);
-        } catch (error) {
-          console.warn(
-            '[useChat] 참여자 로드 실패 (API 없음 또는 에러):',
-            error
-          );
-          // 실패 시 빈 목록 유지
-        }
+        useChatStore
+          .getState()
+          .setParticipants(workspaceId, mappedParticipants);
       }
     };
 
     loadParticipants();
 
-    initializedRef.current = workspaceId;
+    // workspaceDetail이 로드 완료된 경우에만 initialized 처리
+    if (workspaceDetail) {
+      initializedRef.current = workspaceId;
+    }
   }, [
     workspaceId,
     messages.length,
     participants.length,
     setActiveWorkspace,
     setPaginationState,
+    workspaceDetail, // 의존성 추가: 이게 바뀌면 다시 실행됨
   ]);
 
   return {

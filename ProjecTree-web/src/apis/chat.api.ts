@@ -24,7 +24,33 @@ export const fetchMessages = async (
   });
 
   // axios response.data를 그대로 반환 = { status: 'success', data: ChatMessage[] }
-  return response.data;
+  // 💥 중요: 백엔드 데이터(snake_case 등)를 프론트엔드 모델(camelCase)로 매핑
+  const rawData = response.data.data || [];
+
+  const mappedData = rawData.map((raw: any) => ({
+    id: raw.id?.toString() || Date.now().toString(),
+    workspaceId:
+      raw.workspace_id?.toString() || raw.workspaceId?.toString() || '',
+    senderId:
+      raw.senderId?.toString() ||
+      raw.sender_id?.toString() ||
+      raw.memberId?.toString() ||
+      raw.userId?.toString() ||
+      'unknown',
+    senderName:
+      raw.senderName ||
+      raw.sender_name ||
+      raw.nickname ||
+      raw.name ||
+      'Unknown',
+    content: raw.content || '',
+    timestamp: raw.timestamp || raw.created_at || new Date().toISOString(),
+    type: 'text',
+    senderAvatar:
+      raw.senderAvatar || raw.sender_avatar || raw.profile_image || undefined,
+  }));
+
+  return { ...response.data, data: mappedData };
 };
 
 /**
