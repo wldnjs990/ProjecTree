@@ -13,7 +13,6 @@ const priorityStyles: Record<Priority, { bg: string; text: string }> = {
   P0: { bg: 'bg-[rgba(231,0,11,0.15)]', text: 'text-[#E7000B]' },
   P1: { bg: 'bg-[rgba(253,154,0,0.15)]', text: 'text-[#FD9A00]' },
   P2: { bg: 'bg-[rgba(43,127,255,0.15)]', text: 'text-[#2B7FFF]' },
-  P3: { bg: 'bg-[rgba(100,116,139,0.15)]', text: 'text-[#64748B]' },
 };
 
 interface PrioritySelectProps {
