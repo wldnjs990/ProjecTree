@@ -248,15 +248,15 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       setIsConnected(true);
       setIsConnecting(false);
 
-      // 마이크 활성화 (권한 거부 시 연결 해제)
+      // 마이크 활성화 (사전 권한 확인을 통과했으므로 정상 동작 기대)
+      // 만약 이 사이에 권한이 취소되는 드문 경우를 대비한 방어 코드 유지
       try {
         await newRoom.localParticipant.setMicrophoneEnabled(true);
         setIsMicEnabled(true);
       } catch (micErr) {
         console.warn('Microphone permission denied, disconnecting:', micErr);
         setIsMicEnabled(false);
-        setMicPermissionDenied(true); // 모달 표시
-        // 권한 거부 시 연결 해제 (다른 참가자 UI 오염 방지)
+        setMicPermissionDenied(true);
         await newRoom.disconnect();
         setIsConnected(false);
         setIsConnecting(false);

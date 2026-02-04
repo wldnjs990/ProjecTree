@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Node, Edge } from '@xyflow/react';
 import { useParams, useNavigate } from 'react-router';
 import {
@@ -11,7 +11,7 @@ import { TreeCanvas } from '@/features/workspace-canvas';
 import { FeatureSpecView } from '@/features/workspace-feature-spec';
 import { TechStackStatusView } from '@/features/workspace-tech-status';
 import { LeftSidebar } from '@/features/workspace-aside';
-import { VoiceChatBar } from '@/features/workspace-voicechat';
+import { VoiceChatBar, MicPermissionAlert } from '@/features/workspace-voicechat';
 import {
   type FlowNode,
   type ApiNode,
@@ -148,22 +148,31 @@ export default function WorkSpacePage() {
   // 음성 채팅 상태
   const [isVoiceChatActive, setIsVoiceChatActive] = useState(false); // 연결 활성화 상태
   const [isVoiceChatBarVisible, setIsVoiceChatBarVisible] = useState(false); // UI 표시 상태
+  const [micPermissionDenied, setMicPermissionDenied] = useState(false); // 마이크 권한 거부 상태
 
   // Event handlers
   const handleSettingsClick = () => {
     console.log('Settings clicked');
   };
 
-  const handleVoiceCallClick = () => {
+  const handleVoiceCallClick = useCallback(async () => {
     if (!isVoiceChatActive) {
-      // 처음 연결: 연결 시작 + UI 표시
+      // 마이크 권한을 먼저 확인 — 권한 없으면 VoiceChatBar를 마운트하지 않음
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach((track) => track.stop());
+      } catch {
+        setMicPermissionDenied(true);
+        return;
+      }
+      // 권한 확인 후 연결 시작 + UI 표시
       setIsVoiceChatActive(true);
       setIsVoiceChatBarVisible(true);
     } else {
       // 이미 연결된 상태: UI만 토글 (연결 유지)
       setIsVoiceChatBarVisible((prev) => !prev);
     }
-  };
+  }, [isVoiceChatActive]);
 
   // 음성 채팅 완전 종료 (나가기 버튼)
   const handleVoiceChatClose = () => {
@@ -248,6 +257,12 @@ export default function WorkSpacePage() {
           )}
         </main>
       </div>
+
+      {/* 마이크 권한 거부 알림 (VoiceChatBar 마운트 전 단계) */}
+      <MicPermissionAlert
+        isOpen={micPermissionDenied}
+        onClose={() => setMicPermissionDenied(false)}
+      />
 
       {/* 음성 채팅 바 */}
       <VoiceChatBar
