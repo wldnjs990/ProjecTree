@@ -105,6 +105,7 @@ public class NodeServiceImpl implements NodeService {
                                 .description(candidate.getDescription())
                                 .summary(candidate.getSummary())
                                 .isSelected(candidate.isSelected())
+                                .derivationId(candidate.getDerivationNode().getId())//N+1 문제 발생
                                 .build())
                         .toList())
                 .techs(techStacks.stream()
