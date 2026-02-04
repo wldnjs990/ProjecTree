@@ -13,6 +13,7 @@ export function ActionButtons({
   onVoiceCallClick,
   onInviteClick,
   isVoiceChatActive,
+  isVoiceChatBarVisible,
 }: ActionButtonsProps) {
   return (
     <TooltipProvider>
@@ -51,7 +52,13 @@ export function ActionButtons({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{isVoiceChatActive ? '음성 통화 중' : '팀 음성 통화 시작'}</p>
+            <p>
+              {!isVoiceChatActive
+                ? '팀 음성 통화 시작'
+                : isVoiceChatBarVisible
+                  ? '음성 통화 중 · 클릭하면 창을 숨기고 통화를 유지합니다'
+                  : '음성 통화 중 · 클릭하면 창을 다시 표시합니다'}
+            </p>
           </TooltipContent>
         </Tooltip>
 
