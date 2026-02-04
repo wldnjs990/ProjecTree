@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import type { Node, Edge } from '@xyflow/react';
 import { useParams, useNavigate } from 'react-router';
-import { getWorkspaceTree, getNodeDetail } from '@/apis/workspace.api';
+import {
+  getWorkspaceTree,
+  getNodeDetail,
+  getWorkspaceDetail,
+} from '@/apis/workspace.api';
 import { Header, type ViewTab } from '@/features/workspace-header';
 import { TreeCanvas } from '@/features/workspace-canvas';
 import { FeatureSpecView } from '@/features/workspace-feature-spec';
@@ -16,6 +20,7 @@ import {
   destroyCrdtClient,
   useConnectionStatus,
   useNodeStore,
+  useWorkspaceStore,
   generateEdges,
   mockUsers,
   useNodeDetailCrdtObservers,
@@ -61,6 +66,9 @@ export default function WorkSpacePage() {
   // Zustand store 액션
   const setNodeListData = useNodeStore((state) => state.setNodeListData);
   const updateNodeDetail = useNodeStore((state) => state.updateNodeDetail);
+  const setWorkspaceDetail = useWorkspaceStore(
+    (state) => state.setWorkspaceDetail
+  );
 
   // 노드 상세 편집 Hook
   const { openSidebar, closeSidebar, selectedNodeId } = useNodeDetailEdit();
@@ -81,6 +89,11 @@ export default function WorkSpacePage() {
 
         // workspaceId params를 받아 crdt 인스턴스 생성
         if (workspaceId) initCrdtClient(workspaceId);
+
+        // 워크스페이스 상세 정보 조회 및 스토어 저장
+        const workspaceDetail = await getWorkspaceDetail(Number(workspaceId));
+        setWorkspaceDetail(workspaceDetail);
+        console.log('[WorkSpacePage] workspaceDetail 저장:', workspaceDetail);
 
         // 워크스페이스 트리 데이터 API 호출
         const apiNodes = await getWorkspaceTree(Number(workspaceId));

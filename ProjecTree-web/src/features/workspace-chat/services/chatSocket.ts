@@ -6,6 +6,7 @@ class ChatSocketService {
   constructor() {
     // 환경변수에서 WebSocket 서버 URL 가져오기
     this.serverUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
+    // this.serverUrl = 'http://localhost:7092';
   }
 
   /**
@@ -19,7 +20,7 @@ class ChatSocketService {
     this.socket = io(this.serverUrl, {
       path: '/socket.io',
       query: {
-        token: accessToken,
+        token: 'Bearer ' + accessToken,
       },
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -71,6 +72,8 @@ class ChatSocketService {
     if (!this.socket || !this.socket.connected) {
       return;
     }
+
+    console.log('🚀 sendMessage:', chatRoomId, content);
 
     // 백엔드 스펙: chatRoomId 사용
     this.socket.emit('message:send', {

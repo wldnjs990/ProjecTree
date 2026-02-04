@@ -3,8 +3,9 @@ import { useChatStore } from '../store/chatStore';
 import { useWebSocket } from './useWebSocket';
 import { chatSocket } from '../services/chatSocket';
 import { fetchMessages, fetchParticipants } from '@/apis/chat.api';
-import { getWorkspaceDetail } from '@/apis/workspace.api';
 import { CHAT_PAGINATION_CONFIG } from '../types/mockData';
+import { useUserStore } from '@/shared/stores/userStore';
+import { useWorkspaceStore } from '@/features/workspace-core';
 
 export const useChat = (workspaceId: string) => {
   const { startTyping, stopTyping, isConnected } = useWebSocket(workspaceId);
@@ -12,8 +13,47 @@ export const useChat = (workspaceId: string) => {
   const sendMessage = (content: string) => {
     if (!workspaceId || !content.trim()) return;
 
-    // 소켓 전송 시도 (연결 안 되어 있어도 시뮬레이션 로직이 작동함)
-    chatSocket.sendMessage(workspaceId, content.trim());
+    // 현재 로그인한 사용자 정보 가져오기
+    const currentUser = useUserStore.getState().user;
+    console.log('[DEBUG] sendMessage currentUser:', currentUser);
+
+    if (!currentUser) return;
+
+    // 1. 소켓 전송
+    // workspaceId가 아니라 실제 chatRoomId를 사용해야 함
+    const chatRoomId = useChatStore.getState().chatRoomIds[workspaceId];
+    if (chatRoomId) {
+      chatSocket.sendMessage(chatRoomId, content.trim());
+    } else {
+      console.warn(
+        '[useChat] Sending message failed: chatRoomId not found for workspace',
+        workspaceId
+      );
+      // Fallback or return? user interaction implies we should try or fail visible?
+      // For now, attempting with workspaceId might be better than nothing, OR just log error.
+      // Given the logic, chatRoomId is required.
+      return;
+    }
+
+    // 2. Optimistic Update (내 화면에 즉시 추가)
+    // 백엔드에서 보낸 사람에게는 브로드캐스트를 안 하므로 직접 추가해야 함
+    const optimisticMessage: any = {
+      id: Date.now().toString(), // 임시 ID
+      workspaceId,
+      // ChatMessageItem 로직과 일치시킴
+      senderId:
+        currentUser.memberId?.toString() ||
+        currentUser.id?.toString() ||
+        currentUser.email ||
+        'unknown',
+      senderName: currentUser.nickname || currentUser.name || 'Unknown',
+      // senderAvatar: currentUser.profileImage || undefined,
+      content: content.trim(),
+      timestamp: new Date().toISOString(),
+      type: 'text',
+    };
+
+    useChatStore.getState().addMessage(workspaceId, optimisticMessage);
   };
 
   // Stable empty array to prevent new reference on every render
@@ -61,28 +101,48 @@ export const useChat = (workspaceId: string) => {
       try {
         setPaginationState({ isLoading: true });
 
-        // 1. 워크스페이스 상세 정보 조회 (ChatRoomId 획득)
-        const workspaceDetail = await getWorkspaceDetail(Number(workspaceId));
+        // 1. 워크스페이스 상세 정보는 이미 Store에 로드되어 있다고 가정 (WorkSpacePage에서 처리)
+        // Store에서 데이터 가져오기
+        const workspaceStore = useWorkspaceStore.getState();
+        const workspaceDetail = workspaceStore.workspaceDetail;
+
+        console.log(
+          '📦 [useChat] Getting workspace detail from STORE:',
+          workspaceDetail
+        );
+
         let chatRoomId = '';
 
         if (workspaceDetail?.teamInfo?.chatRoomId) {
           chatRoomId = workspaceDetail.teamInfo.chatRoomId;
           useChatStore.getState().setChatRoomId(workspaceId, chatRoomId);
-          console.log('✅ [useChat] ChatRoomId set:', chatRoomId);
+          console.log('✅ [useChat] ChatRoomId set in store:', chatRoomId);
+        } else {
+          // 아직 로드되지 않았거나 없을 수 있음.
+          // 만약 WorkSpacePage가 먼저 실행되었다면 있어야 함.
+          // 여기서 없으면, WorkSpacePage의 로딩을 기다려야 할 수도 있음.
+          // 일단은 없으면 패스 (이후 useEffect 의존성 등으로 다시 시도하게 하거나 해야 함)
+          console.warn(
+            '⚠️ [useChat] chatRoomId not found workspaceDetail (might be loading or empty):',
+            workspaceDetail
+          );
+
+          // Retry logic needed? Or assume it will re-render if we subscribe?
+          // For now, if null, we just stop here.
         }
 
         // 2. 메시지 로드 (chatRoomId가 있을 때만 요청)
         let messages: any[] = [];
-        if (chatRoomId) {
-          try {
-            const response = await fetchMessages(chatRoomId, {
-              limit: CHAT_PAGINATION_CONFIG.initialLoad,
-            });
-            messages = response.data || [];
-          } catch (e) {
-            console.warn('[useChat] 메시지 로드 실패:', e);
-          }
-        }
+        // if (chatRoomId) {
+        //   try {
+        //     const response = await fetchMessages(chatRoomId, {
+        //       limit: CHAT_PAGINATION_CONFIG.initialLoad,
+        //     });
+        //     messages = response.data || [];
+        //   } catch (e) {
+        //     console.warn('[useChat] 메시지 로드 실패:', e);
+        //   }
+        // }
 
         // response = { status: 'success', data: ChatMessage[] }
         useChatStore.getState().setMessages(workspaceId, messages);

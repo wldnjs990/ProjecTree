@@ -99,8 +99,6 @@ export const selectNodeCandidates = async (
   console.log(response);
   // API 응답에서 id, taskType이 없으므로 클라이언트에서 임시 생성
   return response.data;
-  // API 응답에서 id, taskType이 없으므로 클라이언트에서 임시 생성
-  return response.data;
 };
 
 // ===== 워크스페이스 상세 조회 =====
