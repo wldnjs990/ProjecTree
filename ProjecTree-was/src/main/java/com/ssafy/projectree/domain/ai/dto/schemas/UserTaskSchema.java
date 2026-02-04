@@ -15,4 +15,5 @@ public class UserTaskSchema {
     private String taskDescription;
     private String taskNote;
     private TaskTechStackSchema techStack;
+    private String comparison;
 }
