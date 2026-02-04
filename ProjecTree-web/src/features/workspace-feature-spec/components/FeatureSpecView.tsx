@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { Download, Notebook, BookOpen, CheckSquare, Pin } from 'lucide-react';
+import { Notebook, BookOpen, CheckSquare, Pin } from 'lucide-react';
 import type { Node, Edge } from '@xyflow/react';
 import { transformNodesForSpecView, useNodes, useEdges } from '@/features/workspace-core';
 import { EpicGroup } from './EpicGroup';
@@ -70,16 +69,6 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
 
   return (
     <div className="flex flex-col h-full bg-transparent">
-      {/* Toolbar */}
-      <div className="h-14 border-b border-zinc-200/60 bg-white/70 backdrop-blur-xl flex items-center justify-end px-4 gap-4 sticky top-0 z-10 transition-all duration-300 shadow-sm">
-        <Button
-          variant="outline"
-          className="gap-2 bg-white/50 border-white/20 shadow-sm text-zinc-700 hover:bg-white/80 transition-all duration-300 rounded-xl backdrop-blur-sm text-sm font-medium h-9 px-4"
-        >
-          <Download className="w-4 h-4" aria-hidden="true" />
-          내보내기
-        </Button>
-      </div>
 
       {/* Content area with horizontal scroll */}
       <div className="flex-1 overflow-x-auto overflow-y-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-white/30 [&::-webkit-scrollbar-thumb]:bg-zinc-300/50 [&::-webkit-scrollbar-thumb]:hover:bg-zinc-400/60 [&::-webkit-scrollbar-thumb]:rounded-full">
