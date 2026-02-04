@@ -17,6 +17,7 @@ import com.ssafy.projectree.domain.tech.model.entity.NodeTechStack;
 import com.ssafy.projectree.domain.tech.model.entity.TechStackInfo;
 import com.ssafy.projectree.domain.tech.model.entity.TechVocabulary;
 import com.ssafy.projectree.domain.tech.model.repository.NodeTechStackRepository;
+import com.ssafy.projectree.domain.tech.model.repository.WorkspaceTechStackRepository;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.workspace.model.repository.TeamRepository;
 import com.ssafy.projectree.domain.workspace.model.repository.WorkspaceRepository;
@@ -41,6 +42,7 @@ public class PortfolioService {
     private final NodeRepository nodeRepository;
     private final TeamRepository teamRepository;
     private final NodeTechStackRepository nodeTechStackRepository;
+    private final WorkspaceTechStackRepository workspaceTechStackRepository;
 
 
     @Transactional(readOnly = true)
@@ -67,9 +69,8 @@ public class PortfolioService {
 
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.WORKSPACE_NOT_FOUND));
-
+        List<String> workspaceTechStacks = workspaceTechStackRepository.findTechNamesByWorkspace(workspace);
         int headCount = teamRepository.countByWorkspace(workspace);
-
         List<TaskNode> taskNodes = nodeRepository.findTaskNodesByWorkspaceAndMember(workspaceId, currentMember.getId());
         List<AdvanceNode> advanceNodes = nodeRepository.findAdvanceNodesByWorkspaceAndMember(workspaceId, currentMember.getId());
 
@@ -81,6 +82,9 @@ public class PortfolioService {
 
         AiPortfolioGenerateDto.Request request = AiPortfolioGenerateDto.Request.builder()
                 .projectTitle(workspace.getName())
+                .projectStartAt(workspace.getStartDate())
+                .projectEndAt(workspace.getEndDate())
+                .projectTechStack(workspaceTechStacks)
                 .projectDescription(workspace.getDescription())
                 .projectHeadCount(headCount)
                 .userTaskSchemas(userTaskSchemas)
