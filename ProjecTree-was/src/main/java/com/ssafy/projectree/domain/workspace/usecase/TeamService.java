@@ -32,8 +32,10 @@ public class TeamService {
 
     @Value("${workspace.invite_url}")
     private String baseUrl;
+
     /**
      * workspace id를 통해 해당 workspace의 사용자가 몇명인지 확인
+     *
      * @param workspace
      * @return
      */
@@ -76,6 +78,28 @@ public class TeamService {
         Team team = findByWorkspaceAndMember(workspace, member);
 
         return team.getRole();
+    }
+
+    public TeamDto.UpdateRoleResponse changeRole(Member member, Workspace workspace, TeamDto.UpdateRoleRequest dto) {
+        List<Team> teams = findAllByWorkspace(workspace);
+
+        if (getMyRole(workspace, member).equals(Role.OWNER)) {
+            throw new BusinessLogicException(ErrorCode.CHANGE_ROLE_REJECTED);
+        }
+
+        Member targetMember = memberService.findById(dto.getTargetMemberId());
+
+        for (Team team : teams) {
+            if (team.getMember().equals(targetMember)) {
+                team.setRole(dto.getRole());
+                break;
+            }
+        }
+
+        return TeamDto.UpdateRoleResponse.builder()
+                .memberId(targetMember.getId())
+                .role(dto.getRole())
+                .build();
     }
 
     public Team findByWorkspaceAndMember(Workspace workspace, Member member) {
