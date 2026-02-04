@@ -69,7 +69,7 @@ function DifficultyDots({ difficult }: { difficult?: number }) {
     <div className="flex gap-0.5">
       {Array.from({ length: Math.min(difficult, 5) }).map((_, i) => (
         <span key={i} className="text-[8px] text-yellow">
-          ??
+          ⭐
         </span>
       ))}
     </div>
@@ -378,7 +378,9 @@ function PreviewNodeComponent({ data }: NodeProps<PreviewNodeType>) {
         <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-2xl">
           <div className="flex flex-col items-center gap-2">
             <Loader2 className="w-6 h-6 text-[#1C69E3] animate-spin" />
-            <span className="text-xs text-[#1C69E3] font-medium">생성 중...</span>
+            <span className="text-xs text-[#1C69E3] font-medium">
+              생성 중...
+            </span>
           </div>
         </div>
       )}
