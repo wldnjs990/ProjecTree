@@ -22,7 +22,7 @@ springRouter.post(
     if (!workspaceId || typeof workspaceId !== "string") {
       return res.status(400).json({ message: "Invalid workspace Id" });
     }
-
+    // TODO description 필드 추가되면 여기도 수정 필요
     const node: IncomingNodePayload = body;
     const doc = getYDocByRoom(workspaceId);
     doc.transact(() => {
