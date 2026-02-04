@@ -17,11 +17,13 @@ langchain-qdrant==1.1.0
 langchain-tavily==0.2.17
 langchain-teddynote==0.5.4
 langchain-upstage==0.7.5
+langchain-anthropic==1.3.1
 langfuse==3.12.0
 pdfminer-six==20251230
 pdfplumber==0.11.9
 pip-chill==1.0.3
 psycopg2==2.9.11
-pyppeteer==2.0.0
+playwright
 socksio==1.0.0
 tomli==2.0.1
+httpx==0.28.1
