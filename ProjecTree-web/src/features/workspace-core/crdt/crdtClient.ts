@@ -71,6 +71,29 @@ class CrdtClient {
         console.log('[CRDT] 동기화 완료');
       }
     });
+
+    // 서버로부터 메시지 수신 리스너
+    this.provider.ws?.addEventListener('message', (event: MessageEvent) => {
+      // y-websocket은 바이너리 데이터도 주고받으므로 문자열만 처리
+      if (typeof event.data === 'string') {
+        try {
+          const message = JSON.parse(event.data);
+          this.handleServerMessage(message);
+        } catch {
+          // JSON 파싱 실패 시 무시
+        }
+      }
+    });
+  }
+
+  private handleServerMessage(message: { type: string; [key: string]: unknown }) {
+    switch (message.type) {
+      case 'AI_MESSAGE':
+        console.log('[CRDT] AI_MESSAGE 수신:', message);
+        break;
+      default:
+        break;
+    }
   }
 
   /**
