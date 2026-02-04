@@ -23,6 +23,7 @@ aiRouter.post("/messages", (req, res) => {
 
   sendToRoom(workspaceId, {
     nodeId,
+    type: "AI_MESSAGE",
     category,
     content,
   });
