@@ -31,9 +31,10 @@ public enum ErrorCode {
     ACCESS_DENIED(DomainCode.AUTH, ExceptionCode.FORBIDDEN, "인가되지 않은 사용자입니다."),
     DUPLICATE_REQUEST_ERROR(DomainCode.NORMAL, ExceptionCode.TOO_MANY_REQUEST, "해당 자원은 이미 사용중입니다."),
     CHATROOM_NOT_FOUND(DomainCode.CHATROOM, ExceptionCode.NOT_FOUND, "채팅방을 찾을 수 없습니다."),
-    INVALIDATED_USER_ERROR(DomainCode.USER, ExceptionCode.INVALID , "인증된 사용자만 이용할 수 있습니다."),
-    PORTFOLIO_NOT_FOUND(DomainCode.PORTFOLIO, ExceptionCode.NOT_FOUND ,"포트폴리오를 찾을 수 없습니다."),
-    PORTFOLIO_INVALID_ACCESS_ERROR(DomainCode.PORTFOLIO, ExceptionCode.INVALID, "비정상적인 포트폴리오 접근입니다.");
+    INVALIDATED_USER_ERROR(DomainCode.USER, ExceptionCode.INVALID, "인증된 사용자만 이용할 수 있습니다."),
+    PORTFOLIO_NOT_FOUND(DomainCode.PORTFOLIO, ExceptionCode.NOT_FOUND, "포트폴리오를 찾을 수 없습니다."),
+    PORTFOLIO_INVALID_ACCESS_ERROR(DomainCode.PORTFOLIO, ExceptionCode.INVALID, "비정상적인 포트폴리오 접근입니다."),
+    CHANGE_ROLE_REJECTED(DomainCode.TEAM, ExceptionCode.FORBIDDEN, "권한 변경이 거부되었습니다. - 권한 없음");
 
     private final DomainCode domainCode;
     private final ExceptionCode exceptionCode;
