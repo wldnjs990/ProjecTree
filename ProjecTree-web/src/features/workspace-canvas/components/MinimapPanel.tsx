@@ -30,7 +30,10 @@ export function MinimapPanel({ className }: MinimapPanelProps) {
       >
         <MiniMap
           className="bg-[#808080] rounded-xl absolute top-0 left-0"
-          style={{ width: size.w - 28, height: size.h - 28 }}
+          style={{
+            width: Math.max(1, size.w - 28),
+            height: Math.max(1, size.h - 28),
+          }}
           nodeColor={(node) => {
             switch (node.type) {
               case 'PROJECT':
