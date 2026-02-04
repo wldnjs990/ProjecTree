@@ -28,12 +28,6 @@ export default function Step5TeamInvite({
   const [memberRole, setMemberRole] = useState<Role>('EDITOR');
   const [emailError, setEmailError] = useState('');
 
-  const ROLE_LABELS: Record<Role, string> = {
-    OWNER: '관리자 - 모든 권한',
-    EDITOR: '편집자 - 편집 가능',
-    VIEWER: '뷰어 - 보기만 가능',
-  };
-
   const validateEmail = (email: string): boolean => {
     if (!email.trim()) {
       setEmailError('');
@@ -86,6 +80,14 @@ export default function Step5TeamInvite({
   const handleRemoveMember = (emailToRemove: string) => {
     const newMemberRoles = { ...data.memberRoles };
     delete newMemberRoles[emailToRemove];
+    onChange({ memberRoles: newMemberRoles });
+  };
+
+  const handleRoleChange = (email: string, newRole: Role) => {
+    const newMemberRoles = {
+      ...data.memberRoles,
+      [email]: newRole,
+    };
     onChange({ memberRoles: newMemberRoles });
   };
 
@@ -146,10 +148,9 @@ export default function Step5TeamInvite({
 
           <Button
             className={`w-full h-[44px] font-['Pretendard'] font-normal text-[13.2px] leading-5 rounded-md border-none transition-colors
-              ${
-                !memberEmail.trim() || !!emailError
-                  ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-emperor)] cursor-not-allowed'
-                  : 'bg-[var(--figma-forest-primary)] text-[var(--figma-white)] hover:bg-[#1B5E20]'
+              ${!memberEmail.trim() || !!emailError
+                ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-emperor)] cursor-not-allowed'
+                : 'bg-[var(--figma-forest-primary)] text-[var(--figma-white)] hover:bg-[#1B5E20]'
               }`}
             onClick={handleInviteMember}
             disabled={!memberEmail.trim() || !!emailError}
@@ -168,15 +169,27 @@ export default function Step5TeamInvite({
               {Object.entries(data.memberRoles).map(([email, role]) => (
                 <div
                   key={email}
-                  className="flex items-center justify-between rounded p-2 bg-white border border-[var(--figma-border-mercury)] shadow-sm shrink-0"
+                  className="flex items-center justify-between rounded-md p-2 bg-white border border-[var(--figma-border-mercury)] shadow-sm shrink-0"
                 >
                   <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-cod-gray)]">
                     {email}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="font-['Pretendard'] font-normal text-[13px] text-[var(--figma-text-emperor)]">
-                      {ROLE_LABELS[role]}
-                    </span>
+                    <Select
+                      value={role}
+                      onValueChange={(newRole: Role) =>
+                        handleRoleChange(email, newRole)
+                      }
+                    >
+                      <SelectTrigger className="h-8 w-[160px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md font-['Pretendard'] font-normal text-[13px] hover:border-[var(--figma-forest-accent)] transition-colors">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="EDITOR">편집자 - 편집 가능</SelectItem>
+                        <SelectItem value="VIEWER">뷰어 - 보기만 가능</SelectItem>
+                        <SelectItem value="OWNER">관리자 - 모든 권한</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Button
                       variant="ghost"
                       size="sm"
