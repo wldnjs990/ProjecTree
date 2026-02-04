@@ -11,11 +11,11 @@ from app.core.dependencies import get_recommendation_service, get_db
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/recommendations", tags=["Recommendations"])
+router = APIRouter(prefix="/tech-stack", tags=["TechStack"])
 
 
 @router.post(
-    "/tech-stack",
+    "",
     response_model=TechStackRecommendResponse,
     summary="기술 스택 추천",
     description="노드 정보를 기반으로 적합한 기술 스택을 추천합니다.",
@@ -38,7 +38,7 @@ async def recommend_tech_stack(
     """
     logger.info(f"[Recommendations API] 기술 스택 추천 요청 시작 - node_id: {request.node_id}")
     try:
-        result = await service.recommend_tech_stack(db=db, request=request)
+        result = await service.recommend_tech_stack(db=db, request=request, workspace_id=request.workspace_id)
         logger.info(f"[Recommendations API] 기술 스택 추천 성공 - node_id: {request.node_id}, 추천된 기술 수: {len(result.techs)}")
         return result
     except NotImplementedError as e:

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import insert
-
+from app.core.callback import get_stream_handler
 from app.api.schemas.nodes import NodeCreateRequest, NodeCreateResponse
 from app.db.repository.node_repository import NodeRepository
 from app.db.repository.candidate_repository import CandidateRepository
@@ -57,7 +57,7 @@ class NodeService:
                 "parent_id": request.parent_id,
                 "candidate_id": request.candidate_id,
             },
-            config={"callbacks": [langfuse_handler]},
+            config={"callbacks": [langfuse_handler, get_stream_handler(workspace_id=request.workspace_id, node_id=request.parent_id)]},
         )
 
         # 3. 결과에서 생성된 노드 정보 추출

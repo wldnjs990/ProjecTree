@@ -2,6 +2,7 @@
 Expert nodes for tech stack recommendation.
 """
 from dotenv import load_dotenv
+from langchain_core.runnables import RunnableConfig
 from app.core.llm import openai_nano_llm, openai_mini_llm
 from deepagents import create_deep_agent
 from langchain.agents.structured_output import ProviderStrategy
@@ -40,7 +41,7 @@ backend_executor = create_expert_agent(BE_SYSTEM_PROMPT)
 advance_executor = create_expert_agent(ADVANCE_SYSTEM_PROMPT)
 
 
-def run_expert_node(state: RecommendationState, executor: Any):
+def run_expert_node(state: RecommendationState, executor: Any, config: RunnableConfig = None):
     from langchain.agents.structured_output import StructuredOutputValidationError
     
     task_type = state.get("task_type")
@@ -96,7 +97,8 @@ def run_expert_node(state: RecommendationState, executor: Any):
                         prompt_msg,
                     )
                 ]
-            }
+            },
+            config=config
         )
         output = response.get("structured_response")
         if output is None:
@@ -111,16 +113,16 @@ def run_expert_node(state: RecommendationState, executor: Any):
         return {"last_error": error_message}
 
 
-def frontend_expert(state: RecommendationState) -> RecommendationState:
-    return run_expert_node(state, frontend_executor)
+def frontend_expert(state: RecommendationState, config: RunnableConfig = None) -> RecommendationState:
+    return run_expert_node(state, frontend_executor, config)
 
 
-def backend_expert(state: RecommendationState) -> RecommendationState:
-    return run_expert_node(state, backend_executor)
+def backend_expert(state: RecommendationState, config: RunnableConfig = None) -> RecommendationState:
+    return run_expert_node(state, backend_executor, config)
 
 
-def advance_expert(state: RecommendationState) -> RecommendationState:
-    return run_expert_node(state, advance_executor)
+def advance_expert(state: RecommendationState, config: RunnableConfig = None) -> RecommendationState:
+    return run_expert_node(state, advance_executor, config)
 
 
 def expert_route(state: RecommendationState) -> RecommendationState:

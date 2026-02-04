@@ -14,6 +14,7 @@ from app.db.schemas.tech import TechStackInfoCreate, NodeTechStackCreate
 from app.db.models import NodeTechStack
 from app.db.models import TaskNode, AdvanceNode
 from app.agents.enums import TaskType
+from app.core.callback import get_stream_handler
 import logging
 import traceback
 
@@ -34,7 +35,7 @@ class RecommendationService:
         self.node_tech_stack_repository = node_tech_stack_repository
 
     async def recommend_tech_stack(
-        self, db: Session, request: TechStackRecommendRequest
+        self, db: Session, request: TechStackRecommendRequest, workspace_id: int,
     ) -> TechStackRecommendResponse:
         """기술 스택 추천 및 저장
 
@@ -88,7 +89,7 @@ class RecommendationService:
             # recommend_graph를 호출하여 실제 기술 스택 추천 로직 구현
             logger.info(f"[RecommendationService] recommend_graph 호출 시작")
             result = await recommend_graph.ainvoke(
-                input_data, config={"callbacks": [langfuse_handler]}
+                input_data, config={"callbacks": [langfuse_handler, get_stream_handler(workspace_id=workspace_id, node_id=node.id)]}
             )
             logger.info(f"[RecommendationService] recommend_graph 호출 완료")
 

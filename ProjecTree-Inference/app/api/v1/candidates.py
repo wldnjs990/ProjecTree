@@ -11,11 +11,11 @@ from app.core.dependencies import get_candidate_service, get_db
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/candidates", tags=["Candidates"])
+router = APIRouter(prefix="/candidate", tags=["Candidates"])
 
 
 @router.post(
-    "/generate",
+    "",
     response_model=CandidateGenerateResponse,
     summary="후보 노드 생성",
     description="현재 노드 정보를 기반으로 하위 후보 노드들을 생성합니다.",
@@ -37,7 +37,7 @@ async def generate_candidates(
     """
     logger.info(f"[Candidates API] 후보 노드 생성 요청 시작 - node_id: {request.node_id}, candidate_count: {request.candidate_count}")
     try:
-        result = await service.generate_candidates(db=db, request=request)
+        result = await service.generate_candidates(db=db, request=request, workspace_id=request.workspace_id)
         logger.info(f"[Candidates API] 후보 노드 생성 성공 - node_id: {request.node_id}, 생성된 후보 수: {len(result.candidates)}")
         return result
     except NotImplementedError as e:
