@@ -18,7 +18,7 @@ export async function saveNodeTechToSpring(
       },
     );
 
-    console.log("Spring response: ", result.data.success);
+    console.log("[Update Tech] Spring response: ", result.data.success);
     return true;
   } catch (error: any) {
     console.error(

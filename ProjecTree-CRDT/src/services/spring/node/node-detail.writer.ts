@@ -15,7 +15,7 @@ export async function saveNodeDetailToSpring(
       payload.detail,
     );
 
-    console.log("Spring response: ", result.data.success);
+    console.log("[Save Detail] Spring response: ", result.data.success);
     return true;
   } catch (error: any) {
     console.error(

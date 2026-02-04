@@ -7,12 +7,13 @@ import { toSendNodeDetail } from "../domain/node/node.detail";
 import { addPendingPosition } from "../sync/pending-store";
 import { flushWorkspace, scheduleFlush } from "../sync/debounce";
 import { getRoom } from "./room-registry";
+import { deleteNodeToSpring } from "../services/spring/node/node-delete.writer";
 
 function sendError(
   ws: WebSocket,
   payload: {
     type: "save_error";
-    action: "save_node_detail" | "select_node_tech";
+    action: "save_node_detail" | "select_node_tech" | "delete_node";
     message: string;
     requestId?: string;
     workspaceId?: number;
@@ -104,6 +105,26 @@ export async function handleMessage(ws: WebSocket, data: Buffer, room: string) {
     });
 
     scheduleFlush(room);
+  }
+  // delete node
+  else if (parsed?.type === "delete_node") {
+    const { nodeId } = parsed;
+    if (!nodeId) return;
+
+    const nodeIdValue = Number(nodeId);
+    if (!Number.isFinite(nodeIdValue)) return;
+
+    const deleted = await deleteNodeToSpring({
+      nodeId: nodeIdValue,
+    });
+    if (!deleted) {
+      sendError(ws, {
+        type: "save_error",
+        action: "delete_node",
+        message: "spring_delete_failed",
+        nodeId: nodeIdValue,
+      });
+    }
   }
 }
 
