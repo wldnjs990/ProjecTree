@@ -171,7 +171,7 @@ export function VoiceChatBar({
       {/* 컴팩트 플로팅 바 - isVisible이 true일 때만 표시 */}
       {isVisible && (
       <div className="fixed bottom-4 left-[18.75rem] right-0 z-50 flex justify-center pointer-events-none overflow-hidden">
-        <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl px-4 py-3 pointer-events-auto">
+        <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl px-4 py-3 pointer-events-auto shrink-0 whitespace-nowrap">
           <div className="flex items-center gap-4">
             {/* 연결 상태 표시 (점만) */}
             {isConnecting ? (
