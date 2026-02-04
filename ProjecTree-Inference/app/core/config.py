@@ -26,10 +26,11 @@ class Settings(BaseSettings):
     AI_API_KEY: str
     OPENAI_BASE_URL: str
     ANTHROPIC_BASE_URL: str
-    
+
     # CRDT Server 설정
     CRDT_SERVER_URL: str
     CRDT_SERVER_PATH: str
+    CRDT_PORTFOLIO_PATH: str
     # =========================================================
     # 2. 선택 변수 (기본값을 주면 .env에 없어도 됨)
     # =========================================================

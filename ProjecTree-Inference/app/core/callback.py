@@ -1,4 +1,5 @@
 from langchain_core.callbacks import AsyncCallbackHandler
+from app.core.config import settings
 from app.agents.candidates.schemas.candidate import CandidateList
 from app.agents.recommend.schemas.expert import TechList
 from app.core.node_messages import get_node_config, is_tracked_node
@@ -246,10 +247,14 @@ def get_stream_handler(workspace_id: int, node_id: int) -> AgentStreamHandler:
         AgentStreamHandler 인스턴스.
     """
     return AgentStreamHandler(
-        crdt_client=get_crdt_client(), workspace_id=workspace_id, node_id=node_id
+        crdt_client=get_crdt_client(path=settings.CRDT_SERVER_PATH),
+        workspace_id=workspace_id,
+        node_id=node_id,
     )
 
-#----------------Portfolio Stream Handler----------------
+
+# ----------------Portfolio Stream Handler----------------
+
 
 class PortfolioStreamHandler(AsyncCallbackHandler):
     """
@@ -260,7 +265,6 @@ class PortfolioStreamHandler(AsyncCallbackHandler):
         self.crdt_client = crdt_client
         self.workspace_id = workspace_id
         self.member_id = member_id
-        self.custom_endpoint = "/crdt/api/internal/ai/portfolio/messages"
 
     async def _send_update(self, content: str):
         """CRDT 서버로 업데이트 전송"""
@@ -271,8 +275,7 @@ class PortfolioStreamHandler(AsyncCallbackHandler):
                     "memberId": self.member_id,
                     "content": content,
                 }
-            },
-            path=self.custom_endpoint,
+            }
         )
 
     async def on_chat_model_start(
@@ -337,5 +340,7 @@ def get_portfolio_stream_handler(
         PortfolioStreamHandler 인스턴스.
     """
     return PortfolioStreamHandler(
-        crdt_client=get_crdt_client(), workspace_id=workspace_id, member_id=member_id
+        crdt_client=get_crdt_client(path=settings.CRDT_PORTFOLIO_PATH),
+        workspace_id=workspace_id,
+        member_id=member_id,
     )

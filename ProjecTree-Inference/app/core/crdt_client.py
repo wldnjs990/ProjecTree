@@ -24,15 +24,16 @@ class CRDTClient:
         })
     """
 
-    def __init__(self, timeout: float = 30.0):
+    def __init__(self, path: Optional[str] = None, timeout: float = 30.0):
         """
         CRDTClient 초기화.
 
         Args:
+            path: (Optional) 기본 요청 경로 overriding. 없으면 settings.CRDT_SERVER_PATH 사용.
             timeout: HTTP 요청 타임아웃 (초).
         """
         self.server_url = settings.CRDT_SERVER_URL
-        self.default_path = settings.CRDT_SERVER_PATH
+        self.default_path = path if path else settings.CRDT_SERVER_PATH
         self.timeout = timeout
 
     async def send(
@@ -83,11 +84,14 @@ class CRDTClient:
             return None
 
 
-def get_crdt_client() -> CRDTClient:
+def get_crdt_client(path: Optional[str] = None) -> CRDTClient:
     """
     CRDT 클라이언트 인스턴스를 반환합니다.
+
+    Args:
+        path: (Optional) 사용할 기본 경로.
 
     Returns:
         CRDTClient 인스턴스.
     """
-    return CRDTClient()
+    return CRDTClient(path=path)
