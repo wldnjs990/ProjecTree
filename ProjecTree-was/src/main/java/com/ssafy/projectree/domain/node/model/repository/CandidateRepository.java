@@ -20,7 +20,7 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
             """)
     void deleteByParentId(Long parentId);
 
-    @Modifying(clearAutomatically = true) // 이 옵션 추가 권장
+    @Modifying(clearAutomatically = true)
     @Query("""
         update Candidate c
         set c.isSelected = false, c.derivationNode = null

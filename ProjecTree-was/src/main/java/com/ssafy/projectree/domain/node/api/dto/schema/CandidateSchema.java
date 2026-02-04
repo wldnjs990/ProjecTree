@@ -26,4 +26,7 @@ public class CandidateSchema {
 
     @Schema(description = "후보노드의 선택 여부", example = "true")
     private boolean isSelected;
+
+    @Schema(description = "파생 노드의 ID", example = "202")
+    private Long derivationId;
 }
