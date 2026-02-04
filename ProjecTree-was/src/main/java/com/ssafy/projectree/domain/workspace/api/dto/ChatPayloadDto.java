@@ -37,7 +37,7 @@ public class ChatPayloadDto {
     @Data
     public static class Typing {
         private String chatRoomId;
-        private String memberId;
-        private String userName;
+        private Long senderId;
+        private String senderName;
     }
 }

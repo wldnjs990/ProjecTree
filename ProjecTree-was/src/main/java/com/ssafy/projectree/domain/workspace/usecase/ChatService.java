@@ -8,6 +8,7 @@ import com.ssafy.projectree.domain.chat.usecase.ChatRoomService;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.usecase.MemberService;
 import com.ssafy.projectree.domain.workspace.api.dto.ChatPayloadDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class ChatService {
     private final ChatRoomService chatRoomService;
     private final ChatLogService chatLogService;
 
+    @Transactional
     public ChatPayloadDto.MessageReceive process(ChatPayloadDto.MessageSend data, SocketIOClient client) {
         Long memberId = client.get("memberId");
         Member member = memberService.findById(memberId);
