@@ -18,8 +18,9 @@ class ChatSocketService {
 
     this.socket = io(this.serverUrl, {
       path: '/socket.io',
-      // @ts-ignore
-      auth: accessToken,
+      query: {
+        token: accessToken,
+      },
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,

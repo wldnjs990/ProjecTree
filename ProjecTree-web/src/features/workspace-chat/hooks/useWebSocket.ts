@@ -26,7 +26,7 @@ export const useWebSocket = (workspaceId: string | null) => {
     // 실제 JWT 토큰 가져오기 (AuthStore)
     const token = useAuthStore.getState().accessToken || '';
 
-    const socket = chatSocket.connect(token);
+    const socket = chatSocket.connect(token); 
 
     // 연결 상태 업데이트
     socket.on('connect', () => {
