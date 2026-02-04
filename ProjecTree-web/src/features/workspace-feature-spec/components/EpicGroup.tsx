@@ -93,7 +93,9 @@ export function EpicGroup({
           {statusLabel[data.status]}
         </Badge>
       </div>
-      <div className="flex justify-center" />
+      <div className="flex justify-center">
+        <span className="text-xs text-gray-300">-</span>
+      </div>
       <div className="flex justify-center">
         {data.assignee ? (
           <UserAvatar

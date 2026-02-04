@@ -43,7 +43,6 @@ export const mockFeatureSpecNodes: Node[] = [
       priority: 'P0',
       status: 'progress',
       assignee: { id: '2', name: '이지은', initials: 'LJ', color: 'pink' },
-      difficult: 4,
     },
   },
   {
@@ -91,7 +90,6 @@ export const mockFeatureSpecNodes: Node[] = [
       priority: 'P1',
       status: 'progress',
       assignee: { id: '3', name: '박현우', initials: 'PH', color: 'green' },
-      difficult: 3,
     },
   },
   {
@@ -127,7 +125,6 @@ export const mockFeatureSpecNodes: Node[] = [
       priority: 'P2',
       status: 'pending',
       assignee: null,
-      difficult: 2,
     },
   },
   {
@@ -163,7 +160,6 @@ export const mockFeatureSpecNodes: Node[] = [
       priority: 'P0',
       status: 'progress',
       assignee: { id: '4', name: '최수진', initials: 'CS', color: 'purple' },
-      difficult: 5,
     },
   },
   {
@@ -223,7 +219,6 @@ export const mockFeatureSpecNodes: Node[] = [
       priority: 'P2',
       status: 'pending',
       assignee: null,
-      difficult: 3,
     },
   },
   {
@@ -271,7 +266,6 @@ export const mockFeatureSpecNodes: Node[] = [
       priority: 'P1',
       status: 'pending',
       assignee: { id: '6', name: '강태영', initials: 'KT', color: 'blue' },
-      difficult: 4,
     },
   },
   {

@@ -94,23 +94,7 @@ export function StoryGroup({
         </Badge>
       </div>
       <div className="flex justify-center">
-        {data.complexity ? (
-          <div className="flex gap-0.5">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <span
-                key={star}
-                className={cn(
-                  'text-xs',
-                  star <= data.complexity!
-                    ? 'text-yellow-500'
-                    : 'text-gray-300'
-                )}
-              >
-                ★
-              </span>
-            ))}
-          </div>
-        ) : null}
+        <span className="text-xs text-gray-300">-</span>
       </div>
       <div className="flex justify-center">
         {data.assignee ? (
