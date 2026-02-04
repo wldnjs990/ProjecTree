@@ -56,8 +56,22 @@ export function VoiceChatBar({
     resetMicPermissionDenied,
   } = useVoiceChat({ workspaceId });
 
-  /** 페이지당 표시할 참여자 수 */
-  const PAGE_SIZE = 6;
+  // 캔버스 영역 폭 감지 (뷰포트 - 사이드바 300px)
+  const SIDEBAR_WIDTH = 300;
+  const [windowWidth, setWindowWidth] = useState(
+    () => (typeof window !== 'undefined' ? window.innerWidth : 1280),
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const canvasWidth = windowWidth - SIDEBAR_WIDTH;
+  const isCompact = canvasWidth < 480;
+  const pageSize = isCompact ? 0 : canvasWidth < 700 ? 3 : 6;
+
   const [currentPage, setCurrentPage] = useState(0);
 
   // "나" + 원격 참여자를 하나의 배열로 합침
@@ -85,12 +99,11 @@ export function VoiceChatBar({
     return [me, ...remotes];
   }, [isConnected, participantName, activeSpeakers, isMicEnabled, remoteTracks]);
 
-  const totalPages = Math.ceil(allParticipants.length / PAGE_SIZE);
-  const needsPagination = allParticipants.length > PAGE_SIZE;
-  const pageParticipants = allParticipants.slice(
-    currentPage * PAGE_SIZE,
-    (currentPage + 1) * PAGE_SIZE,
-  );
+  const totalPages = pageSize > 0 ? Math.ceil(allParticipants.length / pageSize) : 0;
+  const needsPagination = pageSize > 0 && allParticipants.length > pageSize;
+  const pageParticipants = pageSize > 0
+    ? allParticipants.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+    : [];
 
   // 현재 페이지가 비었을 때 마지막 유효 페이지로 이동
   useEffect(() => {
@@ -157,8 +170,8 @@ export function VoiceChatBar({
 
       {/* 컴팩트 플로팅 바 - isVisible이 true일 때만 표시 */}
       {isVisible && (
-      <div className="fixed bottom-4 left-[calc(50%+9.375rem)] -translate-x-1/2 z-50">
-        <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl px-4 py-3">
+      <div className="fixed bottom-4 left-[18.75rem] right-0 z-50 flex justify-center pointer-events-none overflow-hidden">
+        <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl px-4 py-3 pointer-events-auto">
           <div className="flex items-center gap-4">
             {/* 연결 상태 표시 (점만) */}
             {isConnecting ? (
@@ -175,47 +188,57 @@ export function VoiceChatBar({
               </Tooltip>
             ) : null}
 
-            {/* 참여자 아바타 목록 (페이지네이션) */}
-            <div className="flex items-center gap-1 py-1 pr-1">
-              {/* 왼쪽 화살표 (첫 페이지면 숨김) */}
-              {needsPagination && currentPage > 0 && (
-                <button
-                  onClick={() => setCurrentPage((p) => p - 1)}
-                  className="p-1 rounded-full transition-colors text-slate-300 hover:bg-slate-700 hover:text-white"
-                  aria-label="이전 참여자"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-              )}
+            {/* 참여자 영역 */}
+            {isCompact ? (
+              /* compact 모드: 아바타 숨기고 인원 뱃지만 표시 */
+              isConnected && (
+                <span className="text-sm text-slate-300">
+                  {allParticipants.length}명
+                </span>
+              )
+            ) : (
+              /* 일반/중간 모드: 페이지네이션 아바타 */
+              <div className="flex items-center gap-1 py-1 pr-1">
+                {/* 왼쪽 화살표 (첫 페이지면 숨김) */}
+                {needsPagination && currentPage > 0 && (
+                  <button
+                    onClick={() => setCurrentPage((p) => p - 1)}
+                    className="p-1 rounded-full transition-colors text-slate-300 hover:bg-slate-700 hover:text-white"
+                    aria-label="이전 참여자"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                )}
 
-              {/* 현재 페이지 참여자 */}
-              <div className="flex items-center gap-3">
-                {pageParticipants.map((participant) => (
-                  <ParticipantAvatar
-                    key={participant.key}
-                    name={participant.name}
-                    displayName={participant.displayName}
-                    isSpeaking={participant.isSpeaking}
-                    isMuted={participant.isMuted}
-                    isMe={participant.isMe}
-                  />
-                ))}
+                {/* 현재 페이지 참여자 */}
+                <div className="flex items-center gap-3">
+                  {pageParticipants.map((participant) => (
+                    <ParticipantAvatar
+                      key={participant.key}
+                      name={participant.name}
+                      displayName={participant.displayName}
+                      isSpeaking={participant.isSpeaking}
+                      isMuted={participant.isMuted}
+                      isMe={participant.isMe}
+                    />
+                  ))}
+                </div>
+
+                {/* 오른쪽 화살표 (마지막 페이지면 숨김) */}
+                {needsPagination && currentPage < totalPages - 1 && (
+                  <button
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                    className="p-1 rounded-full transition-colors text-slate-300 hover:bg-slate-700 hover:text-white"
+                    aria-label="다음 참여자"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
+
+                {/* 에러 메시지 */}
+                {error && <span className="text-sm text-red-400">{error}</span>}
               </div>
-
-              {/* 오른쪽 화살표 (마지막 페이지면 숨김) */}
-              {needsPagination && currentPage < totalPages - 1 && (
-                <button
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                  className="p-1 rounded-full transition-colors text-slate-300 hover:bg-slate-700 hover:text-white"
-                  aria-label="다음 참여자"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              )}
-
-              {/* 에러 메시지 */}
-              {error && <span className="text-sm text-red-400">{error}</span>}
-            </div>
+            )}
 
             {/* 구분선 */}
             {isConnected && <div className="w-px h-8 bg-slate-700" />}
