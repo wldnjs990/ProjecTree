@@ -34,7 +34,7 @@ class TechStackServiceTest {
         TechVocabulary tech2 = new TechVocabulary(2L, "JavaScript");
         List<TechVocabulary> techList = List.of(tech1, tech2);
 
-        given(techVocabularyRepository.findTop10ByNameStartingWithIgnoreCaseOrderByNameAsc(keyword)).willReturn(techList);
+        given(techVocabularyRepository.findTop10ByNameStartingWithIgnoreCaseOrderByIdAsc(keyword)).willReturn(techList);
 
         // when
         List<TechVocabularyDto> result = techStackService.searchTechVocabulary(keyword);
@@ -43,6 +43,6 @@ class TechStackServiceTest {
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getName()).isEqualTo("Java");
         assertThat(result.get(1).getName()).isEqualTo("JavaScript");
-        verify(techVocabularyRepository).findTop10ByNameStartingWithIgnoreCaseOrderByNameAsc(keyword);
+        verify(techVocabularyRepository).findTop10ByNameStartingWithIgnoreCaseOrderByIdAsc(keyword);
     }
 }
