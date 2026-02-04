@@ -13,6 +13,11 @@ export function getOrCreateRoom(roomId: string): Room {
 
   return room;
 }
+
+export function getAllRooms() {
+  return rooms;
+}
+
 export function getRoom(room: string) {
   return rooms.get(room);
 }
