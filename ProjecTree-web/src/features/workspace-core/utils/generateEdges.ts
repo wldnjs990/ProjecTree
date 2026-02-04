@@ -7,12 +7,13 @@ const NODE_WIDTH = 180;
 const NODE_HEIGHT = 100;
 
 /** 노드 타입별 엣지 색상 */
-const EDGE_COLORS: Record<ServerNodeType, string> = {
+const EDGE_COLORS: Record<ServerNodeType | 'PREVIEW', string> = {
   PROJECT: '#8B5CF6', // purple
   EPIC: '#8B5CF6', // purple
   STORY: '#2B7FFF', // blue
   TASK: '#00D492', // green
   ADVANCE: '#06B6D4', // cyan
+  PREVIEW: '#1C69E3', // blue (preview)
 };
 
 /** 기본 엣지 스타일 */
@@ -40,7 +41,7 @@ export function generateEdges(nodes: FlowNode[]): Edge[] {
         id: `e-${node.parentId}-${node.id}`,
         source: node.parentId!,
         target: node.id,
-        type: 'bezier',
+        type: 'default',
         style: {
           stroke: edgeColor,
           ...DEFAULT_EDGE_STYLE,

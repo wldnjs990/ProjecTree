@@ -78,12 +78,13 @@ export const generateNodeCandidates = async (
     `nodes/${nodeId}/candidates`
   );
   console.log(response);
-  // API 응답에서 id, taskType, isSelected가 없으므로 클라이언트에서 초기화
+  // API 응답에서 id, taskType, selected, summary가 없으므로 클라이언트에서 초기화
   return response.data.data.candidates.map((c, index) => ({
     ...c,
     id: Date.now() + index,
     taskType: null,
-    isSelected: false,
+    selected: false,
+    summary: c.description?.slice(0, 50) || '', // summary가 없으면 description에서 생성
   }));
 };
 

@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { StatusTag, type TagType } from '@/shared/components/StatusTag';
 import { PriorityBadge } from '@/shared/components/PriorityBadge';
@@ -9,6 +10,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import type { FlowNodeData } from '@/features/workspace-core';
+import { useIsCreatingNode } from '@/features/workspace-core';
 
 /** 노드 고정 크기 상수 */
 export const NODE_DIMENSIONS = {
@@ -323,9 +325,77 @@ function AdvanceNodeComponent({ data, selected }: NodeProps<AdvanceNodeType>) {
   );
 }
 
+// Preview 노드 (더미/미리보기용)
+export interface PreviewNodeData extends FlowNodeData {
+  isPreview: true;
+}
+export type PreviewNodeType = Node<PreviewNodeData, 'PREVIEW'>;
+function PreviewNodeComponent({ data }: NodeProps<PreviewNodeType>) {
+  const isCreating = useIsCreatingNode();
+
+  return (
+    <div
+      className={cn(
+        'relative rounded-2xl p-3 w-[180px]',
+        'border-2 border-dashed',
+        isCreating
+          ? 'border-[#1C69E3] bg-[rgba(28,105,227,0.08)] shadow-[0_0_20px_rgba(28,105,227,0.4)]'
+          : 'border-[#1C69E3]/50 bg-[rgba(28,105,227,0.03)]',
+        'transition-all duration-300'
+      )}
+    >
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="w-2 h-2 border-2 border-white bg-[#1C69E3]/50"
+      />
+
+      {/* 미리보기 태그 */}
+      <div className="flex items-center gap-1.5 mb-2">
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded-lg',
+            'bg-[#1C69E3]/10 text-[#1C69E3] border border-[#1C69E3]/30'
+          )}
+        >
+          <Sparkles className="w-3 h-3" />
+          미리보기
+        </span>
+      </div>
+
+      {/* 노드 제목 */}
+      <p
+        className={cn(
+          'text-sm font-medium line-clamp-2',
+          isCreating ? 'text-[#1C69E3]' : 'text-[#0B0B0B]/70'
+        )}
+      >
+        {data.title}
+      </p>
+
+      {/* 로딩 오버레이 */}
+      {isCreating && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-2xl">
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="w-6 h-6 text-[#1C69E3] animate-spin" />
+            <span className="text-xs text-[#1C69E3] font-medium">생성 중...</span>
+          </div>
+        </div>
+      )}
+
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="w-2 h-2 border-2 border-white bg-[#1C69E3]/50"
+      />
+    </div>
+  );
+}
+
 // export---------------------------------------------------------------
 export const ProjectNode = memo(ProjectNodeComponent);
 export const EpicNode = memo(EpicNodeComponent);
 export const StoryNode = memo(StoryNodeComponent);
 export const TaskNode = memo(TaskNodeComponent);
 export const AdvancedNode = memo(AdvanceNodeComponent);
+export const PreviewNode = memo(PreviewNodeComponent);

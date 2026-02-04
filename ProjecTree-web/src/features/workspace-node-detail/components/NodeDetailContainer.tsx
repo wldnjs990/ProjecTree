@@ -8,10 +8,13 @@ import { useSelectedNodeDetail, useNodeDetailEdit } from '../hooks';
 import {
   useSelectedNodeId,
   nodeDetailCrdtService,
+  previewNodesCrdtService,
   useNodeDetailStore,
+  useNodes,
+  calculateChildNodePosition,
+  type FlowNode,
 } from '@/features/workspace-core';
 import { generateNodeCandidates } from '@/apis/workspace.api';
-import { postCreateNode } from '@/apis/node.api';
 
 interface NodeDetailContainerProps {
   nodeInfo?: {
@@ -28,6 +31,7 @@ export default function NodeDetailContainer({
   // Store에서 상태 및 액션 구독
   const nodeDetail = useSelectedNodeDetail();
   const selectedNodeId = useSelectedNodeId();
+  const nodes = useNodes();
   const { isEditing, closeSidebar, startEdit, finishEdit } =
     useNodeDetailEdit();
   const setSelectedTechId = useNodeDetailStore(
@@ -35,6 +39,9 @@ export default function NodeDetailContainer({
   );
   const setSelectedCandidateIds = useNodeDetailStore(
     (state) => state.setSelectedCandidateIds
+  );
+  const enterCandidatePreview = useNodeDetailStore(
+    (state) => state.enterCandidatePreview
   );
 
   // AI 생성 로딩 상태
@@ -73,14 +80,40 @@ export default function NodeDetailContainer({
     }
   };
 
-  // 노드 후보 클릭/추가 핸들러
-  const handleCandidateClick = async (nodeId: number, candidateId: number) => {
-    console.log('노드 생성 시작');
-    // 일단 하드코딩으로 만듬
-    // TODO : 좌표설정 유틸 함수 만들기
-    const requestBody = { xpos: 200, ypos: 200 };
-    const response = await postCreateNode(requestBody, nodeId, candidateId);
-    console.log(response);
+  // 노드 후보 클릭 → 미리보기 모드 진입 핸들러
+  const handleCandidateClick = (_nodeId: number, candidateId: number) => {
+    // 후보 노드 찾기
+    const candidate = nodeDetail?.candidates.find((c) => c.id === candidateId);
+    if (!candidate || !selectedNodeId) return;
+
+    // 위치 계산
+    const position = calculateChildNodePosition(nodes, selectedNodeId);
+
+    // Preview 노드 생성 (CRDT 동기화 → 다른 유저에게도 표시)
+    const previewNode: FlowNode = {
+      id: `preview-${candidateId}`,
+      type: 'PREVIEW',
+      position: { x: position.xpos, y: position.ypos },
+      parentId: selectedNodeId,
+      data: {
+        title: candidate.name,
+        status: 'TODO',
+        taskId: '#preview',
+        taskType: candidate.taskType,
+      },
+    };
+
+    // CRDT를 통해 preview 노드 추가 (다른 유저에게도 동기화)
+    previewNodesCrdtService.addPreviewNode(previewNode);
+
+    // 미리보기 모드 진입
+    enterCandidatePreview(candidate, position);
+
+    console.log('[NodeDetailContainer] 미리보기 모드 진입:', {
+      candidate,
+      position,
+      previewNode,
+    });
   };
 
   const handleCandidateAddManual = () => {

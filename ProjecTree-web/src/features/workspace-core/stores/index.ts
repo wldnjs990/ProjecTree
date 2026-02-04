@@ -13,6 +13,7 @@ export {
   useNodeDetail,
   useNodeListData,
   useNodeListItem,
+  usePreviewNodes,
   type ConfirmedNodeData,
 } from './nodeStore';
 
@@ -27,5 +28,9 @@ export {
   useEditField,
   useSelectedTechId,
   useSelectedCandidateIds,
+  useCandidatePreviewMode,
+  usePreviewCandidate,
+  usePreviewNodePosition,
+  useIsCreatingNode,
   type EditableNodeDetail,
 } from './nodeDetailStore';

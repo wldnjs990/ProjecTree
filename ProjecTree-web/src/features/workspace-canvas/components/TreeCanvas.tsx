@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -26,6 +26,7 @@ import {
   ProjectNode,
   StoryNode,
   TaskNode,
+  PreviewNode,
 } from './Nodes';
 import {
   useNodesCrdt,
@@ -34,6 +35,8 @@ import {
   useNodes,
   useEdges,
   useSelectedNodeId,
+  usePreviewNodes,
+  usePreviewNodesCrdt,
   type FlowNode,
 } from '@/features/workspace-core';
 import CursorPointers from './CursorPointers';
@@ -60,6 +63,7 @@ const nodeTypes = {
   STORY: StoryNode,
   TASK: TaskNode,
   ADVANCE: AdvancedNode,
+  PREVIEW: PreviewNode,
 };
 
 // hideAttribution: reactflow 워터마크가 기본적으로 표시되는데, 그걸 끄는 설정
@@ -84,26 +88,41 @@ function TreeCanvasInner({
   // Undo/Redo 키보드 이벤트 훅 (Ctrl+Z, Ctrl+Shift+Z)
   useUndoRedo();
 
+  // Preview 노드 CRDT 동기화 훅
+  usePreviewNodesCrdt();
+
   // Zustand 스토어에서 노드/엣지 가져오기
   const storeNodes = useNodes();
   const storeEdges = useEdges();
   const selectedNodeId = useSelectedNodeId();
+  const previewNodes = usePreviewNodes();
 
   // ReactFlow 로컬 상태 (드래그 중 즉시 반영용)
   const [nodes, setNodes] = useNodesState(storeNodes);
   const [edges, setEdges] = useEdgesState(storeEdges);
 
-  // 스토어 노드가 변경되면 로컬 상태에 반영
-  useEffect(() => {
-    if (storeNodes.length > 0) {
-      // ReactFlow에 전달 시 parentId 제거 → 부모 드래그 시 자식 연동 이동 비활성화
-      // (엣지 생성은 스토어의 원본 parentId를 사용하므로 영향 없음)
-      const nodesForReactFlow = storeNodes.map(
+  // 스토어 노드 + 미리보기 노드 병합
+  const displayNodes = useMemo(() => {
+    // ReactFlow에 전달 시 parentId 제거 → 부모 드래그 시 자식 연동 이동 비활성화
+    const nodesForReactFlow = storeNodes.map(
+      ({ parentId: _, ...node }) => node
+    );
+    // 미리보기 노드들이 있으면 병합
+    if (previewNodes.length > 0) {
+      const previewNodesWithoutParent = previewNodes.map(
         ({ parentId: _, ...node }) => node
       );
-      setNodes(nodesForReactFlow as FlowNode[]);
+      return [...nodesForReactFlow, ...previewNodesWithoutParent] as FlowNode[];
     }
-  }, [storeNodes, setNodes]);
+    return nodesForReactFlow as FlowNode[];
+  }, [storeNodes, previewNodes]);
+
+  // 스토어 노드가 변경되면 로컬 상태에 반영
+  useEffect(() => {
+    if (displayNodes.length > 0) {
+      setNodes(displayNodes);
+    }
+  }, [displayNodes, setNodes]);
 
   useEffect(() => {
     if (storeEdges.length > 0) {

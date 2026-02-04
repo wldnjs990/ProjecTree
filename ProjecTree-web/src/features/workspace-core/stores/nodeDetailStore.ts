@@ -1,5 +1,10 @@
 import { create } from 'zustand';
-import type { NodeStatus, Priority, Assignee } from '../types/nodeDetail';
+import type {
+  NodeStatus,
+  Priority,
+  Assignee,
+  Candidate,
+} from '../types/nodeDetail';
 
 // 편집 가능한 노드 상세 필드 타입
 // candidates는 별도 Y.Map에서 관리
@@ -21,6 +26,12 @@ interface NodeDetailState {
   selectedTechId: number | null;
   selectedCandidateIds: number[];
 
+  // === 후보 미리보기 상태 ===
+  candidatePreviewMode: boolean;
+  previewCandidate: Candidate | null;
+  previewNodePosition: { xpos: number; ypos: number } | null;
+  isCreatingNode: boolean;
+
   // === 단순 setter ===
   setSelectedNodeId: (id: string | null) => void;
   setIsOpen: (open: boolean) => void;
@@ -29,10 +40,16 @@ interface NodeDetailState {
   setIsSaving: (saving: boolean) => void;
   setSelectedTechId: (techId: number | null) => void;
   setSelectedCandidateIds: (ids: number[]) => void;
+  setIsCreatingNode: (creating: boolean) => void;
 
   // === 복합 setter ===
   openSidebar: (nodeId: string) => void;
   closeSidebar: () => void;
+  enterCandidatePreview: (
+    candidate: Candidate,
+    position: { xpos: number; ypos: number }
+  ) => void;
+  exitCandidatePreview: () => void;
   reset: () => void;
 }
 
@@ -46,6 +63,12 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   selectedTechId: null,
   selectedCandidateIds: [],
 
+  // === 후보 미리보기 초기 상태 ===
+  candidatePreviewMode: false,
+  previewCandidate: null,
+  previewNodePosition: null,
+  isCreatingNode: false,
+
   // === 단순 setter ===
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
   setIsOpen: (open) => set({ isOpen: open }),
@@ -54,6 +77,7 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   setIsSaving: (saving) => set({ isSaving: saving }),
   setSelectedTechId: (techId) => set({ selectedTechId: techId }),
   setSelectedCandidateIds: (ids) => set({ selectedCandidateIds: ids }),
+  setIsCreatingNode: (creating) => set({ isCreatingNode: creating }),
 
   // === 복합 setter ===
   openSidebar: (nodeId) => {
@@ -68,6 +92,27 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       editData: null,
       selectedTechId: null,
       selectedCandidateIds: [],
+      candidatePreviewMode: false,
+      previewCandidate: null,
+      previewNodePosition: null,
+      isCreatingNode: false,
+    });
+  },
+
+  enterCandidatePreview: (candidate, position) => {
+    set({
+      candidatePreviewMode: true,
+      previewCandidate: candidate,
+      previewNodePosition: position,
+    });
+  },
+
+  exitCandidatePreview: () => {
+    set({
+      candidatePreviewMode: false,
+      previewCandidate: null,
+      previewNodePosition: null,
+      isCreatingNode: false,
     });
   },
 
@@ -80,6 +125,10 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       isSaving: false,
       selectedTechId: null,
       selectedCandidateIds: [],
+      candidatePreviewMode: false,
+      previewCandidate: null,
+      previewNodePosition: null,
+      isCreatingNode: false,
     }),
 }));
 
@@ -114,3 +163,19 @@ export const useSelectedTechId = () =>
 /** 선택된 후보 노드 ID 목록 */
 export const useSelectedCandidateIds = () =>
   useNodeDetailStore((state) => state.selectedCandidateIds);
+
+/** 후보 미리보기 모드 여부 */
+export const useCandidatePreviewMode = () =>
+  useNodeDetailStore((state) => state.candidatePreviewMode);
+
+/** 미리보기 중인 후보 노드 */
+export const usePreviewCandidate = () =>
+  useNodeDetailStore((state) => state.previewCandidate);
+
+/** 미리보기 노드 위치 (서버 전송용) */
+export const usePreviewNodePosition = () =>
+  useNodeDetailStore((state) => state.previewNodePosition);
+
+/** AI 노드 생성 중 상태 */
+export const useIsCreatingNode = () =>
+  useNodeDetailStore((state) => state.isCreatingNode);
