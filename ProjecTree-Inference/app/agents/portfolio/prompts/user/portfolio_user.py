@@ -1,4 +1,4 @@
-"""포트폴리오 생성 사용자 프롬프트"""
+"""포트폴리오 생성 사용자 프롬프트 (동적 데이터 삽입)"""
 
 PORTFOLIO_USER_PROMPT = """
 아래 프로젝트 정보를 바탕으로 포트폴리오를 작성해주세요.
@@ -15,7 +15,6 @@ PORTFOLIO_USER_PROMPT = """
 
 ---
 위 정보를 분석하고, 도구들을 활용하여 매력적인 포트폴리오를 작성해주세요.
-마크다운을 통한 컨텐츠 이외의 부가적인 정보와 재 질문 등은 출력할 필요 없습니다.
 """
 
 
@@ -40,6 +39,10 @@ def format_tasks_for_prompt(user_tasks: list) -> str:
                     task_str += f"  - 설명: {tech.get('description')}\n"
             else:
                 task_str += f"- **사용 기술**: {tech}\n"
+        
+        comparison = task.get('comparison')
+        if comparison:
+            task_str += f"- **기술 비교 분석**: {comparison}\n"
         
         formatted.append(task_str)
     

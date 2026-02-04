@@ -2,6 +2,7 @@
 
 from langgraph.graph import StateGraph, END, START
 from app.agents.portfolio.state import PortfolioState
+from app.agents.portfolio.nodes.filter_notes import filter_notes_node
 from app.agents.portfolio.nodes.generate import generate_portfolio_node
 
 
@@ -9,10 +10,12 @@ from app.agents.portfolio.nodes.generate import generate_portfolio_node
 portfolio_graph_builder = StateGraph(PortfolioState)
 
 # 노드 추가
+portfolio_graph_builder.add_node("filter_notes", filter_notes_node)
 portfolio_graph_builder.add_node("generate_portfolio", generate_portfolio_node)
 
-# 엣지 정의
-portfolio_graph_builder.add_edge(START, "generate_portfolio")
+# 엣지 정의: filter_notes -> generate_portfolio -> END
+portfolio_graph_builder.add_edge(START, "filter_notes")
+portfolio_graph_builder.add_edge("filter_notes", "generate_portfolio")
 portfolio_graph_builder.add_edge("generate_portfolio", END)
 
 # 그래프 컴파일

@@ -3,6 +3,7 @@
 from app.api.schemas.portfolio import PortfolioGenerateRequest, PortfolioGenerateResponse
 from app.agents.portfolio.graph import portfolio_graph
 from app.core.log import langfuse_handler
+from app.core.callback import get_portfolio_stream_handler
 import logging
 import traceback
 
@@ -62,10 +63,13 @@ class PortfolioService:
                     "project_title": request.project_title,
                     "project_description": request.project_description,
                     "project_head_count": request.project_head_count,
+                    "project_start_date": request.project_start_date,
+                    "project_end_date": request.project_end_date,
+                    "project_tech_stack": request.project_tech_stack,
                     "user_tasks": user_tasks,
                     "retry_count": 0
                 },
-                config={"callbacks": [langfuse_handler]}
+                config={"callbacks": [langfuse_handler, get_portfolio_stream_handler(request.workspace_id, request.member_id)]}
             )
             logger.info(f"[PortfolioService] portfolio_graph 호출 완료")
             

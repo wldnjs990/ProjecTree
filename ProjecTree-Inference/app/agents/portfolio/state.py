@@ -17,6 +17,8 @@ class UserTask(TypedDict):
     task_name: str
     task_description: str
     task_note: Optional[str]
+    combination: Optional[str]
+    comparison: Optional[str]
     tech_stack: Optional[TechStackInfo]
 
 
@@ -26,6 +28,9 @@ class PortfolioState(TypedDict):
     project_title: str
     project_description: str
     project_head_count: int
+    project_start_date: Optional[str]  # 프로젝트 시작일
+    project_end_date: Optional[str]  # 프로젝트 종료일
+    project_tech_stack: Optional[List[str]]  # 프로젝트 기술 스택 리스트
     user_tasks: List[UserTask]
     
     # 생성 과정에서 사용되는 중간 상태
