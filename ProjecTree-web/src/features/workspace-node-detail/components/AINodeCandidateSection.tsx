@@ -12,6 +12,7 @@ import {
   useSelectedNodeId,
   useNodes,
   calculateChildNodePosition,
+  useSelectedCandidateIds,
 } from '@/features/workspace-core';
 import { SubNodeCard } from './SubNodeCard';
 import { CandidateEmptyState } from './CandidateEmptyState';
@@ -39,6 +40,7 @@ export function AINodeCandidateSection({
   const hasCandidates = candidates && candidates.length > 0;
   const selectedNodeId = useSelectedNodeId();
   const nodes = useNodes();
+  const selectedCandidateIds = useSelectedCandidateIds();
 
   const handleCandidateClick = (candidate: Candidate) => {
     if (!selectedNodeId) return;
@@ -78,6 +80,7 @@ export function AINodeCandidateSection({
                     key={node.id}
                     node={node}
                     onClick={() => handleCandidateClick(node)}
+                    isSelected={selectedCandidateIds.includes(node.id)}
                   />
                 ))}
               </div>

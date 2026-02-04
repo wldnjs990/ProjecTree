@@ -18,6 +18,8 @@ interface NodeDetailState {
   isEditing: boolean;
   editData: EditableNodeDetail | null;
   isSaving: boolean;
+  selectedTechId: number | null;
+  selectedCandidateIds: number[];
 
   // === 단순 setter ===
   setSelectedNodeId: (id: string | null) => void;
@@ -25,6 +27,8 @@ interface NodeDetailState {
   setIsEditing: (editing: boolean) => void;
   setEditData: (data: EditableNodeDetail | null) => void;
   setIsSaving: (saving: boolean) => void;
+  setSelectedTechId: (techId: number | null) => void;
+  setSelectedCandidateIds: (ids: number[]) => void;
 
   // === 복합 setter ===
   openSidebar: (nodeId: string) => void;
@@ -39,6 +43,8 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   isEditing: false,
   editData: null,
   isSaving: false,
+  selectedTechId: null,
+  selectedCandidateIds: [],
 
   // === 단순 setter ===
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
@@ -46,6 +52,8 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   setIsEditing: (editing) => set({ isEditing: editing }),
   setEditData: (data) => set({ editData: data }),
   setIsSaving: (saving) => set({ isSaving: saving }),
+  setSelectedTechId: (techId) => set({ selectedTechId: techId }),
+  setSelectedCandidateIds: (ids) => set({ selectedCandidateIds: ids }),
 
   // === 복합 setter ===
   openSidebar: (nodeId) => {
@@ -58,6 +66,8 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       selectedNodeId: null,
       isEditing: false,
       editData: null,
+      selectedTechId: null,
+      selectedCandidateIds: [],
     });
   },
 
@@ -68,6 +78,8 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       isEditing: false,
       editData: null,
       isSaving: false,
+      selectedTechId: null,
+      selectedCandidateIds: [],
     }),
 }));
 
@@ -94,3 +106,11 @@ export const useIsSaving = () => useNodeDetailStore((state) => state.isSaving);
 /** 특정 편집 필드 값 */
 export const useEditField = <K extends keyof EditableNodeDetail>(field: K) =>
   useNodeDetailStore((state) => state.editData?.[field]);
+
+/** 선택된 기술스택 ID */
+export const useSelectedTechId = () =>
+  useNodeDetailStore((state) => state.selectedTechId);
+
+/** 선택된 후보 노드 ID 목록 */
+export const useSelectedCandidateIds = () =>
+  useNodeDetailStore((state) => state.selectedCandidateIds);

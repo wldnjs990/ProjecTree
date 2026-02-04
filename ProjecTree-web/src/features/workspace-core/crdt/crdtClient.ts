@@ -56,6 +56,7 @@ class CrdtClient {
       if (status === 'connected') {
         setConnectionStatus('connected');
         console.log('[CRDT] 서버 연결됨');
+        this.setupMessageListener();
       } else if (status === 'connecting') {
         setConnectionStatus('connecting');
         console.log('[CRDT] 연결 중...');
@@ -71,6 +72,45 @@ class CrdtClient {
         console.log('[CRDT] 동기화 완료');
       }
     });
+  }
+
+  /**
+   * WebSocket 메시지 수신 리스너 설정
+   */
+  private setupMessageListener() {
+    const ws = this.provider.ws;
+    if (!ws) return;
+
+    ws.addEventListener('message', (event: MessageEvent) => {
+      // y-websocket 바이너리 메시지는 무시 (CRDT 동기화용)
+      if (event.data instanceof ArrayBuffer || event.data instanceof Blob) {
+        return;
+      }
+
+      try {
+        const data = JSON.parse(event.data);
+        console.log('[CRDT] 메시지 수신:', data);
+
+        // 메시지 타입별 처리
+        switch (data.type) {
+          case 'save_node_detail_response':
+            console.log('[CRDT] 노드 상세정보 저장 응답:', data);
+            break;
+          case 'save_node_position_response':
+            console.log('[CRDT] 노드 위치 저장 응답:', data);
+            break;
+          case 'select_node_tech_response':
+            console.log('[CRDT] 기술스택 선택 응답:', data);
+            break;
+          default:
+            console.log('[CRDT] 알 수 없는 메시지 타입:', data.type);
+        }
+      } catch {
+        // JSON 파싱 실패 시 무시 (y-websocket 내부 메시지일 수 있음)
+      }
+    });
+
+    console.log('[CRDT] 메시지 리스너 설정됨');
   }
 
   /**
