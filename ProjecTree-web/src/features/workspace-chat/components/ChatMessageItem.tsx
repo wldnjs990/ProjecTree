@@ -5,13 +5,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/shared/lib/utils';
 import { MOCK_MY_ID } from '../types/mockData';
 
+import { useUserStore } from '@/shared/stores/userStore';
+
 interface ChatMessageItemProps {
   message: ChatMessage;
 }
 
 export const ChatMessageItem = ({ message }: ChatMessageItemProps) => {
-  // TODO: 실제 구현 시 useAuth 등의 훅으로 현재 로그인한 사용자 정보를 가져와야 함.
-  const isCurrentUser = message.senderId === MOCK_MY_ID;
+  const user = useUserStore((state) => state.user);
+  // user.id 또는 user.memberId를 사용, 없으면 이메일 사용
+  const currentUserId =
+    user?.memberId?.toString() || user?.id?.toString() || user?.email;
+
+  const isCurrentUser = message.senderId === currentUserId;
 
   const timestamp = format(new Date(message.timestamp), 'a h:mm', {
     locale: ko,

@@ -15,23 +15,24 @@ export const ChatInput = ({
   disabled = false,
 }: ChatInputProps) => {
   const [message, setMessage] = useState('');
-  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTypingRef = useRef(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
 
-    // 타이핑 시작
-    if (e.target.value.length === 1) {
-      onStartTyping();
+    // 텍스트가 있으면 타이핑 상태 유지
+    if (e.target.value.length > 0) {
+      if (!isTypingRef.current) {
+        onStartTyping();
+        isTypingRef.current = true;
+      }
+    } else {
+      // 텍스트가 없으면 종료
+      if (isTypingRef.current) {
+        onStopTyping();
+        isTypingRef.current = false;
+      }
     }
-
-    // 타이핑 종료 디바운싱
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-    typingTimeoutRef.current = setTimeout(() => {
-      onStopTyping();
-    }, 1000);
   };
 
   const handleSubmit = useCallback(
@@ -41,10 +42,11 @@ export const ChatInput = ({
 
       onSendMessage(message);
       setMessage('');
-      onStopTyping();
 
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
+      // 전송 시 타이핑 종료
+      if (isTypingRef.current) {
+        onStopTyping();
+        isTypingRef.current = false;
       }
     },
     [message, disabled, onSendMessage, onStopTyping]
