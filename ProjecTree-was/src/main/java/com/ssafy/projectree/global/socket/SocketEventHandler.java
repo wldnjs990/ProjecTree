@@ -29,10 +29,11 @@ public class SocketEventHandler {
             try {
                 String token = client.getHandshakeData().getSingleUrlParam("token");
 
+                log.info("[Web Socket] 연결 시도 (token: {})", token);
                 Member member = jwtResolver.resolve(token);
                 client.set("memberId", member.getId());
                 client.set("memberNickname", member.getNickname());
-                
+
                 log.info("[id:{}번 사용자({})]가 web socket과 연결되었습니다. [session: {}]",
                         member.getId(), member.getNickname(), client.getSessionId());
             } catch (Exception e) {
