@@ -25,7 +25,7 @@ export const priorityBadge = {
 // Base grid layout for all hierarchy levels (JIRA style)
 // [chevron+icon+type combined] [priority] [name] [status] [complexity] [assignee]
 export const specGridCols =
-  'grid grid-cols-[11rem_5rem_1fr_7rem_6rem_6.5rem] items-center gap-2';
+  'grid grid-cols-[11rem_5rem_minmax(0,1fr)_7rem_6rem_6.5rem] items-center gap-2';
 
 // Indentation for each hierarchy level (applied to first column)
 export const indentLevel = {
