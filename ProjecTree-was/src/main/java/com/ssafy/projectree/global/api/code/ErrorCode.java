@@ -30,7 +30,8 @@ public enum ErrorCode {
     AUTHENTICATION_REQUIRED(DomainCode.AUTH, ExceptionCode.INVALID, "AUTHENTICATION_REQUIRED"),
     ACCESS_DENIED(DomainCode.AUTH, ExceptionCode.FORBIDDEN, "ACCESS_DENIED"),
     DUPLICATE_REQUEST_ERROR(DomainCode.NORMAL, ExceptionCode.TOO_MANY_REQUEST, "해당 자원은 이미 사용중입니다."),
-    CHATROOM_NOT_FOUND(DomainCode.CHATROOM, ExceptionCode.NOT_FOUND, "CHATROOM_NOT_FOUND");
+    CHATROOM_NOT_FOUND(DomainCode.CHATROOM, ExceptionCode.NOT_FOUND, "CHATROOM_NOT_FOUND"),
+    CHANGE_ROLE_REJECTED(DomainCode.TEAM, ExceptionCode.FORBIDDEN, "권한 변경이 거부되었습니다. - 권한 없음");
 
     private final DomainCode domainCode;
     private final ExceptionCode exceptionCode;
