@@ -2,13 +2,25 @@ package com.ssafy.projectree.domain.node.api.controller;
 
 import com.ssafy.projectree.domain.ai.lock.LockType;
 import com.ssafy.projectree.domain.ai.lock.utils.LockService;
-import com.ssafy.projectree.domain.node.api.dto.*;
+import com.ssafy.projectree.domain.member.model.entity.Member;
+import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
+import com.ssafy.projectree.domain.node.api.dto.CustomNodeDto;
+import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
+import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
+import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
+import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
+import com.ssafy.projectree.domain.node.api.dto.TechStackRecommendDto;
 import com.ssafy.projectree.domain.node.usecase.NodeService;
 import com.ssafy.projectree.global.api.code.SuccessCode;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import com.ssafy.projectree.global.docs.NodeDocsController;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,4 +64,9 @@ public class NodeController implements NodeDocsController {
         return CommonResponse.success(SuccessCode.SUCCESS, null);
     }
 
+    @Override
+    @PostMapping("/nodes/custom")
+    public CommonResponse<?> createCustom(@AuthenticationPrincipal Member member, @RequestBody CustomNodeDto.Request dto) {
+        return CommonResponse.success(SuccessCode.SUCCESS, nodeService.createCustom(dto));
+    }
 }

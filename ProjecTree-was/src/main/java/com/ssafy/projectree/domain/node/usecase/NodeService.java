@@ -1,6 +1,7 @@
 package com.ssafy.projectree.domain.node.usecase;
 
 import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
+import com.ssafy.projectree.domain.node.api.dto.CustomNodeDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
@@ -29,6 +30,8 @@ public interface NodeService {
     void createEpicNodes(Workspace workspace, Node projectNode, List<FunctionSpecificationDto.EpicInfo> epics);
 
     CandidateCreateDto.Response createCandidate(Long parentId);
+
+    CustomNodeDto.Response createCustom(CustomNodeDto.Request dto);
 
     TechStackRecommendDto.Response recommendTechStack(Long nodeId);
 

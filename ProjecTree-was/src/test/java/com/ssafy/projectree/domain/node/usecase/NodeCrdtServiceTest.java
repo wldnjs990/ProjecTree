@@ -7,6 +7,7 @@ import com.ssafy.projectree.domain.node.enums.NodeType;
 import com.ssafy.projectree.domain.node.enums.Priority;
 import com.ssafy.projectree.domain.node.enums.TaskType;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ class NodeCrdtServiceTest {
 
     @Test
     @DisplayName("더미 데이터를 활용하여 Node.js 서버로 노드 생성 알림 전송")
+    @Disabled
     void send_dummy_node_to_crdt_server() {
         // 1. 테스트용 더미 데이터(Payload) 구성
         Long workspaceId = 2L;
