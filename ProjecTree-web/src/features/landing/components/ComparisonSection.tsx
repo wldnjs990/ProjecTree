@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Leaf } from 'lucide-react';
+import { Leaf, TreeDeciduous } from 'lucide-react';
 
 export function ComparisonSection() {
   const [sliderPosition, setSliderPosition] = useState(50);
@@ -29,6 +29,7 @@ export function ComparisonSection() {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging.current) return;
     handleMove(e.touches[0].clientX);
   };
 
@@ -60,7 +61,7 @@ export function ComparisonSection() {
           </motion.div>
           <h2 className="mb-4 text-3xl font-bold text-zinc-900 md:text-5xl">
             복잡한 기획을{' '}
-            <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
               구조화된 트리로
             </span>
           </h2>
@@ -76,52 +77,57 @@ export function ComparisonSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
           ref={containerRef}
-          className="relative mx-auto max-w-4xl aspect-video cursor-ew-resize overflow-hidden rounded-2xl border border-zinc-200 shadow-2xl shadow-zinc-200/50"
-          onMouseDown={handleMouseDown}
+          className="relative mx-auto max-w-4xl aspect-video overflow-hidden rounded-2xl border border-zinc-200 shadow-2xl shadow-zinc-200/50 select-none"
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
           onMouseMove={handleMouseMove}
           onTouchMove={handleTouchMove}
+          onDragStart={(e) => e.preventDefault()}
         >
-          {/* Before Side */}
-          <div className="absolute inset-0 bg-zinc-50">
-            <img
-              src="/before.png"
-              alt="ProjecTree 사용 전"
-              className="h-full w-full object-cover select-none pointer-events-none"
-              draggable={false}
-            />
-            {/* Label */}
-            <div className="absolute bottom-6 left-6 rounded-full border border-zinc-200 bg-white/80 px-4 py-2 text-sm text-zinc-500 font-medium backdrop-blur-sm shadow-sm select-none pointer-events-none">
-              ProjecTree 사용 전
-            </div>
-          </div>
-
-          {/* After Side */}
-          <div
-            className="absolute inset-0 bg-white"
-            style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
-          >
+          {/* Base Layer - Right Side (Visible when slider moves left) - NOW AFTER */}
+          <div className="absolute inset-0 bg-white">
             <img
               src="/after.png"
               alt="ProjecTree 사용 후"
               className="h-full w-full object-cover select-none pointer-events-none"
               draggable={false}
             />
-            {/* Label */}
+            {/* Label - Right Side */}
             <div className="absolute bottom-6 right-6 rounded-full border border-emerald-100 bg-white/90 px-4 py-2 text-sm text-emerald-600 font-medium backdrop-blur-sm shadow-lg shadow-emerald-100/50 select-none pointer-events-none">
               ProjecTree 사용 후
             </div>
           </div>
 
+          {/* Top Layer - Left Side (Visible when slider moves right) - NOW BEFORE */}
+          <div
+            className="absolute inset-0 bg-zinc-50"
+            style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
+          >
+            <img
+              src="/before.png"
+              alt="ProjecTree 사용 전"
+              className="h-full w-full object-cover select-none pointer-events-none"
+              draggable={false}
+            />
+            {/* Label - Left Side */}
+            <div className="absolute bottom-6 left-6 rounded-full border border-zinc-200 bg-white/80 px-4 py-2 text-sm text-zinc-500 font-medium backdrop-blur-sm shadow-sm select-none pointer-events-none">
+              ProjecTree 사용 전
+            </div>
+          </div>
+
           {/* Slider Handle */}
           <div
-            className="absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize drop-shadow-md"
-            style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
+            className="absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize drop-shadow-md z-10"
+            style={{
+              left: `${sliderPosition}%`,
+              transform: 'translateX(-50%)',
+            }}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleMouseDown}
           >
             {/* Leaf-shaped handle */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex h-12 w-12 items-center justify-center rounded-full border-4 border-white bg-emerald-500 shadow-xl">
-              <Leaf className="h-5 w-5 text-white" />
+              <TreeDeciduous className="h-6 w-6 text-white" />
             </div>
           </div>
         </motion.div>
