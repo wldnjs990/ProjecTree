@@ -10,11 +10,13 @@ import {
   nodeDetailCrdtService,
   previewNodesCrdtService,
   useNodeDetailStore,
+  useNodeStore,
   useNodes,
   calculateChildNodePosition,
   type FlowNode,
 } from '@/features/workspace-core';
 import { generateNodeCandidates } from '@/apis/workspace.api';
+import { getAiNodeTechRecommendation } from '@/apis/node.api';
 
 interface NodeDetailContainerProps {
   nodeInfo?: {
@@ -40,12 +42,14 @@ export default function NodeDetailContainer({
   const setSelectedCandidateIds = useNodeDetailStore(
     (state) => state.setSelectedCandidateIds
   );
+  const updateNodeDetail = useNodeStore((state) => state.updateNodeDetail);
   const enterCandidatePreview = useNodeDetailStore(
     (state) => state.enterCandidatePreview
   );
 
   // AI 생성 로딩 상태
   const [isGeneratingCandidates, setIsGeneratingCandidates] = useState(false);
+  const [isGeneratingTechs, setIsGeneratingTechs] = useState(false);
 
   // 노드 상세 접근 시 선택된 기술스택 ID 설정
   useEffect(() => {
@@ -128,6 +132,48 @@ export default function NodeDetailContainer({
     console.log('Candidate add manual clicked');
   };
 
+  // AI 기술 추천 생성 핸들러
+  const handleGenerateTechs = async () => {
+    if (!selectedNodeId) return;
+
+    setIsGeneratingTechs(true);
+    try {
+      const response = await getAiNodeTechRecommendation(Number(selectedNodeId));
+      const rawTechs = response?.data?.techs;
+      const techsArray = Array.isArray(rawTechs)
+        ? rawTechs
+        : rawTechs
+        ? [rawTechs]
+        : [];
+
+      const mappedTechs = techsArray.map((tech, index) => ({
+        id: tech.id ?? Date.now() + index,
+        name: tech.name,
+        advantage: tech.advantage ?? '',
+        disAdvantage: tech.disAdvantage ?? '',
+        description: tech.description ?? '',
+        ref: tech.ref ?? '',
+        recommendScore: tech.recommendScore ?? 0,
+        selected: false,
+      }));
+
+      nodeDetailCrdtService.updateTechRecommendations(
+        selectedNodeId,
+        mappedTechs
+      );
+
+      if (response?.data?.comparison) {
+        updateNodeDetail(Number(selectedNodeId), {
+          comparison: response.data.comparison,
+        });
+      }
+    } catch (error) {
+      console.error('AI 기술 추천 생성 실패:', error);
+    } finally {
+      setIsGeneratingTechs(false);
+    }
+  };
+
   // AI 노드 후보 생성 핸들러
   const handleGenerateCandidates = async () => {
     if (!selectedNodeId) return;
@@ -170,6 +216,8 @@ export default function NodeDetailContainer({
           isEdit={isEditing}
           recommendations={nodeDetail.techs || []}
           comparison={nodeDetail.comparison}
+          onGenerateTechs={handleGenerateTechs}
+          isGenerating={isGeneratingTechs}
         />
       )}
 
