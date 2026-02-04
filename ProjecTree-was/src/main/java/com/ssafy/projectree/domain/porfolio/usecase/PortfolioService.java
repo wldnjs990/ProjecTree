@@ -87,6 +87,8 @@ public class PortfolioService {
                 .projectTechStack(workspaceTechStacks)
                 .projectDescription(workspace.getDescription())
                 .projectHeadCount(headCount)
+                .memberId(currentMember.getId())
+                .workspaceId(workspace.getId())
                 .userTaskSchemas(userTaskSchemas)
                 .build();
 

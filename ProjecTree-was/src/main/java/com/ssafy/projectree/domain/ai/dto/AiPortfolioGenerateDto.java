@@ -25,6 +25,8 @@ public class AiPortfolioGenerateDto {
         private LocalDate projectEndAt;
         private List<String> projectTechStack;
         private int projectHeadCount;
+        private Long memberId;
+        private Long workspaceId;
         @Builder.Default
         private List<UserTaskSchema> userTaskSchemas = new ArrayList<>();
 
