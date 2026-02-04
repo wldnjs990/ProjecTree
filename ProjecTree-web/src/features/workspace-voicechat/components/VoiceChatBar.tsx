@@ -7,9 +7,9 @@
  * - 화자 표시 (Glow effect)
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import type { RemoteAudioTrack } from 'livekit-client';
-import { Mic, MicOff, PhoneOff, Loader2 } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -55,6 +55,49 @@ export function VoiceChatBar({
     micPermissionDenied,
     resetMicPermissionDenied,
   } = useVoiceChat({ workspaceId });
+
+  /** 페이지당 표시할 참여자 수 */
+  const PAGE_SIZE = 6;
+  const [currentPage, setCurrentPage] = useState(0);
+
+  // "나" + 원격 참여자를 하나의 배열로 합침
+  const allParticipants = useMemo(() => {
+    if (!isConnected) return [];
+
+    const me = {
+      key: 'me',
+      name: participantName,
+      displayName: '나' as string | undefined,
+      isSpeaking: activeSpeakers.includes(participantName),
+      isMuted: !isMicEnabled,
+      isMe: true,
+    };
+
+    const remotes = remoteTracks.map((track) => ({
+      key: track.trackPublication.trackSid,
+      name: track.participantIdentity,
+      displayName: undefined as string | undefined,
+      isSpeaking: activeSpeakers.includes(track.participantIdentity),
+      isMuted: track.isMuted,
+      isMe: false,
+    }));
+
+    return [me, ...remotes];
+  }, [isConnected, participantName, activeSpeakers, isMicEnabled, remoteTracks]);
+
+  const totalPages = Math.ceil(allParticipants.length / PAGE_SIZE);
+  const needsPagination = allParticipants.length > PAGE_SIZE;
+  const pageParticipants = allParticipants.slice(
+    currentPage * PAGE_SIZE,
+    (currentPage + 1) * PAGE_SIZE,
+  );
+
+  // 현재 페이지가 비었을 때 마지막 유효 페이지로 이동
+  useEffect(() => {
+    if (currentPage > 0 && currentPage >= totalPages) {
+      setCurrentPage(Math.max(0, totalPages - 1));
+    }
+  }, [currentPage, totalPages]);
 
   // 음성 채팅이 활성화될 때 자동으로 음성 채팅방 입장
   useEffect(() => {
@@ -114,7 +157,7 @@ export function VoiceChatBar({
 
       {/* 컴팩트 플로팅 바 - isVisible이 true일 때만 표시 */}
       {isVisible && (
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+      <div className="fixed bottom-4 left-[calc(50%+9.375rem)] -translate-x-1/2 z-50">
         <div className="bg-slate-900/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl px-4 py-3">
           <div className="flex items-center gap-4">
             {/* 연결 상태 표시 (점만) */}
@@ -132,31 +175,42 @@ export function VoiceChatBar({
               </Tooltip>
             ) : null}
 
-            {/* 참여자 아바타 목록 */}
-            <div className="flex items-center gap-3 py-1 pr-1 overflow-visible">
-              {isConnected && (
-                <>
-                  {/* 내 아바타 */}
-                  <ParticipantAvatar
-                    name={participantName}
-                    displayName="나"
-                    isSpeaking={activeSpeakers.includes(participantName)}
-                    isMuted={!isMicEnabled}
-                    isMe
-                  />
+            {/* 참여자 아바타 목록 (페이지네이션) */}
+            <div className="flex items-center gap-1 py-1 pr-1">
+              {/* 왼쪽 화살표 (첫 페이지면 숨김) */}
+              {needsPagination && currentPage > 0 && (
+                <button
+                  onClick={() => setCurrentPage((p) => p - 1)}
+                  className="p-1 rounded-full transition-colors text-slate-300 hover:bg-slate-700 hover:text-white"
+                  aria-label="이전 참여자"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              )}
 
-                  {/* 다른 참여자 아바타 */}
-                  {remoteTracks.map((track) => (
-                    <ParticipantAvatar
-                      key={track.trackPublication.trackSid}
-                      name={track.participantIdentity}
-                      isSpeaking={activeSpeakers.includes(
-                        track.participantIdentity
-                      )}
-                      isMuted={track.isMuted}
-                    />
-                  ))}
-                </>
+              {/* 현재 페이지 참여자 */}
+              <div className="flex items-center gap-3">
+                {pageParticipants.map((participant) => (
+                  <ParticipantAvatar
+                    key={participant.key}
+                    name={participant.name}
+                    displayName={participant.displayName}
+                    isSpeaking={participant.isSpeaking}
+                    isMuted={participant.isMuted}
+                    isMe={participant.isMe}
+                  />
+                ))}
+              </div>
+
+              {/* 오른쪽 화살표 (마지막 페이지면 숨김) */}
+              {needsPagination && currentPage < totalPages - 1 && (
+                <button
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  className="p-1 rounded-full transition-colors text-slate-300 hover:bg-slate-700 hover:text-white"
+                  aria-label="다음 참여자"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               )}
 
               {/* 에러 메시지 */}
