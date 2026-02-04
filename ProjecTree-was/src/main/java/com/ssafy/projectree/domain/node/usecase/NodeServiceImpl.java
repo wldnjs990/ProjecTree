@@ -13,6 +13,7 @@ import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.TechStackRecommendDto;
+import com.ssafy.projectree.domain.node.api.dto.schema.CandidateSchema;
 import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
 import com.ssafy.projectree.domain.node.api.dto.schema.NodeWithParentSchema;
 import com.ssafy.projectree.domain.node.api.dto.schema.PositionSchema;
@@ -21,23 +22,22 @@ import com.ssafy.projectree.domain.node.enums.NodeType;
 import com.ssafy.projectree.domain.node.enums.Priority;
 import com.ssafy.projectree.domain.node.enums.TaskType;
 import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
+import com.ssafy.projectree.domain.node.model.entity.Candidate;
 import com.ssafy.projectree.domain.node.model.entity.EpicNode;
 import com.ssafy.projectree.domain.node.model.entity.Node;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
 import com.ssafy.projectree.domain.node.model.entity.TaskNode;
-import com.ssafy.projectree.domain.node.model.entity.*;
 import com.ssafy.projectree.domain.node.model.repository.CandidateRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeTreeRepository;
+import com.ssafy.projectree.domain.tech.api.dto.schemas.TechStackSchema;
+import com.ssafy.projectree.domain.tech.model.entity.NodeTechStack;
 import com.ssafy.projectree.domain.tech.model.entity.TechStackInfo;
+import com.ssafy.projectree.domain.tech.model.repository.NodeTechStackRepository;
 import com.ssafy.projectree.domain.tech.model.repository.TechStackInfoRepository;
 import com.ssafy.projectree.domain.workspace.api.dto.FunctionSpecificationDto;
 import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
-import com.ssafy.projectree.domain.tech.model.entity.NodeTechStack;
-import com.ssafy.projectree.domain.tech.model.repository.NodeTechStackRepository;
-import com.ssafy.projectree.domain.tech.api.dto.schemas.TechStackSchema;
-import com.ssafy.projectree.domain.node.api.dto.schema.CandidateSchema;
 import com.ssafy.projectree.domain.workspace.model.repository.TeamRepository;
 import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.exception.BusinessLogicException;
@@ -250,7 +250,7 @@ public class NodeServiceImpl implements NodeService {
         projectNode.setXPos(0.0);
         projectNode.setYPos(0.0);
 
-        nodeRepository.save(projectNode);
+        nodeRepository.saveRoot(projectNode);
 
         return projectNode;
     }
@@ -274,7 +274,6 @@ public class NodeServiceImpl implements NodeService {
             epicNode.setXPos(0.0);
             epicNode.setYPos(0.0);
 
-            nodeRepository.save(epicNode);
             nodeRepository.saveWithParent(projectNode.getId(), epicNode);
 
         }

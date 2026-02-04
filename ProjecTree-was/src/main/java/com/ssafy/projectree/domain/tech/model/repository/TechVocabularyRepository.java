@@ -10,5 +10,5 @@ public interface TechVocabularyRepository extends JpaRepository<TechVocabulary, 
 	boolean existsByName(String name);
 
 
-	List<TechVocabulary> findTop10ByNameStartingWithIgnoreCaseOrderByNameAsc(String name);
+	List<TechVocabulary> findTop10ByNameStartingWithIgnoreCaseOrderByIdAsc(String name);
 }

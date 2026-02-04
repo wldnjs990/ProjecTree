@@ -29,7 +29,6 @@ public class SocketEventHandler {
             try {
                 String token = client.getHandshakeData().getSingleUrlParam("token");
 
-                log.info("[Web Socket] 연결 시도 (token: {})", token);
                 Member member = jwtResolver.resolve(token);
                 client.set("memberId", member.getId());
 
