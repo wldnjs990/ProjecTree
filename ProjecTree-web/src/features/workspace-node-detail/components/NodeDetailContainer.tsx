@@ -67,6 +67,14 @@ export default function NodeDetailContainer({
 
   if (!nodeDetail) return null;
 
+  const nodeType = nodeInfo?.nodeType;
+  const isTaskOrAdvance = nodeType
+    ? nodeType === 'TASK' || nodeType === 'ADVANCE'
+    : true;
+  const showTechRecommend = isTaskOrAdvance;
+  const showDifficulty = isTaskOrAdvance;
+  const showCandidateSection = nodeType !== 'ADVANCE';
+
   // 편집 토글 핸들러
   const handleToggleEdit = async () => {
     if (!isEditing) {
@@ -151,26 +159,30 @@ export default function NodeDetailContainer({
       />
 
       {/* Status & Meta 섹션 - store 직접 구독 */}
-      <StatusMetaSection />
+      <StatusMetaSection showDifficulty={showDifficulty} />
 
       {/* 메모 섹션 - store 직접 구독 */}
       <MemoSection />
 
       {/* AI 기술 추천 섹션 - 항상 표시 */}
-      <AITechRecommendSection
-        isEdit={isEditing}
-        recommendations={nodeDetail.techs || []}
-        comparison={nodeDetail.comparison}
-      />
+      {showTechRecommend && (
+        <AITechRecommendSection
+          isEdit={isEditing}
+          recommendations={nodeDetail.techs || []}
+          comparison={nodeDetail.comparison}
+        />
+      )}
 
       {/* AI 다음 노드 추천 섹션 - 항상 표시 */}
-      <AINodeCandidateSection
-        candidates={nodeDetail.candidates || []}
-        onCandidateClick={handleCandidateClick}
-        onAddManual={handleCandidateAddManual}
-        onGenerateCandidates={handleGenerateCandidates}
-        isGenerating={isGeneratingCandidates}
-      />
+      {showCandidateSection && (
+        <AINodeCandidateSection
+          candidates={nodeDetail.candidates || []}
+          onCandidateClick={handleCandidateClick}
+          onAddManual={handleCandidateAddManual}
+          onGenerateCandidates={handleGenerateCandidates}
+          isGenerating={isGeneratingCandidates}
+        />
+      )}
     </div>
   );
 }
