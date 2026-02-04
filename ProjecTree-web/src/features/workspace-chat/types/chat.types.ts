@@ -25,7 +25,8 @@ export interface ChatParticipant {
 // Socket 이벤트 페이로드
 export interface TypingPayload {
   workspaceId: string;
-  userId: string;
+  chatRoomId?: string;
+  memberId: string;
   userName: string;
 }
 
@@ -66,6 +67,7 @@ export interface ChatState {
 
   // 읽지 않은 메시지 수
   unreadCounts: Record<string, number>;
+  chatRoomIds: Record<string, string>;
 
   // 연결 상태
   isConnected: boolean;
@@ -81,6 +83,7 @@ export interface ChatState {
     workspaceId: string,
     participants: ChatParticipant[]
   ) => void;
+  setChatRoomId: (workspaceId: string, chatRoomId: string) => void;
   updateParticipantStatus: (userId: string, isOnline: boolean) => void;
   setTyping: (workspaceId: string, userId: string, isTyping: boolean) => void;
   setActiveWorkspace: (workspaceId: string | null) => void;
