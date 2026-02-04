@@ -3,10 +3,10 @@
  */
 
 export const statusBadge = {
-  TODO: 'bg-gray-100 text-gray-600',
-  IN_PROGRESS: 'bg-blue-100 text-blue-600',
-  DONE: 'bg-green-100 text-green-600',
-  HOLD: 'bg-yellow-100 text-yellow-600',
+  TODO: 'bg-gray-100 text-gray-600 border-gray-200',
+  IN_PROGRESS: 'bg-blue-100 text-blue-600 border-blue-200',
+  DONE: 'bg-green-100 text-green-600 border-green-200',
+  HOLD: 'bg-yellow-100 text-yellow-600 border-yellow-200',
 } as const;
 
 export const statusLabel = {
@@ -23,14 +23,14 @@ export const priorityBadge = {
 } as const;
 
 // Base grid layout for all hierarchy levels (JIRA style)
-// [chevron+dot+type combined] [priority] [name] [status] [complexity] [assignee]
+// [chevron+icon+type combined] [priority] [name] [status] [complexity] [assignee]
 export const specGridCols =
-  'grid grid-cols-[10rem_4rem_1fr_5rem_5rem_5rem] items-center gap-2';
+  'grid grid-cols-[11rem_5rem_1fr_7rem_6rem_6.5rem] items-center gap-2';
 
 // Indentation for each hierarchy level (applied to first column)
 export const indentLevel = {
-  EPIC: 'pl-2',
-  STORY: 'pl-5',
-  TASK: 'pl-8',
-  ADVANCE: 'pl-11',
+  EPIC: 'pl-6',
+  STORY: 'pl-9',
+  TASK: 'pl-12',
+  ADVANCE: 'pl-15',
 } as const;
