@@ -29,12 +29,12 @@ public class SocketEventHandler {
             try {
                 String token = client.getHandshakeData().getSingleUrlParam("token");
 
+                log.info("[Web Socket] 연결 시도 (token: {})", token);
                 Member member = jwtResolver.resolve(token);
                 client.set("memberId", member.getId());
-                client.set("memberNickname", member.getNickname());
-                
-                log.info("[id:{}번 사용자({})]가 web socket과 연결되었습니다. [session: {}]",
-                        member.getId(), member.getNickname(), client.getSessionId());
+
+                log.info("[id:{}번 사용자]가 web socket과 연결되었습니다. [session: {}]",
+                        member.getId(), client.getSessionId());
             } catch (Exception e) {
                 log.error("인증 실패: {}", e.getMessage());
                 client.disconnect();
@@ -43,16 +43,15 @@ public class SocketEventHandler {
 
         socketIOServer.addDisconnectListener(client -> {
             Long memberId = client.get("memberId");
-            String nickname = client.get("memberNickname");
-            log.info("[id:{}번 사용자({})]가 web socket과 연결이 종료되었습니다. [session: {}]",
-                    memberId, nickname, client.getSessionId());
+            log.info("[id:{}번 사용자]가 web socket과 연결이 종료되었습니다. [session: {}]",
+                    memberId, client.getSessionId());
         });
 
         socketIOServer.addEventListener("chat:join", ChatPayloadDto.Join.class,
                 (client, data, ackRequest) -> {
                     client.joinRoom(data.getChatRoomId());
-                    log.info("[id:{}번 사용자({})]가 [id:{}] 채팅방에 진입했습니다. [session-id: {}]",
-                            client.get("memberId"), client.get("memberNickname"), data.getChatRoomId(), client.getSessionId());
+                    log.info("[id:{}번 사용자]가 [id:{}] 채팅방에 진입했습니다. [session-id: {}]",
+                            client.get("memberId"), data.getChatRoomId(), client.getSessionId());
 
                     List<ChatPayloadDto.MessageReceive> logs = chatLogService.history(data.getChatRoomId());
                     client.sendEvent("chat:history", logs);
@@ -64,9 +63,6 @@ public class SocketEventHandler {
         socketIOServer.addEventListener("chat:leave", ChatPayloadDto.Leave.class,
                 (client, data, ackRequest) -> {
                     client.leaveRoom(data.getChatRoomId());
-
-                    log.info("[id:{}번 사용자({})]가 채팅방을 떠났습니다.",
-                            client.get("memberId"), client.get("memberNickname"));
                 }
         );
 
@@ -77,9 +73,8 @@ public class SocketEventHandler {
 
                     String chatRoomId = data.getChatRoomId();
                     Long memberId = client.get("memberId");
-                    String nickname = client.get("memberNickname");
 
-                    log.info("[id:{}번 사용자({})]가 채팅방({})에서 메세지[{}]를 전송했습니다.", memberId, nickname, chatRoomId, data.getContent());
+                    log.info("[id:{}번 사용자]가 채팅방({})에서 메세지[{}]를 전송했습니다.", memberId, chatRoomId, data.getContent());
 
                     socketIOServer.getRoomOperations(data.getChatRoomId())
                             .getClients().stream()
