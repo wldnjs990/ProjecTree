@@ -8,6 +8,7 @@ import com.ssafy.projectree.domain.member.api.dto.schemas.MemberSchema;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
 import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
+import com.ssafy.projectree.domain.node.api.dto.CustomNodeDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
@@ -26,6 +27,7 @@ import com.ssafy.projectree.domain.node.model.entity.Candidate;
 import com.ssafy.projectree.domain.node.model.entity.EpicNode;
 import com.ssafy.projectree.domain.node.model.entity.Node;
 import com.ssafy.projectree.domain.node.model.entity.ProjectNode;
+import com.ssafy.projectree.domain.node.model.entity.StoryNode;
 import com.ssafy.projectree.domain.node.model.entity.TaskNode;
 import com.ssafy.projectree.domain.node.model.repository.CandidateRepository;
 import com.ssafy.projectree.domain.node.model.repository.NodeRepository;
@@ -292,6 +294,39 @@ public class NodeServiceImpl implements NodeService {
         return CandidateCreateDto.Response.builder()
                 .candidates(candidate.getCandidates())
                 .build();
+    }
+
+    @Override
+    public CustomNodeDto.Response createCustom(CustomNodeDto.Request dto) {
+
+        Node node = createByNodeType(dto.getNodeType());
+        node.setName(dto.getName());
+        node.setDescription(dto.getDescription());
+        node.setXPos(dto.getXPos());
+        node.setYPos(dto.getYPos());
+        nodeRepository.saveWithParent(dto.getParentNodeId(), node);
+
+        NodeSchema nodeSchema = NodeSchema.convertToSchema(node, dto.getParentNodeId());
+        nodeCrdtService.sendNodeCreationToCrdt(dto.getWorkspaceId(), nodeSchema);
+
+        return CustomNodeDto.Response.builder()
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .nodeType(dto.getNodeType())
+                .parentNodeId(dto.getParentNodeId())
+                .xPos(dto.getXPos())
+                .yPos(dto.getYPos())
+                .build();
+    }
+
+    private Node createByNodeType(NodeType nodeType) {
+        if (nodeType.equals(NodeType.EPIC)) return new EpicNode();
+        else if (nodeType.equals(NodeType.STORY)) return new StoryNode();
+        else if (nodeType.equals(NodeType.TASK)) return new TaskNode();
+        else if (nodeType.equals(NodeType.ADVANCE)) return new AdvanceNode();
+        else {
+            throw new BusinessLogicException(ErrorCode.NODE_TYPE_NOT_SUPPORT_ERROR, "유효하지 않는 노드 타입입니다.");
+        }
     }
 
     @Override
