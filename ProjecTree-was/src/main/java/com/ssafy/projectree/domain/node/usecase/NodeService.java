@@ -40,4 +40,5 @@ public interface NodeService {
 
     void deleteNode(Long nodeId);
 
+    void createCustomTechStack(Long nodeId,Long workspaceId, Long techStackId);
 }

@@ -46,6 +46,10 @@ public class NodeController implements NodeDocsController {
         return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.TECH, String.valueOf(nodeId), () -> nodeService.recommendTechStack(nodeId)));
     }
 
-
+    @PostMapping("/nodes/{nodeId}/tech-stack")
+    public CommonResponse<Void> createCustomTechStack(@PathVariable Long nodeId, @RequestBody CustomTechCreateDto.Request request) {
+        nodeService.createCustomTechStack(nodeId,request.getWorkspaceId(), request.getTechVocaId());
+        return CommonResponse.success(SuccessCode.SUCCESS, null);
+    }
 
 }

@@ -8,6 +8,7 @@ import com.ssafy.projectree.domain.member.api.dto.schemas.MemberSchema;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
 import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
+import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
@@ -33,8 +34,10 @@ import com.ssafy.projectree.domain.node.model.repository.NodeTreeRepository;
 import com.ssafy.projectree.domain.tech.api.dto.schemas.TechStackSchema;
 import com.ssafy.projectree.domain.tech.model.entity.NodeTechStack;
 import com.ssafy.projectree.domain.tech.model.entity.TechStackInfo;
+import com.ssafy.projectree.domain.tech.model.entity.TechVocabulary;
 import com.ssafy.projectree.domain.tech.model.repository.NodeTechStackRepository;
 import com.ssafy.projectree.domain.tech.model.repository.TechStackInfoRepository;
+import com.ssafy.projectree.domain.tech.model.repository.TechVocabularyRepository;
 import com.ssafy.projectree.domain.workspace.api.dto.FunctionSpecificationDto;
 import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
@@ -62,6 +65,7 @@ public class NodeServiceImpl implements NodeService {
     private final NodeCrdtService nodeCrdtService;
     private final NodeTechStackRepository nodeTechStackRepository;
     private final TechStackInfoRepository techStackInfoRepository;
+    private final TechVocabularyRepository techVocabularyRepository;
     private final TeamRepository teamRepository;
 
     private ProjectNode findRootNode(Long nodeId) {
@@ -357,7 +361,6 @@ public class NodeServiceImpl implements NodeService {
         return NodeSchema.convertToSchema(node, parentId);
     }
 
-
     @Override
     public void deleteNode(Long nodeId) {
         Node node = nodeRepository.findById(nodeId)
@@ -371,4 +374,39 @@ public class NodeServiceImpl implements NodeService {
         candidateRepository.deleteByParentId(nodeId);
         candidateRepository.disConnectDerivation(nodeId);
     }
+
+    @Transactional
+    @Override
+    public void createCustomTechStack(Long nodeId, Long workspaceId, Long techVocaId) {
+
+        Node node = nodeRepository.findById(nodeId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
+
+        TechVocabulary techVocabulary = techVocabularyRepository.findById(techVocaId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.TECHSTACK_NOT_FOUND));
+
+        TechStackInfo techStackInfo = new TechStackInfo();
+        techStackInfo.setDescription(null);
+        techStackInfo.setAdvantage(null);
+        techStackInfo.setDisadvantage(null);
+        techStackInfo.setRef(null);
+        techStackInfo.setRecommendation(0);
+        techStackInfo.setSelected(false);
+
+        techStackInfoRepository.save(techStackInfo);
+
+        NodeTechStack nodeTechStack = new NodeTechStack();
+        nodeTechStack.setNode(node);
+        nodeTechStack.setTechVocabulary(techVocabulary);
+        nodeTechStack.setTechStackInfo(techStackInfo);
+        nodeTechStack.setRecommended(false);
+
+        nodeTechStackRepository.save(nodeTechStack);
+
+        nodeCrdtService.sendTechCreationToCrdt(workspaceId, nodeId, CustomTechCreateDto.Response.builder()
+                .techVocaId(techVocaId)
+                .techName(techVocabulary.getName())
+                .build());
+    }
+
 }
