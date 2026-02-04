@@ -16,15 +16,13 @@ export function sendToRoom(roomId: string, payload: unknown) {
 
   // 테스트 완료 후 제거
   getAllRooms().forEach((room, id) => {
-    if (id === roomId) {
-      const message = JSON.stringify(payload);
-      for (const client of room.clients) {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(message);
-          console.log(
-            `Sent to client in room:${roomId}, client: ${client} ${new Date().toISOString()}`,
-          );
-        }
+    const message = JSON.stringify(payload);
+    for (const client of room.clients) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message);
+        console.log(
+          `Sent to client in room:${roomId}, client: ${client} ${new Date().toISOString()}`,
+        );
       }
     }
   });
