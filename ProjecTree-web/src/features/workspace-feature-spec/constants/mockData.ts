@@ -28,7 +28,7 @@ export const mockFeatureSpecNodes: Node[] = [
     type: 'EPIC',
     position: { x: 200, y: 180 },
     data: {
-      title: '사용자 인증',
+      title: 'User Authentication and Session Recovery Management Flow',
       priority: 'P0',
       status: 'progress',
       assignee: { id: '1', name: '김민수', initials: 'KM', color: 'blue' },
@@ -39,7 +39,8 @@ export const mockFeatureSpecNodes: Node[] = [
     type: 'STORY',
     position: { x: 100, y: 310 },
     data: {
-      title: '사용자가 로그인한다',
+      title:
+        '사용자가 다양한 인증 수단으로 로그인하고 세션이 만료되어도 안전하게 복구할 수 있는 통합 인증 흐름 구현',
       priority: 'P0',
       status: 'progress',
       assignee: { id: '2', name: '이지은', initials: 'LJ', color: 'pink' },
@@ -50,7 +51,7 @@ export const mockFeatureSpecNodes: Node[] = [
     type: 'TASK',
     position: { x: 50, y: 440 },
     data: {
-      title: '프론트엔드 로그인 폼 구현',
+      title: 'Implement frontend login UI validation with inline errors',
       priority: 'P0',
       status: 'progress',
       assignee: { id: '2', name: '이지은', initials: 'LJ', color: 'pink' },
@@ -74,7 +75,7 @@ export const mockFeatureSpecNodes: Node[] = [
     type: 'ADVANCE',
     position: { x: 50, y: 570 },
     data: {
-      title: 'OAuth2 소셜 로그인 연동',
+      title: 'Integrate OAuth2 social login callbacks and token refresh',
       priority: 'P1',
       status: 'pending',
       assignee: { id: '2', name: '이지은', initials: 'LJ', color: 'pink' },
@@ -86,7 +87,8 @@ export const mockFeatureSpecNodes: Node[] = [
     type: 'STORY',
     position: { x: 300, y: 310 },
     data: {
-      title: '사용자가 회원가입한다',
+      title:
+        '사용자가 다양한 인증 수단으로 로그인하고 세션이 만료되어도 안전하게 복구할 수 있는 통합 인증 흐름 구현',
       priority: 'P1',
       status: 'progress',
       assignee: { id: '3', name: '박현우', initials: 'PH', color: 'green' },
@@ -203,7 +205,8 @@ export const mockFeatureSpecNodes: Node[] = [
     type: 'ADVANCE',
     position: { x: 650, y: 570 },
     data: {
-      title: '실시간 인기 여행지 표시',
+      title:
+        '사용자가 다양한 인증 수단으로 로그인하고 세션이 만료되어도 안전하게 복구할 수 있는 통합 인증 흐름 구현',
       priority: 'P2',
       status: 'pending',
       assignee: { id: '5', name: '정서연', initials: 'JS', color: 'orange' },
@@ -297,7 +300,8 @@ export const mockFeatureSpecNodes: Node[] = [
     type: 'ADVANCE',
     position: { x: 1050, y: 570 },
     data: {
-      title: '정기 결제 구독 기능',
+      title:
+        '정기 결제 구독 기능 정기 결제 구독 기능 정기 결제 구독 기능 정기 결제 구독 기능 정기 결제 구독 기능',
       priority: 'P2',
       status: 'pending',
       assignee: { id: '6', name: '강태영', initials: 'KT', color: 'blue' },
