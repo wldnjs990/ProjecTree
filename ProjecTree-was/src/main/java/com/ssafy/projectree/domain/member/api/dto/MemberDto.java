@@ -1,7 +1,8 @@
 package com.ssafy.projectree.domain.member.api.dto;
 
-import com.ssafy.projectree.domain.auth.enums.AuthRole;
 import com.ssafy.projectree.domain.member.model.entity.Member;
+import com.ssafy.projectree.domain.workspace.enums.Role;
+import com.ssafy.projectree.domain.workspace.model.entity.Team;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,15 +28,18 @@ public class MemberDto {
         @Schema(description = "member nickname", example = "test")
         private String nickname;
 
-        @Schema(description = "member role", example = "ROLE_ADMIN")
-        private AuthRole role;
+        @Schema(description = "member role", example = "OWNER")
+        private Role role;
 
-        public static Info from(Member member) {
+
+        public static Info from(Team team) {
+            Member member = team.getMember();
+
             return Info.builder()
                     .id(member.getId())
                     .email(member.getEmail())
                     .nickname(member.getNickname())
-                    .role(member.getRole())
+                    .role(team.getRole())
                     .build();
         }
     }
