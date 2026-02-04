@@ -1,5 +1,5 @@
 import { pendingPositions } from "./pending-store";
-import { sendBatchToSpring } from "../services/spring/node/node-position.writer";
+import { sendBatchToSpring } from "../../services/spring/node/node-position.writer";
 
 const flushTimers = new Map<string, NodeJS.Timeout>();
 const DEBOUNCE_MS = 2000;
