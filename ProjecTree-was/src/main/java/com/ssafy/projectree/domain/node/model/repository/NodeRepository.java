@@ -1,7 +1,9 @@
 package com.ssafy.projectree.domain.node.model.repository;
 
 import com.ssafy.projectree.domain.node.api.dto.schema.NodeWithParentSchema;
+import com.ssafy.projectree.domain.node.model.entity.AdvanceNode;
 import com.ssafy.projectree.domain.node.model.entity.Node;
+import com.ssafy.projectree.domain.node.model.entity.TaskNode;
 import com.ssafy.projectree.domain.node.model.repository.custom.NodeRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,6 +17,30 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
     @Query("SELECT TYPE(n) FROM Node n WHERE n.id = :nodeId")
     Optional<Class<? extends Node>> findNodeTypeById(@Param("nodeId") Long nodeId);
 
+    @Query("""
+        SELECT tn
+        FROM TaskNode tn
+        JOIN NodeTree nt ON tn.id = nt.descendant.id
+        JOIN ProjectNode pn ON nt.ancestor.id = pn.id
+        WHERE pn.workspace.id = :workspaceId
+        AND tn.member.id = :memberId
+        AND tn.status = 'DONE'
+        AND tn.deletedAt IS NULL
+    """)
+    List<TaskNode> findTaskNodesByWorkspaceAndMember(@Param("workspaceId") Long workspaceId, @Param("memberId") Long memberId);
+
+    @Query("""
+        SELECT an
+        FROM AdvanceNode an
+        JOIN NodeTree nt ON an.id = nt.descendant.id
+        JOIN ProjectNode pn ON nt.ancestor.id = pn.id
+        WHERE pn.workspace.id = :workspaceId
+        AND an.member.id = :memberId
+        AND an.status = 'DONE'
+        AND an.deletedAt IS NULL
+    """)
+    List<AdvanceNode> findAdvanceNodesByWorkspaceAndMember(@Param("workspaceId") Long workspaceId, @Param("memberId") Long memberId);
+
     @Modifying
     @Query("""
             update Node n
@@ -22,8 +48,6 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
             n.yPos = :y
             where n.id = :id
             """)
-        // TODO workspaceId 값을 추가로 받게되면 주석 해제
-        // and n.workspace.id = :workspaceId
     void updatePosition(Long id, /*Long workspaceId,*/ double x, double y);
 
 

@@ -82,6 +82,7 @@ public interface WorkspaceDocsController {
                              @RequestPart(value = "data") WorkspaceDto.Insert dto,
                              @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles
     ) throws IOException;
+
     @Operation(summary = "워크 스페이스 수정 API", description = "워크 스페이스 정보를 수정합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successfully Completed"),
@@ -97,38 +98,6 @@ public interface WorkspaceDocsController {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = WorkspaceDto.Detail.class)
-//                            examples = @ExampleObject(
-//                                    name = "워크 스페이스 상세 조회 API 응답 예시",
-//                                    value = """
-//                                            {
-//                                              "nodeTree": {
-//                                                "tree": [
-//                                                  {
-//                                                    "id": 1,
-//                                                    "name": "프로젝트 루트",
-//                                                    "nodeType": "PROJECT",
-//                                                    ...
-//                                                  }
-//                                                ]
-//                                              },
-//                                              "files": [
-//                                                {
-//                                                  "id": 1,
-//                                                  "orginFileName": "AI여행_기능명세서.pdf",
-//                                                  "contentType": "application/pdf",
-//                                                  "path": "s3://testbucket/test/AI여행기능명세서.pdf",
-//                                                  "size": 10042314
-//                                                }
-//                                              ],
-//                                              "epics": [
-//                                                {
-//                                                  "name": "인증/인가",
-//                                                  "description": "인증/인가를 통해 사용자의 서비스 이용에 대한 접근을 관리합니다."
-//                                                }
-//                                              ]
-//                                            }
-//                                            """
-//                            )
                     )),
     })
     @GetMapping()

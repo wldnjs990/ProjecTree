@@ -1,21 +1,17 @@
-package com.ssafy.projectree.domain.tech.api.dto.schemas;
+package com.ssafy.projectree.domain.ai.dto.schemas;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-public class TechStackSchema {
-    private Long id;
+public class TaskTechStackSchema {
     private String name;
     private String advantage;
-    private String disAdvantage;
+    private String disadvantage;
     private String description;
-    private String ref;
-    private Integer recommendScore;
-    private boolean isSelected;
 }

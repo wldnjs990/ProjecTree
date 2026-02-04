@@ -15,6 +15,7 @@ public enum DomainCode {
     TECH(5),
     AUTH(6),
     CHATROOM(7),
-    TEAM(8);
+    PORTFOLIO(8),
+    TEAM(9);
     private int value;
 }

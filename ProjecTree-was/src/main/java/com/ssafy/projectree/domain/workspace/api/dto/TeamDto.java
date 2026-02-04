@@ -4,6 +4,7 @@ import com.ssafy.projectree.domain.member.api.dto.MemberDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -32,10 +33,13 @@ public class TeamDto {
 
     @Getter
     @Builder
+    @Schema(description = "팀 정보")
     public static class Info {
 
+        @Schema(description = "채팅방 id", example = "saSCasd12Hbd4!@sa")
         private String chatRoomId;
 
+        @Schema(description = "팀 멤버 정보")
         private List<MemberDto.Info> memberInfos;
 
     }
