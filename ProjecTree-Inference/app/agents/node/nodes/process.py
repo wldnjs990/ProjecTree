@@ -27,7 +27,7 @@ from app.agents.node.schemas.process import (
 )
 from typing import Type, Any
 
-llm = openai_mini_llm
+llm = openai_nano_llm
 
 
 async def _process_node(

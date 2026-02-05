@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-llm = openai_mini_llm
+llm = openai_nano_llm
 tools = [restricted_search]
 
 

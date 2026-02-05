@@ -9,7 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-llm = openai_mini_llm
+llm = openai_nano_llm
 
 
 def route_feedback(state: RecommendationState) -> RecommendationState:
