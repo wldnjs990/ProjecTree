@@ -28,7 +28,7 @@ public class SocketEventHandler {
         socketIOServer.addConnectListener(client -> {
             try {
                 String token = client.getHandshakeData().getSingleUrlParam("token");
-
+                log.info("받은 토큰: {}", token);
                 Member member = jwtResolver.resolve(token);
                 client.set("memberId", member.getId());
 
