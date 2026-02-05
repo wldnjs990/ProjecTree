@@ -35,17 +35,20 @@ export function MinimapPanel({ className }: MinimapPanelProps) {
             height: Math.max(1, size.h - 28),
           }}
           nodeColor={(node) => {
+            const taskType = node.data?.taskType;
             switch (node.type) {
               case 'PROJECT':
-                return '#64748B';
+                return '#90A1B9';
               case 'EPIC':
                 return '#8B5CF6';
               case 'STORY':
-                return '#2B7FFF';
+                return '#7CCF00';
               case 'TASK':
-                return '#00D492';
+                return taskType === 'FE' ? '#F97316' : '#6366F1';
               case 'ADVANCE':
-                return '#06B6D4';
+                return taskType === 'FE' ? '#F97316' : '#6366F1';
+              case 'PREVIEW':
+                return '#1C69E3';
               default:
                 return '#DEDEDE';
             }
