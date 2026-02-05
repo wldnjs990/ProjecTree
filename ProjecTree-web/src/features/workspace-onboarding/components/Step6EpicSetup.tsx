@@ -118,13 +118,13 @@ export default function Step6EpicSetup({
             placeholder="에픽에 대한 설명을 간략하게 작성해주세요"
             value={epicDescription}
             onChange={(e) => setEpicDescription(e.target.value)}
-            maxLength={50}
+            maxLength={200}
             rows={4}
             className="resize-none font-['Pretendard'] font-normal text-[14px] leading-4 p-[12.5px_12px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors"
           />
           <div className="flex justify-end">
             <span className="font-['Pretendard'] font-normal text-xs leading-4 text-[var(--figma-text-dove-gray)]">
-              {epicDescription.length}/50
+              {epicDescription.length}/200
             </span>
           </div>
         </div>
