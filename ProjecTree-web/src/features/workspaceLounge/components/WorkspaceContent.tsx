@@ -2,33 +2,12 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ProjectCard, type ProjectCardProps } from './ProjectCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Search,
-  Plus,
-  ChevronDown,
-  Clock,
-  Calendar,
-  ArrowDownAZ,
-  Loader2,
-  Layers,
-  HelpCircle,
-} from 'lucide-react';
+
+import { Search, Plus, Loader2, Layers, HelpCircle } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
 import type { FilterType } from '../types';
 import { getMyWorkspaces } from '@/apis/workspace-lounge.api';
 import { TutorialModal } from '@/shared/components/TutorialModal';
-
-const sortOptions = [
-  { label: '최근 수정순', value: 'recent', icon: Clock },
-  { label: '생성일순', value: 'created', icon: Calendar },
-  { label: '이름순', value: 'name', icon: ArrowDownAZ },
-];
 
 interface ContentProps {
   filterType?: FilterType;
@@ -50,10 +29,6 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
   const [inputValue, setInputValue] = useState(initialQuery);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
 
-  const sortByValue = searchParams.get('sort') || 'recent';
-  const currentSortOption =
-    sortOptions.find((opt) => opt.value === sortByValue) || sortOptions[0];
-
   useEffect(() => {
     const fetchWorkspaces = async () => {
       try {
@@ -70,70 +45,64 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
     fetchWorkspaces();
   }, []);
 
+  // 검색어 디바운스 처리
   useEffect(() => {
-    const updateState = () => {
-      setDebouncedQuery(inputValue);
-
-      setSearchParams((prev) => {
-        if (inputValue) {
-          prev.set('q', inputValue);
-        } else {
-          prev.delete('q');
-        }
-        return prev;
-      });
-    };
-
-    if (inputValue === '') {
-      updateState();
+    // 입력값이 없으면 즉시 초기화
+    if (inputValue.trim() === '') {
+      setDebouncedQuery('');
       return;
     }
 
-    const timer = setTimeout(updateState, 300);
+    // 입력값이 있을 때만 디바운스 적용
+    const timer = setTimeout(() => {
+      setDebouncedQuery(inputValue);
+    }, 300);
 
     return () => clearTimeout(timer);
-  }, [inputValue, setSearchParams]);
+  }, [inputValue]);
+
+  // URL 파라미터 동기화
+  useEffect(() => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      if (debouncedQuery) {
+        newParams.set('q', debouncedQuery);
+      } else {
+        newParams.delete('q');
+      }
+      return newParams;
+    });
+  }, [debouncedQuery, setSearchParams]);
 
   const handleSearchChange = (value: string) => {
     setInputValue(value);
   };
 
-  const handleSortChange = (value: string) => {
-    setSearchParams((prev) => {
-      prev.set('sort', value);
-      return prev;
-    });
-  };
-
   const filteredWorkspaces = useMemo(() => {
     let result = workspaces.filter((ws) => {
       if (filterType === 'all') return true;
-      if (filterType === 'mine') return ws.role === 'Owner';
-      if (filterType === 'joined')
-        return ws.role === 'Editor' || ws.role === 'Viewer';
+      if (filterType === 'mine')
+        return ws.role === 'Owner' || ws.role === 'Editor';
+      if (filterType === 'joined') return ws.role === 'Viewer';
       return true;
     });
 
-    const query = debouncedQuery.toLowerCase();
+    const query = debouncedQuery.toLowerCase().trim().normalize('NFC');
     result = result.filter(
       (ws) =>
-        ws.title.toLowerCase().includes(query) ||
-        ws.description.toLowerCase().includes(query)
+        ws.title.toLowerCase().normalize('NFC').includes(query) ||
+        ws.description.toLowerCase().normalize('NFC').includes(query)
     );
 
-    if (sortByValue === 'name') {
-      result.sort((a, b) => a.title.localeCompare(b.title));
-    } else if (sortByValue === 'created') {
-      result.sort((a, b) => Number(b.id) - Number(a.id));
-    } else {
-      result.sort(
-        (a, b) =>
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      );
-    }
+    // 기본 정렬: 생성일순 (최신순)
+    result.sort(
+      (a, b) =>
+        new Date(b.createdAt || b.updatedAt).getTime() -
+        new Date(a.createdAt || a.updatedAt).getTime()
+    );
 
     return result;
-  }, [workspaces, inputValue, sortByValue, filterType]);
+  }, [workspaces, debouncedQuery, filterType]);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-zinc-50/50 h-full">
@@ -165,36 +134,6 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
               onChange={(e) => handleSearchChange(e.target.value)}
             />
           </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="gap-2 bg-white/50 border border-white/20 shadow-sm text-zinc-600 hover:bg-white/80 sm:w-[140px] justify-between backdrop-blur-sm transition-all duration-300 rounded-xl"
-              >
-                <div className="flex items-center gap-2">
-                  <currentSortOption.icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{currentSortOption.label}</span>
-                </div>
-                <ChevronDown className="h-4 w-4 opacity-50 hidden sm:block" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="bg-white border-zinc-200"
-            >
-              {sortOptions.map((option) => (
-                <DropdownMenuItem
-                  key={option.value}
-                  onClick={() => handleSortChange(option.value)}
-                  className="text-zinc-600 cursor-pointer"
-                >
-                  <option.icon className="mr-2 h-4 w-4" />
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
 
           <Button
             className="gap-2 bg-[#4ADE80]/80 hover:bg-[#4ADE80]/90 text-[#064E3B] font-bold shadow-lg shadow-green-500/20 border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(74,222,128,0.4)]"
@@ -235,7 +174,10 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
                 key={workspace.id}
                 onClick={() => navigate(`/workspace/${workspace.id}`)}
               >
-                <ProjectCard project={workspace} />
+                <ProjectCard
+                  project={workspace}
+                  timeLabel={workspace.lastCreated}
+                />
               </div>
             ))}
           </div>

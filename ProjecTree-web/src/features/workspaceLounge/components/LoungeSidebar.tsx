@@ -55,8 +55,8 @@ type MenuItem = {
 
 const MENU_ITEMS: MenuItem[] = [
   { id: 'all', icon: FolderOpen, label: '전체 워크스페이스' },
-  { id: 'mine', icon: UserStar, label: '내 워크스페이스' },
-  { id: 'joined', icon: Users, label: '초대받은 워크스페이스' },
+  { id: 'mine', icon: UserStar, label: '편집 가능' },
+  { id: 'joined', icon: Users, label: '읽기 전용' },
 ];
 
 function useProfileDialogState(nickname: string) {
@@ -93,11 +93,7 @@ function useProfileDialogState(nickname: string) {
   };
 }
 
-function ProfileDialog({
-  nickname,
-}: {
-  nickname: string;
-}) {
+function ProfileDialog({ nickname }: { nickname: string }) {
   const navigate = useNavigate();
   const updateStoreNickname = useUpdateNickname();
   const {
@@ -177,7 +173,8 @@ function ProfileDialog({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="
+      <DialogContent
+        className="
         sm:max-w-106.25
         bg-white
         backdrop-blur-2xl
@@ -187,9 +184,12 @@ function ProfileDialog({
         z-[1001]
         p-0
         overflow-hidden
-      ">
+      "
+      >
         <DialogHeader className="p-6 pb-0 bg-white">
-          <DialogTitle className="text-[var(--figma-tech-green)] text-xl font-bold tracking-tight">프로필 정보</DialogTitle>
+          <DialogTitle className="text-[var(--figma-tech-green)] text-xl font-bold tracking-tight">
+            프로필 정보
+          </DialogTitle>
           <DialogDescription className="text-zinc-500">
             계정 정보를 확인하고 수정할 수 있습니다.
           </DialogDescription>
@@ -197,7 +197,10 @@ function ProfileDialog({
 
         <div className="py-4 bg-white">
           <div className="grid gap-2">
-            <Label htmlFor="nickname" className="text-zinc-700 px-6 text-xs font-bold uppercase tracking-wider opacity-70">
+            <Label
+              htmlFor="nickname"
+              className="text-zinc-700 px-6 text-xs font-bold uppercase tracking-wider opacity-70"
+            >
               닉네임
             </Label>
 
@@ -215,7 +218,7 @@ function ProfileDialog({
                     className={cn(
                       'bg-white/50 border-transparent shadow-sm focus:bg-white focus:ring-2 focus:ring-[var(--figma-neon-green)]/40 focus:border-[var(--figma-neon-green)] rounded-xl transition-colors duration-300 hover:bg-white/60',
                       errorMessage &&
-                      'border-red-300 focus:border-red-400 focus:ring-red-100'
+                        'border-red-300 focus:border-red-400 focus:ring-red-100'
                     )}
                     autoFocus
                   />
@@ -244,7 +247,9 @@ function ProfileDialog({
                   ) : (
                     <span />
                   )}
-                  <span className="text-xs text-zinc-400">{temp.length}/16</span>
+                  <span className="text-xs text-zinc-400">
+                    {temp.length}/16
+                  </span>
                 </div>
               </div>
             ) : (
@@ -270,14 +275,13 @@ function ProfileDialog({
           <div className="flex justify-end">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <button
-                  className="text-sm text-zinc-400 hover:text-zinc-500 transition-colors"
-                >
+                <button className="text-sm text-zinc-400 hover:text-zinc-500 transition-colors">
                   탈퇴하기
                 </button>
               </AlertDialogTrigger>
 
-              <AlertDialogContent className="
+              <AlertDialogContent
+                className="
                 bg-white/92
                 backdrop-blur-2xl
                 border border-white/60
@@ -286,7 +290,8 @@ function ProfileDialog({
                 z-[1001]
                 p-0
                 overflow-hidden
-              ">
+              "
+              >
                 <AlertDialogHeader className="p-6">
                   <AlertDialogTitle className="text-zinc-900 font-bold">
                     정말 탈퇴하시겠습니까?
@@ -311,8 +316,8 @@ function ProfileDialog({
             </AlertDialog>
           </div>
         </div>
-      </DialogContent >
-    </Dialog >
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -326,17 +331,24 @@ function SidebarSkeleton({ collapsed }: { collapsed: boolean }) {
       )}
     >
       {/* Profile Skeleton */}
-      <div className={cn(
-        'flex items-center gap-3 border-b border-white/20 p-3',
-        collapsed && 'flex-col gap-2 p-2'
-      )}>
+      <div
+        className={cn(
+          'flex items-center gap-3 border-b border-white/20 p-3',
+          collapsed && 'flex-col gap-2 p-2'
+        )}
+      >
         <div className="h-9 w-9 rounded-full bg-zinc-200/60 animate-pulse" />
-        {!collapsed && <div className="h-5 w-20 bg-zinc-200/60 rounded animate-pulse" />}
+        {!collapsed && (
+          <div className="h-5 w-20 bg-zinc-200/60 rounded animate-pulse" />
+        )}
       </div>
       {/* Nav Skeleton */}
       <div className="flex-1 p-3 space-y-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-10 bg-zinc-200/40 rounded-xl animate-pulse" />
+          <div
+            key={i}
+            className="h-10 bg-zinc-200/40 rounded-xl animate-pulse"
+          />
         ))}
       </div>
     </aside>
@@ -395,9 +407,13 @@ export function LoungeSidebar({
       <button
         onClick={onToggle}
         className="absolute -right-3 top-15 h-6 w-6 rounded-full bg-white border border-[var(--figma-forest-bg)] shadow-md flex items-center justify-center text-[var(--figma-forest-accent)] hover:text-[var(--figma-tech-green)] hover:scale-110 hover:border-[var(--figma-forest-accent)] transition-all z-50 outline-none focus:ring-2 focus:ring-[var(--figma-forest-bg)] opacity-0 group-hover/sidebar:opacity-100"
-        aria-label={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
+        aria-label={collapsed ? '사이드바 펼치기' : '사이드바 접기'}
       >
-        {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
+        {collapsed ? (
+          <ChevronRight className="h-3.5 w-3.5" />
+        ) : (
+          <ChevronLeft className="h-3.5 w-3.5" />
+        )}
       </button>
       {/* User Profile */}
       <div
@@ -428,7 +444,8 @@ export function LoungeSidebar({
               )}
             </button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="
+          <AlertDialogContent
+            className="
             bg-white/92
             backdrop-blur-2xl
             border border-white/60
@@ -437,7 +454,8 @@ export function LoungeSidebar({
             z-[1001]
             p-0
             overflow-hidden
-          ">
+          "
+          >
             <AlertDialogHeader className="p-6">
               <AlertDialogTitle className="text-zinc-900 font-bold">
                 로그아웃 하시겠습니까?
@@ -465,9 +483,7 @@ export function LoungeSidebar({
           </AlertDialogContent>
         </AlertDialog>
 
-        {!collapsed && (
-          <ProfileDialog nickname={nickname} />
-        )}
+        {!collapsed && <ProfileDialog nickname={nickname} />}
       </div>
 
       {/* Navigation */}

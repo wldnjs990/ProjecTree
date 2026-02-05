@@ -63,18 +63,18 @@ export type OnboardingStep = (typeof ONBOARDING_TEXTS.steps)[number];
 
 // 도메인 옵션 상수
 export const DOMAIN_OPTIONS = [
-  '여행',
-  '전자상거래',
-  '교육',
-  '소셜미디어',
   'AI/ML',
-  '헬스케어',
-  '금융',
   '게임',
-  '생산성/협업',
-  '부동산/주거',
-  '음식/배달',
+  '교육',
+  '금융',
   '모빌리티',
+  '부동산/주거',
+  '생산성/협업',
+  '소셜미디어',
+  '여행',
+  '음식/배달',
+  '전자상거래',
+  '헬스케어',
   '기타',
 ] as const;
 

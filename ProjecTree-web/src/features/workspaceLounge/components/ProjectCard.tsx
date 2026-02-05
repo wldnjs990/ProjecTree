@@ -12,7 +12,6 @@ import { Users } from 'lucide-react';
 export interface Member {
   name: string;
   avatar: string;
-
 }
 
 // 프로젝트의 권한을 나타내는 타입
@@ -35,18 +34,17 @@ export interface ProjectCardProps {
 
     members: Member[];
   };
+  timeLabel?: string;
 }
-
 
 /**
  * [컴포넌트] 단일 프로젝트 카드 UI
  * - 프로젝트의 제목, 설명, 진행률(P0/P1/P2), 멤버 수, 최근 수정일을 표시합니다.
  */
-export function ProjectCard({ project }: ProjectCardProps) {
-
-
+export function ProjectCard({ project, timeLabel }: ProjectCardProps) {
   return (
-    <Card className="
+    <Card
+      className="
   group h-full flex flex-col gap-0
   bg-gradient-to-br from-white/70 via-white/40 to-white/20
   backdrop-blur-2xl
@@ -59,24 +57,25 @@ export function ProjectCard({ project }: ProjectCardProps) {
   hover:shadow-[0_12px_40px_rgba(0,0,0,0.08),inset_0_0_0_1px_rgba(255,255,255,0.6)]
   hover:bg-gradient-to-br hover:from-white/80 hover:to-white/30
   p-0
-">
+"
+    >
       <CardHeader className="pb-4 pt-5 px-5">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-['Pretendard'] font-bold text-lg leading-snug text-zinc-900 group-hover:text-[var(--figma-tech-green)] transition-colors line-clamp-2 min-h-[50px]">
+          <h3 className="font-['Pretendard'] font-bold text-lg leading-snug text-zinc-900 group-hover:text-[var(--figma-tech-green)] transition-colors line-clamp-2 min-h-[50px] break-all">
             {project.title}
           </h3>
           <Badge
             variant="outline"
             className={cn(
-              "shrink-0 text-[11px] font-semibold px-2.5 py-0.5 border-0 transition-colors shadow-sm mt-0.5 rounded-lg",
-              project.role === "Owner"
-                // Owner: Forest Glass (Brand Consistent)
-                ? "bg-[var(--figma-forest-bg)]/80 backdrop-blur-md text-[var(--figma-forest-deep)]"
-                : project.role === "Editor"
-                  // Editor: Sky Blue Glass (Balanced)
-                  ? "bg-sky-100/50 backdrop-blur-md text-sky-700"
-                  // Viewer: Zinc Glass (Balanced)
-                  : "bg-zinc-100/50 backdrop-blur-md text-zinc-600"
+              'shrink-0 text-[11px] font-semibold px-2.5 py-0.5 border-0 transition-colors shadow-sm mt-0.5 rounded-lg',
+              project.role === 'Owner'
+                ? // Owner: Forest Glass (Brand Consistent)
+                  'bg-[var(--figma-forest-bg)]/80 backdrop-blur-md text-[var(--figma-forest-deep)]'
+                : project.role === 'Editor'
+                  ? // Editor: Sky Blue Glass (Balanced)
+                    'bg-sky-100/50 backdrop-blur-md text-sky-700'
+                  : // Viewer: Zinc Glass (Balanced)
+                    'bg-zinc-100/50 backdrop-blur-md text-zinc-600'
             )}
           >
             {project.role}
@@ -85,7 +84,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       </CardHeader>
 
       <CardContent className="px-5 pb-8 flex-1 flex flex-col gap-5">
-        <p className="font-['Pretendard'] text-[14px] leading-relaxed text-zinc-500 line-clamp-2 h-[46px]">
+        <p className="font-['Pretendard'] text-[14px] leading-relaxed text-zinc-500 line-clamp-2 h-[46px] break-all">
           {project.description}
         </p>
 
@@ -94,7 +93,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <div className="flex-1 space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-rose-600">P0</span>
-              <span className="text-[11px] font-medium text-zinc-500">{project.progressP0}%</span>
+              <span className="text-[11px] font-medium text-zinc-500">
+                {project.progressP0}%
+              </span>
             </div>
             {/* Track: Glass groove effect */}
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]">
@@ -109,7 +110,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <div className="flex-1 space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-amber-500">P1</span>
-              <span className="text-[11px] font-medium text-zinc-500">{project.progressP1}%</span>
+              <span className="text-[11px] font-medium text-zinc-500">
+                {project.progressP1}%
+              </span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]">
               <div
@@ -122,8 +125,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {/* P2 */}
           <div className="flex-1 space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-[var(--figma-forest-accent)]">P2</span>
-              <span className="text-[11px] font-medium text-zinc-500">{project.progressP2}%</span>
+              <span className="text-[11px] font-bold text-[var(--figma-forest-accent)]">
+                P2
+              </span>
+              <span className="text-[11px] font-medium text-zinc-500">
+                {project.progressP2}%
+              </span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]">
               <div
@@ -140,10 +147,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-medium">
           <Users className="h-3.5 w-3.5 text-zinc-400" />
           <span>{project.members.length}명</span>
-
         </div>
 
-        <span className="text-[11px] text-zinc-400 font-['Inter'] tracking-tight">{project.lastModified}</span>
+        <span className="text-[11px] text-zinc-400 font-['Inter'] tracking-tight">
+          {timeLabel || project.lastModified}
+        </span>
       </CardFooter>
     </Card>
   );

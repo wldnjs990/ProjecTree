@@ -37,7 +37,8 @@ export const useWebSocket = (workspaceId: string | null) => {
       setConnected(true);
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (ev) => {
+      console.log('왜 꺼짐?', ev);
       setConnected(false);
     });
 
@@ -45,7 +46,7 @@ export const useWebSocket = (workspaceId: string | null) => {
       chatSocket.disconnect();
       setConnected(false);
     };
-  }, [setConnected]);
+  }, []);
 
   // 채팅방 입장/퇴장 (chatRoomId 변경 시)
   useEffect(() => {
