@@ -3,8 +3,8 @@ package com.ssafy.projectree.domain.workspace.api.dto;
 import com.ssafy.projectree.domain.member.api.dto.MemberDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.workspace.enums.Role;
-import lombok.AllArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -59,6 +59,16 @@ public class TeamDto {
     @Builder
     public static class UpdateRoleResponse {
         private Long memberId;
+        private Role role;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Invite {
+        private Long workspaceId;
+        private String chatRoomId;
+        private String email;
         private Role role;
     }
 

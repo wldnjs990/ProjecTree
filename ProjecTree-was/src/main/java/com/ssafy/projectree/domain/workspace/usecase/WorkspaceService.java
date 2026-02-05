@@ -56,7 +56,7 @@ public class WorkspaceService {
                             .name(workspace.getName())
                             .description(workspace.getDescription())
                             .totalMembers(teamService.getMemberCount(workspace))
-                            .role(teamService.getMyRole(workspace, member))
+                            .role(teamService.getMemberRole(workspace, member))
                             .progress(nodeService.getStatistics(id))
                             .updatedAt(workspace.getUpdatedAt())
                             .build()
