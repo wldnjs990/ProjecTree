@@ -98,7 +98,6 @@ export default function WorkSpacePage() {
         // 워크스페이스 상세 정보 조회 및 스토어 저장
         const workspaceDetail = await getWorkspaceDetail(Number(workspaceId));
         setWorkspaceDetail(workspaceDetail);
-        console.log('[WorkSpacePage] workspaceDetail 저장:', workspaceDetail);
 
         // 워크스페이스 트리 데이터 API 호출
         const apiNodes = await getWorkspaceTree(Number(workspaceId));

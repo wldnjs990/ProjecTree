@@ -90,7 +90,7 @@ function TreeCanvasInner({
   const nickname = useUser()?.nickname || '익명';
 
   // 유저 정보 awareness 훅
-  setUserInfo(nickname, 'gray');
+  setUserInfo(nickname, '#F24822');
 
   // Undo/Redo 키보드 이벤트 훅 (Ctrl+Z, Ctrl+Shift+Z)
   useUndoRedo();
