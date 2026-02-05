@@ -42,6 +42,7 @@ import {
 import CursorPointers from './CursorPointers';
 // TODO: workspace-node-detail feature 생성 후 import 경로 수정
 import { NodeDetailSidebar } from '@/features/workspace-node-detail';
+import { useUser } from '@/shared/stores/userStore';
 
 interface OnlineUser {
   id: string;
@@ -83,7 +84,13 @@ function TreeCanvasInner({
   const { handleNodeDragStop } = useNodesCrdt({ initialNodes });
 
   // 커서 CRDT 훅 (Awareness 커서 동기화)
-  const { cursors, handleMouseMove } = useCursors();
+  const { cursors, handleMouseMove, setUserInfo } = useCursors();
+
+  // 유저 닉네임 가져오기(awareness 등록용)
+  const nickname = useUser()?.nickname || '익명';
+
+  // 유저 정보 awareness 훅
+  setUserInfo(nickname, 'gray');
 
   // Undo/Redo 키보드 이벤트 훅 (Ctrl+Z, Ctrl+Shift+Z)
   useUndoRedo();

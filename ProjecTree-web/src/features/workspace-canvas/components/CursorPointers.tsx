@@ -30,7 +30,7 @@ export default function CursorPointers({
             }}
           >
             <MousePointer2 className="text-primary" />
-            <span className="absolute left-full text-xs">
+            <span className="absolute left-full text-xs whitespace-nowrap">
               {state.user?.name}
             </span>
           </div>
