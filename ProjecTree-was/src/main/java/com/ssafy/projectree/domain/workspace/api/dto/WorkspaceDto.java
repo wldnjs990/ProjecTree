@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
@@ -136,23 +137,31 @@ public class WorkspaceDto {
     @Schema(description = "워크 스페이스 진입 요청에 대한 응답 DTO")
     public static class Detail {
 
+        @Schema(description = "워크스페이스 기본 정보")
         private Info info;
 
+        @Schema(description = "노드 트리")
         private NodeTreeReadDto.Response nodeTree;
 
+        @Schema(description = "파일 목록")
         private List<FileReadDto.Response> files;
 
+        @Schema(description = "기능 명세(에픽) 목록")
         private List<FunctionSpecificationDto.EpicInfo> epics;
 
+        @Schema(description = "워크 스페이스 팀 정보")
         private TeamDto.Info teamInfo;
 
     }
 
+    @Getter
     @Builder
+    @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "워크 스페이스 기본 정보 반환 DTO")
+    @Schema(name = "WorkspaceDto.Info", description = "워크 스페이스 기본 정보 반환 DTO")
     public static class Info {
 
+        private Long id;
         private String name;
         private String description;
         private ServiceType serviceType;
@@ -164,6 +173,7 @@ public class WorkspaceDto {
 
         public static Info from(Workspace workspace) {
             return Info.builder()
+                    .id(workspace.getId())
                     .name(workspace.getName())
                     .description(workspace.getDescription())
                     .serviceType(workspace.getServiceType())
