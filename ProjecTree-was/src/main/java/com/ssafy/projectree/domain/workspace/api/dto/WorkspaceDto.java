@@ -1,16 +1,16 @@
 package com.ssafy.projectree.domain.workspace.api.dto;
 
 import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
-import com.ssafy.projectree.domain.file.model.entity.FileProperty;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.enums.ServiceType;
+import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -137,13 +137,53 @@ public class WorkspaceDto {
     @Schema(description = "워크 스페이스 진입 요청에 대한 응답 DTO")
     public static class Detail {
 
+        @Schema(description = "워크스페이스 기본 정보")
+        private Info info;
+
+        @Schema(description = "노드 트리")
         private NodeTreeReadDto.Response nodeTree;
 
+        @Schema(description = "파일 목록")
         private List<FileReadDto.Response> files;
 
+        @Schema(description = "기능 명세(에픽) 목록")
         private List<FunctionSpecificationDto.EpicInfo> epics;
 
+        @Schema(description = "워크 스페이스 팀 정보")
         private TeamDto.Info teamInfo;
+
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(name = "WorkspaceDto.Info", description = "워크 스페이스 기본 정보 반환 DTO")
+    public static class Info {
+
+        private Long id;
+        private String name;
+        private String description;
+        private ServiceType serviceType;
+        private String domain;
+        private LocalDate startDate;
+        private LocalDate endDate;
+        private String purpose;
+        private String identifierPrefix;
+
+        public static Info from(Workspace workspace) {
+            return Info.builder()
+                    .id(workspace.getId())
+                    .name(workspace.getName())
+                    .description(workspace.getDescription())
+                    .serviceType(workspace.getServiceType())
+                    .domain(workspace.getDomain())
+                    .startDate(workspace.getStartDate())
+                    .endDate(workspace.getEndDate())
+                    .purpose(workspace.getPurpose())
+                    .identifierPrefix(workspace.getIdentifierPrefix())
+                    .build();
+        }
 
     }
 }
