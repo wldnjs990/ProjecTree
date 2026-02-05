@@ -34,13 +34,14 @@ export interface ProjectCardProps {
 
     members: Member[];
   };
+  timeLabel?: string;
 }
 
 /**
  * [컴포넌트] 단일 프로젝트 카드 UI
  * - 프로젝트의 제목, 설명, 진행률(P0/P1/P2), 멤버 수, 최근 수정일을 표시합니다.
  */
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, timeLabel }: ProjectCardProps) {
   return (
     <Card
       className="
@@ -149,7 +150,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
 
         <span className="text-[11px] text-zinc-400 font-['Inter'] tracking-tight">
-          {project.lastModified}
+          {timeLabel || project.lastModified}
         </span>
       </CardFooter>
     </Card>
