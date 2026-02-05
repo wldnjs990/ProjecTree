@@ -1,6 +1,9 @@
 package com.ssafy.projectree.domain.workspace.usecase;
 
+import com.ssafy.projectree.domain.auth.utils.SecurityUtils;
 import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
+import com.ssafy.projectree.domain.file.model.entity.FileProperty;
+import com.ssafy.projectree.domain.file.model.repository.FileRepository;
 import com.ssafy.projectree.domain.file.usecase.FileService;
 import com.ssafy.projectree.domain.member.api.dto.MemberDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
@@ -14,11 +17,14 @@ import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.model.entity.FunctionSpecification;
 import com.ssafy.projectree.domain.workspace.model.entity.Team;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
+import com.ssafy.projectree.domain.workspace.model.repository.TeamRepository;
 import com.ssafy.projectree.domain.workspace.model.repository.WorkspaceRepository;
 import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +45,8 @@ public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceTechStackService workspaceTechStackService;
     private final FunctionSpecificationService functionSpecificationService;
+    private final TeamRepository teamRepository;
+    private final FileRepository fileRepository;
 
     public List<WorkspaceDto.Response> read(Member member) {
 
@@ -154,4 +162,20 @@ public class WorkspaceService {
                 .build();
     }
 
+    public Page<FileReadDto.Response> getWorkspaceFiles(int page, int size, Long workspaceId) {
+        Member currentMember = SecurityUtils.getCurrentMember();
+        Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(() -> new BusinessLogicException(ErrorCode.WORKSPACE_NOT_FOUND));
+        if (!teamRepository.isParticipant(workspace, currentMember)) {
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND_IN_WORKSPACE, "해당 워크스페이스에 참여중이지 않은 사용자입니다.");
+        }
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<FileProperty> files = fileRepository.findByWorkspace(workspace, pageRequest);
+        return files.map(file ->
+                FileReadDto.Response.builder()
+                        .originFileName(file.getOriginFileName())
+                        .path(file.getPath())
+                        .size(file.getSize())
+                        .build()
+        );
+    }
 }

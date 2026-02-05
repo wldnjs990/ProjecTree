@@ -1,5 +1,6 @@
 package com.ssafy.projectree.global.docs;
 
+import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.global.api.response.CommonResponse;
@@ -10,11 +11,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -102,4 +106,20 @@ public interface WorkspaceDocsController {
     })
     @GetMapping()
     CommonResponse<?> details(Member member, Long workspaceId);
+
+    @Operation(summary = "워크 스페이스 파일 조회 API", description = "워크 스페이스 내에 업로드된 파일들을 페이징 처리하여 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully Completed",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = FileReadDto.Response.class)
+                    )),
+    })
+    @GetMapping("/{workspace-id}/files")
+    CommonResponse<Page<FileReadDto.Response>> getWorkspaceFiles(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @PathVariable(name = "workspace-id") Long workspaceId);
 }
