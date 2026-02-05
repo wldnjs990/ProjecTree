@@ -40,7 +40,8 @@ export interface NodesApiResponse {
 // 노드 상세 API 응답 타입
 export interface Assignee {
   id: string;
-  name: string;
+  name?: string;
+  nickname?: string;
 }
 
 export interface Candidate {

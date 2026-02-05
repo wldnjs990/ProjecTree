@@ -35,6 +35,7 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   const nodes = useNodes();
   const selectedNodeId = useSelectedNodeId();
   const [isDescriptionView, setIsDescriptionView] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const { closeSidebar } = useNodeDetailEdit();
 
   // 후보 미리보기 상태
@@ -76,6 +77,7 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
 
   useEffect(() => {
     setIsDescriptionView(false);
+    setIsExpanded(false);
   }, [selectedNodeId, isOpen]);
 
   // 확정 핸들러
@@ -118,7 +120,8 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
           exit={{ x: '100%' }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
           className={cn(
-            'absolute top-0 right-0 h-full w-100 bg-white border-l border-[#E2E8F0] shadow-lg z-50',
+            'absolute top-0 right-0 h-full bg-white border-l border-[#E2E8F0] shadow-lg z-50',
+            isExpanded ? 'w-full' : 'w-100',
             className
           )}
         >
@@ -153,6 +156,8 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
                     description={nodeDetail.description}
                     onBack={() => setIsDescriptionView(false)}
                     onClose={closeSidebar}
+                    onToggleExpand={() => setIsExpanded((prev) => !prev)}
+                    isExpanded={isExpanded}
                   />
                 </motion.div>
               ) : (
@@ -166,6 +171,8 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
                   <NodeDetailContainer
                     nodeInfo={selectedNodeInfo}
                     onShowDescription={() => setIsDescriptionView(true)}
+                    onToggleExpand={() => setIsExpanded((prev) => !prev)}
+                    isExpanded={isExpanded}
                   />
                 </motion.div>
               )}
