@@ -4,6 +4,7 @@ import com.ssafy.projectree.domain.auth.enums.AuthRole;
 import com.ssafy.projectree.domain.auth.filter.InternalJwtAuthenticationFilter;
 import com.ssafy.projectree.domain.auth.filter.JwtAuthenticationFilter;
 import com.ssafy.projectree.domain.auth.filter.JwtExceptionFilter;
+import com.ssafy.projectree.domain.auth.handler.OAuth2FailureHandler;
 import com.ssafy.projectree.domain.auth.handler.OAuth2SuccessHandler;
 import com.ssafy.projectree.domain.auth.model.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.ssafy.projectree.domain.auth.usecase.CustomOAuth2UserService;
@@ -28,6 +29,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final CustomOAuth2UserService oAuth2UserService;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final InternalJwtAuthenticationFilter internalJwtAuthenticationFilter;
@@ -93,6 +95,7 @@ public class SecurityConfig {
                         )
                         .userInfoEndpoint(user -> user.userService(oAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler)
                 );
 
         return httpSecurity.build();
