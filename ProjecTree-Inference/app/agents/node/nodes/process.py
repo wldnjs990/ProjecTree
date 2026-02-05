@@ -54,6 +54,7 @@ async def _process_node(
     Name:{candidate_info.name}, Description:{candidate_info.description}
     """
 
+
     if workspace_info:
         workspace_context = GLOBAL_CONTEXT.format(
             project_tech_stack=[
