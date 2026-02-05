@@ -98,20 +98,6 @@ export function ZoomControls({ className }: ZoomControlsProps) {
         <TooltipContent side="right">전체 보기</TooltipContent>
       </Tooltip>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 bg-white"
-            onClick={handleReset}
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right">초기화</TooltipContent>
-      </Tooltip>
-
       <div className="w-full h-px bg-gray-200 my-1" />
 
       <Tooltip>

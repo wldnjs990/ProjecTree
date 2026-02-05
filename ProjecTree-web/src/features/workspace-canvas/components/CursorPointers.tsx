@@ -30,7 +30,9 @@ export default function CursorPointers({
             }}
           >
             <MousePointer2 className="text-primary" />
-            <span className="absolute left-full text-xs">{clientId}</span>
+            <span className="absolute left-full text-xs">
+              {state.user?.name}
+            </span>
           </div>
         );
       })}

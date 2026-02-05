@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Node, Edge } from '@xyflow/react';
-import { useParams, useNavigate } from 'react-router';
+import { useParams } from 'react-router';
 import {
   getWorkspaceTree,
   getNodeDetail,
@@ -11,7 +11,11 @@ import { TreeCanvas } from '@/features/workspace-canvas';
 import { FeatureSpecView } from '@/features/workspace-feature-spec';
 import { TechStackStatusView } from '@/features/workspace-tech-status';
 import { LeftSidebar } from '@/features/workspace-aside';
-import { VoiceChatBar, MicPermissionAlert } from '@/features/workspace-voicechat';
+import {
+  VoiceChatBar,
+  MicPermissionAlert,
+} from '@/features/workspace-voicechat';
+import { WorkspaceSettingsDialog } from '@/features/workspace-settings';
 import {
   type FlowNode,
   type ApiNode,
@@ -21,6 +25,7 @@ import {
   useConnectionStatus,
   useNodeStore,
   useWorkspaceStore,
+  useWorkspaceDetail,
   generateEdges,
   mockUsers,
   useNodeDetailCrdtObservers,
@@ -56,7 +61,6 @@ export default function WorkSpacePage() {
   const { workspaceId: paramWorkspaceId } = useParams<{
     workspaceId: string;
   }>();
-  const navigate = useNavigate();
   // workspaceId가 없으면 임시 ID 사용
   const workspaceId = paramWorkspaceId || String(TEMP_WORKSPACE_ID);
 
@@ -69,6 +73,7 @@ export default function WorkSpacePage() {
   const setWorkspaceDetail = useWorkspaceStore(
     (state) => state.setWorkspaceDetail
   );
+  const workspaceDetail = useWorkspaceDetail();
 
   // 노드 상세 편집 Hook
   const { openSidebar, closeSidebar, selectedNodeId } = useNodeDetailEdit();
@@ -113,22 +118,8 @@ export default function WorkSpacePage() {
         });
         console.log('[WorkSpacePage] nodeListData 저장:', nodeListDataMap);
         setNodeListData(nodeListDataMap);
-      } catch (error: any) {
+      } catch (error) {
         console.error('워크스페이스 데이터 로드 실패:', error);
-
-        const errorCode = error.response?.data?.errorCode;
-
-        if (errorCode === 'WORKSPACE_NOT_FOUND') {
-          alert('워크스페이스에 접근할 수 없습니다');
-          navigate('/workspaces');
-          return;
-        }
-
-        if (error.response?.status === 403 || error.response?.status === 404) {
-          // 권한 없음 또는 워크스페이스 없음
-          alert('접근 권한이 없습니다');
-          navigate('/workspaces'); // 목록으로 이동
-        }
       } finally {
         setIsLoading(false);
       }
@@ -140,7 +131,7 @@ export default function WorkSpacePage() {
     return () => {
       destroyCrdtClient();
     };
-  }, [setNodeListData, workspaceId]);
+  }, [setNodeListData, workspaceId, setWorkspaceDetail]);
 
   // Header state
   const [activeTab, setActiveTab] = useState<ViewTab>('tree-editor');
@@ -149,17 +140,20 @@ export default function WorkSpacePage() {
   const [isVoiceChatActive, setIsVoiceChatActive] = useState(false); // 연결 활성화 상태
   const [isVoiceChatBarVisible, setIsVoiceChatBarVisible] = useState(false); // UI 표시 상태
   const [micPermissionDenied, setMicPermissionDenied] = useState(false); // 마이크 권한 거부 상태
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Event handlers
   const handleSettingsClick = () => {
-    console.log('Settings clicked');
+    setIsSettingsOpen(true);
   };
 
   const handleVoiceCallClick = useCallback(async () => {
     if (!isVoiceChatActive) {
       // 마이크 권한을 먼저 확인 — 권한 없으면 VoiceChatBar를 마운트하지 않음
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
         stream.getTracks().forEach((track) => track.stop());
       } catch {
         setMicPermissionDenied(true);
@@ -271,6 +265,17 @@ export default function WorkSpacePage() {
         isVisible={isVoiceChatBarVisible}
         onClose={handleVoiceChatClose}
         workspaceId={workspaceId || 'default'}
+      />
+
+      <WorkspaceSettingsDialog
+        isOpen={isSettingsOpen}
+        onOpenChange={setIsSettingsOpen}
+        workspaceId={Number(workspaceId)}
+        workspaceDetail={workspaceDetail}
+        onUpdated={(updates) => {
+          if (!workspaceDetail) return;
+          setWorkspaceDetail({ ...workspaceDetail, ...updates });
+        }}
       />
     </div>
   );

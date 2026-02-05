@@ -59,9 +59,12 @@ export interface FlowNodeData {
   [key: string]: unknown; // ReactFlow 호환용 인덱스 시그니처
 }
 
+/** 클라이언트 전용 노드 타입 (미리보기 등) */
+export type ClientNodeType = 'PREVIEW';
+
 /** ReactFlow에서 사용하는 노드 형식 (parentId 포함) */
 export interface FlowNode extends Node {
-  type: ServerNodeType;
+  type: ServerNodeType | ClientNodeType;
   parentId?: string; // undefined = 루트 노드
   data: FlowNodeData;
 }
@@ -71,7 +74,7 @@ export interface FlowNode extends Node {
 /** Y.Map에 저장되는 노드 형식 */
 export interface YjsNode {
   id: string;
-  type: ServerNodeType;
+  type: ServerNodeType | ClientNodeType;
   parentId?: string; // undefined = 루트 노드
   position: { x: number; y: number };
   data: FlowNodeData;

@@ -7,13 +7,20 @@ const NODE_WIDTH = 180;
 const NODE_HEIGHT = 100;
 
 /** 노드 타입별 엣지 색상 */
-const EDGE_COLORS: Record<ServerNodeType, string> = {
+const EDGE_COLORS: Record<ServerNodeType | 'PREVIEW', string> = {
   PROJECT: '#8B5CF6', // purple
   EPIC: '#8B5CF6', // purple
   STORY: '#2B7FFF', // blue
   TASK: '#00D492', // green
   ADVANCE: '#06B6D4', // cyan
+  PREVIEW: '#1C69E3', // blue (preview)
 };
+
+/** TASK -> ADVANCE edge colors (by parent taskType) */
+const TASK_TO_ADVANCE_EDGE_COLORS = {
+  FE: '#F97316', // orange
+  BE: '#6366F1', // indigo
+} as const;
 
 /** 기본 엣지 스타일 */
 const DEFAULT_EDGE_STYLE = {
@@ -32,15 +39,23 @@ export function generateEdges(nodes: FlowNode[]): Edge[] {
     .map((node) => {
       // 부모 노드의 타입으로 색상 결정
       const parentNode = nodes.find((n) => n.id === node.parentId);
-      const edgeColor = parentNode
-        ? EDGE_COLORS[parentNode.type]
-        : EDGE_COLORS.TASK;
+      const isTaskToAdvance =
+        parentNode?.type === 'TASK' && node.type === 'ADVANCE';
+      const edgeColor = isTaskToAdvance
+        ? parentNode.data.taskType === 'FE'
+          ? TASK_TO_ADVANCE_EDGE_COLORS.FE
+          : parentNode.data.taskType === 'BE'
+            ? TASK_TO_ADVANCE_EDGE_COLORS.BE
+            : EDGE_COLORS.TASK
+        : parentNode
+          ? EDGE_COLORS[parentNode.type]
+          : EDGE_COLORS.TASK;
 
       return {
         id: `e-${node.parentId}-${node.id}`,
         source: node.parentId!,
         target: node.id,
-        type: 'bezier',
+        type: 'default',
         style: {
           stroke: edgeColor,
           ...DEFAULT_EDGE_STYLE,

@@ -11,6 +11,7 @@ import type {
   Assignee,
   NodeType,
   Candidate,
+  TechRecommendation,
 } from '../types/nodeDetail';
 
 // Y.Map에 저장되는 값 타입 (candidates는 별도 Y.Map에서 관리)
@@ -28,6 +29,7 @@ class NodeDetailCrdtService {
   private yNodeDetailsRef: Y.Map<Y.Map<YNodeDetailValue>> | null = null;
   private yConfirmedRef: Y.Map<ConfirmedNodeData> | null = null;
   private yNodeCandidatesRef: Y.Map<Candidate[]> | null = null;
+  private yNodeTechRecommendationsRef: Y.Map<TechRecommendation[]> | null = null;
   private cleanupFn: (() => void) | null = null;
   private isInitialized = false;
 
@@ -59,6 +61,8 @@ class NodeDetailCrdtService {
     const yNodeDetails = client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
     const yConfirmed = client.getYMap<ConfirmedNodeData>('confirmedNodeData');
     const yNodeCandidates = client.getYMap<Candidate[]>('nodeCandidates');
+    const yNodeTechRecommendations =
+      client.getYMap<TechRecommendation[]>('nodeTechRecommendations');
 
     // 편집 데이터 변경 감지
     const editObserveHandler = () => {
@@ -97,9 +101,26 @@ class NodeDetailCrdtService {
       });
     };
 
+    const techRecommendationsHandler = (
+      event: Y.YMapEvent<TechRecommendation[]>
+    ) => {
+      event.keysChanged.forEach((key) => {
+        const techs = yNodeTechRecommendations.get(key);
+        if (techs) {
+          console.log(
+            '[NodeDetailCrdtService] TechRecommendations 수신:',
+            key,
+            techs
+          );
+          useNodeStore.getState().updateNodeDetail(Number(key), { techs });
+        }
+      });
+    };
+
     yNodeDetails.observeDeep(editObserveHandler);
     yConfirmed.observe(confirmedObserveHandler);
     yNodeCandidates.observe(candidatesHandler);
+    yNodeTechRecommendations.observe(techRecommendationsHandler);
 
     // 기존 데이터 로드 함수
     const loadExistingData = () => {
@@ -149,12 +170,14 @@ class NodeDetailCrdtService {
       yNodeDetails.unobserveDeep(editObserveHandler);
       yConfirmed.unobserve(confirmedObserveHandler);
       yNodeCandidates.unobserve(candidatesHandler);
+      yNodeTechRecommendations.unobserve(techRecommendationsHandler);
       client.provider.off('sync', syncHandler);
     };
 
     this.yNodeDetailsRef = yNodeDetails;
     this.yConfirmedRef = yConfirmed;
     this.yNodeCandidatesRef = yNodeCandidates;
+    this.yNodeTechRecommendationsRef = yNodeTechRecommendations;
     this.isInitialized = true;
 
     console.log('[NodeDetailCrdtService] 옵저버 초기화 완료');
@@ -171,6 +194,7 @@ class NodeDetailCrdtService {
     this.yNodeDetailsRef = null;
     this.yConfirmedRef = null;
     this.yNodeCandidatesRef = null;
+    this.yNodeTechRecommendationsRef = null;
     this.cleanupFn = null;
     this.isInitialized = false;
 
@@ -412,6 +436,29 @@ class NodeDetailCrdtService {
     useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates });
 
     console.log('[NodeDetailCrdtService] Candidates 업데이트:', nodeId, candidates);
+  }
+
+  /**
+   * TechRecommendations 업데이트 (실시간 동기화)
+   */
+  updateTechRecommendations(
+    nodeId: string,
+    techs: TechRecommendation[]
+  ): void {
+    const client = getCrdtClient();
+    if (!client || !this.yNodeTechRecommendationsRef) {
+      console.warn('[NodeDetailCrdtService] CRDT 클라이언트가 없습니다.');
+      return;
+    }
+
+    this.yNodeTechRecommendationsRef.set(nodeId, techs);
+    useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs });
+
+    console.log(
+      '[NodeDetailCrdtService] TechRecommendations 업데이트:',
+      nodeId,
+      techs
+    );
   }
 }
 

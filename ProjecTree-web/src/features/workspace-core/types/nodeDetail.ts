@@ -5,7 +5,7 @@ export type ApiStatus = 'SUCCESS' | 'FAIL';
 export type NodeType = 'PROJECT' | 'EPIC' | 'STORY' | 'TASK' | 'ADVANCE';
 export type TaskType = 'FE' | 'BE' | null;
 export type NodeStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
-export type Priority = 'P0' | 'P1' | 'P2' | 'P3';
+export type Priority = 'P0' | 'P1' | 'P2';
 
 // 노드 목록 API 응답 타입
 export interface NodePosition {
@@ -53,14 +53,14 @@ export interface Candidate {
 }
 
 export interface TechRecommendation {
-  id: number;
-  name: string;
+  id: number; //
+  name: string; //
   advantage: string;
   disAdvantage: string;
   description: string;
   ref: string;
   recommendScore: number;
-  selected: boolean;
+  selected: boolean; //
 }
 
 export interface NodeDetailData {

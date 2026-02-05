@@ -21,7 +21,6 @@ import {
   useSelectedTechId,
   useNodeDetailStore,
 } from '@/features/workspace-core';
-import { getAiNodeTechRecommendation } from '@/apis/node.api';
 
 interface AITechRecommendSectionProps {
   isEdit: boolean;
@@ -245,12 +244,12 @@ function TechCardList({
 
 // 빈 상태 컴포넌트
 function TechEmptyState({
+  onGenerate,
   isGenerating,
 }: {
   onGenerate?: () => void;
   isGenerating?: boolean;
 }) {
-  const selectedNodeId = useSelectedNodeId();
 
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-3">
@@ -261,8 +260,8 @@ function TechEmptyState({
         </p>
       </div>
       <button
-        onClick={() => getAiNodeTechRecommendation(Number(selectedNodeId))}
-        disabled={isGenerating}
+        onClick={onGenerate}
+        disabled={isGenerating || !onGenerate}
         className="flex items-center justify-center gap-2 px-4 py-2 text-sm text-white bg-[#1C69E3] rounded-lg hover:bg-[#1557c0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isGenerating ? (
