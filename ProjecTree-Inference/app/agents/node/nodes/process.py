@@ -57,7 +57,11 @@ async def _process_node(
 
     if workspace_info:
         workspace_context = GLOBAL_CONTEXT.format(
-            project_tech_stack=[tech.name for tech in workspace_info.workspace_tech_stacks],
+            project_tech_stack=[
+                tech.tech_vocabulary.name
+                for tech in workspace_info.workspace_tech_stacks
+                if tech.tech_vocabulary
+            ],
             project_headcount=headcount,
             project_purpose=workspace_info.purpose,
             start_date=workspace_info.start_date,
@@ -87,8 +91,7 @@ async def _process_node(
 
         # 3. 비동기 실행 (ainvoke) with config for callbacks
         response = await agent.ainvoke(
-            {"messages": [HumanMessage(content=formatted_user_prompt)]},
-            config=config
+            {"messages": [HumanMessage(content=formatted_user_prompt)]}, config=config
         )
         result = response.get("structured_response")
 
@@ -105,26 +108,34 @@ async def _process_node(
         return {"generated_node": None, "last_error": str(e)}
 
 
-async def epic_node_process(state: NodeState, config: RunnableConfig = None) -> NodeState:
+async def epic_node_process(
+    state: NodeState, config: RunnableConfig = None
+) -> NodeState:
     return await _process_node(
         state, EPIC_USER_PROMPT, EPIC_PROCESS_PROMPT, EpicProcessResult, config
     )
 
 
-async def story_node_process(state: NodeState, config: RunnableConfig = None) -> NodeState:
+async def story_node_process(
+    state: NodeState, config: RunnableConfig = None
+) -> NodeState:
     return await _process_node(
         state, STORY_USER_PROMPT, STORY_PROCESS_PROMPT, StoryProcessResult, config
     )
 
 
-async def task_node_process(state: NodeState, config: RunnableConfig = None) -> NodeState:
+async def task_node_process(
+    state: NodeState, config: RunnableConfig = None
+) -> NodeState:
     """Candidate와 부모 정보를 기반으로 상세 태스크 정보를 생성합니다."""
     return await _process_node(
         state, TASK_USER_PROMPT, TASK_PROCESS_PROMPT, TaskProcessResult, config
     )
 
 
-async def advance_node_process(state: NodeState, config: RunnableConfig = None) -> NodeState:
+async def advance_node_process(
+    state: NodeState, config: RunnableConfig = None
+) -> NodeState:
     return await _process_node(
         state, ADVANCE_USER_PROMPT, ADVANCE_PROCESS_PROMPT, AdvanceProcessResult, config
     )
