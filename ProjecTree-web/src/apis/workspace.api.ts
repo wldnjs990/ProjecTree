@@ -78,12 +78,13 @@ export const generateNodeCandidates = async (
     `nodes/${nodeId}/candidates`
   );
   console.log(response);
-  // API 응답에서 id, taskType, isSelected가 없으므로 클라이언트에서 초기화
+  // API 응답에서 id, taskType, selected, summary가 없으므로 클라이언트에서 초기화
   return response.data.data.candidates.map((c, index) => ({
     ...c,
     id: Date.now() + index,
     taskType: null,
-    isSelected: false,
+    selected: false,
+    summary: c.description?.slice(0, 50) || '', // summary가 없으면 description에서 생성
   }));
 };
 
@@ -104,6 +105,15 @@ export const selectNodeCandidates = async (
 // ===== 워크스페이스 상세 조회 =====
 
 export interface WorkspaceDetailData {
+  name?: string;
+  description?: string;
+  domain?: string;
+  purpose?: string;
+  serviceType?: string;
+  identifierPrefix?: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  workspaceTechStacks?: number[] | string;
   nodeTree: { tree: ApiNode[] };
   files: Array<{
     id: number;
@@ -116,10 +126,11 @@ export interface WorkspaceDetailData {
   teamInfo: {
     chatRoomId: string;
     memberInfos: Array<{
-      memberId: number;
-      name: string;
-      nickname: string;
-      email: string;
+      memberId?: number;
+      id?: number;
+      name?: string;
+      nickname?: string;
+      email?: string;
       role: 'OWNER' | 'EDITOR' | 'VIEWER';
     }>;
   };
@@ -144,6 +155,53 @@ export const getWorkspaceDetail = async (
     { params: { workspaceId } }
   );
   return response.data.data;
+};
+
+// ===== 워크스페이스 수정 =====
+
+export interface UpdateWorkspaceRequest {
+  memberRoles?: Record<string, Role>;
+  domain?: string;
+  endDate?: string | null;
+  name?: string;
+  epics?: Array<{ name: string; description: string }>;
+  serviceType?: string;
+  startDate?: string | null;
+  workspaceTechStacks?: number[] | string;
+  identifierPrefix?: string;
+  description?: string;
+  purpose?: string;
+}
+
+/**
+ * [워크스페이스 API] 워크스페이스 수정
+ */
+export const updateWorkspace = async (
+  workspaceId: number,
+  data: UpdateWorkspaceRequest,
+  files: File[] = []
+): Promise<ApiResponse<unknown>> => {
+  const formData = new FormData();
+
+  formData.append(
+    'data',
+    new Blob([JSON.stringify(data)], { type: 'application/json' })
+  );
+
+  files.forEach((file) => formData.append('files', file));
+
+  const response = await wasApiClient.patch<ApiResponse<unknown>>(
+    '/workspaces',
+    formData,
+    {
+      params: { workspaceId },
+      headers: {
+        'Content-Type': undefined,
+      },
+    }
+  );
+
+  return response.data;
 };
 
 // ===== 워크스페이스 생성 =====

@@ -27,7 +27,7 @@ function mapStatus(status: string): 'TODO' | 'IN_PROGRESS' | 'DONE' {
 }
 
 /**
- * mockNodes 데이터를 FeatureSpecView가 사용할 수 있는 형식으로 변환
+ * 노드 데이터를 FeatureSpecView가 사용할 수 있는 형식으로 변환
  */
 export function transformNodesForSpecView(nodes: Node[]) {
   return nodes.map((node) => ({

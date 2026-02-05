@@ -28,6 +28,9 @@ interface NodeState {
   connectionStatus: ConnectionStatus;
   isSynced: boolean;
 
+  // 미리보기 노드 배열 (CRDT Y.Map으로 동기화)
+  previewNodes: FlowNode[];
+
   // 노드 상세 데이터 (id -> NodeDetailData)
   nodeDetails: Record<number, NodeDetailData>;
   // 노드 목록 데이터 (id -> NodeData)
@@ -42,6 +45,11 @@ interface NodeState {
   updateNode: (nodeId: string, updates: Partial<FlowNode>) => void;
   addNode: (node: FlowNode) => void;
   deleteNode: (nodeId: string) => void;
+  // 미리보기 노드 액션 (CRDT 동기화용)
+  setPreviewNodes: (nodes: FlowNode[]) => void;
+  addPreviewNode: (node: FlowNode) => void;
+  removePreviewNode: (nodeId: string) => void;
+  clearPreviewNodes: () => void;
 
   // 노드 상세/목록 데이터 액션
   setNodeDetails: (details: Record<number, NodeDetailData>) => void;
@@ -63,6 +71,7 @@ const initialState = {
   nodes: [] as FlowNode[],
   connectionStatus: 'disconnected' as ConnectionStatus,
   isSynced: false,
+  previewNodes: [] as FlowNode[],
   nodeDetails: {} as Record<number, NodeDetailData>,
   nodeListData: {} as Record<number, NodeData>,
 };
@@ -95,6 +104,18 @@ export const useNodeStore = create<NodeState>((set) => ({
     set((state) => ({
       nodes: state.nodes.filter((node) => node.id !== nodeId),
     })),
+
+  // 미리보기 노드 액션 (CRDT 동기화용)
+  setPreviewNodes: (nodes) => set({ previewNodes: nodes }),
+  addPreviewNode: (node) =>
+    set((state) => ({
+      previewNodes: [...state.previewNodes, node],
+    })),
+  removePreviewNode: (nodeId) =>
+    set((state) => ({
+      previewNodes: state.previewNodes.filter((node) => node.id !== nodeId),
+    })),
+  clearPreviewNodes: () => set({ previewNodes: [] }),
 
   // 노드 상세/목록 데이터 액션
   setNodeDetails: (details) => set({ nodeDetails: details }),
@@ -207,3 +228,7 @@ export const useNodeListData = () =>
 /** 특정 노드 목록 데이터 선택 */
 export const useNodeListItem = (nodeId: number | null) =>
   useNodeStore((state) => (nodeId ? state.nodeListData[nodeId] : null));
+
+/** 미리보기 노드 배열 선택 */
+export const usePreviewNodes = () =>
+  useNodeStore((state) => state.previewNodes);

@@ -6,7 +6,13 @@ import { useDisplayData, useNodeDetailEdit } from '../hooks';
 import { useIsEditing } from '@/features/workspace-core';
 import type { NodeStatus, Priority, Assignee } from '../types';
 
-export function StatusMetaSection() {
+interface StatusMetaSectionProps {
+  showDifficulty?: boolean;
+}
+
+export function StatusMetaSection({
+  showDifficulty = true,
+}: StatusMetaSectionProps) {
   // Store에서 상태 구독
   const displayData = useDisplayData();
   const isEdit = useIsEditing();
@@ -74,7 +80,7 @@ export function StatusMetaSection() {
         </div>
 
         {/* 난이도 - TASK, ADVANCED 타입에만 표시 */}
-        {displayData.difficult !== undefined && (
+        {showDifficulty && displayData.difficult !== undefined && (
           <div className="space-y-1">
             <span className="text-xs text-[#61626F]">난이도</span>
             <NodeDifficultyField

@@ -156,6 +156,8 @@ export const useNodesCrdt = ({
     [updateNodePosition]
   );
 
+  // 노드 정렬 완료 핸들러
+
   // 노드 데이터 업데이트
   const updateNodeData = useCallback(
     (nodeId: string, data: Partial<FlowNodeData>) => {

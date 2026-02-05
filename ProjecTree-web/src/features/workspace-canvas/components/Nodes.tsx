@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Handle, Position, type NodeProps, type Node } from '@xyflow/react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { StatusTag, type TagType } from '@/shared/components/StatusTag';
 import { PriorityBadge } from '@/shared/components/PriorityBadge';
@@ -9,6 +10,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import type { FlowNodeData } from '@/features/workspace-core';
+import { useIsCreatingNode, useNodes } from '@/features/workspace-core';
 
 /** 노드 고정 크기 상수 */
 export const NODE_DIMENSIONS = {
@@ -67,7 +69,7 @@ function DifficultyDots({ difficult }: { difficult?: number }) {
     <div className="flex gap-0.5">
       {Array.from({ length: Math.min(difficult, 5) }).map((_, i) => (
         <span key={i} className="text-[8px] text-yellow">
-          ??
+          ⭐
         </span>
       ))}
     </div>
@@ -273,12 +275,25 @@ function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
 
 // Advance 노드
 export type AdvanceNodeType = Node<FlowNodeData, 'ADVANCE'>;
-function AdvanceNodeComponent({ data, selected }: NodeProps<AdvanceNodeType>) {
+function AdvanceNodeComponent({
+  id,
+  data,
+  selected,
+}: NodeProps<AdvanceNodeType>) {
   const nodeData = data;
+  const nodes = useNodes();
+  const currentNode = nodes.find((node) => node.id === id);
+  const parentNode = currentNode?.parentId
+    ? nodes.find((node) => node.id === currentNode.parentId)
+    : undefined;
+  const parentTaskType = parentNode?.data.taskType ?? nodeData.taskType;
 
   const borderColor =
-    nodeData.taskType === 'FE' ? 'border-[#F97316]' : 'border-[#6366F1]';
-  const bgColor = nodeData.taskType === 'FE' ? 'bg-[#FFF7ED]' : 'bg-[#EEF2FF]';
+    parentTaskType === 'FE' ? 'border-[#F97316]' : 'border-[#6366F1]';
+  const bgColor =
+    parentTaskType === 'FE' ? 'bg-[#FFF7ED]' : 'bg-[#EEF2FF]';
+  const handleColor =
+    parentTaskType === 'FE' ? 'bg-[#F97316]' : 'bg-[#6366F1]';
 
   return (
     <div
@@ -288,7 +303,7 @@ function AdvanceNodeComponent({ data, selected }: NodeProps<AdvanceNodeType>) {
         bgColor,
         borderColor,
         selected && 'ring-2 ring-offset-2',
-        nodeData.taskType === 'FE' ? 'ring-[#F97316]' : 'ring-[#6366F1]'
+        parentTaskType === 'FE' ? 'ring-[#F97316]' : 'ring-[#6366F1]'
       )}
     >
       <PriorityBadgeSlot priority={nodeData.priority} />
@@ -296,10 +311,7 @@ function AdvanceNodeComponent({ data, selected }: NodeProps<AdvanceNodeType>) {
       <Handle
         type="target"
         position={Position.Top}
-        className={cn(
-          'w-2 h-2 border-2 border-white',
-          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#0891B2]'
-        )}
+        className={cn('w-2 h-2 border-2 border-white', handleColor)}
       />
 
       <NodeTags
@@ -314,10 +326,76 @@ function AdvanceNodeComponent({ data, selected }: NodeProps<AdvanceNodeType>) {
       <Handle
         type="source"
         position={Position.Bottom}
+        className={cn('w-2 h-2 border-2 border-white', handleColor)}
+      />
+    </div>
+  );
+}
+
+// Preview 노드 (더미/미리보기용)
+export interface PreviewNodeData extends FlowNodeData {
+  isPreview: true;
+}
+export type PreviewNodeType = Node<PreviewNodeData, 'PREVIEW'>;
+function PreviewNodeComponent({ data }: NodeProps<PreviewNodeType>) {
+  const isCreating = useIsCreatingNode();
+
+  return (
+    <div
+      className={cn(
+        'relative rounded-2xl p-3 w-[180px]',
+        'border-2 border-dashed',
+        isCreating
+          ? 'border-[#1C69E3] bg-[rgba(28,105,227,0.08)] shadow-[0_0_20px_rgba(28,105,227,0.4)]'
+          : 'border-[#1C69E3]/50 bg-[rgba(28,105,227,0.03)]',
+        'transition-all duration-300'
+      )}
+    >
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="w-2 h-2 border-2 border-white bg-[#1C69E3]/50"
+      />
+
+      {/* 미리보기 태그 */}
+      <div className="flex items-center gap-1.5 mb-2">
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded-lg',
+            'bg-[#1C69E3]/10 text-[#1C69E3] border border-[#1C69E3]/30'
+          )}
+        >
+          <Sparkles className="w-3 h-3" />
+          미리보기
+        </span>
+      </div>
+
+      {/* 노드 제목 */}
+      <p
         className={cn(
-          'w-2 h-2 border-2 border-white',
-          nodeData.taskType === 'FE' ? 'bg-[#00D492]' : 'bg-[#0891B2]'
+          'text-sm font-medium line-clamp-2',
+          isCreating ? 'text-[#1C69E3]' : 'text-[#0B0B0B]/70'
         )}
+      >
+        {data.title}
+      </p>
+
+      {/* 로딩 오버레이 */}
+      {isCreating && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-2xl">
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="w-6 h-6 text-[#1C69E3] animate-spin" />
+            <span className="text-xs text-[#1C69E3] font-medium">
+              생성 중...
+            </span>
+          </div>
+        </div>
+      )}
+
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="w-2 h-2 border-2 border-white bg-[#1C69E3]/50"
       />
     </div>
   );
@@ -329,3 +407,4 @@ export const EpicNode = memo(EpicNodeComponent);
 export const StoryNode = memo(StoryNodeComponent);
 export const TaskNode = memo(TaskNodeComponent);
 export const AdvancedNode = memo(AdvanceNodeComponent);
+export const PreviewNode = memo(PreviewNodeComponent);
