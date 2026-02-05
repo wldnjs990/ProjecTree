@@ -9,6 +9,7 @@ import { ChevronDown, BookOpen } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { Node } from '@xyflow/react';
 import { UserAvatar } from '@/shared/components/UserAvatar';
+import { TruncatedLabel } from './TruncatedLabel';
 import {
   statusBadge,
   statusLabel,
@@ -75,16 +76,15 @@ export function StoryGroup({
           {data.priority}
         </Badge>
       </div>
-      <div className="flex justify-center">
-        <span
-          className="font-medium text-sm truncate cursor-pointer hover:underline inline-block"
+      <div className="flex justify-center w-full min-w-0 px-3">
+        <TruncatedLabel
+          text={data.label}
+          className="font-medium text-sm cursor-pointer hover:underline text-center"
           onClick={(e) => {
             e.stopPropagation();
             onNodeClick?.(story.id);
           }}
-        >
-          {data.label}
-        </span>
+        />
       </div>
       <div className="flex justify-center">
         <Badge

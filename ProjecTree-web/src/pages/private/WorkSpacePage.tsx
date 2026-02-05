@@ -210,6 +210,7 @@ export default function WorkSpacePage() {
         onVoiceCallClick={handleVoiceCallClick}
         onInviteClick={handleInviteClick}
         isVoiceChatActive={isVoiceChatActive}
+        isVoiceChatBarVisible={isVoiceChatBarVisible}
       />
 
       {/* Main Content */}

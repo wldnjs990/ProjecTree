@@ -18,6 +18,7 @@ export interface HeaderProps {
   onVoiceCallClick?: () => void;
   onInviteClick?: () => void;
   isVoiceChatActive?: boolean;
+  isVoiceChatBarVisible?: boolean;
 }
 
 export interface ActionButtonsProps {
@@ -25,6 +26,7 @@ export interface ActionButtonsProps {
   onVoiceCallClick?: () => void;
   onInviteClick?: () => void;
   isVoiceChatActive?: boolean;
+  isVoiceChatBarVisible?: boolean;
 }
 
 export interface LogoProps {

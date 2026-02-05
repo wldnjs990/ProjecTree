@@ -8,6 +8,7 @@ import { ChevronDown, CheckSquare, Pin } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { Node } from '@xyflow/react';
 import { UserAvatar } from '@/shared/components/UserAvatar';
+import { TruncatedLabel } from './TruncatedLabel';
 import {
   statusBadge,
   statusLabel,
@@ -64,16 +65,15 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
           {data.priority}
         </Badge>
       </div>
-      <div className="flex justify-center">
-        <span
-          className="font-medium text-sm truncate cursor-pointer hover:underline inline-block"
+      <div className="flex justify-center w-full min-w-0 px-3">
+        <TruncatedLabel
+          text={data.label}
+          className="font-medium text-sm cursor-pointer hover:underline text-center"
           onClick={(e) => {
             e.stopPropagation();
             onNodeClick?.(task.id);
           }}
-        >
-          {data.label}
-        </span>
+        />
       </div>
       <div className="flex justify-center">
         <Badge
@@ -162,11 +162,12 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
                   {advancedData.priority}
                 </Badge>
               </div>
-              <div className="flex justify-center">
-                <span
+              <div className="flex justify-center w-full min-w-0 px-3">
+                <TruncatedLabel
+                  text={advancedData.label}
                   role="button"
                   tabIndex={0}
-                  className="font-medium text-sm truncate cursor-pointer hover:underline inline-block"
+                  className="font-medium text-sm cursor-pointer hover:underline text-center"
                   onClick={() => onNodeClick?.(advanced.id)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -174,9 +175,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
                       onNodeClick?.(advanced.id);
                     }
                   }}
-                >
-                  {advancedData.label}
-                </span>
+                />
               </div>
               <div className="flex justify-center">
                 <Badge
