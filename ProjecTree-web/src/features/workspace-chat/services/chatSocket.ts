@@ -99,6 +99,7 @@ class ChatSocketService {
     this.socket.emit('typing:start', {
       chatRoomId,
       memberId: userId,
+      userId: userId, // 백엔드 호환성 위해 추가
       userName,
     });
   }
@@ -111,6 +112,7 @@ class ChatSocketService {
     this.socket.emit('typing:stop', {
       chatRoomId,
       memberId: userId,
+      userId: userId, // 백엔드 호환성 위해 추가
     });
   }
 

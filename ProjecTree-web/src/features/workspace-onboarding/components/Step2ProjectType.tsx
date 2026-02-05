@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CalendarIcon, Info } from 'lucide-react';
@@ -40,10 +40,26 @@ export default function Step2ProjectType({
   onChange,
   errors,
 }: Step2ProjectTypeProps) {
-  const [customDomain, setCustomDomain] = useState('');
   const isCustomDomain =
     data.domain === '기타' ||
     (!!data.domain && !DOMAIN_OPTIONS.includes(data.domain as any));
+
+  // 초기값 설정: data.domain이 커스텀 도메인이면 그 값을 사용
+  const [customDomain, setCustomDomain] = useState(() => {
+    if (isCustomDomain && data.domain !== '기타') {
+      return data.domain;
+    }
+    return '';
+  });
+
+  // data.domain이 변경될 때 customDomain 동기화
+  useEffect(() => {
+    if (isCustomDomain && data.domain !== '기타') {
+      setCustomDomain(data.domain);
+    } else if (!isCustomDomain) {
+      setCustomDomain('');
+    }
+  }, [data.domain, isCustomDomain]);
 
   return (
     <div className="flex flex-col gap-6">

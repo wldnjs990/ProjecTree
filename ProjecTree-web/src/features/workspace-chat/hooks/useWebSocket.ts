@@ -9,6 +9,8 @@ import type {
   UserStatusPayload,
 } from '../types/chat.types';
 
+import { useWorkspaceStore } from '@/features/workspace-core';
+
 export const useWebSocket = (workspaceId: string | null) => {
   const addMessage = useChatStore((state) => state.addMessage);
   const setTyping = useChatStore((state) => state.setTyping);
@@ -17,8 +19,8 @@ export const useWebSocket = (workspaceId: string | null) => {
   );
   const setConnected = useChatStore((state) => state.setConnected);
   // chatRoomId 가져오기
-  const chatRoomId = useChatStore((state) =>
-    workspaceId ? state.chatRoomIds[workspaceId] : null
+  const chatRoomId = useWorkspaceStore(
+    (state) => state.workspaceDetail?.teamInfo?.chatRoomId
   );
 
   // WebSocket 연결
@@ -66,64 +68,134 @@ export const useWebSocket = (workspaceId: string | null) => {
 
     // 메시지 수신
     // 백엔드 MessageReceive DTO: { id, chatRoomId, senderId, senderName, content, timestamp }
+    // 메시지 매핑 헬퍼
+    const mapToChatMessage = (raw: any): ChatMessage => {
+      const rawMsg = raw.message || raw;
+      return {
+        id: rawMsg.id?.toString() || Date.now().toString(),
+        workspaceId: workspaceId,
+        senderId:
+          rawMsg.senderId?.toString() ||
+          rawMsg.sender_id?.toString() ||
+          rawMsg.memberId?.toString() ||
+          rawMsg.member_id?.toString() ||
+          rawMsg.userId?.toString() ||
+          rawMsg.user_id?.toString() ||
+          rawMsg.sender?.id?.toString() ||
+          rawMsg.sender?.memberId?.toString() ||
+          rawMsg.member?.id?.toString() ||
+          'unknown',
+        senderName:
+          rawMsg.senderName ||
+          rawMsg.sender_name ||
+          rawMsg.nickname ||
+          rawMsg.name ||
+          rawMsg.sender?.name ||
+          rawMsg.sender?.nickname ||
+          rawMsg.member?.name ||
+          'Unknown',
+        content: rawMsg.content || '',
+        timestamp:
+          rawMsg.timestamp || rawMsg.created_at || new Date().toISOString(),
+        type: 'text',
+      };
+    };
+
+    // 메시지 수신
     const handleMessageReceive = (data: any) => {
       console.log('📨 [useWebSocket] Message received (Raw):', data);
-
-      // 데이터 매핑 (Backend -> Frontend)
-      // 백엔드는 data 자체가 메시지 객체일 가능성이 높음 (또는 data.data)
-      const rawMsg = data.message || data;
-
-      const newMessage: ChatMessage = {
-        id: rawMsg.id?.toString() || Date.now().toString(),
-        workspaceId: workspaceId, // 현재 보고 있는 워크스페이스 ID 주입
-        senderId: rawMsg.senderId?.toString() || 'unknown',
-        senderName: rawMsg.senderName || 'Unknown',
-        content: rawMsg.content || '',
-        timestamp: rawMsg.timestamp || new Date().toISOString(),
-        type: 'text',
-        // senderAvatar: ... // 백엔드에서 안 주면 없음
-      };
-
+      const newMessage = mapToChatMessage(data);
       console.log('✨ [useWebSocket] Mapped Message:', newMessage);
       addMessage(workspaceId, newMessage);
     };
 
     // 타이핑 시작
     const handleTypingStart = (data: any) => {
-      console.log('⌨️ [useWebSocket] Typing Start:', data);
-      // memberId 안전하게 변환
-      const memberId = data.memberId?.toString() || data.userId?.toString();
+      // 0. 데이터 구조 유연하게 처리
+      const payload = data.data || data.message || data;
 
-      // 내 자신의 타이핑 이벤트는 무시
+      // 1. 이벤트에서 유저 ID 추출 (다양한 필드 체크)
+      const eventUserId =
+        payload.memberId?.toString() ||
+        payload.userId?.toString() ||
+        payload.senderId?.toString() ||
+        payload.sender_id?.toString() ||
+        payload.user_id?.toString() ||
+        payload.member_id?.toString() ||
+        '';
+
+      // 2. 로컬 유저 ID 추출
       const currentUser = useUserStore.getState().user;
-      const currentUserId =
+      const localUserId =
         currentUser?.memberId?.toString() ||
         currentUser?.id?.toString() ||
-        currentUser?.email;
+        currentUser?.email ||
+        '';
 
-      if (memberId === currentUserId) return;
+      // 3. 유효성 검사 (ID가 없으면 무시 - 서버 이슈로 경고 생략)
+      if (!eventUserId) {
+        return;
+      }
 
-      if (data.workspaceId === workspaceId || data.chatRoomId === chatRoomId) {
-        setTyping(workspaceId, memberId, true);
+      // 4. ID 비교 (내 이벤트면 무시)
+      if (localUserId && eventUserId === localUserId) {
+        return;
+      }
+
+      // 5. 라우팅 체크
+      const targetChatRoomId =
+        payload.chatRoomId?.toString() || data.chatRoomId?.toString();
+      const targetWorkspaceId =
+        payload.workspaceId?.toString() || data.workspaceId?.toString();
+      const currentWorkspaceIdStr = workspaceId?.toString();
+      const currentChatRoomIdStr = chatRoomId?.toString();
+
+      const isRoutingMatch =
+        (targetWorkspaceId && targetWorkspaceId === currentWorkspaceIdStr) ||
+        (targetChatRoomId && targetChatRoomId === currentChatRoomIdStr) ||
+        (!targetWorkspaceId && !targetChatRoomId);
+
+      if (isRoutingMatch) {
+        setTyping(workspaceId, eventUserId, true);
       }
     };
 
     // 타이핑 종료
     const handleTypingStop = (data: any) => {
-      // console.log('xxxx [useWebSocket] Typing Stop:', data);
-      const memberId = data.memberId?.toString() || data.userId?.toString();
+      const payload = data.data || data.message || data;
 
-      // 내 자신의 타이핑 이벤트는 무시
+      const eventUserId =
+        payload.memberId?.toString() ||
+        payload.userId?.toString() ||
+        payload.senderId?.toString() ||
+        payload.sender_id?.toString() ||
+        payload.user_id?.toString() ||
+        payload.member_id?.toString() ||
+        '';
+
       const currentUser = useUserStore.getState().user;
-      const currentUserId =
+      const localUserId =
         currentUser?.memberId?.toString() ||
         currentUser?.id?.toString() ||
-        currentUser?.email;
+        currentUser?.email ||
+        '';
 
-      if (memberId === currentUserId) return;
+      if (!eventUserId) return;
 
-      if (data.workspaceId === workspaceId || data.chatRoomId === chatRoomId) {
-        setTyping(workspaceId, memberId, false);
+      if (localUserId && eventUserId === localUserId) {
+        return;
+      }
+
+      const targetChatRoomId = payload.chatRoomId || data.chatRoomId;
+      const targetWorkspaceId = payload.workspaceId || data.workspaceId;
+
+      const isRoutingMatch =
+        (targetWorkspaceId && targetWorkspaceId === workspaceId) ||
+        (targetChatRoomId && targetChatRoomId === chatRoomId) ||
+        (!targetWorkspaceId && !targetChatRoomId);
+
+      if (isRoutingMatch) {
+        setTyping(workspaceId, eventUserId, false);
       }
     };
 
@@ -134,6 +206,19 @@ export const useWebSocket = (workspaceId: string | null) => {
 
     const handleUserOffline = (data: UserStatusPayload) => {
       updateParticipantStatus(data.userId, false);
+    };
+
+    const handleChatHistory = (data: any) => {
+      console.log('📨 [useWebSocket] Chat history:', data);
+      if (Array.isArray(data)) {
+        data.forEach((item) => {
+          const msg = mapToChatMessage(item);
+          addMessage(workspaceId, msg);
+        });
+      } else {
+        const msg = mapToChatMessage(data);
+        addMessage(workspaceId, msg);
+      }
     };
 
     // 에러 처리
@@ -147,6 +232,7 @@ export const useWebSocket = (workspaceId: string | null) => {
     chatSocket.on('typing:stop', handleTypingStop);
     chatSocket.on('user:online', handleUserOnline);
     chatSocket.on('user:offline', handleUserOffline);
+    chatSocket.on('chat:history', handleChatHistory);
     chatSocket.on('error', handleError);
 
     return () => {
@@ -155,6 +241,7 @@ export const useWebSocket = (workspaceId: string | null) => {
       chatSocket.off('typing:stop', handleTypingStop);
       chatSocket.off('user:online', handleUserOnline);
       chatSocket.off('user:offline', handleUserOffline);
+      chatSocket.off('chat:history', handleChatHistory);
       chatSocket.off('error', handleError);
     };
   }, [workspaceId, chatRoomId, addMessage, setTyping, updateParticipantStatus]);

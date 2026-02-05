@@ -13,7 +13,7 @@ import {
   ONBOARDING_TEXTS,
 } from '@/features/workspace-onboarding';
 import { createWorkspace } from '@/apis/workspace.api';
-import type { Role } from '@/apis/workspace.api';
+import type { Role, TechStackItem } from '@/apis/workspace.api';
 
 export default function WorkspaceOnboardingPage() {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function WorkspaceOnboardingPage() {
     startDate: null as Date | null,
     endDate: null as Date | null,
     specFiles: [] as File[],
-    techStacks: [] as number[], // 🚨 ID 기반 (number)
+    techStacks: [] as TechStackItem[], // 🚨 변경: ID와 이름을 함께 저장
     epics: [] as Array<{ name: string; description: string }>,
     memberRoles: {} as Record<string, Role>, // 🚨 변경: Map 구조 (이메일 -> 역할)
   });
@@ -93,7 +93,12 @@ export default function WorkspaceOnboardingPage() {
       setIsLoading(true);
       try {
         console.log('[API] 워크스페이스 생성 요청 시작...');
-        const response = await createWorkspace(formData);
+        // API 호출 시 techStacks에서 ID만 추출
+        const apiFormData = {
+          ...formData,
+          techStacks: formData.techStacks.map((tech) => tech.id),
+        };
+        const response = await createWorkspace(apiFormData);
         console.log('[API] 워크스페이스 생성 성공:', response);
 
         // 성공 시 워크스페이스 라운지로 이동

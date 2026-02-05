@@ -13,15 +13,23 @@ interface ChatMessageItemProps {
 
 export const ChatMessageItem = ({ message }: ChatMessageItemProps) => {
   const user = useUserStore((state) => state.user);
-  // user.id 또는 user.memberId를 사용, 없으면 이메일 사용
-  const currentUserId =
-    user?.memberId?.toString() || user?.id?.toString() || user?.email;
 
-  const isCurrentUser = message.senderId === currentUserId;
+  // ID 매칭을 더 유연하게 처리 (서버가 어떤 ID를 보낼지 확실치 않을 경우 대비)
+  const isCurrentUser =
+    (user?.memberId && message.senderId === user.memberId.toString()) ||
+    (user?.id && message.senderId === user.id.toString()) ||
+    (user?.email && message.senderId === user.email);
 
-  const timestamp = format(new Date(message.timestamp), 'a h:mm', {
-    locale: ko,
-  });
+  let timestamp = '';
+  try {
+    const date = new Date(message.timestamp);
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date');
+    }
+    timestamp = format(date, 'a h:mm', { locale: ko });
+  } catch (e) {
+    timestamp = '시간 오류';
+  }
 
   return (
     <div
@@ -33,9 +41,12 @@ export const ChatMessageItem = ({ message }: ChatMessageItemProps) => {
       {/* 아바타 (상대방만 표시) */}
       {!isCurrentUser && (
         <Avatar className="h-6 w-6">
-          <AvatarImage src={message.senderAvatar} alt={message.senderName} />
+          <AvatarImage
+            src={message.senderAvatar}
+            alt={message.senderName || 'User'}
+          />
           <AvatarFallback className="text-[10px]">
-            {message.senderName[0]}
+            {message.senderName?.[0] || '?'}
           </AvatarFallback>
         </Avatar>
       )}
@@ -45,7 +56,7 @@ export const ChatMessageItem = ({ message }: ChatMessageItemProps) => {
         <div className="mb-0.5 flex items-center gap-1.5">
           {!isCurrentUser && (
             <span className="text-xs font-medium text-gray-900">
-              {message.senderName}
+              {message.senderName || '알 수 없는 사용자'}
             </span>
           )}
           <span className="text-[10px] text-gray-500">{timestamp}</span>
