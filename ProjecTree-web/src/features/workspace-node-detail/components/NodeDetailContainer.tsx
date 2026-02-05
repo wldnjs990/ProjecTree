@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { NodeHeaderSection } from './NodeHeaderSection';
 import { StatusMetaSection } from './StatusMetaSection';
 import { AITechRecommendSection } from './AITechRecommendSection';
@@ -53,9 +53,8 @@ export default function NodeDetailContainer({
     (state) => state.enterCandidatePreview
   );
 
-  // AI 생성 로딩 상태
-  const [isGeneratingCandidates, setIsGeneratingCandidates] = useState(false);
-  const [isGeneratingTechs, setIsGeneratingTechs] = useState(false);
+  const isGeneratingCandidates = !!nodeDetail.candidatesPending;
+  const isGeneratingTechs = !!nodeDetail.techsPending;
 
   // 노드 상세 접근 시 선택된 기술스택 ID 설정
   useEffect(() => {
@@ -142,7 +141,7 @@ export default function NodeDetailContainer({
   const handleGenerateTechs = async () => {
     if (!selectedNodeId) return;
 
-    setIsGeneratingTechs(true);
+    nodeDetailCrdtService.setTechsPending(selectedNodeId, true);
     try {
       const response = await getAiNodeTechRecommendation(Number(selectedNodeId));
       const rawTechs = response?.data?.techs;
@@ -175,8 +174,7 @@ export default function NodeDetailContainer({
       }
     } catch (error) {
       console.error('AI 기술 추천 생성 실패:', error);
-    } finally {
-      setIsGeneratingTechs(false);
+      nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
   };
 
@@ -184,7 +182,7 @@ export default function NodeDetailContainer({
   const handleGenerateCandidates = async () => {
     if (!selectedNodeId) return;
 
-    setIsGeneratingCandidates(true);
+    nodeDetailCrdtService.setCandidatesPending(selectedNodeId, true);
     try {
       const candidates = await generateNodeCandidates(Number(selectedNodeId));
 
@@ -194,8 +192,7 @@ export default function NodeDetailContainer({
       console.log('[NodeDetailContainer] AI 노드 후보 생성 완료:', candidates);
     } catch (error) {
       console.error('AI 노드 후보 생성 실패:', error);
-    } finally {
-      setIsGeneratingCandidates(false);
+      nodeDetailCrdtService.setCandidatesPending(selectedNodeId, false);
     }
   };
 
