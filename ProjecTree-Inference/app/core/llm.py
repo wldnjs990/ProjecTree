@@ -22,7 +22,7 @@ temperature=0,
 max_retries=3, 
 base_url=settings.OPENAI_BASE_URL, 
 api_key=settings.AI_API_KEY,
-reasoning_effort="high", 
+reasoning_effort="medium", 
 )
 
 openai_nano_llm = ChatOpenAI(model="gpt-5-nano", 
