@@ -11,7 +11,7 @@ from app.core.dependencies import get_recommendation_service, get_db
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/tech-stack", tags=["TechStack"])
+router = APIRouter(prefix="/tech-stacks", tags=["TechStack"])
 
 
 @router.post(

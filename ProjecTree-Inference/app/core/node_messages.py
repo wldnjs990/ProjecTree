@@ -145,9 +145,14 @@ NODE_MESSAGE_CONFIG: dict[str, NodeMessageConfig] = {
     # ----------------------------------------------------------
     # Portfolio Graph (portfolio/graph.py) - 포트폴리오 생성
     # ----------------------------------------------------------
+    "filter_notes": NodeMessageConfig(
+        category="PORTFOLIO",
+        start_msg="🔍 노트에서 기술적 의사결정을 분석 중입니다...",
+        end_msg="✅ 노트 필터링 완료",
+    ),
     "generate_portfolio": NodeMessageConfig(
         category="PORTFOLIO",
-        start_msg="� 포트폴리오를 생성 중입니다...",
+        start_msg="📝 포트폴리오를 생성 중입니다...",
         end_msg="✅ 포트폴리오 생성 완료",
     ),
 }

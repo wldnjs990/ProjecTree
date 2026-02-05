@@ -4,12 +4,12 @@ Feedback nodes for tech stack validation.
 from app.agents.recommend.state import RecommendationState
 from app.agents.recommend.schemas.expert import TechList
 from app.agents.recommend.routers import MAX_RETRIES
-from app.core.llm import openai_mini_llm
+from app.core.llm import opendai_reasoning_llm
 import logging
 
 logger = logging.getLogger(__name__)
 
-llm = openai_mini_llm
+llm = opendai_reasoning_llm
 
 
 def route_feedback(state: RecommendationState) -> RecommendationState:

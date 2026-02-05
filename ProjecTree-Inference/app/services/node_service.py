@@ -47,7 +47,7 @@ class NodeService:
         Returns:
             생성된 노드 ID 및 상태
         """
-        from app.agents.graph import builder
+        from app.agents.node.graph import builder
 
         # 2. Graph 컴파일 및 실행
         graph = builder.compile()

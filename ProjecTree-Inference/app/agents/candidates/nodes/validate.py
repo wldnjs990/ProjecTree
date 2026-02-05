@@ -3,7 +3,7 @@ Validate generated candidate nodes.
 """
 from app.agents.candidates.state import CandidateNodeState
 from app.agents.enums import NodeType
-from app.core.llm import openai_mini_llm
+from app.core.llm import openai_nano_llm
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from typing import List
@@ -15,7 +15,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-llm = openai_mini_llm
+llm = openai_nano_llm
 
 
 class ValidationResult(BaseModel):

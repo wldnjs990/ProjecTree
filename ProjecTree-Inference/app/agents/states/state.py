@@ -20,15 +20,3 @@ class GlobalState(TypedDict):
     max_retries: Optional[int]  # 최대 재시도 횟수 (기본값 2)
     is_valid: Optional[bool]  # 후보 검증 통과 여부
     last_error: Optional[str]  # 마지막 에러 메시지
-
-
-class NodeState(GlobalState):
-    """메인 그래프의 전체 상태"""
-
-    parent_id: int
-    parent_info: NodeResponse
-    candidate_id: int
-    current_candidate_info: CandidateResponse
-    task_type: TaskType
-    generated_node: BaseNodeProcessResult
-    is_parse_error: Optional[bool]
