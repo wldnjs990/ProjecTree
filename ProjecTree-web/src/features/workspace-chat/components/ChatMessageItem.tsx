@@ -3,9 +3,9 @@ import { ko } from 'date-fns/locale';
 import type { ChatMessage } from '../types/chat.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/shared/lib/utils';
-import { MOCK_MY_ID } from '../types/mockData';
 
 import { useUserStore } from '@/shared/stores/userStore';
+import { useChatStore } from '../store/chatStore';
 
 interface ChatMessageItemProps {
   message: ChatMessage;
@@ -13,6 +13,13 @@ interface ChatMessageItemProps {
 
 export const ChatMessageItem = ({ message }: ChatMessageItemProps) => {
   const user = useUserStore((state) => state.user);
+
+  // 참여자 목록에서 최신 닉네임 조회
+  const participants = useChatStore(
+    (state) => state.participants[message.workspaceId] || []
+  );
+  const sender = participants.find((p) => p.id === message.senderId);
+  const displayName = sender?.name || message.senderName || '알 수 없는 사용자';
 
   // ID 매칭을 더 유연하게 처리 (서버가 어떤 ID를 보낼지 확실치 않을 경우 대비)
   const isCurrentUser =
@@ -41,12 +48,9 @@ export const ChatMessageItem = ({ message }: ChatMessageItemProps) => {
       {/* 아바타 (상대방만 표시) */}
       {!isCurrentUser && (
         <Avatar className="h-6 w-6">
-          <AvatarImage
-            src={message.senderAvatar}
-            alt={message.senderName || 'User'}
-          />
+          <AvatarImage src={message.senderAvatar} alt={displayName} />
           <AvatarFallback className="text-[10px]">
-            {message.senderName?.[0] || '?'}
+            {displayName?.[0] || '?'}
           </AvatarFallback>
         </Avatar>
       )}
@@ -56,7 +60,7 @@ export const ChatMessageItem = ({ message }: ChatMessageItemProps) => {
         <div className="mb-0.5 flex items-center gap-1.5">
           {!isCurrentUser && (
             <span className="text-xs font-medium text-gray-900">
-              {message.senderName || '알 수 없는 사용자'}
+              {displayName}
             </span>
           )}
           <span className="text-[10px] text-gray-500">{timestamp}</span>
