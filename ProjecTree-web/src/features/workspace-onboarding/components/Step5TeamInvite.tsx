@@ -140,7 +140,7 @@ export default function Step5TeamInvite({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="EDITOR">편집자 - 편집 가능</SelectItem>
-                <SelectItem value="VIEWER">뷰어 - 보기만 가능</SelectItem>
+                <SelectItem value="VIEWER">열람자 - 보기만 가능</SelectItem>
                 <SelectItem value="OWNER">관리자 - 모든 권한</SelectItem>
               </SelectContent>
             </Select>
@@ -186,7 +186,7 @@ export default function Step5TeamInvite({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="EDITOR">편집자 - 편집 가능</SelectItem>
-                        <SelectItem value="VIEWER">뷰어 - 보기만 가능</SelectItem>
+                        <SelectItem value="VIEWER">열람자 - 보기만 가능</SelectItem>
                         <SelectItem value="OWNER">관리자 - 모든 권한</SelectItem>
                       </SelectContent>
                     </Select>

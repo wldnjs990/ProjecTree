@@ -6,7 +6,12 @@ import {
   getNodeDetail,
   getWorkspaceDetail,
 } from '@/apis/workspace.api';
-import { Header, type ViewTab } from '@/features/workspace-header';
+import {
+  Header,
+  type ViewTab,
+  type OnlineUser,
+  MemberManagementModal,
+} from '@/features/workspace-header';
 import { TreeCanvas } from '@/features/workspace-canvas';
 import { FeatureSpecView } from '@/features/workspace-feature-spec';
 import { TechStackStatusView } from '@/features/workspace-tech-status';
@@ -27,10 +32,13 @@ import {
   useWorkspaceStore,
   useWorkspaceDetail,
   generateEdges,
-  mockUsers,
   useNodeDetailCrdtObservers,
 } from '@/features/workspace-core';
+import { useUserStore } from '@/shared/stores/userStore';
+import type { AvatarColor } from '@/shared/components/UserAvatar';
+import { getAvatarColor } from '@/shared/lib/utils';
 import { useNodeDetailEdit } from '@/features/workspace-node-detail';
+import { useMemo } from 'react';
 
 // 임시 워크스페이스 ID (백엔드 DB 더미 데이터용)
 const TEMP_WORKSPACE_ID = 8;
@@ -58,6 +66,7 @@ const transformApiNodesToFlowNodes = (apiNodes: ApiNode[]): FlowNode[] => {
 };
 
 export default function WorkSpacePage() {
+  const user = useUserStore((state) => state.user);
   const { workspaceId: paramWorkspaceId } = useParams<{
     workspaceId: string;
   }>();
@@ -74,6 +83,24 @@ export default function WorkSpacePage() {
     (state) => state.setWorkspaceDetail
   );
   const workspaceDetail = useWorkspaceDetail();
+
+  // 멤버 목록 가공 (API 데이터 -> UI 데이터)
+  const members = useMemo<OnlineUser[]>(() => {
+    return workspaceDetail?.teamInfo?.memberInfos?.map((member) => ({
+      id: String(member.memberId || member.id),
+      name: member.name || 'Unknown',
+      nickname: member.nickname || member.name || 'Unknown',
+      initials: (
+        member.nickname?.[0] ||
+        member.name?.[0] ||
+        'U'
+      ).toUpperCase(),
+      color: getAvatarColor(member.memberId || member.id || member.email || '0'),
+      isOnline: member.email === user?.email, // 나 자신만 온라인
+      role: member.role,
+      isMe: member.email === user?.email,
+    })) || [];
+  }, [workspaceDetail, user]);
 
   // 노드 상세 편집 Hook
   const { openSidebar, closeSidebar, selectedNodeId } = useNodeDetailEdit();
@@ -98,7 +125,6 @@ export default function WorkSpacePage() {
         // 워크스페이스 상세 정보 조회 및 스토어 저장
         const workspaceDetail = await getWorkspaceDetail(Number(workspaceId));
         setWorkspaceDetail(workspaceDetail);
-        console.log('[WorkSpacePage] workspaceDetail 저장:', workspaceDetail);
 
         // 워크스페이스 트리 데이터 API 호출
         const apiNodes = await getWorkspaceTree(Number(workspaceId));
@@ -116,7 +142,6 @@ export default function WorkSpacePage() {
         apiNodes.forEach((node) => {
           nodeListDataMap[node.id] = node.data;
         });
-        console.log('[WorkSpacePage] nodeListData 저장:', nodeListDataMap);
         setNodeListData(nodeListDataMap);
       } catch (error) {
         console.error('워크스페이스 데이터 로드 실패:', error);
@@ -141,6 +166,7 @@ export default function WorkSpacePage() {
   const [isVoiceChatBarVisible, setIsVoiceChatBarVisible] = useState(false); // UI 표시 상태
   const [micPermissionDenied, setMicPermissionDenied] = useState(false); // 마이크 권한 거부 상태
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   // Event handlers
   const handleSettingsClick = () => {
@@ -175,18 +201,16 @@ export default function WorkSpacePage() {
   };
 
   const handleInviteClick = () => {
-    console.log('Invite clicked');
+    setIsInviteModalOpen(true);
   };
 
   // 노드 클릭 시 상세정보 API 호출
   const handleNodeClick = async (nodeId: string) => {
-    console.log('[handleNodeClick] 노드 클릭:', nodeId);
 
     if (!selectedNodeId || selectedNodeId !== nodeId) {
       // 노드 상세정보 API 호출 후 사이드바 열기
       try {
         const nodeDetail = await getNodeDetail(Number(nodeId));
-        console.log('[handleNodeClick] API 응답:', nodeDetail);
         updateNodeDetail(Number(nodeId), nodeDetail);
         // API 호출 완료 후 사이드바 열기 (nodeDetail이 store에 저장된 상태)
         openSidebar(nodeId);
@@ -202,10 +226,11 @@ export default function WorkSpacePage() {
     <div className="flex flex-col h-screen w-screen overflow-hidden">
       {/* Header */}
       <Header
-        projectName="AI 여행 추천 서비스 (매우 긴 이름을 테스트 중입니다)"
+        workspaceId={Number(workspaceId)}
+        projectName={workspaceDetail?.name || '워크스페이스'}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onlineUsers={mockUsers}
+        onlineUsers={members}
         onSettingsClick={handleSettingsClick}
         onVoiceCallClick={handleVoiceCallClick}
         onInviteClick={handleInviteClick}
@@ -234,7 +259,7 @@ export default function WorkSpacePage() {
             ) : connectionStatus === 'connected' ? (
               <TreeCanvas
                 initialNodes={nodes}
-                onlineUsers={mockUsers}
+                onlineUsers={members}
                 onNodeClick={handleNodeClick}
               />
             ) : (
@@ -276,6 +301,13 @@ export default function WorkSpacePage() {
           if (!workspaceDetail) return;
           setWorkspaceDetail({ ...workspaceDetail, ...updates });
         }}
+      />
+
+      <MemberManagementModal
+        open={isInviteModalOpen}
+        onOpenChange={setIsInviteModalOpen}
+        onlineUsers={members}
+        workspaceId={Number(workspaceId)}
       />
     </div>
   );

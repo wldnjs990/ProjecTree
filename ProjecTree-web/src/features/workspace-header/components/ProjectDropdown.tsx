@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
@@ -12,23 +14,32 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
+import { getMyWorkspaces, type WorkspaceCardData } from '@/apis/workspace-lounge.api';
 import type { ProjectDropdownProps } from '../types';
 
-const mockProjects = [
-  { id: '1', name: 'AI 여행 추천 서비스 (매우 긴 이름을 테스트 중입니다)' },
-  { id: '2', name: '이커머스 플랫폼 (텍스트가 넘치면 말줄임표 처리되어야 함)' },
-  { id: '3', name: '소셜 미디어 앱' },
-  { id: '4', name: '금융 자산 관리 대시보드' },
-  { id: '5', name: '실시간 채팅 서비스' },
-  { id: '6', name: '블록체인 거래소 (보안 강화 버전)' },
-  { id: '7', name: 'IoT 스마트홈 컨트롤러' },
-  { id: '8', name: 'SaaS 구독 관리 플랫폼' },
-  { id: '9', name: '교육용 LMS 시스템' },
-  { id: '10', name: '헬스케어 웨어러블 앱' },
-  { id: '11', name: '메타버스 가상 오피스' },
-];
+export function ProjectDropdown({ projectName }: ProjectDropdownProps) {
+  const navigate = useNavigate();
+  const { workspaceId } = useParams<{ workspaceId: string }>();
+  const [projects, setProjects] = useState<WorkspaceCardData[]>([]);
 
-export function ProjectDropdown({ projectName, onProjectChange }: ProjectDropdownProps) {
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await getMyWorkspaces();
+        setProjects(data);
+      } catch (error) {
+        console.error('워크스페이스 목록 로드 실패:', error);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  const handleProjectChange = (workspaceId: string) => {
+    // 같은 워크스페이스면 이동 안 함 (선택적)
+    // 하지만 리로드 효과를 위해 이동 허용하거나, 현재 ID와 비교 가능
+    navigate(`/workspace/${workspaceId}/tree-editor`); // 기본 탭으로 이동
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -40,11 +51,13 @@ export function ProjectDropdown({ projectName, onProjectChange }: ProjectDropdow
             <Tooltip delayDuration={300}>
               <TooltipTrigger asChild>
                 <span className="truncate max-w-[160px] cursor-default block text-left">
-                  {projectName}
+                  {projects.find((p) => String(p.id) === String(workspaceId))?.title || projectName}
                 </span>
               </TooltipTrigger>
               <TooltipContent>
-                <p>{projectName}</p>
+                <p>
+                  {projects.find((p) => String(p.id) === String(workspaceId))?.title || projectName}
+                </p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -54,27 +67,32 @@ export function ProjectDropdown({ projectName, onProjectChange }: ProjectDropdow
 
       <DropdownMenuContent
         align="start"
-        className="w-56 max-h-[300px] overflow-y-auto rounded-xl border-zinc-200/60 bg-white/80 backdrop-blur-md shadow-lg [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-300/50 [&::-webkit-scrollbar-thumb]:hover:bg-zinc-400/60 [&::-webkit-scrollbar-thumb]:rounded-full"
+        className="w-56 max-h-[160px] overflow-y-auto rounded-xl border-zinc-200/60 bg-white/80 backdrop-blur-md shadow-lg [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-300/50 [&::-webkit-scrollbar-thumb]:hover:bg-zinc-400/60 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
-        {mockProjects.map((project) => (
-          <DropdownMenuItem
-            key={project.id}
-            onClick={() => onProjectChange?.(project.id)}
-            className="rounded-lg cursor-pointer"
-          >
-            {/* 리스트 아이템도 길어지면 truncate 처리 + 툴팁 */}
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <span className="truncate block w-full text-left">{project.name}</span>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>{project.name}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </DropdownMenuItem>
-        ))}
+        {projects.length === 0 ? (
+          <div className="p-2 text-xs text-zinc-500 text-center">
+            참여 중인 프로젝트가 없습니다.
+          </div>
+        ) : (
+          projects.map((project) => (
+            <DropdownMenuItem
+              key={project.id}
+              onClick={() => handleProjectChange(project.id)}
+              className="rounded-lg cursor-pointer"
+            >
+              <TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>
+                    <span className="truncate block w-full text-left">{project.title}</span>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>{project.title}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </DropdownMenuItem>
+          ))
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

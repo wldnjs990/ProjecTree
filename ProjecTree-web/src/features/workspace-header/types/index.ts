@@ -14,6 +14,7 @@ export interface OnlineUser {
 }
 
 export interface HeaderProps {
+  workspaceId: number;
   projectName: string;
   activeTab: ViewTab;
   onTabChange: (tab: ViewTab) => void;

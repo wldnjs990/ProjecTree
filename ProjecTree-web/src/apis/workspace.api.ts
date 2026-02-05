@@ -77,7 +77,7 @@ export const generateNodeCandidates = async (
   const response = await wasApiClient.post<NodeCandidatesResponse>(
     `nodes/${nodeId}/candidates`
   );
-  console.log(response);
+
   // API 응답에서 id, taskType, selected, summary가 없으므로 클라이언트에서 초기화
   return response.data.data.candidates.map((c, index) => ({
     ...c,
@@ -97,7 +97,7 @@ export const selectNodeCandidates = async (
     `nodes/${nodeId}/candidates/${candidateId}`,
     body
   );
-  console.log(response);
+
   // API 응답에서 id, taskType이 없으므로 클라이언트에서 임시 생성
   return response.data;
 };
@@ -258,7 +258,6 @@ export interface TechStackItem {
 export const getTechStacks = async (
   keyword: string = ''
 ): Promise<TechStackItem[]> => {
-  console.log('📡 [API] getTechStacks 호출됨, keyword:', keyword);
   if (!keyword.trim()) return [];
 
   const response = await wasApiClient.get<{
@@ -273,7 +272,6 @@ export const getTechStacks = async (
     params: { keyword },
   });
 
-  console.log('✅ [API] getTechStacks 응답:', response.data);
   return response.data.data.map((item) => ({
     id: item.id,
     name: item.name,
@@ -312,13 +310,7 @@ export const createWorkspace = async (
     epics: epics, // 🚨 재변경: 백엔드 DTO(epics) 확인 -> epics (복수형)
   };
 
-  // 📝 디버깅 로그 추가
-  console.log('🚀 [API 요청 데이터 확인 - 최종 수정 버전]');
-  console.log('1. JSON 데이터:', JSON.stringify(requestData, null, 2));
-  console.log('2. 파일 개수:', data.specFiles.length);
-  data.specFiles.forEach((file, index) => {
-    console.log(`   - 파일 ${index + 1}:`, file.name, file.size, file.type);
-  });
+
 
   // 2. FormData에 데이터 담기
   // JSON 객체 -> Blob (application/json) -> 'data' 필드

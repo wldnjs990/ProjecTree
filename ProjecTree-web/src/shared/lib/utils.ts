@@ -14,3 +14,20 @@ export function parseJwt(token: string) {
     return {};
   }
 }
+
+export function getAvatarColor(id: string | number): "blue" | "pink" | "orange" | "green" | "purple" {
+  const colors: ("blue" | "pink" | "orange" | "green" | "purple")[] = [
+    'blue',
+    'pink',
+    'orange',
+    'green',
+    'purple',
+  ];
+  const strId = String(id);
+  let hash = 0;
+  for (let i = 0; i < strId.length; i++) {
+    hash = strId.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash % colors.length);
+  return colors[index];
+}

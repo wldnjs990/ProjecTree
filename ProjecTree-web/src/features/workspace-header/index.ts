@@ -6,6 +6,7 @@ export {
   ViewTabs,
   ActionButtons,
   OnlineUsers,
+  MemberManagementModal,
 } from './components';
 
 // Types
