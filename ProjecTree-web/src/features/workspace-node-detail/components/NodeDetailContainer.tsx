@@ -25,10 +25,12 @@ interface NodeDetailContainerProps {
     identifier: string;
     taskType: string | null;
   };
+  onShowDescription?: () => void;
 }
 
 export default function NodeDetailContainer({
   nodeInfo,
+  onShowDescription,
 }: NodeDetailContainerProps) {
   // Store에서 상태 및 액션 구독
   const nodeDetail = useSelectedNodeDetail();
@@ -202,6 +204,7 @@ export default function NodeDetailContainer({
         onClose={closeSidebar}
         toggleEdit={handleToggleEdit}
         isEdit={isEditing}
+        onShowDescription={onShowDescription}
       />
 
       {/* Status & Meta 섹션 - store 직접 구독 */}
