@@ -216,9 +216,21 @@ export const useChat = (workspaceId: string) => {
           const rawId = m.memberId || m.member_id || m.id;
           const safeId = rawId ? rawId.toString() : `unknown-${Math.random()}`;
 
+          // 현재 사용자인 경우 userStore의 최신 닉네임 사용
+          const currentUser = useUserStore.getState().user;
+          const isMe =
+            currentUser &&
+            (currentUser.memberId?.toString() === safeId ||
+              currentUser.id?.toString() === safeId ||
+              currentUser.email === m.email);
+
+          const finalName = isMe
+            ? currentUser.nickname || currentUser.name
+            : m.nickname || m.name || 'Unknown';
+
           return {
             id: safeId,
-            name: m.nickname || m.name || 'Unknown', // 닉네임 우선
+            name: finalName, // 현재 사용자는 userStore 닉네임 우선
             email: m.email || '',
             role:
               m.role === 'OWNER'
