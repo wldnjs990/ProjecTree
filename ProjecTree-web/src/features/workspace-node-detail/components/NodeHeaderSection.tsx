@@ -15,6 +15,7 @@ interface NodeHeaderSectionProps {
   onClose: () => void;
   toggleEdit: () => void;
   isEdit: boolean;
+  onShowDescription?: () => void;
 }
 
 export function NodeHeaderSection({
@@ -23,6 +24,7 @@ export function NodeHeaderSection({
   onClose,
   toggleEdit,
   isEdit,
+  onShowDescription,
 }: NodeHeaderSectionProps) {
   if (!nodeInfo) return null;
 
@@ -37,6 +39,15 @@ export function NodeHeaderSection({
       <div className="flex px-4 py-4 justify-between absolute top-0 left-0 w-full bg-white z-10 border-b border-[#EEEEEE]">
         {/* 태그 영역 */}
         <div className="flex items-center gap-3">
+          {onShowDescription && (
+            <button
+              type="button"
+              onClick={onShowDescription}
+              className="text-xs font-medium text-[#4F46E5] px-2 py-1 rounded-md border border-[#E0E7FF] bg-[#EEF2FF] hover:bg-[#E0E7FF] transition-colors"
+            >
+              상세설명보기
+            </button>
+          )}
           {/* 노드 타입 태그 */}
           <span
             className={cn(

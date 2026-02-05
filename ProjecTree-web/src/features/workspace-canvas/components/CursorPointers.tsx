@@ -1,4 +1,5 @@
 import type { AwarenessState } from '@/features/workspace-core';
+import { cn } from '@/shared/lib/utils';
 import { useReactFlow } from '@xyflow/react';
 import { MousePointer2 } from 'lucide-react';
 
@@ -29,8 +30,11 @@ export default function CursorPointers({
               pointerEvents: 'none',
             }}
           >
-            <MousePointer2 className="text-primary" />
-            <span className="absolute left-full text-xs">
+            <MousePointer2 style={{ color: state.user?.color || 'black' }} />
+            <span
+              className={cn('absolute left-full text-xs whitespace-nowrap')}
+              style={{ color: state.user?.color || 'black' }}
+            >
               {state.user?.name}
             </span>
           </div>

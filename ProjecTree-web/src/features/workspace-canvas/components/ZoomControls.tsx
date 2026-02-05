@@ -1,4 +1,5 @@
-import { Plus, Minus, Maximize2, RotateCcw, LayoutGrid } from 'lucide-react';
+import { Plus, Minus, Maximize2, LayoutGrid } from 'lucide-react';
+import * as Y from 'yjs';
 import { useReactFlow } from '@xyflow/react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/shared/lib/utils';
@@ -10,8 +11,10 @@ import {
 import {
   getAutoLayoutedNodes,
   generateEdges,
+  getCrdtClient,
   useNodeStore,
   type FlowNode,
+  type YNodeValue,
 } from '@/features/workspace-core';
 
 interface ZoomControlsProps {
@@ -19,13 +22,8 @@ interface ZoomControlsProps {
 }
 
 export function ZoomControls({ className }: ZoomControlsProps) {
-  const { zoomIn, zoomOut, fitView, setViewport, setNodes, getNodes } =
-    useReactFlow();
+  const { zoomIn, zoomOut, fitView, setNodes, getNodes } = useReactFlow();
   const { setNodes: setStoreNodes } = useNodeStore();
-
-  const handleReset = () => {
-    setViewport({ x: 0, y: 0, zoom: 1 });
-  };
 
   const handleAutoLayout = () => {
     const currentNodes = getNodes() as FlowNode[];
@@ -47,6 +45,23 @@ export function ZoomControls({ className }: ZoomControlsProps) {
     setNodes(layoutedNodes);
     // Zustand 스토어도 업데이트 (CRDT 동기화용)
     setStoreNodes(layoutedNodes);
+
+    // Yjs에 위치 반영 + 서버 저장 트리거
+    const client = getCrdtClient();
+    const yNodes = client?.getYMap<Y.Map<YNodeValue>>('nodes');
+    if (client && yNodes) {
+      client.yDoc.transact(() => {
+        layoutedNodes.forEach((node) => {
+          const yNode = yNodes.get(node.id);
+          if (!yNode) return;
+          yNode.set('position', { x: node.position.x, y: node.position.y });
+        });
+      });
+
+      layoutedNodes.forEach((node) => {
+        client.saveNodePosition(node.id);
+      });
+    }
 
     // 정렬 후 전체 뷰에 맞춤
     setTimeout(() => {

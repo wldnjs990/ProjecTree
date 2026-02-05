@@ -1,5 +1,9 @@
 import { cn } from '@/shared/lib/utils';
-import { useSelectedNodeDetail, useSelectedNodeListData } from '../hooks';
+import {
+  useSelectedNodeDetail,
+  useSelectedNodeListData,
+  useNodeDetailEdit,
+} from '../hooks';
 import {
   useIsNodeDetailOpen,
   useSelectedNodeId,
@@ -13,7 +17,8 @@ import {
 } from '@/features/workspace-core';
 import CandidateNodeContainer from './CandidateNodeContainer';
 import NodeDetailContainer from './NodeDetailContainer';
-import { useCallback, useMemo } from 'react';
+import NodeDescriptionMarkdown from './NodeDescriptionMarkdown';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { postCreateNode } from '@/apis/node.api';
 
@@ -29,6 +34,8 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   const nodeListData = useSelectedNodeListData();
   const nodes = useNodes();
   const selectedNodeId = useSelectedNodeId();
+  const [isDescriptionView, setIsDescriptionView] = useState(false);
+  const { closeSidebar } = useNodeDetailEdit();
 
   // 후보 미리보기 상태
   const candidatePreviewMode = useCandidatePreviewMode();
@@ -66,6 +73,10 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
     previewNodesCrdtService.clearPreviewNodes();
     exitCandidatePreview();
   }, [exitCandidatePreview]);
+
+  useEffect(() => {
+    setIsDescriptionView(false);
+  }, [selectedNodeId, isOpen]);
 
   // 확정 핸들러
   const handleConfirmCreate = useCallback(async () => {
@@ -130,6 +141,20 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
                     isCreating={isCreatingNode}
                   />
                 </motion.div>
+              ) : isDescriptionView ? (
+                <motion.div
+                  key="node-description"
+                  initial={{ x: -50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: 50, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                >
+                  <NodeDescriptionMarkdown
+                    description={nodeDetail.description}
+                    onBack={() => setIsDescriptionView(false)}
+                    onClose={closeSidebar}
+                  />
+                </motion.div>
               ) : (
                 <motion.div
                   key="node-detail"
@@ -138,7 +163,10 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
                   exit={{ x: 50, opacity: 0 }}
                   transition={{ duration: 0.25, ease: 'easeInOut' }}
                 >
-                  <NodeDetailContainer nodeInfo={selectedNodeInfo} />
+                  <NodeDetailContainer
+                    nodeInfo={selectedNodeInfo}
+                    onShowDescription={() => setIsDescriptionView(true)}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>

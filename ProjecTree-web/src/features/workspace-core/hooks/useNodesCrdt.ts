@@ -6,6 +6,7 @@ import { useConnectionStatus, useNodeStore } from '../stores';
 import type { FlowNode, FlowNodeData, YjsNode } from '../types/node';
 import type { NodeData } from '../types/nodeDetail';
 import { flowNodeToYjsNode, yjsNodeToFlowNode } from '../utils/nodeTransform';
+import { generateEdges, getAutoLayoutedNodes } from '../utils';
 
 interface UseNodesCrdtOptions {
   initialNodes?: FlowNode[];
@@ -24,6 +25,7 @@ export const useNodesCrdt = ({
 
   // 노드리스트 관리용 ref객체
   const yNodesRef = useRef<Y.Map<Y.Map<YNodeValue>> | null>(null);
+  const didAutoLayoutRef = useRef(false);
 
   // Zustand 스토어 액션
   const setNodes = useNodeStore((state) => state.setNodes);
@@ -73,6 +75,15 @@ export const useNodesCrdt = ({
     setNodeListData(nodeListDataMap);
   }, [setNodes, setNodeListData]);
 
+  const shouldAutoLayout = useCallback((nodes: FlowNode[]) => {
+    if (nodes.length === 0) return false;
+    const isZero = (value: unknown) =>
+      Number.isFinite(Number(value)) && Number(value) === 0;
+    return nodes.every(
+      (node) => isZero(node.position?.x) && isZero(node.position?.y)
+    );
+  }, []);
+
   // Y.Map 초기화 및 구독
   useEffect(() => {
     const client = getCrdtClient();
@@ -111,6 +122,27 @@ export const useNodesCrdt = ({
 
         // UndoManager 초기화 (sync 완료 후)
         client.initUndoManager();
+
+        if (!didAutoLayoutRef.current && shouldAutoLayout(initialNodes)) {
+          didAutoLayoutRef.current = true;
+          const edges = generateEdges(initialNodes);
+          const layoutedNodes = getAutoLayoutedNodes(initialNodes, edges);
+
+          client.yDoc.transact(() => {
+            layoutedNodes.forEach((node) => {
+              const yNode = yNodes.get(node.id);
+              if (!yNode) return;
+              yNode.set('position', {
+                x: node.position.x,
+                y: node.position.y,
+              });
+            });
+          });
+
+          layoutedNodes.forEach((node) => {
+            client.saveNodePosition(node.id);
+          });
+        }
       }
     };
 
@@ -134,7 +166,7 @@ export const useNodesCrdt = ({
       yNodes.unobserveDeep(observeHandler);
       yNodesRef.current = null;
     };
-  }, [initialNodes, syncFromYjs, connectionStatus]);
+  }, [initialNodes, syncFromYjs, connectionStatus, shouldAutoLayout]);
 
   // 노드 드래그 완료 핸들러
   const handleNodeDragStop = useCallback(
