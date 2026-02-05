@@ -26,11 +26,15 @@ interface NodeDetailContainerProps {
     taskType: string | null;
   };
   onShowDescription?: () => void;
+  onToggleExpand?: () => void;
+  isExpanded?: boolean;
 }
 
 export default function NodeDetailContainer({
   nodeInfo,
   onShowDescription,
+  onToggleExpand,
+  isExpanded,
 }: NodeDetailContainerProps) {
   // Store에서 상태 및 액션 구독
   const nodeDetail = useSelectedNodeDetail();
@@ -205,6 +209,8 @@ export default function NodeDetailContainer({
         toggleEdit={handleToggleEdit}
         isEdit={isEditing}
         onShowDescription={onShowDescription}
+        onToggleExpand={onToggleExpand}
+        isExpanded={isExpanded}
       />
 
       {/* Status & Meta 섹션 - store 직접 구독 */}

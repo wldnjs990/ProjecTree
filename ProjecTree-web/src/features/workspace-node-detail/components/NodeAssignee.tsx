@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   Select,
   SelectContent,
@@ -6,13 +7,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { Assignee } from '../types';
-
-// 임시 팀원 목록 (나중에 API에서 가져올 예정)
-const teamMembers: Assignee[] = [
-  { id: '1', name: '김민수' },
-  { id: '2', name: '이지은' },
-  { id: '3', name: '박현우' },
-];
+import { useWorkspaceDetail } from '@/features/workspace-core';
 
 // 담당자 선택 컴포넌트 (편집 모드)
 interface AssigneeSelectProps {
@@ -20,19 +15,45 @@ interface AssigneeSelectProps {
   onChange?: (value: Assignee | null) => void;
 }
 function AssigneeSelect({ value, onChange }: AssigneeSelectProps) {
-  const handleChange = (selectedId: string) => {
-    if (selectedId === 'none') {
+  const workspaceDetail = useWorkspaceDetail();
+
+  const teamMembers = useMemo<Assignee[]>(() => {
+    const members = workspaceDetail?.teamInfo?.memberInfos ?? [];
+    const result: Assignee[] = [];
+    for (const member of members) {
+      const rawId = member.memberId ?? member.id;
+      const numericId = Number(rawId);
+      const name = member.nickname ?? member.name ?? member.email ?? '';
+      if (!Number.isFinite(numericId) || !name) continue;
+      result.push({ id: String(numericId), name });
+    }
+    return result;
+  }, [workspaceDetail]);
+
+  const displayName = value?.name || value?.nickname || '';
+  const selectedId = value?.id ? String(value.id) : 'none';
+
+  const options = useMemo<Assignee[]>(() => {
+    if (selectedId === 'none') return teamMembers;
+    const exists = teamMembers.some((member) => member.id === selectedId);
+    if (exists) return teamMembers;
+    const fallbackName = displayName || `ID ${selectedId}`;
+    return [{ id: selectedId, name: fallbackName }, ...teamMembers];
+  }, [teamMembers, displayName, selectedId]);
+
+  const handleChange = (id: string) => {
+    if (id === 'none') {
       onChange?.(null);
-    } else {
-      const member = teamMembers.find((m) => m.id === selectedId);
-      if (member) {
-        onChange?.(member);
-      }
+      return;
+    }
+    const member = options.find((m) => m.id === id);
+    if (member) {
+      onChange?.(member);
     }
   };
 
   return (
-    <Select value={value?.id || 'none'} onValueChange={handleChange}>
+    <Select value={selectedId} onValueChange={handleChange}>
       <SelectTrigger className="w-full h-9 text-sm">
         <SelectValue placeholder="담당자 선택" />
       </SelectTrigger>
@@ -40,13 +61,13 @@ function AssigneeSelect({ value, onChange }: AssigneeSelectProps) {
         <SelectItem value="none">
           <span className="text-muted-foreground">미지정</span>
         </SelectItem>
-        {teamMembers.map((member) => (
+        {options.map((member) => (
           <SelectItem key={member.id} value={member.id}>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-[#1C69E3] flex items-center justify-center text-xs text-white">
                 {member.name?.slice(0, 2) ?? '??'}
               </div>
-              <span>{member.name ?? '알 수 없음'}</span>
+              <span>{member.name ?? '이름없음'}</span>
             </div>
           </SelectItem>
         ))}
@@ -60,22 +81,23 @@ interface SelectedAssigneeProps {
   assignee: Assignee | null;
 }
 function SelectedAssignee({ assignee }: SelectedAssigneeProps) {
-  // assignee가 없거나 name이 없으면 미지정 표시
-  if (!assignee || !assignee.name) {
+  const display = assignee?.name || assignee?.nickname || '';
+  // assignee가 없거나 표시할 이름이 없으면 미지정 표시
+  if (!display) {
     return <span className="text-sm text-muted-foreground">미지정</span>;
   }
 
   return (
     <div className="flex items-center gap-2 px-2 py-2 bg-[rgba(238,238,238,0.5)] rounded-md">
       <div className="w-6 h-6 rounded-full bg-[#1C69E3] flex items-center justify-center text-xs text-white">
-        {assignee.name.slice(0, 2)}
+        {display.slice(0, 2)}
       </div>
-      <span className="text-sm text-[#0B0B0B]">{assignee.name}</span>
+      <span className="text-sm text-[#0B0B0B]">{display}</span>
     </div>
   );
 }
 
-// 병합 =========================================================
+// 종합 =========================================================
 interface NodeAssigneeProps {
   value: Assignee | null;
   onChange?: (value: Assignee | null) => void;
@@ -87,5 +109,5 @@ export const NodeAssignee = ({
   isEdit,
 }: NodeAssigneeProps) => {
   if (isEdit) return <AssigneeSelect value={value} onChange={onChange} />;
-  else return <SelectedAssignee assignee={value} />;
+  return <SelectedAssignee assignee={value} />;
 };
