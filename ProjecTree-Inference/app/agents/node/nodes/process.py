@@ -5,6 +5,8 @@ from langchain.agents import create_agent
 from langchain.agents.structured_output import ProviderStrategy
 from langchain_core.messages import HumanMessage
 from langchain_core.runnables import RunnableConfig
+from langchain.output_parsers import PydanticOutputParser
+from langchain_core.exceptions import OutputParserException
 from app.agents.prompts.system.global_context import GLOBAL_CONTEXT
 from app.agents.node.prompts.system.process_prompts import (
     EPIC_PROCESS_PROMPT,
@@ -54,7 +56,6 @@ async def _process_node(
     Name:{candidate_info.name}, Description:{candidate_info.description}
     """
 
-
     if workspace_info:
         workspace_context = GLOBAL_CONTEXT.format(
             project_tech_stack=[
@@ -80,28 +81,39 @@ async def _process_node(
 
     try:
         # Agent 동적 생성 및 실행
-        # 1. Tool 비동기 획득
-        # 2. Agent 생성 (매번 생성하는 비용이 크다면 캐싱 고려 가능하지만, Context 관리가 더 중요함)
+        parser = PydanticOutputParser(pydantic_object=schema)
+
+        # System Prompt에 포맷 가이드 추가
+        system_prompt_with_format = f"{system_prompt}\n\n{parser.get_format_instructions()}\n\n반드시 위의 JSON 형식을 엄수하여 최종 답변을 작성하세요."
+
+        # create_agent에서 response_format 제거 -> ReAct/Tool 모드 활성화
         agent = create_agent(
             llm,
             tools=[validate_description],
-            system_prompt=system_prompt,
-            response_format=ProviderStrategy(schema),
+            system_prompt=system_prompt_with_format,
         )
 
-        # 3. 비동기 실행 (ainvoke) with config for callbacks
+        # 3. 비동기 실행 (ainvoke)
         response = await agent.ainvoke(
             {"messages": [HumanMessage(content=formatted_user_prompt)]}, config=config
         )
-        result = response.get("structured_response")
 
-        if result:
-            # 결과 반환
+        # 응답 처리: AgentExecutor 스타일 vs LangGraph 스타일 대응
+        output_text = ""
+        if isinstance(response, dict):
+            if "output" in response:
+                output_text = response["output"]
+            elif "messages" in response and response["messages"]:
+                output_text = response["messages"][-1].content
+
+        # 파싱
+        try:
+            result = parser.parse(output_text)
             return {"generated_node": result.model_dump()}
-        else:
+        except OutputParserException as e:
             return {
                 "generated_node": None,
-                "last_error": "No structured response",
+                "last_error": f"Parsing failed: {str(e)}",
             }
 
     except Exception as e:
