@@ -5,8 +5,7 @@ class ChatSocketService {
   private readonly serverUrl: string;
   constructor() {
     // 환경변수에서 WebSocket 서버 URL 가져오기
-    this.serverUrl = 'https://i14d107.p.ssafy.io';
-    // this.serverUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
+    this.serverUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
     // this.serverUrl = 'http://localhost:7092';
   }
 
