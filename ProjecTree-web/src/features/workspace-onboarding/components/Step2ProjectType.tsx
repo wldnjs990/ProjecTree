@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DOMAIN_OPTIONS } from '../constants';
+import { DOMAIN_OPTIONS } from '@/shared/constants/workspace';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface Step2ProjectTypeProps {
