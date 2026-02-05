@@ -1,6 +1,8 @@
 package com.ssafy.projectree.domain.workspace.usecase;
 
 import com.ssafy.projectree.domain.chat.model.entity.ChatRoom;
+import com.ssafy.projectree.domain.chat.usecase.ChatRoomService;
+import com.ssafy.projectree.domain.member.api.dto.MemberDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.usecase.EmailService;
 import com.ssafy.projectree.domain.member.usecase.MemberService;
@@ -11,6 +13,7 @@ import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.workspace.model.repository.TeamRepository;
 import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.exception.BusinessLogicException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +32,7 @@ public class TeamService {
     private final EmailService emailService;
     private final TeamRepository teamRepository;
     private final MemberService memberService;
+    private final ChatRoomService chatRoomService;
 
     @Value("${workspace.invite_url}")
     private String baseUrl;
@@ -74,7 +78,7 @@ public class TeamService {
         return workspacesId;
     }
 
-    public Role getMyRole(Workspace workspace, Member member) {
+    public Role getMemberRole(Workspace workspace, Member member) {
         Team team = findByWorkspaceAndMember(workspace, member);
 
         return team.getRole();
@@ -83,7 +87,7 @@ public class TeamService {
     public TeamDto.UpdateRoleResponse changeRole(Member member, Workspace workspace, TeamDto.UpdateRoleRequest dto) {
         List<Team> teams = findAllByWorkspace(workspace);
 
-        if (getMyRole(workspace, member).equals(Role.OWNER)) {
+        if (getMemberRole(workspace, member).equals(Role.OWNER)) {
             throw new BusinessLogicException(ErrorCode.CHANGE_ROLE_REJECTED);
         }
 
@@ -124,5 +128,25 @@ public class TeamService {
         }
 
         return members;
+    }
+
+    @Transactional
+    public MemberDto.Info invite(Member member, Workspace workspace, TeamDto.Invite dto) {
+
+        Team team = findByWorkspaceAndMember(workspace, member);
+        Role memberRole = team.getRole();
+
+        ChatRoom chatRoom = chatRoomService.findById(dto.getChatRoomId());
+
+        if (!memberRole.equals(Role.OWNER)) {
+            throw new BusinessLogicException(ErrorCode.INVITE_MEMBER_REJECTED);
+        }
+
+        Team newTeammate = new Team(member, workspace, chatRoom, Role.OWNER);
+        teamRepository.save(newTeammate);
+
+        emailService.sendEmail(dto.getEmail(), baseUrl + dto.getWorkspaceId());
+
+        return MemberDto.Info.from(newTeammate);
     }
 }

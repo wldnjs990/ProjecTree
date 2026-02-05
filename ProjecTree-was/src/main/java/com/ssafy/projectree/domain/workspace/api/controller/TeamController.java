@@ -11,6 +11,7 @@ import com.ssafy.projectree.global.docs.TeamDocsController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,10 +24,17 @@ public class TeamController implements TeamDocsController {
     private final WorkspaceService workspaceService;
     private final TeamService teamService;
 
+    @Override
     @PatchMapping()
     public CommonResponse<?> updateMemberRole(@AuthenticationPrincipal Member member, @RequestBody TeamDto.UpdateRoleRequest dto) {
         Workspace workspace = workspaceService.findById(dto.getWorkspaceId());
         return CommonResponse.success(SuccessCode.SUCCESS, teamService.changeRole(member, workspace, dto));
     }
 
+    @Override
+    @PostMapping("/invite")
+    public CommonResponse<?> invite(@AuthenticationPrincipal Member member, @RequestBody TeamDto.Invite dto) {
+        Workspace workspace = workspaceService.findById(dto.getWorkspaceId());
+        return CommonResponse.success(SuccessCode.SUCCESS, teamService.invite(member, workspace, dto));
+    }
 }
