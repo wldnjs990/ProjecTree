@@ -3,6 +3,7 @@ import type { NodeStatus, NodeType, Priority, TaskType } from "./node.type";
 export function isValidNodePayload(body: any): body is IncomingNodePayload {
   return (
     // 추가 검증 로직은 필요에 따라 여기에 작성
+    // TODO description 필드 추가되면 여기도 수정 필요
     typeof body?.id === "number" &&
     typeof body?.name === "string" &&
     typeof body?.nodeType === "string" &&
