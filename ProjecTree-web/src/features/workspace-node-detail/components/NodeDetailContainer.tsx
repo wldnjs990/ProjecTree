@@ -37,7 +37,7 @@ export default function NodeDetailContainer({
   onToggleExpand,
   isExpanded,
 }: NodeDetailContainerProps) {
-  // Store에서 상태 및 액션 구독
+  // Store?�서 ?�태 �??�션 구독
   const nodeDetail = useSelectedNodeDetail();
   const selectedNodeId = useSelectedNodeId();
   const nodes = useNodes();
@@ -58,7 +58,7 @@ export default function NodeDetailContainer({
   const isGeneratingCandidates = nodeDetail?.candidatesPending || false;
   const isGeneratingTechs = nodeDetail?.techsPending || false;
 
-  // 노드 상세 접근 시 선택된 기술스택 ID 설정
+  // ?�드 ?�세 ?�근 ???�택??기술?�택 ID ?�정
   useEffect(() => {
     if (nodeDetail?.techs) {
       const selectedTech = nodeDetail.techs.find((tech) => tech.selected);
@@ -66,7 +66,7 @@ export default function NodeDetailContainer({
     }
   }, [nodeDetail?.techs, setSelectedTechId]);
 
-  // 노드 상세 접근 시 선택된 후보 노드 ID 목록 설정
+  // ?�드 ?�세 ?�근 ???�택???�보 ?�드 ID 목록 ?�정
   useEffect(() => {
     if (nodeDetail?.candidates) {
       const selectedIds = nodeDetail.candidates
@@ -86,7 +86,7 @@ export default function NodeDetailContainer({
   const showDifficulty = isTaskOrAdvance;
   const showCandidateSection = nodeType !== 'ADVANCE';
 
-  // 편집 토글 핸들러
+  // ?�집 ?��? ?�들??
   const handleToggleEdit = async () => {
     if (!isEditing) {
       startEdit();
@@ -94,21 +94,21 @@ export default function NodeDetailContainer({
       try {
         await finishEdit();
       } catch (error) {
-        console.error('저장 실패:', error);
+        console.error('?�???�패:', error);
       }
     }
   };
 
-  // 노드 후보 클릭 → 미리보기 모드 진입 핸들러
+  // ?�드 ?�보 ?�릭 ??미리보기 모드 진입 ?�들??
   const handleCandidateClick = (_nodeId: number, candidateId: number) => {
-    // 후보 노드 찾기
+    // ?�보 ?�드 찾기
     const candidate = nodeDetail?.candidates.find((c) => c.id === candidateId);
     if (!candidate || !selectedNodeId) return;
 
-    // 위치 계산
+    // ?�치 계산
     const position = calculateChildNodePosition(nodes, selectedNodeId);
 
-    // Preview 노드 생성 (CRDT 동기화 → 다른 유저에게도 표시)
+    // Preview ?�드 ?�성 (CRDT ?�기?????�른 ?��??�게???�시)
     const currentUserId = currentUser?.memberId ?? currentUser?.id;
     const previewNode: FlowNode = {
       id: `preview-${candidateId}`,
@@ -124,7 +124,7 @@ export default function NodeDetailContainer({
       },
     };
 
-    // CRDT를 통해 preview 노드 추가 (다른 유저에게도 동기화)
+    // CRDT�??�해 preview ?�드 추�? (?�른 ?��??�게???�기??
     previewNodesCrdtService.addPreviewNode(previewNode);
 
     // 미리보기 모드 진입
@@ -141,7 +141,7 @@ export default function NodeDetailContainer({
     console.log('Candidate add manual clicked');
   };
 
-  // AI 기술 추천 생성 핸들러
+  // AI 기술 추천 ?�성 ?�들??
   const handleGenerateTechs = async () => {
     if (!selectedNodeId) return;
 
@@ -179,32 +179,29 @@ export default function NodeDetailContainer({
         });
       }
     } catch (error) {
-      console.error('AI 기술 추천 생성 실패:', error);
+      console.error('AI 기술 추천 ?�성 ?�패:', error);
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
   };
 
-  // AI 노드 후보 생성 핸들러
+  // AI ?�드 ?�보 ?�성 ?�들??
   const handleGenerateCandidates = async () => {
     if (!selectedNodeId) return;
 
     nodeDetailCrdtService.setCandidatesPending(selectedNodeId, true);
     try {
-      const candidates = await generateNodeCandidates(Number(selectedNodeId));
+      await generateNodeCandidates(Number(selectedNodeId));
 
-      // CRDT 동기화 (Y.Map + 로컬 store 모두 업데이트)
-      nodeDetailCrdtService.updateCandidates(selectedNodeId, candidates);
 
-      console.log('[NodeDetailContainer] AI 노드 후보 생성 완료:', candidates);
+      console.log('[NodeDetailContainer] AI ?�드 ?�보 ?�성 ?�료');
     } catch (error) {
-      console.error('AI 노드 후보 생성 실패:', error);
-      nodeDetailCrdtService.setCandidatesPending(selectedNodeId, false);
+      console.error('AI ?�드 ?�보 ?�성 ?�패:', error);
     }
   };
 
   return (
     <div className="p-4 space-y-4 pt-20">
-      {/* 노드 헤더 */}
+      {/* ?�드 ?�더 */}
       <NodeHeaderSection
         nodeInfo={nodeInfo}
         description={nodeDetail.description}
@@ -216,13 +213,13 @@ export default function NodeDetailContainer({
         isExpanded={isExpanded}
       />
 
-      {/* Status & Meta 섹션 - store 직접 구독 */}
+      {/* Status & Meta ?�션 - store 직접 구독 */}
       <StatusMetaSection showDifficulty={showDifficulty} />
 
-      {/* 메모 섹션 - store 직접 구독 */}
+      {/* 메모 ?�션 - store 직접 구독 */}
       <MemoSection />
 
-      {/* AI 기술 추천 섹션 - 항상 표시 */}
+      {/* AI 기술 추천 ?�션 - ??�� ?�시 */}
       {showTechRecommend && (
         <AITechRecommendSection
           isEdit={isEditing}
@@ -233,7 +230,7 @@ export default function NodeDetailContainer({
         />
       )}
 
-      {/* AI 다음 노드 추천 섹션 - 항상 표시 */}
+      {/* AI ?�음 ?�드 추천 ?�션 - ??�� ?�시 */}
       {showCandidateSection && (
         <AINodeCandidateSection
           candidates={nodeDetail.candidates || []}
