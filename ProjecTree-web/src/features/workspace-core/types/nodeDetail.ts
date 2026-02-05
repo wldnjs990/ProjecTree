@@ -53,14 +53,14 @@ export interface Candidate {
 }
 
 export interface TechRecommendation {
-  id: number;
-  name: string;
+  id: number; //
+  name: string; //
   advantage: string;
   disAdvantage: string;
   description: string;
   ref: string;
   recommendScore: number;
-  selected: boolean;
+  selected: boolean; //
 }
 
 export interface NodeDetailData {

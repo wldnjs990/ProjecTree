@@ -75,7 +75,10 @@ export const useCursors = () => {
     const client = getCrdtClient();
     if (!client) return;
 
-    client.awareness.setLocalStateField('user', { name, color });
+    client.awareness.setLocalStateField('user', {
+      name,
+      color,
+    });
   }, []);
 
   return {
