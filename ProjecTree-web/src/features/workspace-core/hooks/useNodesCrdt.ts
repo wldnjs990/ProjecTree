@@ -77,8 +77,10 @@ export const useNodesCrdt = ({
 
   const shouldAutoLayout = useCallback((nodes: FlowNode[]) => {
     if (nodes.length === 0) return false;
+    const isZero = (value: unknown) =>
+      Number.isFinite(Number(value)) && Number(value) === 0;
     return nodes.every(
-      (node) => node.position?.x === 0 && node.position?.y === 0
+      (node) => isZero(node.position?.x) && isZero(node.position?.y)
     );
   }, []);
 
