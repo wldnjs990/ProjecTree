@@ -5,6 +5,7 @@ import com.ssafy.projectree.domain.ai.lock.utils.LockService;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.CustomNodeDto;
+import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
@@ -55,6 +56,12 @@ public class NodeController implements NodeDocsController {
     @PostMapping("/nodes/{node-id}/tech-stack/recommendation")
     public CommonResponse<TechStackRecommendDto.Response> recommendTechStack(@PathVariable(name = "node-id") Long nodeId) {
         return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.TECH, String.valueOf(nodeId), () -> nodeService.recommendTechStack(nodeId)));
+    }
+
+    @PostMapping("/nodes/{nodeId}/tech-stack")
+    public CommonResponse<Void> createCustomTechStack(@PathVariable Long nodeId, @RequestBody CustomTechCreateDto.Request request) {
+        nodeService.createCustomTechStack(nodeId,request.getWorkspaceId(), request.getTechVocaId());
+        return CommonResponse.success(SuccessCode.SUCCESS, null);
     }
 
     @Override

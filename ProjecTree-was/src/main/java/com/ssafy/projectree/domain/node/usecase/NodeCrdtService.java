@@ -1,5 +1,6 @@
 package com.ssafy.projectree.domain.node.usecase;
 
+import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodePositionUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
 import com.ssafy.projectree.domain.node.model.repository.NodeRepository;
@@ -31,6 +32,9 @@ public class NodeCrdtService {
 
     @Value("${crdt-server.new-node-path}")
     private String nodePath;
+
+    @Value("${crdt-server.new-tech-path}")
+    private String techPath;
 
     @Async("nodePositionExecutor")
     @Transactional
@@ -72,4 +76,24 @@ public class NodeCrdtService {
         }
     }
 
+    public void sendTechCreationToCrdt(
+            Long workspaceId,
+            Long nodeId, CustomTechCreateDto.Response response) {
+        String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
+                .path(pathPrefix)
+                .path(techPath)
+                .build()
+                .toUriString();
+
+        try {
+            restClient.post().uri(uriString, workspaceId, nodeId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response)
+                    .retrieve().toBodilessEntity();
+        } catch (Exception e) {
+            // TODO: 현재는 트랜잭션과 같이 동작 하기에 로그만 띄우지만
+            // Transaction 과 별개로 동작하여 예외 반환 로직을 구현하는 것이 더 좋을 것같음
+            log.error("CRDT 서버 전송 실패: {}", e.getMessage());
+        }
+    }
 }
