@@ -10,7 +10,6 @@ from app.agents.node.nodes.process import (
     story_node_process,
     task_node_process,
     advance_node_process,
-    node_description_process,
 )
 from app.agents.node.nodes.creation import sub_node_info_create
 from app.agents.node.nodes.feedback import node_feedback, struct_feedback
@@ -34,7 +33,6 @@ builder.add_node("sub_node_info_create", sub_node_info_create)
 builder.add_node("task_node_process", task_node_process)
 builder.add_node("advance_node_process", advance_node_process)
 builder.add_node("structured_output_parser", structured_output_parser)
-builder.add_node("node_description_process", node_description_process)
 builder.add_node("node_feedback", node_feedback)
 builder.add_node("struct_feedback", struct_feedback)
 
@@ -55,11 +53,10 @@ builder.add_conditional_edges(
         "advance_node_process",
     ],
 )
-builder.add_edge("epic_node_process", "node_description_process")
-builder.add_edge("story_node_process", "node_description_process")
-builder.add_edge("task_node_process", "node_description_process")
-builder.add_edge("advance_node_process", "node_description_process")
-builder.add_edge("node_description_process", "node_feedback")
+builder.add_edge("epic_node_process", "node_feedback")
+builder.add_edge("story_node_process", "node_feedback")
+builder.add_edge("task_node_process", "node_feedback")
+builder.add_edge("advance_node_process", "node_feedback")
 
 builder.add_conditional_edges(
     "node_feedback",
@@ -68,6 +65,9 @@ builder.add_conditional_edges(
 )
 builder.add_edge("structured_output_parser", "struct_feedback")
 builder.add_conditional_edges(
-    "struct_feedback", route_struct_feedback, ["structured_output_parser", END]
+    "struct_feedback", route_struct_feedback, 
+    ["structured_output_parser", END]
 )
-builder.add_edge("struct_feedback", END)
+builder.add_edge(
+    "struct_feedback", END
+)
