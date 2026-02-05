@@ -11,7 +11,7 @@ EPIC_PROCESS_PROMPT = """당신은 수석 프로젝트 매니저(Senior PM)입�
 
 [지시사항]
 1. 에픽 이름은 '명사형'으로 간결하게 작성하세요. (예: [회원] 소셜 로그인 통합)
-2. 명세(Description)는 비즈니스 배경과 범위를 명확히 하여 개발자들이 길을 잃지 않게 하세요. (1000자 이내)
+2. 명세(Description)는 비즈니스 배경과 범위를 명확히 하여 개발자들이 길을 잃지 않게 하세요. (700token 이내)
 3. [Description 작성 및 검증 규칙 - 필수 준수 사항]
    최종 답변을 생성하기 전에 **반드시** `validate_description` 도구를 사용하여 내용을 검증해야 합니다.
    - 먼저 Description 초안을 작성합니다.
@@ -37,7 +37,7 @@ STORY_PROCESS_PROMPT = """당신은 프로덕트 오너(PO)입니다.
 
 [지시사항]
 1. 스토리 이름은 "사용자는 ~하기 위해 ~할 수 있다" 형식이나 그에 준하는 명확한 문장으로 작성하세요.
-2. 명세(Description)에는 반드시 **인수 조건(Acceptance Criteria)**이 포함되어야 합니다. (1000자 이내)
+2. 명세(Description)에는 반드시 **인수 조건(Acceptance Criteria)**이 포함되어야 합니다. (700token 이내)
 3. [Description 작성 및 검증 규칙 - 필수 준수 사항]
    최종 답변을 생성하기 전에 **반드시** `validate_description` 도구를 사용하여 내용을 검증해야 합니다.
    - 먼저 Description 초안을 작성합니다.
