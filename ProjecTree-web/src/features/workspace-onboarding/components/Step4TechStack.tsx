@@ -8,7 +8,7 @@ import type { TechStackItem } from '@/apis/workspace.api';
 
 interface Step4TechStackProps {
   data: {
-    techStacks: number[];
+    techStacks: TechStackItem[];
   };
   onChange: (updates: Partial<Step4TechStackProps['data']>) => void;
   onNext: () => void;
@@ -23,11 +23,6 @@ export default function Step4TechStack({
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  // 선택된 기술의 이름 매핑을 위한 상태 (검색 결과에 없어도 표시하기 위함)
-  const [selectedTechMap, setSelectedTechMap] = useState<Map<number, string>>(
-    new Map()
-  );
 
   // 검색어 입력 시 API 조회
   useEffect(() => {
@@ -49,16 +44,12 @@ export default function Step4TechStack({
   }, [searchTerm]);
 
   const filteredTechs = techOptions.filter(
-    (tech) => !data.techStacks.includes(tech.id)
+    (tech) => !data.techStacks.some((selected) => selected.id === tech.id)
   );
 
   const handleAdd = (techEntry: TechStackItem) => {
-    if (!data.techStacks.includes(techEntry.id)) {
-      onChange({ techStacks: [...data.techStacks, techEntry.id] });
-      // 이름 매핑 저장
-      setSelectedTechMap((prev) =>
-        new Map(prev).set(techEntry.id, techEntry.name)
-      );
+    if (!data.techStacks.some((selected) => selected.id === techEntry.id)) {
+      onChange({ techStacks: [...data.techStacks, techEntry] });
       setSearchTerm('');
       setShowSuggestions(false);
       setSelectedIndex(0);
@@ -67,7 +58,7 @@ export default function Step4TechStack({
 
   const handleRemove = (techId: number) => {
     onChange({
-      techStacks: data.techStacks.filter((id) => id !== techId),
+      techStacks: data.techStacks.filter((tech) => tech.id !== techId),
     });
   };
 
@@ -96,14 +87,6 @@ export default function Step4TechStack({
         setSelectedIndex(0);
         break;
     }
-  };
-
-  const getTechName = (id: number) => {
-    return (
-      selectedTechMap.get(id) ||
-      techOptions.find((t) => t.id === id)?.name ||
-      `Tech ${id}`
-    );
   };
 
   return (
@@ -148,10 +131,9 @@ export default function Step4TechStack({
                 <div
                   key={tech.id}
                   className={`cursor-pointer px-4 py-2.5 font-['Pretendard'] font-normal text-[14px] transition-colors
-                    ${
-                      index === selectedIndex
-                        ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-cod-gray)]'
-                        : 'bg-transparent text-[var(--figma-text-cod-gray)] hover:bg-[var(--figma-gray-concrete)]'
+                    ${index === selectedIndex
+                      ? 'bg-[var(--figma-gray-concrete)] text-[var(--figma-text-cod-gray)]'
+                      : 'bg-transparent text-[var(--figma-text-cod-gray)] hover:bg-[var(--figma-gray-concrete)]'
                     }`}
                   onClick={() => handleAdd(tech)}
                   onMouseEnter={() => setSelectedIndex(index)}
@@ -166,17 +148,17 @@ export default function Step4TechStack({
         {/* 선택된 기술 스택 */}
         {data.techStacks.length > 0 && (
           <div className="flex min-h-15 max-h-[320px] overflow-y-auto chat-scrollbar flex-wrap gap-2 rounded-lg p-4 bg-[var(--figma-gray-concrete)] border border-[var(--figma-border-mercury)]">
-            {data.techStacks.map((techId) => (
+            {data.techStacks.map((tech) => (
               <Badge
-                key={techId}
+                key={tech.id}
                 variant="secondary"
                 className="flex items-center gap-2 px-3 py-1.5 text-sm font-['Pretendard'] font-normal bg-white text-[var(--figma-text-cod-gray)] border border-[var(--figma-border-mercury)] shadow-sm hover:bg-gray-50"
               >
-                {getTechName(techId)}
+                {tech.name}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleRemove(techId);
+                    handleRemove(tech.id);
                   }}
                   className="rounded-full p-0.5 hover:bg-gray-200 transition-colors"
                 >
