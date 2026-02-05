@@ -142,7 +142,12 @@ public class TeamService {
             throw new BusinessLogicException(ErrorCode.INVITE_MEMBER_REJECTED);
         }
 
-        Team newTeammate = new Team(member, workspace, chatRoom, Role.OWNER);
+        Member newMember = memberService.findByEmail(dto.getEmail());
+        if (newMember.isDeleted() || newMember == null) {
+            throw new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR, "존재하지 않는 사용자입니다.");
+        }
+
+        Team newTeammate = new Team(newMember, workspace, chatRoom, dto.getRole());
         teamRepository.save(newTeammate);
 
         emailService.sendEmail(dto.getEmail(), baseUrl + dto.getWorkspaceId());
