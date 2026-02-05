@@ -83,7 +83,7 @@ async def _process_node(
         # 1. Tool 비동기 획득
         # 2. Agent 생성 (매번 생성하는 비용이 크다면 캐싱 고려 가능하지만, Context 관리가 더 중요함)
         agent = create_agent(
-            llm,
+            llm.bind(max_tokens=900),
             tools=[validate_description],
             system_prompt=system_prompt,
             response_format=ProviderStrategy(schema),
