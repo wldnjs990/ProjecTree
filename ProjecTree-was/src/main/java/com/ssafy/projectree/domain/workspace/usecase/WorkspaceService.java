@@ -146,6 +146,7 @@ public class WorkspaceService {
                 .build();
 
         return WorkspaceDto.Detail.builder()
+                .info(WorkspaceDto.Info.from(workspace))
                 .nodeTree(nodeService.getNodeTree(workspaceId))
                 .files(files)
                 .epics(epics)

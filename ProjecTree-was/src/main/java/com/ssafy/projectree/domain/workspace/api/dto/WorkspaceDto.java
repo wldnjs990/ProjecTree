@@ -1,16 +1,15 @@
 package com.ssafy.projectree.domain.workspace.api.dto;
 
 import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
-import com.ssafy.projectree.domain.file.model.entity.FileProperty;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.enums.ServiceType;
+import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -137,6 +136,8 @@ public class WorkspaceDto {
     @Schema(description = "워크 스페이스 진입 요청에 대한 응답 DTO")
     public static class Detail {
 
+        private Info info;
+
         private NodeTreeReadDto.Response nodeTree;
 
         private List<FileReadDto.Response> files;
@@ -144,6 +145,35 @@ public class WorkspaceDto {
         private List<FunctionSpecificationDto.EpicInfo> epics;
 
         private TeamDto.Info teamInfo;
+
+    }
+
+    @Builder
+    @AllArgsConstructor
+    @Schema(description = "워크 스페이스 기본 정보 반환 DTO")
+    public static class Info {
+
+        private String name;
+        private String description;
+        private ServiceType serviceType;
+        private String domain;
+        private LocalDate startDate;
+        private LocalDate endDate;
+        private String purpose;
+        private String identifierPrefix;
+
+        public static Info from(Workspace workspace) {
+            return Info.builder()
+                    .name(workspace.getName())
+                    .description(workspace.getDescription())
+                    .serviceType(workspace.getServiceType())
+                    .domain(workspace.getDomain())
+                    .startDate(workspace.getStartDate())
+                    .endDate(workspace.getEndDate())
+                    .purpose(workspace.getPurpose())
+                    .identifierPrefix(workspace.getIdentifierPrefix())
+                    .build();
+        }
 
     }
 }
