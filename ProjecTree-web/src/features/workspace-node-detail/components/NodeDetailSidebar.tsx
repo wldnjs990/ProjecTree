@@ -10,10 +10,11 @@ import {
   useNodes,
   useCandidatePreviewMode,
   usePreviewCandidate,
-  usePreviewNodePosition,
   useIsCreatingNode,
   useNodeDetailStore,
   previewNodesCrdtService,
+  getCrdtClient,
+  type YNodeValue,
 } from '@/features/workspace-core';
 import CandidateNodeContainer from './CandidateNodeContainer';
 import NodeDetailContainer from './NodeDetailContainer';
@@ -21,6 +22,8 @@ import NodeDescriptionMarkdown from './NodeDescriptionMarkdown';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { postCreateNode } from '@/apis/node.api';
+import { useUser } from '@/shared/stores/userStore';
+import * as Y from 'yjs';
 
 // 노드 기본 정보 (헤더용) - WorkSpacePage에서 전달받음
 interface NodeDetailSidebarProps {
@@ -41,8 +44,9 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   // 후보 미리보기 상태
   const candidatePreviewMode = useCandidatePreviewMode();
   const previewCandidate = usePreviewCandidate();
-  const previewNodePosition = usePreviewNodePosition();
   const isCreatingNode = useIsCreatingNode();
+  const currentUser = useUser();
+  const currentUserId = String(currentUser?.memberId ?? currentUser?.id ?? '');
 
   // 스토어 액션
   const { exitCandidatePreview, setIsCreatingNode } = useNodeDetailStore();
@@ -71,9 +75,11 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
 
   // 미리보기 종료 핸들러
   const handleExitPreview = useCallback(() => {
-    previewNodesCrdtService.clearPreviewNodes();
+    if (currentUserId) {
+      previewNodesCrdtService.clearPreviewNodesByOwner(currentUserId);
+    }
     exitCandidatePreview();
-  }, [exitCandidatePreview]);
+  }, [exitCandidatePreview, currentUserId]);
 
   useEffect(() => {
     setIsDescriptionView(false);
@@ -82,20 +88,33 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
 
   // 확정 핸들러
   const handleConfirmCreate = useCallback(async () => {
-    if (!selectedNodeId || !previewCandidate || !previewNodePosition) return;
+    if (!selectedNodeId || !previewCandidate) return;
+
+    const client = getCrdtClient();
+    const yPreviewNodes = client?.getYMap<Y.Map<YNodeValue>>('previewNodes');
+    const previewNodeId = `preview-${previewCandidate.id}`;
+    const yNode = yPreviewNodes?.get(previewNodeId);
+    const position = yNode?.get('position') as
+      | { x?: unknown; y?: unknown }
+      | undefined;
+    const xpos = Number(position?.x);
+    const ypos = Number(position?.y);
+    if (!Number.isFinite(xpos) || !Number.isFinite(ypos)) return;
 
     try {
       setIsCreatingNode(true);
 
       // API 호출 (계산된 위치 전송)
       await postCreateNode(
-        previewNodePosition, // { xpos, ypos }
+        { xpos, ypos },
         Number(selectedNodeId),
         previewCandidate.id
       );
 
       // 성공 시: preview 노드 제거 (새 노드는 CRDT 브로드캐스트로 자동 추가됨)
-      previewNodesCrdtService.clearPreviewNodes();
+      if (currentUserId) {
+        previewNodesCrdtService.clearPreviewNodesByOwner(currentUserId);
+      }
       exitCandidatePreview();
     } catch (error) {
       console.error('노드 생성 실패:', error);
@@ -106,9 +125,9 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   }, [
     selectedNodeId,
     previewCandidate,
-    previewNodePosition,
     setIsCreatingNode,
     exitCandidatePreview,
+    currentUserId,
   ]);
 
   return (

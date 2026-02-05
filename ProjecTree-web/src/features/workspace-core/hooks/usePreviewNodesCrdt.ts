@@ -26,6 +26,7 @@ export const usePreviewNodesCrdt = () => {
     yPreviewNodesRef.current.forEach((yNode, nodeId) => {
       const rawParentId = yNode.get('parentId');
       const data = yNode.get('data') as FlowNodeData;
+      const lockedBy = yNode.get('lockedBy') as string | undefined;
 
       const yjsNode: YjsNode = {
         id: nodeId,
@@ -35,7 +36,7 @@ export const usePreviewNodesCrdt = () => {
             ? undefined
             : (rawParentId as string | undefined),
         position: yNode.get('position') as { x: number; y: number },
-        data,
+        data: lockedBy ? { ...data, lockedBy } : data,
       };
       previewNodes.push(yjsNodeToFlowNode(yjsNode));
     });

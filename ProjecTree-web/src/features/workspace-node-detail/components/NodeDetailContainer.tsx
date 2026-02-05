@@ -15,6 +15,7 @@ import {
   calculateChildNodePosition,
   type FlowNode,
 } from '@/features/workspace-core';
+import { useUser } from '@/shared/stores/userStore';
 import { generateNodeCandidates } from '@/apis/workspace.api';
 import { getAiNodeTechRecommendation } from '@/apis/node.api';
 
@@ -52,9 +53,10 @@ export default function NodeDetailContainer({
   const enterCandidatePreview = useNodeDetailStore(
     (state) => state.enterCandidatePreview
   );
+  const currentUser = useUser();
 
-  const isGeneratingCandidates = !!nodeDetail.candidatesPending;
-  const isGeneratingTechs = !!nodeDetail.techsPending;
+  const isGeneratingCandidates = nodeDetail?.candidatesPending || false;
+  const isGeneratingTechs = nodeDetail?.techsPending || false;
 
   // 노드 상세 접근 시 선택된 기술스택 ID 설정
   useEffect(() => {
@@ -107,6 +109,7 @@ export default function NodeDetailContainer({
     const position = calculateChildNodePosition(nodes, selectedNodeId);
 
     // Preview 노드 생성 (CRDT 동기화 → 다른 유저에게도 표시)
+    const currentUserId = currentUser?.memberId ?? currentUser?.id;
     const previewNode: FlowNode = {
       id: `preview-${candidateId}`,
       type: 'PREVIEW',
@@ -117,6 +120,7 @@ export default function NodeDetailContainer({
         status: 'TODO',
         taskId: '#preview',
         taskType: candidate.taskType,
+        ...(currentUserId ? { lockedBy: String(currentUserId) } : {}),
       },
     };
 
@@ -143,13 +147,15 @@ export default function NodeDetailContainer({
 
     nodeDetailCrdtService.setTechsPending(selectedNodeId, true);
     try {
-      const response = await getAiNodeTechRecommendation(Number(selectedNodeId));
+      const response = await getAiNodeTechRecommendation(
+        Number(selectedNodeId)
+      );
       const rawTechs = response?.data?.techs;
       const techsArray = Array.isArray(rawTechs)
         ? rawTechs
         : rawTechs
-        ? [rawTechs]
-        : [];
+          ? [rawTechs]
+          : [];
 
       const mappedTechs = techsArray.map((tech, index) => ({
         id: tech.id ?? Date.now() + index,
