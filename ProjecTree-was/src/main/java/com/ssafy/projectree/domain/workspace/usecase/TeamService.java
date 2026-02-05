@@ -87,7 +87,7 @@ public class TeamService {
     public TeamDto.UpdateRoleResponse changeRole(Member member, Workspace workspace, TeamDto.UpdateRoleRequest dto) {
         List<Team> teams = findAllByWorkspace(workspace);
 
-        if (getMemberRole(workspace, member).equals(Role.OWNER)) {
+        if (!getMemberRole(workspace, member).equals(Role.OWNER)) {
             throw new BusinessLogicException(ErrorCode.CHANGE_ROLE_REJECTED);
         }
 
