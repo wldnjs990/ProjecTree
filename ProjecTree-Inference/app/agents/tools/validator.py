@@ -4,21 +4,21 @@ from langchain.tools import tool
 @tool
 def validate_description(description: str) -> str:
     """
-    작성된 description의 길이를 계산하여 700token 제한 준수 여부를 검증합니다.
-    (대략 3000자 정도를 700token으로 간주합니다.)
+    작성된 description의 길이를 계산하여 1500자 제한 준수 여부를 검증합니다.
+    (대략 1500자 정도를 700token으로 간주합니다.)
     검증 통과 시: 검증된 description을 그대로 반환합니다. 이 반환값을 최종 출력에 그대로 사용하세요.
     검증 실패 시: 오류 메시지를 반환합니다. 내용을 줄인 후 다시 검증하세요.
     """
-    limit = 3000  # Approx 700 tokens
+    limit = 1500
     current_length = len(description)
 
     if current_length <= limit:
         # 검증 통과: description을 그대로 반환 (LLM이 이 값을 그대로 사용해야 함)
-        return f"✅ 검증 통과 ({current_length}자/약{limit}자-700token). 아래 description을 최종 출력에 그대로 복사하세요:\n\n{description}"
+        return f"✅ 검증 통과 ({current_length}자/약{limit}자). 아래 description을 최종 출력에 그대로 복사하세요:\n\n{description}"
     else:
         excess = current_length - limit
         return (
-            f"❌ 검증 실패: 현재 {current_length}자로, 제한(700token/약{limit}자)을 {excess}자 초과했습니다. "
+            f"❌ 검증 실패: 현재 {current_length}자로, 제한(약{limit}자)을 {excess}자 초과했습니다. "
             f"내용을 {excess + 100}자 이상 줄인 후 다시 검증하세요. 절대로 검증 없이 출력하지 마세요."
         )
 
