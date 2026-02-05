@@ -22,6 +22,7 @@ export interface WorkspaceLoungeResponse {
   role: 'OWNER' | 'EDITOR' | 'VIEWER';
   progress: WorkspaceProgress;
   updatedAt: string;
+  createdAt?: string; // Optional if backend doesn't support it yet
 }
 
 /**
@@ -36,7 +37,9 @@ export interface WorkspaceCardData {
   progressP1: number;
   progressP2: number;
   lastModified: string;
+  lastCreated: string;
   updatedAt: string;
+  createdAt: string;
   members: { name: string; avatar: string }[];
 }
 
@@ -68,8 +71,11 @@ const convertRole = (
 /**
  * 상대 시간 변환 (updatedAt -> "2시간 전")
  */
-const formatRelativeTime = (dateString: string): string => {
-  const date = new Date(dateString);
+const formatRelativeTime = (dateString?: string): string => {
+  if (!dateString) return '';
+  // UTC 시간으로 처리 (KST +9시간 보정)
+  const isUTC = dateString.endsWith('Z') || dateString.includes('+');
+  const date = new Date(isUTC ? dateString : `${dateString}Z`);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
@@ -89,6 +95,8 @@ const formatRelativeTime = (dateString: string): string => {
 const transformWorkspace = (
   workspace: WorkspaceLoungeResponse
 ): WorkspaceCardData => {
+  const createdDate = workspace.createdAt || workspace.updatedAt;
+
   return {
     id: String(workspace.workspaceId),
     title: workspace.name,
@@ -98,7 +106,9 @@ const transformWorkspace = (
     progressP1: calculateProgress(workspace.progress.p1),
     progressP2: calculateProgress(workspace.progress.p2),
     lastModified: formatRelativeTime(workspace.updatedAt),
+    lastCreated: formatRelativeTime(createdDate),
     updatedAt: workspace.updatedAt,
+    createdAt: createdDate,
     members: Array.from({ length: workspace.totalMembers }, (_, i) => ({
       name: `멤버${i + 1}`,
       avatar: '',
@@ -118,9 +128,8 @@ export interface WorkspaceLoungeApiResponse {
 }
 
 export const getMyWorkspaces = async (): Promise<WorkspaceCardData[]> => {
-  const response = await wasApiClient.get<WorkspaceLoungeApiResponse>(
-    `/workspaces/my`
-  );
+  const response =
+    await wasApiClient.get<WorkspaceLoungeApiResponse>(`/workspaces/my`);
 
   return response.data.data.map(transformWorkspace);
 };

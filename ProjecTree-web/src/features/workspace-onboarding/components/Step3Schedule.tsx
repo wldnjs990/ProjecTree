@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Upload, X, Info } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 
 interface Step3ScheduleProps {
   data: {
@@ -129,13 +129,13 @@ export default function Step3Schedule({
             placeholder="예: AI가 사용자 취향을 분석해 최적의 여행 일정을 추천"
             value={data.description}
             onChange={(e) => onChange({ description: e.target.value })}
-            maxLength={50}
-            rows={2}
-            className="resize-none font-['Pretendard'] font-normal text-[13.5px] leading-relaxed p-[10px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors"
+            maxLength={500}
+            rows={5}
+            className="resize-none font-['Pretendard'] font-normal text-[13.5px] leading-relaxed p-[10px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors overflow-y-auto chat-scrollbar"
           />
           <div className="flex justify-end">
             <span className="font-['Pretendard'] font-normal text-[11px] leading-3 text-[var(--figma-text-dove-gray)]">
-              {data.description.length}/50
+              {data.description.length}/500
             </span>
           </div>
           {errors?.description && (
@@ -150,18 +150,6 @@ export default function Step3Schedule({
             <Label className="font-['Pretendard'] font-medium text-[13px] leading-[14px] text-[var(--figma-text-cod-gray)]">
               프로젝트 문서 업로드
             </Label>
-            <div className="relative group">
-              <Info className="h-4 w-4 text-[#BDBDBD] hover:text-[#4CAF50] transition-colors cursor-help" />
-              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block px-4 py-3 bg-white border border-[#4ADE80] text-[#374151] text-xs rounded-xl shadow-[0_4px_14px_0_rgba(74,222,128,0.25)] z-50 w-[320px] whitespace-normal text-left leading-relaxed">
-                <p>
-                  기획서, 회의록 등을 업로드하면 <br />
-                  <span className="text-[#16A34A] font-bold text-[13px]">
-                    AI가 내용을 분석해 프로젝트 구조
-                  </span>
-                  를 자동으로 잡아줍니다.
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* 파일 업로드 영역 */}
