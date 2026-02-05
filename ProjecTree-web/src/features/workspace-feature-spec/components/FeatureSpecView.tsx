@@ -100,10 +100,10 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
         ) : (
           <div className="flex h-full flex-col items-center justify-center text-zinc-500">
             <p className="text-lg font-bold text-zinc-700 mb-1">
-              아직 기능명세서가 없습니다.
+              아직 기능 명세서가 없습니다.
             </p>
             <p className="text-sm text-zinc-400 text-center">
-              기능명세서는 트리 에디터에서 설계한 프로젝트 구조를 자동으로
+              기능 명세서는 트리 에디터에서 설계한 프로젝트 구조를 자동으로
               정리해 보여주는 결과물이에요.
             </p>
             <p className="text-sm text-zinc-400 mt-1">

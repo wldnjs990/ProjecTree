@@ -92,14 +92,12 @@ export default function WorkspaceOnboardingPage() {
     } else if (currentStep === 6) {
       setIsLoading(true);
       try {
-        console.log('[API] 워크스페이스 생성 요청 시작...');
         // API 호출 시 techStacks에서 ID만 추출
         const apiFormData = {
           ...formData,
           techStacks: formData.techStacks.map((tech) => tech.id),
         };
         const response = await createWorkspace(apiFormData);
-        console.log('[API] 워크스페이스 생성 성공:', response);
 
         // 성공 시 워크스페이스 라운지로 이동
         alert(`워크스페이스가 생성되었습니다! (ID: ${response.data})`);

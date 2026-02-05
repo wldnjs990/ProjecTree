@@ -4,12 +4,17 @@ export type ViewTab = 'tree-editor' | 'feature-spec' | 'tech-selection';
 
 export interface OnlineUser {
   id: string;
+  name: string;
+  nickname: string;
   initials: string;
   color: AvatarColor;
   isOnline: boolean;
+  role: 'OWNER' | 'EDITOR' | 'VIEWER';
+  isMe?: boolean;
 }
 
 export interface HeaderProps {
+  workspaceId: number;
   projectName: string;
   activeTab: ViewTab;
   onTabChange: (tab: ViewTab) => void;
