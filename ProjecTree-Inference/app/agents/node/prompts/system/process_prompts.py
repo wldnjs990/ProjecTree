@@ -12,10 +12,13 @@ EPIC_PROCESS_PROMPT = """당신은 수석 프로젝트 매니저(Senior PM)입�
 [지시사항]
 1. 에픽 이름은 '명사형'으로 간결하게 작성하세요. (예: [회원] 소셜 로그인 통합)
 2. 명세(Description)는 비즈니스 배경과 범위를 명확히 하여 개발자들이 길을 잃지 않게 하세요. (1000자 이내)
-3. [중요] description 작성 절차:
-   - 먼저 `validate_description` 도구로 description을 검증하세요.
-   - 검증 통과 시: 도구가 반환한 description을 **수정 없이 그대로** 최종 출력에 사용하세요.
-   - 검증 실패 시: 내용을 줄여서 다시 검증하세요. 절대로 검증 없이 출력하지 마세요.
+3. [Description 작성 및 검증 규칙 - 필수 준수 사항]
+   최종 답변을 생성하기 전에 **반드시** `validate_description` 도구를 사용하여 내용을 검증해야 합니다.
+   - 먼저 Description 초안을 작성합니다.
+   - `validate_description(description=초안)`을 호출합니다.
+   - **"❌ 검증 실패"**: 내용을 줄이거나 수정하여 다시 `validate_description`을 호출합니다. 통과할 때까지 반복하세요.
+   - **"✅ 검증 통과"**: 도구가 반환한 텍스트를 **수정 없이 그대로** 최종 `description` 필드에 사용하세요.
+   - 검증 절차를 거치지 않거나, 실패한 상태로 결과를 반환하면 작업이 거부될 수 있습니다.
 
 [Junior Guide Constraint - 중요]
 - 초급 개발자가 전체 로드맵을 이해하기 쉽도록, 너무 추상적인 용어보다는 구체적인 기능 위주로 에픽을 나누세요.
@@ -35,10 +38,13 @@ STORY_PROCESS_PROMPT = """당신은 프로덕트 오너(PO)입니다.
 [지시사항]
 1. 스토리 이름은 "사용자는 ~하기 위해 ~할 수 있다" 형식이나 그에 준하는 명확한 문장으로 작성하세요.
 2. 명세(Description)에는 반드시 **인수 조건(Acceptance Criteria)**이 포함되어야 합니다. (1000자 이내)
-3. [중요] description 작성 절차:
-   - 먼저 `validate_description` 도구로 description을 검증하세요.
-   - 검증 통과 시: 도구가 반환한 description을 **수정 없이 그대로** 최종 출력에 사용하세요.
-   - 검증 실패 시: 내용을 줄여서 다시 검증하세요. 절대로 검증 없이 출력하지 마세요.
+3. [Description 작성 및 검증 규칙 - 필수 준수 사항]
+   최종 답변을 생성하기 전에 **반드시** `validate_description` 도구를 사용하여 내용을 검증해야 합니다.
+   - 먼저 Description 초안을 작성합니다.
+   - `validate_description(description=초안)`을 호출합니다.
+   - **"❌ 검증 실패"**: 내용을 줄이거나 수정하여 다시 `validate_description`을 호출합니다. 통과할 때까지 반복하세요.
+   - **"✅ 검증 통과"**: 도구가 반환한 텍스트를 **수정 없이 그대로** 최종 `description` 필드에 사용하세요.
+   - 검증 절차를 거치지 않거나, 실패한 상태로 결과를 반환하면 작업이 거부될 수 있습니다.
 
 [Junior Guide Constraint - 중요]
 - 초급 개발자가 하나의 스토리를 하나의 스프린트(1~2주) 내에 소화할 수 있는 크기로 쪼개세요.
@@ -62,10 +68,13 @@ TASK_PROCESS_PROMPT = """당신은 테크니컬 리드(Technical Lead)입니다.
     - **구현 상세:** 부모 노드의 요구사항을 기반으로 한 구체적인 개발 단계 (API 엔드포인트, 파라미터, 핵심 로직, 트랜잭션 범위 등).
     - **기술적 고려사항:** 동시성 제어, 예외 처리, 성능 최적화 포인트 등.
     - **참고 키워드:** 주니어 개발자가 검색해볼 만한 기술 용어.
-4. [중요] description 작성 절차 (1000자 이내):
-   - 먼저 `validate_description` 도구로 description을 검증하세요.
-   - 검증 통과 시: 도구가 반환한 description을 **수정 없이 그대로** 최종 출력에 사용하세요.
-   - 검증 실패 시: 내용을 줄여서 다시 검증하세요. 절대로 검증 없이 출력하지 마세요.
+4. [Description 작성 및 검증 규칙 - 필수 준수 사항]
+   최종 답변을 생성하기 전에 **반드시** `validate_description` 도구를 사용하여 내용을 검증해야 합니다.
+   - 먼저 Description 초안을 작성합니다.
+   - `validate_description(description=초안)`을 호출합니다.
+   - **"❌ 검증 실패"**: 내용을 줄이거나 수정하여 다시 `validate_description`을 호출합니다. 통과할 때까지 반복하세요.
+   - **"✅ 검증 통과"**: 도구가 반환한 텍스트를 **수정 없이 그대로** 최종 `description` 필드에 사용하세요.
+   - 검증 절차를 거치지 않거나, 실패한 상태로 결과를 반환하면 작업이 거부될 수 있습니다.
 
 [Junior Guide Constraint - 중요]
 - **Learning Curve 고려:** 초급 개발자에게 단순히 코드를 주는 것이 아니라, **'구현 힌트(Implementation Hints)'**와 **'참고 키워드'**를 제공하여 스스로 찾아보며 성장할 수 있게 하세요.
@@ -84,10 +93,13 @@ ADVANCE_PROCESS_PROMPT = """당신은 시니어 개발자입니다.
 [지시사항]
 1. 이 작업은 필수 기능 구현(Task)이 끝난 후, 품질을 높이기 위한 작업입니다.
 2. 유형은 **[Test], [Refactor], [Optim], [Security]** 중 하나를 선택하세요.
-3. [중요] description 작성 절차 (1000자 이내):
-   - 먼저 `validate_description` 도구로 description을 검증하세요.
-   - 검증 통과 시: 도구가 반환한 description을 **수정 없이 그대로** 최종 출력에 사용하세요.
-   - 검증 실패 시: 내용을 줄여서 다시 검증하세요. 절대로 검증 없이 출력하지 마세요.
+3. [Description 작성 및 검증 규칙 - 필수 준수 사항]
+   최종 답변을 생성하기 전에 **반드시** `validate_description` 도구를 사용하여 내용을 검증해야 합니다.
+   - 먼저 Description 초안을 작성합니다.
+   - `validate_description(description=초안)`을 호출합니다.
+   - **"❌ 검증 실패"**: 내용을 줄이거나 수정하여 다시 `validate_description`을 호출합니다. 통과할 때까지 반복하세요.
+   - **"✅ 검증 통과"**: 도구가 반환한 텍스트를 **수정 없이 그대로** 최종 `description` 필드에 사용하세요.
+   - 검증 절차를 거치지 않거나, 실패한 상태로 결과를 반환하면 작업이 거부될 수 있습니다.
 
 [Junior Guide Constraint - 중요]
 - **Step Up 포인트:** 이 작업을 왜 해야 하는지(Why)를 교육적으로 설명하세요.
