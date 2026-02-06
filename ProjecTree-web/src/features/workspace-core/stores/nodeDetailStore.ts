@@ -41,6 +41,7 @@ interface NodeDetailState {
   setSelectedTechId: (techId: number | null) => void;
   setSelectedCandidateIds: (ids: number[]) => void;
   setIsCreatingNode: (creating: boolean) => void;
+  setPreviewNodePosition: (position: { xpos: number; ypos: number }) => void;
 
   // === 복합 setter ===
   openSidebar: (nodeId: string) => void;
@@ -78,6 +79,7 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   setSelectedTechId: (techId) => set({ selectedTechId: techId }),
   setSelectedCandidateIds: (ids) => set({ selectedCandidateIds: ids }),
   setIsCreatingNode: (creating) => set({ isCreatingNode: creating }),
+  setPreviewNodePosition: (position) => set({ previewNodePosition: position }),
 
   // === 복합 setter ===
   openSidebar: (nodeId) => {

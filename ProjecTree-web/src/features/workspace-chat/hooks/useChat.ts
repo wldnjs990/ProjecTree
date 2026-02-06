@@ -3,7 +3,6 @@ import { useChatStore } from '../store/chatStore';
 import { useWebSocket } from './useWebSocket';
 import { chatSocket } from '../services/chatSocket';
 // import { fetchMessages, fetchParticipants } from '@/apis/chat.api';
-import { CHAT_PAGINATION_CONFIG } from '../types/mockData';
 import { useUserStore } from '@/shared/stores/userStore';
 import { useWorkspaceStore } from '@/features/workspace-core';
 import { useAuthStore } from '@/shared/stores/authStore';
