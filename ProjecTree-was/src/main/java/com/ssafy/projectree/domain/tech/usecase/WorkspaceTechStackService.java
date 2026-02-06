@@ -29,6 +29,8 @@ public class WorkspaceTechStackService {
             WorkspaceTechStack workspaceTechStack = new WorkspaceTechStack();
             workspaceTechStack.setWorkspace(workspace);
             workspaceTechStack.setTechVocabulary(techStackService.findById(id));
+
+            workspaceTechStackRepository.save(workspaceTechStack);
         }
 
     }
