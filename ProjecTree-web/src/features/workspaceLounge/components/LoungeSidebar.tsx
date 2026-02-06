@@ -422,68 +422,78 @@ export function LoungeSidebar({
           collapsed && 'flex-col gap-2 p-2'
         )}
       >
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <button
-              className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 group',
-                'hover:bg-white/70 hover:shadow-sm hover:backdrop-blur-md',
-                collapsed && 'flex-col gap-1'
-              )}
+        <div
+          className={cn(
+            'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 group',
+            collapsed && 'flex-col gap-1'
+          )}
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--figma-forest-bg)] to-emerald-50 text-[var(--figma-tech-green)] text-sm font-bold shadow-inner ring-1 ring-[var(--figma-forest-accent)]/30">
+            {initialLetter}
+          </div>
+          {!collapsed && (
+            <span
+              className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px]"
+              title={nickname}
             >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--figma-forest-bg)] to-emerald-50 text-[var(--figma-tech-green)] text-sm font-bold shadow-inner ring-1 ring-[var(--figma-forest-accent)]/30">
-                {initialLetter}
-              </div>
-              {!collapsed && (
-                <span
-                  className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px]"
-                  title={nickname}
-                >
-                  {nickname}
-                </span>
-              )}
-            </button>
-          </AlertDialogTrigger>
-          <AlertDialogContent
-            className="
-            bg-white/92
-            backdrop-blur-2xl
-            border border-white/60
-            rounded-3xl
-            shadow-2xl
-            z-[1001]
-            p-0
-            overflow-hidden
-          "
-          >
-            <AlertDialogHeader className="p-6">
-              <AlertDialogTitle className="text-zinc-900 font-bold">
-                로그아웃 하시겠습니까?
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-zinc-500">
-                로그아웃하면 다시 로그인해야 합니다.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-100">
-              <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
-                취소
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={async () => {
-                  await logout();
-                  useUserStore.getState().clearUser();
-                  navigate('/login');
-                }}
-                className="border border-zinc-200 text-zinc-600 hover:bg-zinc-200 bg-zinc-100 rounded-xl"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                로그아웃
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              {nickname}
+            </span>
+          )}
+        </div>
 
-        {!collapsed && <ProfileDialog nickname={nickname} />}
+        {!collapsed && (
+          <div className="flex items-center gap-1">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-zinc-100/50 transition-colors"
+                  aria-label="로그아웃"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent
+                className="
+                bg-white/92
+                backdrop-blur-2xl
+                border border-white/60
+                rounded-3xl
+                shadow-2xl
+                z-[1001]
+                p-0
+                overflow-hidden
+              "
+              >
+                <AlertDialogHeader className="p-6">
+                  <AlertDialogTitle className="text-zinc-900 font-bold">
+                    로그아웃 하시겠습니까?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-zinc-500">
+                    로그아웃하면 다시 로그인해야 합니다.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-100">
+                  <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
+                    취소
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={async () => {
+                      await logout();
+                      useUserStore.getState().clearUser();
+                      navigate('/login');
+                    }}
+                    className="border border-zinc-200 text-zinc-600 hover:bg-zinc-200 bg-zinc-100 rounded-xl"
+                  >
+                    로그아웃
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <ProfileDialog nickname={nickname} />
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
