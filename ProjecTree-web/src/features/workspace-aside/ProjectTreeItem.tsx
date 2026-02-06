@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   ChevronRight,
   ChevronDown,
@@ -10,6 +10,11 @@ import {
   Folder,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { ServerNodeType } from '@/features/workspace-core';
 import { useNodeDetailStore } from '@/features/workspace-core';
 
@@ -42,6 +47,8 @@ export function ProjectTreeItem({
   selectedId,
 }: ProjectTreeItemProps) {
   const openSidebar = useNodeDetailStore((state) => state.openSidebar);
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   const [isOpen, setIsOpen] = useState(true);
   const IconConfig = TYPE_ICONS[item.type];
@@ -66,16 +73,25 @@ export function ProjectTreeItem({
     onSelect?.(item);
   };
 
+  const handleTooltipOpen = () => {
+    const el = titleRef.current;
+    if (!el) {
+      setIsTooltipOpen(false);
+      return;
+    }
+    setIsTooltipOpen(el.scrollWidth > el.clientWidth);
+  };
+
   return (
-    <div className="select-none">
+    <div className="select-none w-full min-w-0">
       <div
         className={cn(
-          'flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors text-xs group',
+          'flex w-full max-w-full items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors text-xs group min-w-0 overflow-hidden box-border',
           isSelected
             ? 'bg-accent text-accent-foreground'
             : 'hover:bg-accent/50 text-muted-foreground'
         )}
-        style={{ paddingLeft: `${level * 8 + 8}px` }}
+        style={{ paddingLeft: `${level * 6 + 4}px` }}
         onClick={handleClick}
       >
         <div
@@ -93,11 +109,27 @@ export function ProjectTreeItem({
         </div>
 
         {Icon && <Icon className={cn('h-4 w-4', IconConfig.color)} />}
-        <span className="truncate flex-1">{item.title}</span>
+        <Tooltip open={isTooltipOpen}>
+          <TooltipTrigger asChild>
+            <span
+              ref={titleRef}
+              className="truncate flex-1 min-w-0 block pr-2"
+              onPointerEnter={handleTooltipOpen}
+              onPointerLeave={() => setIsTooltipOpen(false)}
+              onFocus={handleTooltipOpen}
+              onBlur={() => setIsTooltipOpen(false)}
+            >
+              {item.title}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>{item.title}</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       {isOpen && hasChildren && (
-        <div>
+        <div className="min-w-0 w-full">
           {item.children!.map((child) => (
             <ProjectTreeItem
               key={child.id}
