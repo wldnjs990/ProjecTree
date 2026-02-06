@@ -2,8 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { getYDocByRoom } from "../../yjs/ydoc-gateway";
 
 const router: Router = Router({ mergeParams: true });
-
-router.post("/:nodeId/candidates", (req: Request, res: Response) => {
+router.post("/:nodeId/candidate", (req: Request, res: Response) => {
   const { workspaceId, nodeId } = req.params;
   const body = req.body;
 
@@ -17,6 +16,13 @@ router.post("/:nodeId/candidates", (req: Request, res: Response) => {
 
   const candidates = body;
   const doc = getYDocByRoom(workspaceId);
+
+  const old = doc.getMap("nodeCandidates").get(nodeId);
+
+  console.log("Old candidates:", old);
+
+  const nodeCandidatesPending = doc.getMap("nodeCandidatesPending").get(nodeId);
+  console.log("candidates pending:", nodeCandidatesPending);
 
   doc.transact(() => {
     const nodeCandidates = doc.getMap("nodeCandidates");
@@ -36,6 +42,10 @@ router.post("/:nodeId/candidates", (req: Request, res: Response) => {
     }
     yNodeCandidatesPending.set(nodeId, false);
   });
+
+  console.log("New candidates:", old);
+
+  console.log("candidates pending:", nodeCandidatesPending);
 
   res.status(200).json({ status: "ok" });
 });
