@@ -59,6 +59,7 @@ export interface NodeCandidatesResponse {
   message: string;
   data: {
     candidates: Array<{
+      id: number;
       name: string;
       description: string;
     }>;
@@ -79,9 +80,9 @@ export const generateNodeCandidates = async (
   );
 
   // API 응답에서 id, taskType, selected, summary가 없으므로 클라이언트에서 초기화
-  return response.data.data.candidates.map((c, index) => ({
+  return response.data.data.candidates.map((c) => ({
     ...c,
-    id: Date.now() + index,
+    id: c.id,
     taskType: null,
     selected: false,
     summary: c.description?.slice(0, 50) || '', // summary가 없으면 description에서 생성
