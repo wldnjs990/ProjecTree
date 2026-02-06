@@ -8,8 +8,8 @@ import com.ssafy.projectree.domain.member.api.dto.schemas.MemberSchema;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
 import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
-import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.CustomNodeDto;
+import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
@@ -173,7 +173,7 @@ public class NodeServiceImpl implements NodeService {
 
         for (NodeWithParentSchema node : flatNodes) {
             Priority priority = node.getPriority() != null ? Priority.valueOf(node.getPriority()) : null;
-            boolean isCompleted = "COMPLETED".equals(node.getStatus());
+            boolean isCompleted = "DONE".equals(node.getStatus());
 
             if (priority != null) {
                 switch (priority) {
