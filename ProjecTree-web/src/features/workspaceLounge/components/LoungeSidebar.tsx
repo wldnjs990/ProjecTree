@@ -98,7 +98,7 @@ function useProfileDialogState(nickname: string) {
   };
 }
 
-function ProfileDialog({ nickname }: { nickname: string }) {
+function ProfileDialog({ nickname, email }: { nickname: string; email: string }) {
   const navigate = useNavigate();
   const updateStoreNickname = useUpdateNickname();
   const {
@@ -259,7 +259,7 @@ function ProfileDialog({ nickname }: { nickname: string }) {
               </div>
             ) : (
               <div className="px-6">
-                <div className="flex items-center justify-between rounded-xl border-transparent bg-white/50 shadow-sm px-3 py-2 h-10 mb-8 hover:bg-white/60 transition-colors duration-300">
+                <div className="flex items-center justify-between rounded-xl border-transparent bg-white/50 shadow-sm px-3 py-2 h-10 mb-4 hover:bg-white/60 transition-colors duration-300">
                   <span className="text-zinc-800 font-medium">{nickname}</span>
                   <Button
                     variant="ghost"
@@ -273,6 +273,20 @@ function ProfileDialog({ nickname }: { nickname: string }) {
                 </div>
               </div>
             )}
+          </div>
+
+          <div className="grid gap-2 mt-2">
+            <Label
+              htmlFor="email"
+              className="text-zinc-700 px-6 text-xs font-bold uppercase tracking-wider opacity-70"
+            >
+              이메일
+            </Label>
+            <div className="px-6">
+              <div className="flex items-center rounded-xl px-3 py-2 h-10 mb-4">
+                <span className="text-zinc-500 font-medium">{email}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -397,8 +411,9 @@ export function LoungeSidebar({
     return null;
   }
 
-  // user 확정 - 닉네임 직접 사용
+  // user 확정 - 닉네임, 이메일 직접 사용
   const nickname = user.nickname;
+  const email = user.email;
   const initialLetter = nickname?.trim().charAt(0) || '?';
 
   return (
@@ -506,7 +521,7 @@ export function LoungeSidebar({
             <Tooltip>
               <TooltipTrigger asChild>
                 <div>
-                  <ProfileDialog nickname={nickname} />
+                  <ProfileDialog nickname={nickname} email={email} />
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom">프로필 설정</TooltipContent>
