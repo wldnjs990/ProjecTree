@@ -207,12 +207,23 @@ export const useWebSocket = (workspaceId: string | null) => {
 
     const handleChatHistory = (data: any) => {
       console.log('📨 [useWebSocket] Chat history received:', data);
+      console.log(
+        '📨 [DEBUG] Data type:',
+        typeof data,
+        'Is array:',
+        Array.isArray(data)
+      );
+      console.log('📨 [DEBUG] Current workspaceId:', workspaceId);
 
-      // 배열로 받은 경우 (정상 케이스)
       if (Array.isArray(data)) {
-        const messages = data.map((item) => mapToChatMessage(item));
+        console.log(
+          `📨 [DEBUG] Processing ${data.length} messages from history`
+        );
 
-        // 🎯 전체 메시지를 한 번에 설정 (addMessage 대신 setMessages 사용)
+        const messages = data.map((item) => mapToChatMessage(item));
+        console.log('📨 [DEBUG] Mapped messages:', messages);
+
+        // 🎯 전체 메시지를 한 번에 설정 (배포 환경 안정성 향상)
         useChatStore.getState().setMessages(workspaceId, messages);
 
         console.log(
@@ -222,26 +233,23 @@ export const useWebSocket = (workspaceId: string | null) => {
         // 히스토리 로드 완료 플래그 설정
         useChatStore.getState().setPaginationState({
           initialLoaded: true,
-          hasMore: false, // 전체 히스토리를 받았으므로
+          hasMore: false,
           isLoading: false,
         });
-      }
-      // 단일 객체로 받은 경우 (예외 처리)
-      else if (data) {
+      } else if (data) {
+        console.log('📨 [DEBUG] Processing single message from history');
         const msg = mapToChatMessage(data);
-        useChatStore.getState().setMessages(workspaceId, [msg]);
+        console.log('📨 [DEBUG] Mapped message:', msg);
 
-        console.log('✅ [useWebSocket] Loaded 1 message from history');
+        useChatStore.getState().setMessages(workspaceId, [msg]);
 
         useChatStore.getState().setPaginationState({
           initialLoaded: true,
           hasMore: false,
           isLoading: false,
         });
-      }
-      // 빈 히스토리인 경우
-      else {
-        console.log('ℹ️ [useWebSocket] No chat history available');
+      } else {
+        console.log('⚠️ [DEBUG] No chat history data received');
         useChatStore.getState().setMessages(workspaceId, []);
         useChatStore.getState().setPaginationState({
           initialLoaded: true,
