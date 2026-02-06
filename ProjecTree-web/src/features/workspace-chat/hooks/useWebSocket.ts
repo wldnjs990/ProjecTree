@@ -27,21 +27,24 @@ export const useWebSocket = (workspaceId: string | null) => {
     const socket = chatSocket.connect(token);
 
     // 연결 상태 업데이트
-    socket.on('connect', () => {
+    const handleConnect = () => {
       // workspaceId가 있더라도 chatRoomId가 아직 없을 수 있음 (비동기 로드)
       // chatRoomId가 생기면 아래 useEffect에서 join함
       setConnected(true);
-    });
+    };
 
-    socket.on('disconnect', (ev) => {
+    const handleDisconnect = (ev: any) => {
       console.log('왜 꺼짐?', ev);
       setConnected(false);
-    });
+    };
+
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
 
     return () => {
-      // 🔧 소켓 연결은 유지하고 상태만 업데이트
-      // disconnect()를 호출하면 페이지 이동 시 소켓이 끊기고
-      // 재연결 시 이벤트 리스너가 제대로 등록되지 않음
+      // 🔧 이벤트 리스너 제거 (중복 등록 방지)
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
       setConnected(false);
     };
   }, []);
