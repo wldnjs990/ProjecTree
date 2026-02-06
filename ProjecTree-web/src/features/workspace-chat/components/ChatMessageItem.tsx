@@ -67,7 +67,7 @@ export const ChatMessageItem = ({ message }: ChatMessageItemProps) => {
         </div>
         <div
           className={cn(
-            'max-w-md rounded-lg px-2.5 py-1',
+            'w-fit max-w-xs rounded-lg px-2.5 py-1',
             isCurrentUser
               ? 'bg-blue-500 text-white'
               : 'bg-gray-100 text-gray-900'

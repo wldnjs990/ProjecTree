@@ -206,15 +206,48 @@ export const useWebSocket = (workspaceId: string | null) => {
     };
 
     const handleChatHistory = (data: any) => {
-      console.log('📨 [useWebSocket] Chat history:', data);
+      console.log('📨 [useWebSocket] Chat history received:', data);
+
+      // 배열로 받은 경우 (정상 케이스)
       if (Array.isArray(data)) {
-        data.forEach((item) => {
-          const msg = mapToChatMessage(item);
-          addMessage(workspaceId, msg);
+        const messages = data.map((item) => mapToChatMessage(item));
+
+        // 🎯 전체 메시지를 한 번에 설정 (addMessage 대신 setMessages 사용)
+        useChatStore.getState().setMessages(workspaceId, messages);
+
+        console.log(
+          `✅ [useWebSocket] Loaded ${messages.length} messages from history`
+        );
+
+        // 히스토리 로드 완료 플래그 설정
+        useChatStore.getState().setPaginationState({
+          initialLoaded: true,
+          hasMore: false, // 전체 히스토리를 받았으므로
+          isLoading: false,
         });
-      } else {
+      }
+      // 단일 객체로 받은 경우 (예외 처리)
+      else if (data) {
         const msg = mapToChatMessage(data);
-        addMessage(workspaceId, msg);
+        useChatStore.getState().setMessages(workspaceId, [msg]);
+
+        console.log('✅ [useWebSocket] Loaded 1 message from history');
+
+        useChatStore.getState().setPaginationState({
+          initialLoaded: true,
+          hasMore: false,
+          isLoading: false,
+        });
+      }
+      // 빈 히스토리인 경우
+      else {
+        console.log('ℹ️ [useWebSocket] No chat history available');
+        useChatStore.getState().setMessages(workspaceId, []);
+        useChatStore.getState().setPaginationState({
+          initialLoaded: true,
+          hasMore: false,
+          isLoading: false,
+        });
       }
     };
 
