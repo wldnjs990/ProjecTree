@@ -65,7 +65,7 @@ export default function NodeDetailContainer({
 
   // Sync selected tech id on detail change
   useEffect(() => {
-    if (nodeDetail?.techs) {
+    if (Array.isArray(nodeDetail?.techs)) {
       const selectedTech = nodeDetail.techs.find((tech) => tech.selected);
       setSelectedTechId(selectedTech?.id ?? null);
     }
@@ -73,7 +73,7 @@ export default function NodeDetailContainer({
 
   // Sync selected candidate ids on detail change
   useEffect(() => {
-    if (nodeDetail?.candidates) {
+    if (Array.isArray(nodeDetail?.candidates)) {
       const selectedIds = nodeDetail.candidates
         .filter((candidate) => candidate.selected)
         .map((candidate) => candidate.id);
