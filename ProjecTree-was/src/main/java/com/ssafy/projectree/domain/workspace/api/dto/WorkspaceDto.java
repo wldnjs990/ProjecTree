@@ -2,6 +2,7 @@ package com.ssafy.projectree.domain.workspace.api.dto;
 
 import com.ssafy.projectree.domain.file.api.dto.FileReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
+import com.ssafy.projectree.domain.tech.model.entity.WorkspaceTechStack;
 import com.ssafy.projectree.domain.workspace.enums.Role;
 import com.ssafy.projectree.domain.workspace.enums.ServiceType;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
@@ -146,9 +147,6 @@ public class WorkspaceDto {
         @Schema(description = "파일 목록")
         private List<FileReadDto.Response> files;
 
-        @Schema(description = "기능 명세(에픽) 목록")
-        private List<FunctionSpecificationDto.EpicInfo> epics;
-
         @Schema(description = "워크 스페이스 팀 정보")
         private TeamDto.Info teamInfo;
 
@@ -170,8 +168,10 @@ public class WorkspaceDto {
         private LocalDate endDate;
         private String purpose;
         private String identifierPrefix;
+        private List<FunctionSpecificationDto.EpicInfo> epics;
+        private List<Tech> techs;
 
-        public static Info from(Workspace workspace) {
+        public static Info from(Workspace workspace, List<FunctionSpecificationDto.EpicInfo> epics, List<Tech> techs) {
             return Info.builder()
                     .id(workspace.getId())
                     .name(workspace.getName())
@@ -182,8 +182,87 @@ public class WorkspaceDto {
                     .endDate(workspace.getEndDate())
                     .purpose(workspace.getPurpose())
                     .identifierPrefix(workspace.getIdentifierPrefix())
+                    .epics(epics)
+                    .techs(techs)
                     .build();
         }
 
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(name = "WorkspaceDto.Tech")
+    public static class Tech {
+
+        private Long id;
+        private String techStackName;
+
+        public static Tech from(WorkspaceTechStack workspaceTechStack) {
+            return Tech.builder()
+                    .id(workspaceTechStack.getTechVocabulary().getId())
+                    .techStackName(workspaceTechStack.getTechVocabulary().getName())
+                    .build();
+        }
+
+    }
+
+    @Data
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(name = "WorkspaceDto.UpdateRequest", description = "워크 스페이스 업데이트 요청 DTO")
+    public static class UpdateRequest {
+
+        @Schema(description = "워크 스페이스 ID", example = "1")
+        private Long id;
+
+        @Schema(description = "워크 스페이스 이름", example = "AI Trip")
+        private String name;
+
+        @Schema(description = "워크 스페이스 시작일자(프로젝트 시작일자)", example = "2026-01-06")
+        private LocalDate startDate;
+
+        @Schema(description = "워크 스페이스 종료일자(프로젝트 종료일자)", example = "2026-02-09")
+        private LocalDate endDate;
+
+        @Schema(description = "워크 스페이스 목적", example = "학습용")
+        private String purpose;
+
+        @Schema(description = "워크 스페이스 생성 시 입력받는 기술 스택들의 ID값", example = "[1, 2, 3, ... ]")
+        private List<Long> workspaceTechStacks;
+
+        @Schema(description = "삭제 할 파일들의 ID값", example = "[1, 2, 3, .. ]")
+        private List<Long> deleteFiles;
+
+    }
+
+    @Data
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(name = "WorkspaceDto.UpdateResponse", description = "워크 스페이스 업데이트 응답 DTO")
+    public static class UpdateResponse {
+
+        @Schema(description = "워크 스페이스 이름", example = "AI Trip")
+        private String name;
+
+        @Schema(description = "워크 스페이스 시작일자(프로젝트 시작일자)", example = "2026-01-06")
+        private LocalDate startDate;
+
+        @Schema(description = "워크 스페이스 종료일자(프로젝트 종료일자)", example = "2026-02-09")
+        private LocalDate endDate;
+
+        @Schema(description = "워크 스페이스 목적", example = "학습용")
+        private String purpose;
+
+        @Schema(description = "워크 스페이스에 등록된 기술 스택들의 ID와 이름", example = "[1, 2, 3, ... ]")
+        private List<Tech> workspaceTechStacks;
+
+        @Schema(description = "파일 목록")
+        private List<FileReadDto.Response> files;
     }
 }

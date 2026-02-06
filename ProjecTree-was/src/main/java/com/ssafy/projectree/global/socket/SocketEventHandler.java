@@ -73,7 +73,7 @@ public class SocketEventHandler {
                     String chatRoomId = data.getChatRoomId();
                     Long memberId = client.get("memberId");
 
-                    log.info("[id:{}번 사용자]가 채팅방({})에서 메세지[{}]를 전송했습니다.", memberId, chatRoomId, data.getContent());
+                    log.info("[id:{}번 사용자]가 채팅방({})에서 메세지[{}]를 전송했습니다.", memberId, chatRoomId, message.getContent());
 
                     socketIOServer.getRoomOperations(data.getChatRoomId())
                             .getClients().stream()
