@@ -128,23 +128,12 @@ export function WorkspaceSettingsDialog({
   useEffect(() => {
     if (!workspaceDetail || !isOpen) return;
 
-    console.log('[워크스페이스 설정] 서버 원본 데이터:', workspaceDetail);
-
     // API 응답 구조 대응: 기본 정보가 info 객체 안에 있을 수 있음
     const info = (workspaceDetail as any).info || workspaceDetail;
-
-    console.log('[워크스페이스 설정] info 객체 (전체):', JSON.stringify(info, null, 2));
-    console.log('[워크스페이스 설정] info.techs:', info.techs);
-    console.log('[워크스페이스 설정] info.epics:', info.epics);
-    console.log('[워크스페이스 설정] workspaceDetail.epics:', workspaceDetail.epics);
-    console.log('[워크스페이스 설정] workspaceDetail.nodeTree:', workspaceDetail.nodeTree);
 
     // 백엔드에서 techs 필드로 기술 스택 반환 (workspaceTechStacks가 아님)
     const techIds = parseTechsToIds(info.techs);
     const techMap = parseTechsToMap(info.techs);
-
-    console.log('[워크스페이스 설정] 파싱된 techIds:', techIds);
-    console.log('[워크스페이스 설정] 파싱된 techMap:', techMap);
 
     setForm({
       name: info.name ?? '',
@@ -252,24 +241,21 @@ export function WorkspaceSettingsDialog({
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      // 기존 기술스택은 이미 DB에 있으므로, 새로 추가된 것만 전송
+      const newTechStacks = form.techStacks.filter(
+        (id) => !originalTechIds.has(id)
+      );
+
       const requestData = {
         name: form.name,
         startDate: form.startDate ? format(form.startDate, 'yyyy-MM-dd') : null,
         endDate: form.endDate ? format(form.endDate, 'yyyy-MM-dd') : null,
         purpose: form.purpose,
-        workspaceTechStacks: form.techStacks,
+        workspaceTechStacks: newTechStacks,
         ...(deleteFileIds.length > 0 && { deleteFiles: deleteFileIds }),
       };
 
-      console.log('[워크스페이스 설정] 요청 데이터:', {
-        workspaceId,
-        requestData,
-        newFiles: newFiles.map((f) => ({ name: f.name, size: f.size })),
-      });
-
       const response = await updateWorkspace(workspaceId, requestData, newFiles);
-
-      console.log('[워크스페이스 설정] 응답 데이터:', response);
 
       if (response.success) {
         toast.success('워크스페이스 설정이 저장되었습니다.');
