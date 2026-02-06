@@ -28,6 +28,12 @@ import {
   type WorkspaceDetailData,
   type TechStackItem,
 } from '@/apis/workspace.api';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { cn } from '@/shared/lib/utils';
 
 interface WorkspaceSettingsDialogProps {
@@ -618,35 +624,40 @@ export function WorkspaceSettingsDialog({
               </div>
 
               {/* 에픽 정보 */}
-              <div className="space-y-4 pt-4 border-t border-zinc-100">
+              <div className="space-y-3 pt-4 border-t border-zinc-100">
                 <Label className="text-sm font-bold text-zinc-700">에픽 정보</Label>
 
-                <div className="space-y-4">
-                  {form.epics.map((epic, idx) => (
-                    <div
-                      key={idx}
-                      className="p-5 bg-zinc-100 border border-zinc-200/60 rounded-2xl space-y-3 shadow-sm"
-                    >
-                      <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">에픽 {idx + 1}</span>
-                      <Input
-                        value={epic.name}
-                        disabled
-                        className="h-10 border-zinc-200 bg-zinc-50 rounded-xl text-zinc-600 cursor-not-allowed"
-                      />
-                      <Textarea
-                        value={epic.description}
-                        disabled
-                        rows={2}
-                        className="resize-none border-zinc-200 bg-zinc-50 rounded-xl min-h-[72px] text-zinc-600 cursor-not-allowed"
-                      />
-                    </div>
-                  ))}
-                  {form.epics.length === 0 && (
-                    <div className="text-center py-6 text-zinc-400 text-sm bg-zinc-100 rounded-xl border border-zinc-200">
-                      등록된 에픽이 없습니다.
-                    </div>
-                  )}
-                </div>
+                {form.epics.length > 0 ? (
+                  <Accordion type="multiple" className="space-y-2">
+                    {form.epics.map((epic, idx) => (
+                      <AccordionItem
+                        key={idx}
+                        value={`epic-${idx}`}
+                        className="border border-zinc-200/60 rounded-xl overflow-hidden bg-zinc-50/50 data-[state=open]:bg-white data-[state=open]:shadow-sm transition-all"
+                      >
+                        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-zinc-50 text-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-md">
+                              {idx + 1}
+                            </span>
+                            <span className="font-bold text-zinc-700">
+                              {epic.name || '(이름 없음)'}
+                            </span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-3">
+                          <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-wrap">
+                            {epic.description || '설명이 없습니다.'}
+                          </p>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                ) : (
+                  <div className="text-center py-6 text-zinc-400 text-sm bg-zinc-100 rounded-xl border border-zinc-200">
+                    등록된 에픽이 없습니다.
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -190,8 +190,6 @@ export const updateWorkspace = async (
     ...data,
   };
 
-  console.log('[workspace.api] 실제 전송 데이터:', requestData);
-
   formData.append(
     'data',
     new Blob([JSON.stringify(requestData)], { type: 'application/json' })
@@ -317,10 +315,6 @@ export const createWorkspace = async (
     workspaceTechStacks: data.techStacks, // 🚨 백엔드 요청대로 필드명 변경 및 활성화
     epics: epics, // 🚨 재변경: 백엔드 DTO(epics) 확인 -> epics (복수형)
   };
-
-  console.log('[workspace.api] 워크스페이스 생성 요청 데이터:', requestData);
-  console.log('[workspace.api] techStacks 원본:', data.techStacks);
-  console.log('[workspace.api] workspaceTechStacks 전송:', requestData.workspaceTechStacks);
 
   // 2. FormData에 데이터 담기
   // JSON 객체 -> Blob (application/json) -> 'data' 필드
