@@ -23,7 +23,8 @@ export function Header({
 
   // 현재 사용자가 관리자(OWNER)인지 확인
   const currentUser = onlineUsers.find(user => user.isMe);
-  const isOwner = currentUser?.role === 'OWNER';
+  const canManageMembers =
+    currentUser?.role === 'OWNER' || currentUser?.role === 'EDITOR';
 
   return (
     <header className="flex items-center justify-between h-14 px-4 bg-white/95 backdrop-blur-sm border-b border-zinc-300/60 z-50 relative">
@@ -40,9 +41,9 @@ export function Header({
 
       <div className="flex items-center gap-2">
         <ActionButtons
-          onSettingsClick={onSettingsClick}
+          onSettingsClick={canManageMembers ? onSettingsClick : undefined}
           onVoiceCallClick={onVoiceCallClick}
-          onInviteClick={isOwner ? () => setMemberModalOpen(true) : undefined}
+          onInviteClick={canManageMembers ? () => setMemberModalOpen(true) : undefined}
           isVoiceChatActive={isVoiceChatActive}
           isVoiceChatBarVisible={isVoiceChatBarVisible}
         />
@@ -52,7 +53,7 @@ export function Header({
         <OnlineUsers users={onlineUsers} />
       </div>
 
-      {isOwner && (
+      {canManageMembers && (
         <MemberManagementModal
           open={isMemberModalOpen}
           onOpenChange={setMemberModalOpen}

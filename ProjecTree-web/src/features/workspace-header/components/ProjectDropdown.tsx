@@ -37,7 +37,7 @@ export function ProjectDropdown({ projectName }: ProjectDropdownProps) {
   const handleProjectChange = (workspaceId: string) => {
     // 같은 워크스페이스면 이동 안 함 (선택적)
     // 하지만 리로드 효과를 위해 이동 허용하거나, 현재 ID와 비교 가능
-    navigate(`/workspace/${workspaceId}/tree-editor`); // 기본 탭으로 이동
+    navigate(`/workspace/${workspaceId}`);
   };
 
   return (

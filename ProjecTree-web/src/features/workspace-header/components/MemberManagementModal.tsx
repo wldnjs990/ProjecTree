@@ -60,9 +60,15 @@ export function MemberManagementModal({
                 email: email.trim(),
                 role: role as TeamRoleType,
             });
-            toast.success(`${email}님에게 초대 메일을 보냈습니다.`);
+            toast.success(`${email}님을 초대했습니다.`);
             setEmail('');
             setRole('EDITOR');
+
+            // 0.5초 대기 후 데이터 갱신 (서버 DB 반영 시간 확보)
+            setTimeout(async () => {
+                const updatedDetail = await getWorkspaceDetail(workspaceId);
+                setWorkspaceDetail(updatedDetail);
+            }, 500);
         } catch (error) {
             console.error('초대 실패:', error);
             toast.error('초대 메일 전송에 실패했습니다.');
