@@ -35,7 +35,7 @@ import {
   Settings,
   Pencil,
   LogOut,
-  TreeDeciduous,
+  House,
 } from 'lucide-react';
 
 import type { FilterType } from '../types';
@@ -536,12 +536,12 @@ export function LoungeSidebar({
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-white/20 p-3 flex justify-center">
+      <div className="border-t border-white/20 p-3">
         <button
-          className="flex w-full items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-sm text-zinc-400 hover:text-emerald-600 hover:bg-white/70 hover:shadow-sm transition-all duration-300"
+          className="flex w-full items-center justify-start gap-3 rounded-xl px-3 py-2.5 text-sm text-zinc-400 hover:text-emerald-600 hover:bg-white/70 transition-all duration-300"
           onClick={() => navigate('/')}
         >
-          <TreeDeciduous className="h-4 w-4" />
+          <House className="h-4 w-4" />
           {!collapsed && <span>홈으로 가기</span>}
         </button>
       </div>
