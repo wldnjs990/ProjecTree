@@ -48,9 +48,9 @@ public class NodeController implements NodeDocsController {
     }
 
     @PostMapping("/nodes/{node-id}/candidates")
-    public CommonResponse<CandidateCreateDto.Response> createCandidates(@PathVariable(name = "node-id") Long parentId) {
-
-        return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.CANDIDATE, String.valueOf(parentId), () -> nodeService.createCandidate(parentId)));
+    public CommonResponse<CandidateCreateDto.Response> createCandidates(@PathVariable(name = "node-id") Long parentId,
+                                                                        @RequestBody CandidateCreateDto.Request request) {
+        return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.CANDIDATE, String.valueOf(parentId), () -> nodeService.createCandidate(parentId, request.getWorkspaceId())));
     }
 
     @PostMapping("/nodes/{node-id}/tech-stack/recommendation")
@@ -60,7 +60,7 @@ public class NodeController implements NodeDocsController {
 
     @PostMapping("/nodes/{nodeId}/tech-stack")
     public CommonResponse<Void> createCustomTechStack(@PathVariable Long nodeId, @RequestBody CustomTechCreateDto.Request request) {
-        nodeService.createCustomTechStack(nodeId,request.getWorkspaceId(), request.getTechVocaId());
+        nodeService.createCustomTechStack(nodeId, request.getWorkspaceId(), request.getTechVocaId());
         return CommonResponse.success(SuccessCode.SUCCESS, null);
     }
 
