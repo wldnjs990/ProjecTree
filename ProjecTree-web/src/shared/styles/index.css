@@ -247,3 +247,28 @@
 .chat-scrollbar:hover::-webkit-scrollbar-thumb:hover {
   background-color: rgb(156 163 175);
 }
+
+.node-detail-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
+  overscroll-behavior: contain;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+.node-detail-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.node-detail-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.node-detail-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+}
+
+.node-detail-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.55);
+}

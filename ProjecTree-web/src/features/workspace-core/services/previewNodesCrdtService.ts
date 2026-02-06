@@ -28,6 +28,10 @@ export const previewNodesCrdtService = {
       yNode.set('parentId', yjsNode.parentId);
       yNode.set('position', yjsNode.position);
       yNode.set('data', yjsNode.data);
+      const lockedBy = (yjsNode.data as { lockedBy?: unknown })?.lockedBy;
+      if (typeof lockedBy === 'string' && lockedBy.length > 0) {
+        yNode.set('lockedBy', lockedBy);
+      }
       yPreviewNodes.set(node.id, yNode);
     });
 
@@ -67,5 +71,30 @@ export const previewNodesCrdtService = {
     });
 
     console.log('[CRDT] 모든 Preview 노드 제거');
+  },
+
+  /**
+   * 특정 사용자 소유 Preview 노드만 제거 (CRDT 동기화)
+   */
+  clearPreviewNodesByOwner(ownerId: string): void {
+    const client = getCrdtClient();
+    if (!client) {
+      console.warn('[previewNodesCrdtService] CRDT 클라이언트가 없습니다.');
+      return;
+    }
+
+    const yPreviewNodes = client.getYMap<Y.Map<YNodeValue>>('previewNodes');
+    client.yDoc.transact(() => {
+      yPreviewNodes.forEach((yNode, nodeId) => {
+        const lockedBy =
+          (yNode.get('lockedBy') as string | undefined) ??
+          ((yNode.get('data') as { lockedBy?: string } | undefined)?.lockedBy);
+        if (lockedBy === ownerId) {
+          yPreviewNodes.delete(nodeId);
+        }
+      });
+    });
+
+    console.log('[CRDT] 소유자 Preview 노드 제거:', ownerId);
   },
 };

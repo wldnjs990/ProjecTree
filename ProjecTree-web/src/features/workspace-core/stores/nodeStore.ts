@@ -22,6 +22,12 @@ export interface ConfirmedNodeData {
   note: string;
 }
 
+const normalizeNodeDetail = (detail: NodeDetailData): NodeDetailData => ({
+  ...detail,
+  candidatesPending: detail.candidatesPending ?? false,
+  techsPending: detail.techsPending ?? false,
+});
+
 interface NodeState {
   // 상태
   nodes: FlowNode[];
@@ -118,7 +124,15 @@ export const useNodeStore = create<NodeState>((set) => ({
   clearPreviewNodes: () => set({ previewNodes: [] }),
 
   // 노드 상세/목록 데이터 액션
-  setNodeDetails: (details) => set({ nodeDetails: details }),
+  setNodeDetails: (details) =>
+    set({
+      nodeDetails: Object.fromEntries(
+        Object.entries(details).map(([key, value]) => [
+          key,
+          normalizeNodeDetail(value),
+        ])
+      ) as Record<number, NodeDetailData>,
+    }),
 
   setNodeListData: (data) => set({ nodeListData: data }),
 
@@ -127,8 +141,11 @@ export const useNodeStore = create<NodeState>((set) => ({
       nodeDetails: {
         ...state.nodeDetails,
         [nodeId]: state.nodeDetails[nodeId]
-          ? { ...state.nodeDetails[nodeId], ...updates }
-          : (updates as NodeDetailData),
+          ? normalizeNodeDetail({
+              ...state.nodeDetails[nodeId],
+              ...updates,
+            })
+          : normalizeNodeDetail(updates as NodeDetailData),
       },
     })),
 
@@ -172,7 +189,7 @@ export const useNodeStore = create<NodeState>((set) => ({
               assignee: data.assignee,
               note: data.note,
             }
-          : ({
+          : normalizeNodeDetail({
               id: nodeId,
               assignee: data.assignee,
               note: data.note,
@@ -180,7 +197,9 @@ export const useNodeStore = create<NodeState>((set) => ({
               candidates: [],
               techs: [],
               comparison: '',
-            } as NodeDetailData),
+              candidatesPending: false,
+              techsPending: false,
+            }),
       },
     })),
 

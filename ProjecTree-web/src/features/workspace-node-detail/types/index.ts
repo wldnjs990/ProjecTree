@@ -73,6 +73,8 @@ export interface NodeDetailData {
   candidates: Candidate[];
   techs: TechRecommendation[];
   comparison: string;
+  candidatesPending: boolean;
+  techsPending: boolean;
 }
 
 export interface NodeDetailApiResponse {

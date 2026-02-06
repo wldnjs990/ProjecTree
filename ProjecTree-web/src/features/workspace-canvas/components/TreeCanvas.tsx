@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
+import * as Y from 'yjs';
 import {
   ReactFlow,
   Background,
@@ -37,6 +38,10 @@ import {
   useSelectedNodeId,
   usePreviewNodes,
   usePreviewNodesCrdt,
+  useCandidatePreviewMode,
+  useIsCreatingNode,
+  getCrdtClient,
+  type YNodeValue,
   type FlowNode,
 } from '@/features/workspace-core';
 import CursorPointers from './CursorPointers';
@@ -81,7 +86,9 @@ function TreeCanvasInner({
   const { fitView } = useReactFlow();
 
   // 노드 CRDT 훅 (Y.js 노드 동기화)
-  const { handleNodeDragStop } = useNodesCrdt({ initialNodes });
+  const { handleNodeDragStop: handleCrdtNodeDragStop } = useNodesCrdt({
+    initialNodes,
+  });
 
   // 커서 CRDT 훅 (Awareness 커서 동기화)
   const { cursors, handleMouseMove, setUserInfo } = useCursors();
@@ -103,26 +110,45 @@ function TreeCanvasInner({
   const storeEdges = useEdges();
   const selectedNodeId = useSelectedNodeId();
   const previewNodes = usePreviewNodes();
+  const candidatePreviewMode = useCandidatePreviewMode();
+  const isCreatingNode = useIsCreatingNode();
+  const currentUser = useUser();
+  const currentUserId = String(currentUser?.memberId ?? currentUser?.id ?? '');
 
   // ReactFlow 로컬 상태 (드래그 중 즉시 반영용)
   const [nodes, setNodes] = useNodesState(storeNodes);
   const [edges, setEdges] = useEdgesState(storeEdges);
 
+  const lockedPreviewIds = useMemo(() => {
+    const locked = new Set<string>();
+    previewNodes.forEach((node) => {
+      const lockedBy = String(node.data?.lockedBy ?? '');
+      if (lockedBy && lockedBy !== currentUserId) {
+        locked.add(node.id);
+      }
+    });
+    return locked;
+  }, [previewNodes, currentUserId]);
+
   // 스토어 노드 + 미리보기 노드 병합
   const displayNodes = useMemo(() => {
-    // ReactFlow에 전달 시 parentId 제거 → 부모 드래그 시 자식 연동 이동 비활성화
     const nodesForReactFlow = storeNodes.map(
       ({ parentId: _, ...node }) => node
     );
-    // 미리보기 노드들이 있으면 병합
+
     if (previewNodes.length > 0) {
       const previewNodesWithoutParent = previewNodes.map(
-        ({ parentId: _, ...node }) => node
+        ({ parentId: _, ...node }) => {
+          if (lockedPreviewIds.has(node.id)) {
+            return { ...node, draggable: false, selectable: false };
+          }
+          return node;
+        }
       );
       return [...nodesForReactFlow, ...previewNodesWithoutParent] as FlowNode[];
     }
     return nodesForReactFlow as FlowNode[];
-  }, [storeNodes, previewNodes]);
+  }, [storeNodes, previewNodes, currentUserId, lockedPreviewIds]);
 
   // 스토어 노드가 변경되면 로컬 상태에 반영
   useEffect(() => {
@@ -151,21 +177,54 @@ function TreeCanvasInner({
   // 노드 변경 핸들러 (드래그 중 로컬 즉시 반영)
   const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
+      if (lockedPreviewIds.size > 0) {
+        const filtered = changes.filter((change) => {
+          if (!('id' in change)) return true;
+          !lockedPreviewIds.has(change.id);
+        });
+        setNodes((nds) => applyNodeChanges(filtered, nds) as FlowNode[]);
+        return;
+      }
       setNodes((nds) => applyNodeChanges(changes, nds) as FlowNode[]);
     },
-    [setNodes]
+    [setNodes, lockedPreviewIds]
   );
 
   // 노드 클릭 핸들러
   const handleNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
+      if (candidatePreviewMode || isCreatingNode) return;
+      if (node.type === 'PREVIEW') {
+        const lockedBy = String((node as FlowNode).data?.lockedBy ?? '');
+        if (lockedBy && lockedBy !== currentUserId) return;
+      }
       fitView({
         nodes: [{ id: node.id }],
         duration: 300,
       });
       onNodeClick?.(node.id);
     },
-    [onNodeClick, fitView]
+    [onNodeClick, fitView, candidatePreviewMode, isCreatingNode, currentUserId]
+  );
+
+  const handleNodeDragStop = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      if (isCreatingNode) return;
+      if (node.type === 'PREVIEW') {
+        const lockedBy = String((node as FlowNode).data?.lockedBy ?? '');
+        if (lockedBy && lockedBy !== currentUserId) return;
+        const client = getCrdtClient();
+        const yPreviewNodes =
+          client?.getYMap<Y.Map<YNodeValue>>('previewNodes');
+        const yNode = yPreviewNodes?.get(node.id);
+        if (yNode) {
+          yNode.set('position', { x: node.position.x, y: node.position.y });
+        }
+        return;
+      }
+      handleCrdtNodeDragStop(event, node);
+    },
+    [isCreatingNode, handleCrdtNodeDragStop, currentUserId]
   );
 
   // 간선 변경 핸들러
@@ -196,6 +255,7 @@ function TreeCanvasInner({
         onConnect={handleConnect}
         onNodeClick={handleNodeClick}
         onNodeDragStop={handleNodeDragStop}
+        nodesDraggable={!isCreatingNode}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={fitviewOptions}

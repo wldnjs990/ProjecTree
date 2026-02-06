@@ -13,6 +13,7 @@ import {
   useNodes,
   calculateChildNodePosition,
   useSelectedCandidateIds,
+  usePreviewNodes,
 } from '@/features/workspace-core';
 import { SubNodeCard } from './SubNodeCard';
 import { CandidateEmptyState } from './CandidateEmptyState';
@@ -41,9 +42,19 @@ export function AINodeCandidateSection({
   const selectedNodeId = useSelectedNodeId();
   const nodes = useNodes();
   const selectedCandidateIds = useSelectedCandidateIds();
+  const previewNodes = usePreviewNodes();
+
+  const lockedCandidateIds = new Set(
+    previewNodes
+      .map((node) => node.id)
+      .filter((id) => id.startsWith('preview-'))
+      .map((id) => Number(id.replace('preview-', '')))
+      .filter((id) => Number.isFinite(id))
+  );
 
   const handleCandidateClick = (candidate: Candidate) => {
     if (!selectedNodeId) return;
+    if (lockedCandidateIds.has(candidate.id)) return;
     const position = calculateChildNodePosition(nodes, selectedNodeId);
     onCandidateClick(Number(selectedNodeId), candidate.id, position);
   };
@@ -81,6 +92,7 @@ export function AINodeCandidateSection({
                     node={node}
                     onClick={() => handleCandidateClick(node)}
                     isSelected={selectedCandidateIds.includes(node.id)}
+                    disabled={lockedCandidateIds.has(node.id)}
                   />
                 ))}
               </div>
