@@ -4,6 +4,7 @@ class ChatSocketService {
   private socket: Socket | null = null;
   private readonly serverUrl: string;
   private onAnyRegistered: boolean = false; // 🔧 onAny 리스너 등록 여부 추적
+  private pendingJoins: Set<string> = new Set(); // 연결 전 보류된 chatRoomId 저장
   private connectionCallbacks: Set<(connected: boolean) => void> = new Set();
 
   constructor() {
@@ -72,6 +73,17 @@ class ChatSocketService {
 
       // 연결 상태 콜백 호출
       this.connectionCallbacks.forEach((cb) => cb(true));
+
+      // 연결 완료 후, 보류 중인 채팅방 입장 요청 처리
+      if (this.pendingJoins.size > 0 && this.socket) {
+        this.pendingJoins.forEach((roomId) => {
+          console.log(
+            `🔄 [ChatSocket] Emitting queued join for room: ${roomId}`
+          );
+          this.socket?.emit('chat:join', { chatRoomId: roomId });
+        });
+        this.pendingJoins.clear();
+      }
     });
 
     this.socket.on('disconnect', (reason) => {
@@ -100,9 +112,16 @@ class ChatSocketService {
    */
   joinChatRoom(chatRoomId: string): void {
     if (!this.socket?.connected) {
+      // 아직 연결되지 않았으면 보류시키고 연결 시 발송
+      console.log(
+        `⏳ [ChatSocket] Socket not connected yet. Queuing join for: ${chatRoomId}`
+      );
+      this.pendingJoins.add(chatRoomId);
       return;
     }
+
     // 백엔드 스펙: chatRoomId (ChatPayloadDto.Join)
+    console.log(`📡 [ChatSocket] Emitting chat:join for: ${chatRoomId}`);
     this.socket.emit('chat:join', { chatRoomId });
   }
 
