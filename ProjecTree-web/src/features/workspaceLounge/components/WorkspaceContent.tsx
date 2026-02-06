@@ -97,8 +97,8 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
     // 기본 정렬: 생성일순 (최신순)
     result.sort(
       (a, b) =>
-        new Date(b.createdAt || b.updatedAt).getTime() -
-        new Date(a.createdAt || a.updatedAt).getTime()
+        new Date(b.updatedAt || b.lastModified).getTime() -
+        new Date(a.updatedAt || a.lastModified).getTime()
     );
 
     return result;
@@ -176,7 +176,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
               >
                 <ProjectCard
                   project={workspace}
-                  timeLabel={workspace.lastCreated}
+                  timeLabel={workspace.updatedAt || workspace.lastModified}
                 />
               </div>
             ))}

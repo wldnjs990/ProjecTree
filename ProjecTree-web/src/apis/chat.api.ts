@@ -27,7 +27,7 @@ export const fetchMessages = async (
   // 💥 중요: 백엔드 데이터(snake_case 등)를 프론트엔드 모델(camelCase)로 매핑
   const rawData = response.data.data || [];
 
-  const mappedData = rawData.map((raw: any) => ({
+  const mappedData: ChatMessage[] = rawData.map((raw: any) => ({
     id: raw.id?.toString() || Date.now().toString(),
     workspaceId:
       raw.workspace_id?.toString() || raw.workspaceId?.toString() || '',
@@ -45,7 +45,7 @@ export const fetchMessages = async (
       'Unknown',
     content: raw.content || '',
     timestamp: raw.timestamp || raw.created_at || new Date().toISOString(),
-    type: 'text',
+    type: 'text' as const,
     senderAvatar:
       raw.senderAvatar || raw.sender_avatar || raw.profile_image || undefined,
   }));
