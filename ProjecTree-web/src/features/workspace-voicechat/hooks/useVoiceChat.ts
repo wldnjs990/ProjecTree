@@ -27,6 +27,7 @@ import type {
   TrackInfo,
   UseVoiceChatProps,
 } from '@/features/workspace-voicechat/types/types';
+import { useUser } from '@/shared/stores/userStore';
 
 const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL;
 const APPLICATION_SERVER_URL = import.meta.env.VITE_API_URL;
@@ -59,10 +60,16 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
   // 현재 말하고 있는 참가자 ID 목록
   const [activeSpeakers, setActiveSpeakers] = useState<string[]>([]);
 
-  // 참가자 이름 (임시로 랜덤 생성, 실제로는 사용자 정보 사용)
-  const [participantName] = useState(
-    `User_${Math.floor(Math.random() * 1000)}`
+  // 로그인한 사용자 정보
+  const user = useUser();
+
+  // Guest 폴백 이름 (닉네임이 없을 경우 사용, 한 번만 생성)
+  const [fallbackName] = useState(
+    () => `Guest_${Math.floor(Math.random() * 1000)}`
   );
+
+  // 참가자 이름 (user?.nickname이 로드되면 자동으로 반영됨)
+  const participantName = user?.nickname ?? fallbackName;
 
   /**
    * 백엔드 서버에서 LiveKit 접속 토큰 가져오기

@@ -13,8 +13,7 @@ export {
 // Constants
 export {
   ONBOARDING_TEXTS,
-  DOMAIN_OPTIONS,
 } from './constants';
 
 // Types
-export type { OnboardingStep, DomainOption } from './constants';
+export type { OnboardingStep } from './constants';
