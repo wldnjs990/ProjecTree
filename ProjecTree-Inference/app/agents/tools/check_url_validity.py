@@ -1,6 +1,6 @@
 
 from langchain_core.tools import tool
-
+import requests
 @tool
 def check_url_validity(url: str) -> str:
     """

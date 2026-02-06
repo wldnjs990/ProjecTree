@@ -5,7 +5,7 @@ from app.agents.portfolio.schemas.portfolio import PortfolioOutput
 from app.agents.portfolio.tools.analyze import analyze_task_distribution
 from app.agents.portfolio.prompts.system.portfolio_system import PORTFOLIO_AGENT_SYSTEM_PROMPT
 from app.agents.portfolio.prompts.user.portfolio_user import PORTFOLIO_USER_PROMPT, format_tasks_for_prompt
-from app.core.llm import openai_nano_llm
+from app.core.llm import openai_mini_llm
 from langchain.agents import create_agent
 from langchain_core.runnables import RunnableConfig
 import logging
@@ -41,7 +41,7 @@ def generate_portfolio_node(state: PortfolioState, config: RunnableConfig) -> Po
         
         # DeepAgent 생성 및 실행
         agent = create_agent(
-            model=openai_nano_llm,
+            model=openai_mini_llm,
             tools=tools,
             system_prompt=PORTFOLIO_AGENT_SYSTEM_PROMPT,
         )

@@ -27,13 +27,14 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 llm = openai_mini_llm
-tools = [restricted_search]
+tools = []
 
 tech_selector_agent = {
     "name": "tech_selector",
     "description": "사용자 요구사항을 분석하여 핵심 기능을 도출하고, 이를 구현할 수 있는 기술적으로 구별되는 3가지 대안 방식을 선정합니다.",
-    "tools": [], 
+    "tools": [restricted_search], 
     "system_prompt": TECH_SELECTOR_SYSTEM_PROMPT,
+    "model": openai_nano_llm,
 }
 
 deep_researcher_agent = {

@@ -9,7 +9,7 @@ from app.agents.enums import NodeType
 from langchain.agents import create_agent
 from app.agents.tools.validator import validate_summary
 from langchain_core.messages import HumanMessage
-from app.core.llm import openai_nano_llm, openai_mini_llm
+from app.core.llm import openai_mini_llm
 from app.agents.candidates.schemas.candidate import CandidateList, TaskCandidateList
 from app.agents.candidates.prompts.system_prompts import (
     EPIC_SYS,
