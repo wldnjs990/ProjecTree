@@ -42,6 +42,11 @@ class ChatSocketService {
       console.error('🔴 Connection error:', error);
     });
 
+    // 🔍 디버깅: 모든 이벤트 로깅
+    this.socket.onAny((eventName, ...args) => {
+      console.log(`🔔 [WebSocket Event] ${eventName}:`, args);
+    });
+
     return this.socket;
   }
 
