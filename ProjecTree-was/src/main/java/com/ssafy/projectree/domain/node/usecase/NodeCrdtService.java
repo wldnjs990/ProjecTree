@@ -41,6 +41,7 @@ public class NodeCrdtService {
     public void savePositionAsync(Long workspaceId, List<NodePositionUpdateDto.NodePositionItem> nodes) {
         try {
             for (NodePositionUpdateDto.NodePositionItem dto : nodes) {
+                //https://ssafy.atlassian.net/browse/S14P11D107-286
                 // TODO 업데이트 요청이 너무 많아서 다른 방안을 찾아보아야 할 듯
                 // gpt 는 Spring Batch는 쓰지 말고, @Async + JDBC batchUpdate 또는
                 // PostgreSQL JSON bulk update가 정답이라 함
@@ -70,6 +71,7 @@ public class NodeCrdtService {
                     .body(payload)
                     .retrieve().toBodilessEntity();
         } catch (Exception e) {
+            // https://ssafy.atlassian.net/browse/S14P11D107-285
             // TODO: 현재는 트랜잭션과 같이 동작 하기에 로그만 띄우지만
             // Transaction 과 별개로 동작하여 예외 반환 로직을 구현하는 것이 더 좋을 것같음
             log.error("CRDT 서버 전송 실패: {}", e.getMessage());
@@ -85,12 +87,17 @@ public class NodeCrdtService {
                 .build()
                 .toUriString();
 
+        sendNodeDataToCrdt(uriString, workspaceId, nodeId, response);
+    }
+
+    private void sendNodeDataToCrdt(String uriString, Long workspaceId, Long nodeId, Object payload) {
         try {
             restClient.post().uri(uriString, workspaceId, nodeId)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(response)
+                    .body(payload)
                     .retrieve().toBodilessEntity();
         } catch (Exception e) {
+            // https://ssafy.atlassian.net/browse/S14P11D107-285
             // TODO: 현재는 트랜잭션과 같이 동작 하기에 로그만 띄우지만
             // Transaction 과 별개로 동작하여 예외 반환 로직을 구현하는 것이 더 좋을 것같음
             log.error("CRDT 서버 전송 실패: {}", e.getMessage());
