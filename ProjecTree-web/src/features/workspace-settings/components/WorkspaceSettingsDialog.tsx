@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { CalendarIcon, Plus, X, Search, FileText, Trash2, Upload } from 'lucide-react';
+import { CalendarIcon, X, FileText, Upload, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -23,9 +23,8 @@ import {
 } from '@/components/ui/popover';
 
 import {
-  getTechStacks,
   updateWorkspace,
-  type UpdateWorkspaceRequest,
+  getTechStacks,
   type WorkspaceDetailData,
   type TechStackItem,
 } from '@/apis/workspace.api';
@@ -41,15 +40,6 @@ interface WorkspaceSettingsDialogProps {
 
 type Epic = { name: string; description: string };
 
-// ... (existing imports)
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { DOMAIN_OPTIONS } from '@/shared/constants/workspace';
 
 
 
@@ -76,15 +66,29 @@ const parseDate = (value?: string | null) => {
   return Number.isNaN(date.getTime()) ? null : date;
 };
 
-const parseTechStacks = (value?: number[] | string | null): number[] => {
-  if (!value) return [];
-  if (Array.isArray(value)) return value;
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+/**
+ * 백엔드 techs 배열에서 ID 배열 추출
+ * 백엔드 형식: { id: number, techStackName: string }[]
+ */
+const parseTechsToIds = (
+  techs?: Array<{ id: number; techStackName: string }> | null
+): number[] => {
+  if (!techs || !Array.isArray(techs)) return [];
+  return techs.map((tech) => tech.id);
+};
+
+/**
+ * 백엔드 techs 배열에서 ID -> 이름 맵 생성
+ */
+const parseTechsToMap = (
+  techs?: Array<{ id: number; techStackName: string }> | null
+): Map<number, string> => {
+  const map = new Map<number, string>();
+  if (!techs || !Array.isArray(techs)) return map;
+  techs.forEach((tech) => {
+    map.set(tech.id, tech.techStackName);
+  });
+  return map;
 };
 
 export function WorkspaceSettingsDialog({
@@ -106,47 +110,41 @@ export function WorkspaceSettingsDialog({
     epics: [],
   });
 
+  const [selectedTechMap, setSelectedTechMap] = useState<Map<number, string>>(
+    new Map()
+  );
+  const [originalTechIds, setOriginalTechIds] = useState<Set<number>>(new Set()); // 서버에서 받은 기존 기술스택 ID
   const [techOptions, setTechOptions] = useState<TechStackItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [selectedTechMap, setSelectedTechMap] = useState<Map<number, string>>(
-    new Map()
-  );
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<WorkspaceDetailData['files']>([]);
+  const [deleteFileIds, setDeleteFileIds] = useState<number[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 도메인 관련 상태 및 로직
-  const isCustomDomain =
-    form.domain === '기타' ||
-    (!!form.domain && !DOMAIN_OPTIONS.includes(form.domain as any));
-
-  const [customDomain, setCustomDomain] = useState(() => {
-    if (isCustomDomain && form.domain !== '기타') {
-      return form.domain;
-    }
-    return '';
-  });
-
-  // form.domain이 변경될 때 customDomain 동기화
-  useEffect(() => {
-    if (isCustomDomain && form.domain !== '기타') {
-      setCustomDomain(form.domain);
-    } else if (!isCustomDomain) {
-      setCustomDomain('');
-    }
-  }, [form.domain, isCustomDomain]);
-
-  // 디버깅용 로그 삭제됨
-
   useEffect(() => {
     if (!workspaceDetail || !isOpen) return;
 
+    console.log('[워크스페이스 설정] 서버 원본 데이터:', workspaceDetail);
+
     // API 응답 구조 대응: 기본 정보가 info 객체 안에 있을 수 있음
     const info = (workspaceDetail as any).info || workspaceDetail;
+
+    console.log('[워크스페이스 설정] info 객체 (전체):', JSON.stringify(info, null, 2));
+    console.log('[워크스페이스 설정] info.techs:', info.techs);
+    console.log('[워크스페이스 설정] info.epics:', info.epics);
+    console.log('[워크스페이스 설정] workspaceDetail.epics:', workspaceDetail.epics);
+    console.log('[워크스페이스 설정] workspaceDetail.nodeTree:', workspaceDetail.nodeTree);
+
+    // 백엔드에서 techs 필드로 기술 스택 반환 (workspaceTechStacks가 아님)
+    const techIds = parseTechsToIds(info.techs);
+    const techMap = parseTechsToMap(info.techs);
+
+    console.log('[워크스페이스 설정] 파싱된 techIds:', techIds);
+    console.log('[워크스페이스 설정] 파싱된 techMap:', techMap);
 
     setForm({
       name: info.name ?? '',
@@ -156,27 +154,21 @@ export function WorkspaceSettingsDialog({
       serviceType: info.serviceType ?? SERVICE_TYPE_OPTIONS[0].value,
       startDate: parseDate(info.startDate),
       endDate: parseDate(info.endDate),
-      techStacks: parseTechStacks(info.workspaceTechStacks),
-      epics: workspaceDetail.epics ?? [],
+      techStacks: techIds,
+      epics: info.epics ?? [],  // info 안에 epics가 있음
     });
+    setSelectedTechMap(techMap);
+    setOriginalTechIds(new Set(techIds)); // 서버에서 받은 기존 기술스택 ID 저장
     setNewFiles([]);
     setExistingFiles(workspaceDetail.files ?? []);
-    setSearchTerm('');
-    setShowSuggestions(false);
-
-    // 모달 열릴 때 커스텀 도메인 상태 초기화
-    const initialDomain = info.domain ?? '';
-    const initialIsCustom = initialDomain === '기타' || (!!initialDomain && !DOMAIN_OPTIONS.includes(initialDomain as any));
-    if (initialIsCustom && initialDomain !== '기타') {
-      setCustomDomain(initialDomain);
-    } else {
-      setCustomDomain('');
-    }
-
+    setDeleteFileIds([]);
   }, [workspaceDetail, isOpen]);
 
-  // ... (existing code)
+  const getTechName = (id: number) => {
+    return selectedTechMap.get(id) || `Tech ${id}`;
+  };
 
+  // 기술 스택 검색
   useEffect(() => {
     const fetchTechs = async () => {
       if (!searchTerm.trim()) {
@@ -195,9 +187,8 @@ export function WorkspaceSettingsDialog({
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const filteredTechs = useMemo(
-    () => techOptions.filter((tech) => !form.techStacks.includes(tech.id)),
-    [techOptions, form.techStacks]
+  const filteredTechs = techOptions.filter(
+    (tech) => !form.techStacks.includes(tech.id)
   );
 
   const handleAddTech = (tech: TechStackItem) => {
@@ -215,35 +206,6 @@ export function WorkspaceSettingsDialog({
     setForm((prev) => ({
       ...prev,
       techStacks: prev.techStacks.filter((id) => id !== techId),
-    }));
-  };
-
-  const getTechName = (id: number) => {
-    return (
-      selectedTechMap.get(id) ||
-      techOptions.find((t) => t.id === id)?.name ||
-      `Tech ${id}`
-    );
-  };
-
-  const handleAddEpic = () => {
-    setForm((prev) => ({
-      ...prev,
-      epics: [...prev.epics, { name: '', description: '' }],
-    }));
-  };
-
-  const handleUpdateEpic = (index: number, updates: Partial<Epic>) => {
-    setForm((prev) => ({
-      ...prev,
-      epics: prev.epics.map((epic, i) => (i === index ? { ...epic, ...updates } : epic)),
-    }));
-  };
-
-  const handleRemoveEpic = (index: number) => {
-    setForm((prev) => ({
-      ...prev,
-      epics: prev.epics.filter((_, i) => i !== index),
     }));
   };
 
@@ -282,44 +244,61 @@ export function WorkspaceSettingsDialog({
     setNewFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleRemoveExistingFile = (fileId: number) => {
+    setExistingFiles((prev) => prev.filter((f) => f.id !== fileId));
+    setDeleteFileIds((prev) => [...prev, fileId]);
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const requestData: UpdateWorkspaceRequest = {
+      const requestData = {
         name: form.name,
-        description: form.description,
-        domain: form.domain,
-        purpose: form.purpose,
-        serviceType: form.serviceType,
         startDate: form.startDate ? format(form.startDate, 'yyyy-MM-dd') : null,
         endDate: form.endDate ? format(form.endDate, 'yyyy-MM-dd') : null,
+        purpose: form.purpose,
         workspaceTechStacks: form.techStacks,
-        epics: form.epics,
+        ...(deleteFileIds.length > 0 && { deleteFiles: deleteFileIds }),
       };
 
-      console.log('Sending update request:', requestData);
+      console.log('[워크스페이스 설정] 요청 데이터:', {
+        workspaceId,
+        requestData,
+        newFiles: newFiles.map((f) => ({ name: f.name, size: f.size })),
+      });
+
       const response = await updateWorkspace(workspaceId, requestData, newFiles);
+
+      console.log('[워크스페이스 설정] 응답 데이터:', response);
 
       if (response.success) {
         toast.success('워크스페이스 설정이 저장되었습니다.');
-        // ... (rest of success logic)
         if (onUpdated) {
+          // info 객체 안의 데이터를 업데이트
+          const currentInfo = (workspaceDetail as any)?.info || workspaceDetail;
           onUpdated({
-            ...workspaceDetail, // Keep existing data
-            ...requestData, // Overwrite with new data
-            // Ensure tech stacks are passed correctly (API might return them differently, but for local update we use what we sent)
-            workspaceTechStacks: requestData.workspaceTechStacks,
+            ...workspaceDetail,
+            info: {
+              ...currentInfo,
+              name: form.name,
+              startDate: form.startDate ? format(form.startDate, 'yyyy-MM-dd') : null,
+              endDate: form.endDate ? format(form.endDate, 'yyyy-MM-dd') : null,
+              purpose: form.purpose,
+              techs: form.techStacks.map((id) => ({
+                id,
+                techStackName: selectedTechMap.get(id) || `Tech ${id}`,
+              })),
+            },
+            files: existingFiles, // 삭제된 파일 반영
           } as any);
         }
         onOpenChange(false);
       } else {
         toast.error((response as any).message || '저장에 실패했습니다.');
-        console.error('Update failed type:', typeof response);
-        console.error('Update failed raw:', response);
-        console.error('Update failed stringified:', JSON.stringify(response, null, 2));
       }
     } catch (error) {
       console.error('Failed to update workspace:', error);
+      toast.error('저장 중 오류가 발생했습니다.');
     } finally {
       setIsSaving(false);
     }
@@ -356,37 +335,23 @@ export function WorkspaceSettingsDialog({
             <div className="flex-1 min-h-0 overflow-y-scroll px-6 pt-6 pb-10 space-y-6 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-300/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-[3px] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-clip-content hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400/50">
               {/* 프로젝트명 */}
               <div className="space-y-2">
-                <div className="flex items-center gap-1">
-                  <Label className="text-sm font-bold text-zinc-700">프로젝트명</Label>
-                  <span className="text-red-500 text-sm">*</span>
-                </div>
+                <Label className="text-sm font-bold text-zinc-700">프로젝트명</Label>
                 <Input
                   value={form.name}
-                  onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-                  maxLength={20}
-                  className="h-11 border-zinc-200 bg-zinc-50/50 rounded-xl focus-visible:ring-2 focus-visible:ring-[var(--figma-neon-green)]/20 focus-visible:border-[var(--figma-neon-green)] transition-all font-medium text-zinc-800 placeholder:text-zinc-400"
+                  disabled
+                  className="h-11 border-zinc-200 bg-zinc-100 rounded-xl font-medium text-zinc-600 cursor-not-allowed"
                 />
-                <div className="text-right text-xs text-zinc-400">
-                  {form.name.length}/20
-                </div>
               </div>
 
               {/* 프로젝트 주제 */}
               <div className="space-y-2">
-                <div className="flex items-center gap-1">
-                  <Label className="text-sm font-bold text-zinc-700">프로젝트 주제</Label>
-                  <span className="text-red-500 text-sm">*</span>
-                </div>
+                <Label className="text-sm font-bold text-zinc-700">프로젝트 주제</Label>
                 <Textarea
                   value={form.description}
-                  onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                  maxLength={500}
+                  disabled
                   rows={2}
-                  className="resize-none border-zinc-200 bg-zinc-50/50 rounded-xl focus-visible:ring-2 focus-visible:ring-[var(--figma-neon-green)]/20 focus-visible:border-[var(--figma-neon-green)] transition-all font-medium text-zinc-800 placeholder:text-zinc-400 min-h-[80px]"
+                  className="resize-none border-zinc-200 bg-zinc-100 rounded-xl font-medium text-zinc-600 cursor-not-allowed min-h-[80px]"
                 />
-                <div className="text-right text-xs text-zinc-400">
-                  {form.description.length}/500
-                </div>
               </div>
 
               {/* 프로젝트 문서 */}
@@ -464,8 +429,14 @@ export function WorkspaceSettingsDialog({
                               PDF {(file.size / 1024 / 1024).toFixed(1)}MB
                             </p>
                           </div>
-                          <button className="p-1.5 hover:bg-zinc-100 rounded-lg transition-colors">
-                            <X className="w-4 h-4 text-zinc-400 hover:text-zinc-600" />
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveExistingFile(file.id);
+                            }}
+                            className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            <X className="w-4 h-4 text-zinc-400 hover:text-red-500" />
                           </button>
                         </div>
                       ))}
@@ -504,53 +475,12 @@ export function WorkspaceSettingsDialog({
 
               {/* 도메인 */}
               <div className="space-y-2">
-                <div className="flex items-center gap-1">
-                  <Label className="text-sm font-bold text-zinc-700">도메인</Label>
-                  <span className="text-red-500 text-sm">*</span>
-                </div>
-                <Select
-                  value={isCustomDomain ? '기타' : form.domain}
-                  onValueChange={(value) => {
-                    if (value === '기타') {
-                      setForm((prev) => ({ ...prev, domain: '기타' }));
-                      setCustomDomain('');
-                    } else {
-                      setForm((prev) => ({ ...prev, domain: value }));
-                      setCustomDomain('');
-                    }
-                  }}
-                >
-                  <SelectTrigger className="h-11 border-zinc-200 bg-zinc-50/50 rounded-xl focus:ring-2 focus:ring-[var(--figma-neon-green)]/20 focus:border-[var(--figma-neon-green)] transition-all font-medium text-zinc-800">
-                    <SelectValue placeholder="도메인을 선택하세요" />
-                  </SelectTrigger>
-                  <SelectContent className="z-[200]">
-                    {DOMAIN_OPTIONS.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                {/* 기타 선택 시 커스텀 입력 필드 */}
-                {isCustomDomain && (
-                  <div className="space-y-1 mt-2">
-                    <Input
-                      placeholder="도메인을 입력하세요"
-                      value={customDomain}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setCustomDomain(value);
-                        setForm((prev) => ({ ...prev, domain: value || '기타' }));
-                      }}
-                      maxLength={10}
-                      className="h-11 border-zinc-200 bg-zinc-50/50 rounded-xl focus-visible:ring-2 focus-visible:ring-[var(--figma-neon-green)]/20 focus-visible:border-[var(--figma-neon-green)] transition-all font-medium text-zinc-800"
-                    />
-                    <div className="text-right text-xs text-zinc-400">
-                      {customDomain.length}/10
-                    </div>
-                  </div>
-                )}
+                <Label className="text-sm font-bold text-zinc-700">도메인</Label>
+                <Input
+                  value={form.domain}
+                  disabled
+                  className="h-11 border-zinc-200 bg-zinc-100 rounded-xl font-medium text-zinc-600 cursor-not-allowed"
+                />
               </div>
 
               {/* 기술 스택 */}
@@ -561,7 +491,7 @@ export function WorkspaceSettingsDialog({
                     <Search className="w-4 h-4 text-zinc-400" />
                   </div>
                   <Input
-                    placeholder="사용할 기술스택 검색 (React, Spring...)"
+                    placeholder="기술스택 검색 (React, Spring...)"
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -592,30 +522,38 @@ export function WorkspaceSettingsDialog({
                 </div>
                 {form.techStacks.length > 0 && (
                   <div className="flex flex-wrap gap-2 p-4 bg-zinc-50/50 border border-zinc-200/50 rounded-xl min-h-[60px]">
-                    {form.techStacks.map((techId) => (
-                      <Badge
-                        key={techId}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-zinc-700 border border-zinc-200 font-bold hover:bg-zinc-50 shadow-sm rounded-lg"
-                      >
-                        {getTechName(techId)}
-                        <button
-                          onClick={() => handleRemoveTech(techId)}
-                          className="p-0.5 hover:bg-zinc-200 rounded-full transition-colors"
+                    {form.techStacks.map((techId) => {
+                      const isExisting = originalTechIds.has(techId);
+                      return (
+                        <Badge
+                          key={techId}
+                          className={cn(
+                            "px-3 py-1.5 font-bold shadow-sm rounded-lg flex items-center gap-1.5",
+                            isExisting
+                              ? "bg-zinc-100 text-zinc-600 border border-zinc-300" // 기존 기술스택 (제거 불가)
+                              : "bg-green-50 text-green-700 border border-green-300" // 새로 추가 (제거 가능)
+                          )}
                         >
-                          <X className="w-3 h-3 text-zinc-400" />
-                        </button>
-                      </Badge>
-                    ))}
+                          {getTechName(techId)}
+                          {!isExisting && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveTech(techId)}
+                              className="ml-1 p-0.5 hover:bg-green-200 rounded transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 )}
               </div>
 
               {/* 예상 기간 */}
               <div className="space-y-2">
-                <div className="flex items-center gap-1">
-                  <Label className="text-sm font-bold text-zinc-700">예상 기간</Label>
-                  <span className="text-red-500 text-sm">*</span>
-                </div>
+                <Label className="text-sm font-bold text-zinc-700">예상 기간</Label>
                 <div className="flex items-center gap-3">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -695,51 +633,30 @@ export function WorkspaceSettingsDialog({
 
               {/* 에픽 정보 */}
               <div className="space-y-4 pt-4 border-t border-zinc-100">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm font-bold text-zinc-700">에픽 정보</Label>
-                  <Button
-                    onClick={handleAddEpic}
-                    className="h-8 px-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200 text-xs font-bold rounded-lg shadow-sm flex items-center gap-1.5 transition-all"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    에픽 추가
-                  </Button>
-                </div>
+                <Label className="text-sm font-bold text-zinc-700">에픽 정보</Label>
 
                 <div className="space-y-4">
                   {form.epics.map((epic, idx) => (
                     <div
                       key={idx}
-                      className="p-5 bg-zinc-50/50 border border-zinc-200/60 rounded-2xl space-y-3 group hover:border-[var(--figma-neon-green)]/30 hover:bg-white transition-all shadow-sm"
+                      className="p-5 bg-zinc-100 border border-zinc-200/60 rounded-2xl space-y-3 shadow-sm"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">에픽 {idx + 1}</span>
-                        <button
-                          onClick={() => handleRemoveEpic(idx)}
-                          className="p-1.5 hover:bg-red-50 text-zinc-400 hover:text-red-500 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">에픽 {idx + 1}</span>
                       <Input
-                        placeholder="에픽명 (20자 이내)"
                         value={epic.name}
-                        onChange={(e) => handleUpdateEpic(idx, { name: e.target.value })}
-                        maxLength={20}
-                        className="h-10 border-zinc-200 bg-white rounded-xl focus-visible:ring-1 focus-visible:ring-[var(--figma-neon-green)]"
+                        disabled
+                        className="h-10 border-zinc-200 bg-zinc-50 rounded-xl text-zinc-600 cursor-not-allowed"
                       />
                       <Textarea
-                        placeholder="에픽 상세 설명 (200자 이내)"
                         value={epic.description}
-                        onChange={(e) => handleUpdateEpic(idx, { description: e.target.value })}
-                        maxLength={200}
+                        disabled
                         rows={2}
-                        className="resize-none border-zinc-200 bg-white rounded-xl min-h-[72px] focus-visible:ring-1 focus-visible:ring-[var(--figma-neon-green)]"
+                        className="resize-none border-zinc-200 bg-zinc-50 rounded-xl min-h-[72px] text-zinc-600 cursor-not-allowed"
                       />
                     </div>
                   ))}
                   {form.epics.length === 0 && (
-                    <div className="text-center py-6 text-zinc-400 text-sm bg-zinc-50/30 rounded-xl border border-dashed border-zinc-200">
+                    <div className="text-center py-6 text-zinc-400 text-sm bg-zinc-100 rounded-xl border border-zinc-200">
                       등록된 에픽이 없습니다.
                     </div>
                   )}
