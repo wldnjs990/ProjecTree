@@ -45,6 +45,7 @@ router.post("/:nodeId/candidate", (req: Request, res: Response) => {
 
     const nodeCandidatesPending = doc.getMap("nodeCandidatesPending");
     nodeCandidatesPending.set(nodeId, false);
+
   });
 
   res.status(200).json({ status: "ok" });
