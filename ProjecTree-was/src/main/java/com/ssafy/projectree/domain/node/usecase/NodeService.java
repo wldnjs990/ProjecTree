@@ -29,7 +29,7 @@ public interface NodeService {
 
     void createEpicNodes(Workspace workspace, Node projectNode, List<FunctionSpecificationDto.EpicInfo> epics);
 
-    CandidateCreateDto.Response createCandidate(Long parentId);
+    CandidateCreateDto.Response createCandidate(Long parentId, Long workspaceId);
 
     CustomNodeDto.Response createCustom(CustomNodeDto.Request dto);
 

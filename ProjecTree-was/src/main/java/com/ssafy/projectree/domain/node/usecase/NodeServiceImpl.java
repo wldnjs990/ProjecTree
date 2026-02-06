@@ -287,7 +287,7 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public CandidateCreateDto.Response createCandidate(Long parentId) {
+    public CandidateCreateDto.Response createCandidate(Long parentId, Long workspaceId) {
         ProjectNode projectNode = findRootNode(parentId);
 
         AiCandidateCreateDto.Response candidate = inferenceService.createCandidate(AiCandidateCreateDto.Request.builder()
@@ -296,7 +296,7 @@ public class NodeServiceImpl implements NodeService {
                 .candidateCount(3)
                 .build());
         return CandidateCreateDto.Response.builder()
-                .candidates(candidate.getCandidates())
+                .nodeId(parentId)
                 .build();
     }
 
