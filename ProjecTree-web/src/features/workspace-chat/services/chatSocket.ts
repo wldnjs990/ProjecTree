@@ -3,6 +3,8 @@ import { io, Socket } from 'socket.io-client';
 class ChatSocketService {
   private socket: Socket | null = null;
   private readonly serverUrl: string;
+  private onAnyRegistered: boolean = false; // 🔧 onAny 리스너 등록 여부 추적
+
   constructor() {
     // 환경변수에서 WebSocket 서버 URL 가져오기
     // this.serverUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
@@ -16,13 +18,14 @@ class ChatSocketService {
   connect(accessToken: string): Socket {
     if (this.socket?.connected) {
       // 🔍 이미 연결된 소켓이 있어도 onAny 리스너 확인 및 등록
-      if (this.socket.listeners('*').length === 0) {
+      if (!this.onAnyRegistered) {
         console.log(
           '🔧 [ChatSocket] Re-registering onAny listener for existing socket'
         );
         this.socket.onAny((eventName, ...args) => {
           console.log(`🔔 [WebSocket Event] ${eventName}:`, args);
         });
+        this.onAnyRegistered = true;
       }
       return this.socket;
     }
@@ -41,20 +44,31 @@ class ChatSocketService {
     // 연결 이벤트
     this.socket.on('connect', () => {
       console.log('✅ WebSocket connected:', this.socket?.id);
+
+      // 🔧 재연결 시 onAny 리스너 재등록
+      if (!this.onAnyRegistered && this.socket) {
+        console.log('🔧 [ChatSocket] Re-registering onAny after reconnect');
+        this.socket.onAny((eventName, ...args) => {
+          console.log(`🔔 [WebSocket Event] ${eventName}:`, args);
+        });
+        this.onAnyRegistered = true;
+      }
     });
 
     this.socket.on('disconnect', (reason) => {
       console.log('❌ WebSocket disconnected:', reason);
+      this.onAnyRegistered = false; // 🔧 연결 끊기면 플래그 리셋
     });
 
     this.socket.on('connect_error', (error) => {
       console.error('🔴 Connection error:', error);
     });
 
-    // 🔍 디버깅: 모든 이벤트 로깅
+    // 🔍 디버깅: 모든 이벤트 로깅 (초기 연결)
     this.socket.onAny((eventName, ...args) => {
       console.log(`🔔 [WebSocket Event] ${eventName}:`, args);
     });
+    this.onAnyRegistered = true; // 🔧 등록 완료 플래그 설정
 
     return this.socket;
   }
