@@ -5,8 +5,11 @@ import com.ssafy.projectree.domain.file.api.dto.FileUploadDto;
 import com.ssafy.projectree.domain.file.model.entity.FileProperty;
 import com.ssafy.projectree.domain.file.model.repository.FileRepository;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
+import com.ssafy.projectree.global.api.code.ErrorCode;
+import com.ssafy.projectree.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -59,4 +62,13 @@ public class FileService {
         return System.currentTimeMillis() + "_" + UUID.randomUUID() + ext;
     }
 
+    @Transactional
+    public void deleteFile(Long id) {
+        FileProperty file = fileRepository.findById(id)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.FILE_NOT_FOUND));
+
+        // S3 삭제 후 DB 삭제
+        s3Service.delete(file.getWorkspace().getId(), file.getSavedFileName());
+        fileRepository.delete(file);
+    }
 }
