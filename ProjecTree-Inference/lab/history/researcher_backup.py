@@ -58,7 +58,7 @@ RESEARCHER_PROMPT = """
       "advantage": "...",
       "disadvantage": "...",
       "description": "...",
-      "ref": "https://..." 
+      "ref": "" 
     }
   ],
   "comparison": "3가지 기술의 선택 기준 및 요약 비교 (Markdown)"

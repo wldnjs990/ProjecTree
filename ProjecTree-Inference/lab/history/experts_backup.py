@@ -8,7 +8,6 @@ from deepagents import create_deep_agent
 from langchain.agents.structured_output import ProviderStrategy
 from app.agents.recommend.state import RecommendationState
 from app.agents.tools.search import restricted_search
-from app.agents.tools.validator import url_validator
 from app.agents.recommend.schemas.expert import TechList
 from typing import Any
 from app.agents.recommend.prompts.user_prompts import EXPERT_USER_PROMPT
@@ -27,7 +26,10 @@ load_dotenv()
 # [변경] 메인 모델을 gpt-5.2로 교체
 llm = openai_gpt_5_2
 # [변경] 검색 툴을 메인 에이전트가 직접 사용
-tools = [restricted_search, url_validator]
+tools = [restricted_search]
+
+# Sub-agents (tech_selector, deep_researcher) removed as per single agent refactoring
+
 
 def create_expert_agent(system_prompt: str):
     return create_deep_agent(
@@ -35,7 +37,7 @@ def create_expert_agent(system_prompt: str):
         tools, 
         system_prompt=system_prompt, 
         response_format=ProviderStrategy(TechList),
-        # [변경] 서브 에이전트 제거: 메인 에이전트가 단독 수행
+        # [변경] 서브 에이전트 제거
         subagents=[],
     )
 
@@ -70,7 +72,7 @@ def run_expert_node(state: RecommendationState, executor: Any, config: RunnableC
         )
     else:
         workspace_context = "[프로젝트 정보가 없습니다.]"
-
+    
     
     # 제외할 기술 스택 컨텍스트 생성
     if excluded_tech_stacks and len(excluded_tech_stacks) > 0:

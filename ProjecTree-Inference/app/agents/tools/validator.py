@@ -42,3 +42,18 @@ def validate_summary(summary: str) -> str:
             f"❌ 검증 실패: 현재 {current_length}자로, 제한({limit}자)을 {excess}자 초과했습니다. "
             f"내용을 {excess + 10}자 이상 줄인 후 다시 검증하세요. 절대로 검증 없이 출력하지 마세요."
         )
+
+
+@tool
+def url_validator(url: str) -> bool:
+    """
+    URL이 실제 접근 가능한지(200 OK) 검증합니다.
+    `ref` 필드에 URL을 넣기 전에 반드시 이 도구로 검증해야 합니다.
+    """
+    import requests
+    try:
+        # 2초 타임아웃으로 빠르게 검증
+        response = requests.head(url, timeout=2, allow_redirects=True)
+        return response.status_code == 200
+    except Exception:
+        return False

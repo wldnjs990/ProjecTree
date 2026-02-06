@@ -1,6 +1,7 @@
-from langchain_tavily import TavilySearch
+from langchain_community.tools.tavily_search import TavilySearchResults
 from dotenv import load_dotenv
 from langchain.tools import tool
+
 load_dotenv()
 
 
@@ -24,6 +25,8 @@ TRUSTED_DOMAINS = [
     "tistory.com",
     "blog.naver.com",
 ]
+
+from app.agents.tools.validator import url_validator
 
 @tool
 def restricted_search(query: str) -> str:
@@ -51,10 +54,32 @@ def restricted_search(query: str) -> str:
         query (str): 검색할 구체적인 기술 키워드 또는 질문 (반드시 한국어로 작성)
     
     Returns:
-        str: 검색된 한국 기술 블로그의 내용 요약 및 URL 정보
+        str: 검색된 한국 기술 블로그의 내용 요약 및 유효한 URL 정보
     """
-    search_tool = TavilySearch(
-        include_domains=TRUSTED_DOMAINS,
-        search_depth="advanced"
-    )
-    return search_tool.invoke({"query": query})
+    try:
+        search_tool = TavilySearchResults(
+            include_domains=TRUSTED_DOMAINS,
+            search_depth="basic",
+            max_results=3  # 결과 개수 제한 (토큰 비용 최적화)
+        )
+        results = search_tool.invoke({"query": query})
+        
+        valid_results = []
+        for res in results:
+            url = res.get("url")
+            content = res.get("content")
+            
+            if not url:
+                continue
+                
+            # url_validator 도구를 사용하여 검증
+            if url_validator.invoke(url):
+                valid_results.append(f"Title: {res.get('title', 'No Title')}\nURL: {url}\nContent: {content}\n")
+
+        if not valid_results:
+            return "검색 결과가 없거나 유효한 기술 블로그 URL을 찾지 못했습니다. 다른 키워드로 재검색해보세요."
+
+        return "\n---\n".join(valid_results)
+
+    except Exception as e:
+        return f"Search Error: {str(e)}"

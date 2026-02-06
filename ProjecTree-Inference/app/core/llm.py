@@ -6,6 +6,15 @@ from langchain_anthropic import ChatAnthropic
 mini_llm = ChatUpstage(model="solar-mini", name="solar-mini", temperature=0, max_retries=3)
 large_llm = ChatUpstage(model="solar-pro2", name="solar-pro2", temperature=0, max_retries=3)
 
+openai_gpt_5_2 = ChatOpenAI(
+    model="gpt-5.2",
+    name="gpt-5.2",
+    temperature=0,
+    max_retries=3,
+    base_url=settings.OPENAI_BASE_URL,
+    api_key=settings.AI_API_KEY
+)
+
 openai_mini_llm = ChatOpenAI(
     model="gpt-5-mini", 
     name="gpt-5-mini", 

@@ -1,13 +1,12 @@
 """기술 스택 검색 도구"""
 
 from langchain_core.tools import tool
-from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_tavily import TavilySearch
 from typing import Dict, Any
-import os
 
 
 # Tavily 검색 설정
-tavily_search = TavilySearchResults(
+tavily_search = TavilySearch(
     max_results=3,
     include_domains=["velog.io", "tistory.com", "medium.com", "dev.to", "techblog.woowahan.com"]
 )

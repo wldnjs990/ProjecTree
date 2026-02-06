@@ -8,7 +8,7 @@ class TechRecommandation(BaseModel):
     advantage: str = Field(description="한글로 설명한 해당 기술의 핵심 장점")
     disadvantage: str = Field(description="한글로 설명한 해당 기술의 핵심 단점")
     description: str = Field(description="한글로 설명한 해당 기술에 대한 설명")    
-    ref: str = Field(description="해당 기술에 대한 웹 검색 도구의 문서 URL")
+    ref: str = Field(description="검증된 '단일' URL (반드시 http:// 또는 https://로 시작). 설명 텍스트나 콤마로 구분된 여러 URL 금지. 없으면 빈 문자열.")
     recommendation_score: int = Field(
         description="추천 점수 (1-5). 기술 목록 내에서 '상위 순위'를 나타내는 유일한(Unique) 정수여야 하며, 다른 기술과 중복될 수 없음.",
         ge=1,
