@@ -33,11 +33,12 @@ interface AiNodeRecommendationResponse {
   comparison: string;
 }
 const getAiNodeTechRecommendation = async (
-  nodeId: number
+  nodeId: number,
+  workspaceId: number
 ): Promise<ApiResponse<AiNodeRecommendationResponse>> => {
   const response = await wasApiClient.post<
     ApiResponse<AiNodeRecommendationResponse>
-  >(`/nodes/${nodeId}/tech-stack/recommendation`);
+  >(`/nodes/${nodeId}/tech-stack/recommendation`, { workspaceId });
   return response.data;
 };
 

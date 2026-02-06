@@ -73,10 +73,12 @@ export interface NodeCandidatesResponse {
  * @param nodeId - 부모 노드 ID
  */
 export const generateNodeCandidates = async (
-  nodeId: number
+  nodeId: number,
+  workspaceId: number
 ): Promise<Candidate[]> => {
   const response = await wasApiClient.post<NodeCandidatesResponse>(
-    `nodes/${nodeId}/candidates`
+    `nodes/${nodeId}/candidates`,
+    { workspaceId }
   );
 
   // API 응답에서 id, taskType, selected, summary가 없으므로 클라이언트에서 초기화
@@ -310,8 +312,6 @@ export const createWorkspace = async (
     workspaceTechStacks: data.techStacks, // 🚨 백엔드 요청대로 필드명 변경 및 활성화
     epics: epics, // 🚨 재변경: 백엔드 DTO(epics) 확인 -> epics (복수형)
   };
-
-
 
   // 2. FormData에 데이터 담기
   // JSON 객체 -> Blob (application/json) -> 'data' 필드

@@ -86,7 +86,7 @@ function NodeFooter({
   return (
     <div className="flex items-center justify-between border-t border-[#DEDEDE]/50 pt-2">
       <span className="text-[10px] text-[#64748B]">{taskId}</span>
-      <DifficultyDots difficult={difficult} />
+      {difficult && <DifficultyDots difficult={difficult} />}
     </div>
   );
 }
@@ -139,6 +139,8 @@ function ProjectNodeComponent({ data, selected }: NodeProps<ProjectNodeType>) {
 
       <NodeTitle title={nodeData.title} />
 
+      <NodeFooter taskId={nodeData.taskId} />
+
       <Handle
         type="source"
         position={Position.Bottom}
@@ -174,7 +176,7 @@ function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
 
       <NodeTitle title={nodeData.title} className="mb-2" />
 
-      <NodeFooter taskId={nodeData.taskId} difficult={nodeData.difficult} />
+      <NodeFooter taskId={nodeData.taskId} />
 
       <Handle
         type="source"
@@ -210,7 +212,7 @@ function StoryNodeComponent({ data, selected }: NodeProps<StoryNodeType>) {
 
       <NodeTitle title={nodeData.title} className="mb-2" />
 
-      <NodeFooter taskId={nodeData.taskId} difficult={nodeData.difficult} />
+      <NodeFooter taskId={nodeData.taskId} />
 
       <Handle
         type="source"
@@ -290,10 +292,8 @@ function AdvanceNodeComponent({
 
   const borderColor =
     parentTaskType === 'FE' ? 'border-[#F97316]' : 'border-[#6366F1]';
-  const bgColor =
-    parentTaskType === 'FE' ? 'bg-[#FFF7ED]' : 'bg-[#EEF2FF]';
-  const handleColor =
-    parentTaskType === 'FE' ? 'bg-[#F97316]' : 'bg-[#6366F1]';
+  const bgColor = parentTaskType === 'FE' ? 'bg-[#FFF7ED]' : 'bg-[#EEF2FF]';
+  const handleColor = parentTaskType === 'FE' ? 'bg-[#F97316]' : 'bg-[#6366F1]';
 
   return (
     <div

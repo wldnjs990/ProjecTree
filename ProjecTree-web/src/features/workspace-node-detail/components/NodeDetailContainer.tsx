@@ -1,4 +1,5 @@
 ﻿import { useEffect } from 'react';
+import { useParams } from 'react-router';
 import { NodeHeaderSection } from './NodeHeaderSection';
 import { StatusMetaSection } from './StatusMetaSection';
 import { AITechRecommendSection } from './AITechRecommendSection';
@@ -37,6 +38,10 @@ export default function NodeDetailContainer({
   onToggleExpand,
   isExpanded,
 }: NodeDetailContainerProps) {
+  // URL에서 workspaceId 가져오기
+  const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
+  const workspaceId = paramWorkspaceId ? Number(paramWorkspaceId) : null;
+
   // Store state subscriptions
   const nodeDetail = useSelectedNodeDetail();
   const selectedNodeId = useSelectedNodeId();
@@ -141,12 +146,13 @@ export default function NodeDetailContainer({
 
   // AI 기술 추천 생성 핸들러
   const handleGenerateTechs = async () => {
-    if (!selectedNodeId) return;
+    if (!selectedNodeId || !workspaceId) return;
 
     nodeDetailCrdtService.setTechsPending(selectedNodeId, true);
     try {
       const response = await getAiNodeTechRecommendation(
-        Number(selectedNodeId)
+        Number(selectedNodeId),
+        workspaceId
       );
       const rawTechs = response?.data?.techs;
       const techsArray = Array.isArray(rawTechs)
@@ -185,11 +191,11 @@ export default function NodeDetailContainer({
 
   // AI 노드 후보 생성 핸들러
   const handleGenerateCandidates = async () => {
-    if (!selectedNodeId) return;
+    if (!selectedNodeId || !workspaceId) return;
 
     nodeDetailCrdtService.setCandidatesPending(selectedNodeId, true);
     try {
-      const candidates = await generateNodeCandidates(Number(selectedNodeId));
+      const candidates = await generateNodeCandidates(Number(selectedNodeId), workspaceId);
       nodeDetailCrdtService.updateCandidates(selectedNodeId, candidates);
 
       console.log('[NodeDetailContainer] AI 노드 후보 생성 완료');
