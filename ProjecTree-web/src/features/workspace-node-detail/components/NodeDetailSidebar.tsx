@@ -145,7 +145,7 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
           )}
         >
           {/* 스크롤 영역 */}
-          <div className="h-full overflow-y-auto">
+          <div className="h-full overflow-y-auto node-detail-scrollbar">
             <AnimatePresence mode="wait">
               {candidatePreviewMode && previewCandidate ? (
                 <motion.div

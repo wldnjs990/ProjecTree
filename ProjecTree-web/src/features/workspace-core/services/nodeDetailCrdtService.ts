@@ -1,5 +1,5 @@
 import * as Y from 'yjs';
-import { getCrdtClient } from '../crdt/crdtClient';
+import { getCrdtClient, type YNodeValue } from '../crdt/crdtClient';
 import { useNodeStore, type ConfirmedNodeData } from '../stores/nodeStore';
 import {
   useNodeDetailStore,
@@ -13,6 +13,7 @@ import type {
   Candidate,
   TechRecommendation,
 } from '../types/nodeDetail';
+import type { FlowNodeData } from '../types/node';
 
 // Y.Map에 저장되는 값 타입 (candidates는 별도 Y.Map에서 관리)
 type YNodeDetailValue = string | number | Assignee | null | undefined;
@@ -36,6 +37,32 @@ class NodeDetailCrdtService {
   private isInitialized = false;
 
   private constructor() {}
+
+  private updateNodeDataInCrdt(
+    nodeId: string,
+    confirmedData: ConfirmedNodeData
+  ): void {
+    const client = getCrdtClient();
+    if (!client) return;
+
+    const yNodes = client.getYMap<Y.Map<YNodeValue>>('nodes');
+    const yNode = yNodes.get(nodeId);
+    if (!yNode) return;
+
+    const currentData = yNode.get('data') as FlowNodeData | undefined;
+    if (!currentData) return;
+
+    const nextData: FlowNodeData = {
+      ...currentData,
+      status: confirmedData.status,
+      priority: confirmedData.priority,
+      difficult: confirmedData.difficult,
+    };
+
+    client.yDoc.transact(() => {
+      yNode.set('data', nextData);
+    });
+  }
 
   static getInstance(): NodeDetailCrdtService {
     if (!NodeDetailCrdtService.instance) {
@@ -88,6 +115,7 @@ class NodeDetailCrdtService {
           useNodeStore
             .getState()
             .applyConfirmedData(Number(key), confirmedData);
+          this.updateNodeDataInCrdt(key, confirmedData);
         }
       });
     };
@@ -162,6 +190,7 @@ class NodeDetailCrdtService {
           confirmedData
         );
         useNodeStore.getState().applyConfirmedData(Number(key), confirmedData);
+        this.updateNodeDataInCrdt(key, confirmedData);
       });
 
       // 기존 편집 데이터가 있으면 동기화
