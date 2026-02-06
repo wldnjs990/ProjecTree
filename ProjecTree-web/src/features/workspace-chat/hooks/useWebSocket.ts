@@ -44,22 +44,7 @@ export const useWebSocket = (workspaceId: string | null) => {
     };
   }, []);
 
-  // 채팅방 입장/퇴장 (chatRoomId 변경 시)
-  useEffect(() => {
-    if (!chatRoomId) return;
-
-    console.log(
-      `🔄 [useWebSocket] Attempting to join chat room: ${chatRoomId}`
-    );
-    chatSocket.joinChatRoom(chatRoomId);
-    console.log(`📡 [useWebSocket] Join event emitted for: ${chatRoomId}`);
-
-    return () => {
-      chatSocket.leaveChatRoom(chatRoomId);
-    };
-  }, [chatRoomId]);
-
-  // 이벤트 리스너 등록
+  // 이벤트 리스너 등록 및 채팅방 입장 (순서 중요!)
   useEffect(() => {
     if (!workspaceId) return;
 
@@ -265,6 +250,10 @@ export const useWebSocket = (workspaceId: string | null) => {
       console.error('Socket error:', error);
     };
 
+    // 🎯 1단계: 이벤트 리스너 먼저 등록 (chat:history 이벤트를 놓치지 않기 위해)
+    console.log(
+      '🔧 [useWebSocket] Registering event listeners BEFORE joining room'
+    );
     chatSocket.on('message:receive', handleMessageReceive);
     chatSocket.on('typing:start', handleTypingStart);
     chatSocket.on('typing:stop', handleTypingStop);
@@ -273,7 +262,19 @@ export const useWebSocket = (workspaceId: string | null) => {
     chatSocket.on('chat:history', handleChatHistory);
     chatSocket.on('error', handleError);
 
+    // 🎯 2단계: 이벤트 리스너 등록 후 채팅방 입장
+    if (chatRoomId) {
+      console.log(
+        `🔄 [useWebSocket] Attempting to join chat room: ${chatRoomId}`
+      );
+      chatSocket.joinChatRoom(chatRoomId);
+      console.log(`📡 [useWebSocket] Join event emitted for: ${chatRoomId}`);
+    }
+
     return () => {
+      if (chatRoomId) {
+        chatSocket.leaveChatRoom(chatRoomId);
+      }
       chatSocket.off('message:receive', handleMessageReceive);
       chatSocket.off('typing:start', handleTypingStart);
       chatSocket.off('typing:stop', handleTypingStop);
