@@ -1,4 +1,11 @@
-import { X, Sprout, SquarePen, Maximize2, Minimize2 } from 'lucide-react';
+import {
+  X,
+  Sprout,
+  SquarePen,
+  Maximize2,
+  Minimize2,
+  FileText,
+} from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import NodeHeaderButton from './NodeHeaderButton';
 import NodeHeaderInfo from './NodeHeaderInfo';
@@ -47,8 +54,10 @@ export function NodeHeaderSection({
             <button
               type="button"
               onClick={onShowDescription}
-              className="text-xs font-medium text-[#4F46E5] px-2 py-1 rounded-md border border-[#E0E7FF] bg-[#EEF2FF] hover:bg-[#E0E7FF] transition-colors"
-            >상세설명보기</button>
+              className="inline-flex items-center gap-1 text-xs font-medium text-[#4F46E5] px-2 py-1 rounded-md border border-[#E0E7FF] bg-[#EEF2FF] hover:bg-[#E0E7FF] transition-colors"
+            >
+              <FileText className="w-3.5 h-3.5" />
+            </button>
           )}
           {/* 노드 타입 태그 */}
           <span
