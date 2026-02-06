@@ -15,6 +15,15 @@ class ChatSocketService {
    */
   connect(accessToken: string): Socket {
     if (this.socket?.connected) {
+      // 🔍 이미 연결된 소켓이 있어도 onAny 리스너 확인 및 등록
+      if (this.socket.listeners('*').length === 0) {
+        console.log(
+          '🔧 [ChatSocket] Re-registering onAny listener for existing socket'
+        );
+        this.socket.onAny((eventName, ...args) => {
+          console.log(`🔔 [WebSocket Event] ${eventName}:`, args);
+        });
+      }
       return this.socket;
     }
 
