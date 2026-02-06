@@ -1,6 +1,17 @@
 import { Router, type Request, type Response } from "express";
 import { getYDocByRoom } from "../../yjs/ydoc-gateway";
 
+export type TaskType = "FE" | "BE" | null;
+
+export interface Candidate {
+  id: number;
+  name: string;
+  description: string;
+  taskType: TaskType;
+  selected: boolean;
+  summary: string;
+}
+
 const router: Router = Router({ mergeParams: true });
 router.post("/:nodeId/candidate", (req: Request, res: Response) => {
   const { workspaceId, nodeId } = req.params;
@@ -14,15 +25,9 @@ router.post("/:nodeId/candidate", (req: Request, res: Response) => {
     return res.status(400).json({ message: "Invalid request" });
   }
 
-  const candidates = body;
+  const candidates: Partial<Candidate>[] = body.candidates;
+
   const doc = getYDocByRoom(workspaceId);
-
-  const old = doc.getMap("nodeCandidates").get(nodeId);
-
-  console.log("Old candidates:", old);
-
-  const nodeCandidatesPending = doc.getMap("nodeCandidatesPending").get(nodeId);
-  console.log("candidates pending:", nodeCandidatesPending);
 
   doc.transact(() => {
     const nodeCandidates = doc.getMap("nodeCandidates");
@@ -31,21 +36,17 @@ router.post("/:nodeId/candidate", (req: Request, res: Response) => {
       yNodeCandidates = new (nodeCandidates.constructor as any)();
       nodeCandidates.set(nodeId, yNodeCandidates);
     }
-    yNodeCandidates.set(nodeId, candidates);
+    const newCandidates = candidates.map((c) => ({
+      ...c,
+      taskType: null,
+      selected: false,
+    }));
+    yNodeCandidates.set(nodeId, newCandidates);
 
     const nodeCandidatesPending = doc.getMap("nodeCandidatesPending");
-    let yNodeCandidatesPending = nodeCandidatesPending.get(nodeId);
+    nodeCandidatesPending.set(nodeId, false);
 
-    if (!yNodeCandidatesPending) {
-      yNodeCandidatesPending = new (nodeCandidatesPending.constructor as any)();
-      nodeCandidatesPending.set(nodeId, yNodeCandidatesPending);
-    }
-    yNodeCandidatesPending = false;
   });
-
-  console.log("New candidates:", old);
-
-  console.log("candidates pending:", nodeCandidatesPending);
 
   res.status(200).json({ status: "ok" });
 });
