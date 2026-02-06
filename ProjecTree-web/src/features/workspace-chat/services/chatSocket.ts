@@ -4,12 +4,28 @@ class ChatSocketService {
   private socket: Socket | null = null;
   private readonly serverUrl: string;
   private onAnyRegistered: boolean = false; // 🔧 onAny 리스너 등록 여부 추적
+  private connectionCallbacks: Set<(connected: boolean) => void> = new Set();
 
   constructor() {
     // 환경변수에서 WebSocket 서버 URL 가져오기
     // this.serverUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
     this.serverUrl = 'https://i14d107.p.ssafy.io';
     // this.serverUrl = 'http://localhost:7092';
+  }
+
+  /**
+   * 연결 상태 변경 콜백 등록
+   */
+  onConnectionChange(callback: (connected: boolean) => void): () => void {
+    this.connectionCallbacks.add(callback);
+    // 현재 연결 상태 즉시 알림
+    if (this.socket?.connected) {
+      callback(true);
+    }
+    // cleanup 함수 반환
+    return () => {
+      this.connectionCallbacks.delete(callback);
+    };
   }
 
   /**
@@ -41,11 +57,11 @@ class ChatSocketService {
       reconnectionAttempts: 5,
     });
 
-    // 연결 이벤트
+    // 🔧 연결 이벤트 리스너 등록 (한 번만!)
     this.socket.on('connect', () => {
       console.log('✅ WebSocket connected:', this.socket?.id);
 
-      // 🔧 재연결 시 onAny 리스너 재등록
+      // 재연결 시 onAny 리스너 재등록
       if (!this.onAnyRegistered && this.socket) {
         console.log('🔧 [ChatSocket] Re-registering onAny after reconnect');
         this.socket.onAny((eventName, ...args) => {
@@ -53,11 +69,17 @@ class ChatSocketService {
         });
         this.onAnyRegistered = true;
       }
+
+      // 연결 상태 콜백 호출
+      this.connectionCallbacks.forEach((cb) => cb(true));
     });
 
     this.socket.on('disconnect', (reason) => {
       console.log('❌ WebSocket disconnected:', reason);
-      this.onAnyRegistered = false; // 🔧 연결 끊기면 플래그 리셋
+      this.onAnyRegistered = false; // 연결 끊기면 플래그 리셋
+
+      // 연결 상태 콜백 호출
+      this.connectionCallbacks.forEach((cb) => cb(false));
     });
 
     this.socket.on('connect_error', (error) => {
@@ -68,7 +90,7 @@ class ChatSocketService {
     this.socket.onAny((eventName, ...args) => {
       console.log(`🔔 [WebSocket Event] ${eventName}:`, args);
     });
-    this.onAnyRegistered = true; // 🔧 등록 완료 플래그 설정
+    this.onAnyRegistered = true; // 등록 완료 플래그 설정
 
     return this.socket;
   }
