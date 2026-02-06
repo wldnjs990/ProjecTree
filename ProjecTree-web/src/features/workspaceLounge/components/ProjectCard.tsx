@@ -17,6 +17,13 @@ export interface Member {
 // 프로젝트의 권한을 나타내는 타입
 type UserRole = 'Owner' | 'Editor' | 'Viewer';
 
+// 역할 한국어 표시 매핑
+const roleLabels: Record<UserRole, string> = {
+  Owner: '관리자',
+  Editor: '편집자',
+  Viewer: '열람자',
+};
+
 // 프로젝트의 정보를 나타내는 인터페이스
 export interface ProjectCardProps {
   project: {
@@ -78,7 +85,7 @@ export function ProjectCard({ project, timeLabel }: ProjectCardProps) {
                     'bg-zinc-100/50 backdrop-blur-md text-zinc-600'
             )}
           >
-            {project.role}
+            {roleLabels[project.role]}
           </Badge>
         </div>
       </CardHeader>
