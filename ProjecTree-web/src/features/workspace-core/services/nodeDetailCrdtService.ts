@@ -1,4 +1,4 @@
-import * as Y from 'yjs';
+﻿import * as Y from 'yjs';
 import { getCrdtClient, type YNodeValue } from '../crdt/crdtClient';
 import { useNodeStore, type ConfirmedNodeData } from '../stores/nodeStore';
 import {
@@ -15,15 +15,9 @@ import type {
 } from '../types/nodeDetail';
 import type { FlowNodeData } from '../types/node';
 
-// Y.Map에 저장되는 값 타입 (candidates는 별도 Y.Map에서 관리)
+// Y.Map stored value type (candidates are managed in a separate Y.Map)
 type YNodeDetailValue = string | number | Assignee | null | undefined;
 
-/**
- * 노드 상세 편집 CRDT 서비스 (싱글톤)
- * - Y.Map 옵저버 관리
- * - 편집 시작/완료/취소 로직
- * - 필드 업데이트 로직
- */
 class NodeDetailCrdtService {
   private static instance: NodeDetailCrdtService | null = null;
 
@@ -38,6 +32,8 @@ class NodeDetailCrdtService {
   private isInitialized = false;
 
   private constructor() {}
+
+  // Sync confirmed data back into the node graph data (for ReactFlow UI)
 
   private updateNodeDataInCrdt(
     nodeId: string,
@@ -72,22 +68,18 @@ class NodeDetailCrdtService {
     return NodeDetailCrdtService.instance;
   }
 
-  /**
-   * CRDT 옵저버 초기화
-   */
+  // Initialize CRDT observers (call once per connection)
   initObservers(): void {
     if (this.isInitialized) {
-      console.log('[NodeDetailCrdtService] 이미 초기화됨');
+      console.log('[NodeDetailCrdtService] already initialized');
       return;
     }
 
     const client = getCrdtClient();
     if (!client) {
-      console.warn('[NodeDetailCrdtService] CRDT 클라이언트가 없습니다.');
+      console.warn('[NodeDetailCrdtService] CRDT client is not available.');
       return;
     }
-
-    // Y.Map 참조 가져오기
     const yNodeDetails = client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
     const yConfirmed = client.getYMap<ConfirmedNodeData>('confirmedNodeData');
     const yNodeCandidates = client.getYMap<Candidate[]>('nodeCandidates');
@@ -98,19 +90,15 @@ class NodeDetailCrdtService {
       'nodeCandidatesPending'
     );
     const yNodeTechsPending = client.getYMap<boolean>('nodeTechsPending');
-
-    // 편집 데이터 변경 감지
     const editObserveHandler = () => {
       this.syncFromYjs();
     };
-
-    // 확정 데이터 변경 감지 → nodeStore 업데이트
     const confirmedObserveHandler = (event: Y.YMapEvent<ConfirmedNodeData>) => {
       event.keysChanged.forEach((key) => {
         const confirmedData = yConfirmed.get(key);
         if (confirmedData) {
           console.log(
-            '[NodeDetailCrdtService] 확정 데이터 수신:',
+            '[NodeDetailCrdtService] confirmed data received:',
             key,
             confirmedData
           );
@@ -121,14 +109,12 @@ class NodeDetailCrdtService {
         }
       });
     };
-
-    // Candidates 변경 감지 → nodeStore 업데이트 (즉시 확정, confirm 불필요)
     const candidatesHandler = (event: Y.YMapEvent<Candidate[]>) => {
       event.keysChanged.forEach((key) => {
         const candidates = yNodeCandidates.get(key);
         if (candidates) {
           console.log(
-            '[NodeDetailCrdtService] Candidates 수신:',
+            '[NodeDetailCrdtService] candidates received:',
             key,
             candidates
           );
@@ -144,7 +130,7 @@ class NodeDetailCrdtService {
         const techs = yNodeTechRecommendations.get(key);
         if (techs) {
           console.log(
-            '[NodeDetailCrdtService] TechRecommendations 수신:',
+            '[NodeDetailCrdtService] tech recommendations received:',
             key,
             techs
           );
@@ -181,31 +167,24 @@ class NodeDetailCrdtService {
     yNodeTechRecommendations.observe(techRecommendationsHandler);
     yNodeCandidatesPending.observe(candidatesPendingHandler);
     yNodeTechsPending.observe(techsPendingHandler);
-
-    // 기존 데이터 로드 함수
     const loadExistingData = () => {
-      // 기존 확정 데이터 초기 로드
       yConfirmed.forEach((confirmedData, key) => {
         console.log(
-          '[NodeDetailCrdtService] 기존 확정 데이터 로드:',
+          '[NodeDetailCrdtService] confirmed data load:',
           key,
           confirmedData
         );
         useNodeStore.getState().applyConfirmedData(Number(key), confirmedData);
         this.updateNodeDataInCrdt(key, confirmedData);
       });
-
-      // 기존 편집 데이터가 있으면 동기화
       const { selectedNodeId } = useNodeDetailStore.getState();
       if (selectedNodeId && yNodeDetails.has(selectedNodeId)) {
         this.syncFromYjs();
         console.log(
-          '[NodeDetailCrdtService] 기존 편집 데이터 복원:',
+          '[NodeDetailCrdtService] restore edit data:',
           selectedNodeId
         );
       }
-
-      // 기존 pending 상태 복원
       yNodeCandidatesPending.forEach((pending, key) => {
         useNodeStore
           .getState()
@@ -217,28 +196,22 @@ class NodeDetailCrdtService {
           .updateNodeDetail(Number(key), { techsPending: pending });
       });
     };
-
-    // sync 이벤트 핸들러
     const syncHandler = (isSynced: boolean) => {
       if (isSynced) {
         console.log(
-          '[NodeDetailCrdtService] Y.js 동기화 완료, 기존 데이터 로드'
+          '[NodeDetailCrdtService] Y.js sync complete, loading existing data'
         );
         loadExistingData();
       }
     };
-
-    // 이미 동기화된 상태면 바로 로드, 아니면 sync 이벤트 대기
     if (client.provider.synced) {
       console.log(
-        '[NodeDetailCrdtService] 이미 동기화됨, 기존 데이터 즉시 로드'
+        '[NodeDetailCrdtService] already synced, loading existing data'
       );
       loadExistingData();
     } else {
       client.provider.once('sync', syncHandler);
     }
-
-    // cleanup 함수 저장
     this.cleanupFn = () => {
       yNodeDetails.unobserveDeep(editObserveHandler);
       yConfirmed.unobserve(confirmedObserveHandler);
@@ -257,12 +230,10 @@ class NodeDetailCrdtService {
     this.yNodeTechsPendingRef = yNodeTechsPending;
     this.isInitialized = true;
 
-    console.log('[NodeDetailCrdtService] 옵저버 초기화 완료');
+    console.log('[NodeDetailCrdtService] observers initialized');
   }
 
-  /**
-   * CRDT 옵저버 정리
-   */
+  // Cleanup CRDT observers
   cleanupObservers(): void {
     if (this.cleanupFn) {
       this.cleanupFn();
@@ -277,29 +248,25 @@ class NodeDetailCrdtService {
     this.cleanupFn = null;
     this.isInitialized = false;
 
-    console.log('[NodeDetailCrdtService] 옵저버 정리 완료');
+    console.log('[NodeDetailCrdtService] observers cleaned up');
   }
 
-  /**
-   * 편집 시작
-   */
+  // Start editing (creates Y.Map entry and local edit state)
   startEdit(): void {
     const { selectedNodeId } = useNodeDetailStore.getState();
     const client = getCrdtClient();
 
     if (!client || !selectedNodeId) {
-      console.warn('[NodeDetailCrdtService] 편집을 시작할 수 없습니다.');
+      console.warn('[NodeDetailCrdtService] cannot start edit.');
       return;
     }
-
-    // nodeStore에서 초기 데이터 가져오기
     const nodeStore = useNodeStore.getState();
     const numericId = Number(selectedNodeId);
     const nodeListData = nodeStore.nodeListData[numericId];
     const nodeDetail = nodeStore.nodeDetails[numericId];
 
     if (!nodeListData || !nodeDetail) {
-      console.warn('[NodeDetailCrdtService] 노드 데이터가 없습니다.');
+      console.warn('[NodeDetailCrdtService] node data not found.');
       return;
     }
 
@@ -307,8 +274,6 @@ class NodeDetailCrdtService {
       .getState()
       .nodes.find((n) => n.id === selectedNodeId)
       ?.type.toUpperCase() as NodeType;
-
-    // 노드 서버 전송용 데이터타입(difficult 식별용 nodeType 추가)
     interface ServerEditableNodeDetail extends EditableNodeDetail {
       nodeType: NodeType;
     }
@@ -320,8 +285,6 @@ class NodeDetailCrdtService {
       note: nodeDetail.note,
       nodeType: nodeType,
     };
-
-    // Y.Map에 편집 데이터 생성(없으면 생성)
     const yNodeDetails = client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
 
     client.yDoc.transact(() => {
@@ -334,23 +297,19 @@ class NodeDetailCrdtService {
       yNodeDetail.set('nodeType', initialData.nodeType);
       yNodeDetails.set(selectedNodeId, yNodeDetail);
     });
-
-    // store 상태 업데이트
     const store = useNodeDetailStore.getState();
     store.setIsEditing(true);
     store.setEditData(initialData);
 
-    console.log('[NodeDetailCrdtService] 편집 시작:', selectedNodeId);
+    console.log('[NodeDetailCrdtService] edit start:', selectedNodeId);
   }
 
-  /**
-   * 편집 완료
-   */
+  // Finish editing (broadcast confirmed data)
   async finishEdit(): Promise<void> {
     const { selectedNodeId, editData } = useNodeDetailStore.getState();
 
     if (!selectedNodeId || !editData) {
-      console.warn('[NodeDetailCrdtService] 저장할 데이터가 없습니다.');
+      console.warn('[NodeDetailCrdtService] no data to save.');
       return;
     }
 
@@ -359,20 +318,17 @@ class NodeDetailCrdtService {
 
     try {
       const client = getCrdtClient();
-
-      // 1. CRDT 서버를 통해 DB에 저장 요청
       if (client) {
         const requestId = client.saveNodeDetail(selectedNodeId);
         if (requestId) {
           console.log(
-            '[NodeDetailCrdtService] 저장 요청 성공, requestId:',
+            '[NodeDetailCrdtService] save request sent, requestId:',
             requestId
           );
         }
       }
 
       if (client && this.yConfirmedRef && this.yNodeDetailsRef) {
-        // 2. 확정 데이터를 Y.Map에 저장 (다른 클라이언트에 브로드캐스트)
         const confirmedData: ConfirmedNodeData = {
           status: editData.status,
           priority: editData.priority,
@@ -382,34 +338,28 @@ class NodeDetailCrdtService {
         };
         this.yConfirmedRef.set(selectedNodeId, confirmedData);
         console.log(
-          '[NodeDetailCrdtService] 확정 데이터 브로드캐스트:',
+          '[NodeDetailCrdtService] confirmed data broadcast:',
           selectedNodeId,
           confirmedData
         );
-
-        // 3. 로컬 store에도 즉시 반영
         useNodeStore
           .getState()
           .applyConfirmedData(Number(selectedNodeId), confirmedData);
-
-        // 4. 편집 데이터 삭제 (메모리 누수 방지)
         this.yNodeDetailsRef.delete(selectedNodeId);
       }
 
       store.setIsEditing(false);
       store.setEditData(null);
-      console.log('[NodeDetailCrdtService] 편집 완료:', selectedNodeId);
+      console.log('[NodeDetailCrdtService] edit finished:', selectedNodeId);
     } catch (error) {
-      console.error('[NodeDetailCrdtService] 저장 실패:', error);
+      console.error('[NodeDetailCrdtService] save failed:', error);
       throw error;
     } finally {
       store.setIsSaving(false);
     }
   }
 
-  /**
-   * 편집 취소
-   */
+  // Cancel editing
   cancelEdit(): void {
     const { selectedNodeId } = useNodeDetailStore.getState();
 
@@ -426,12 +376,10 @@ class NodeDetailCrdtService {
     store.setIsEditing(false);
     store.setEditData(null);
 
-    console.log('[NodeDetailCrdtService] 편집 취소:', selectedNodeId);
+    console.log('[NodeDetailCrdtService] edit canceled:', selectedNodeId);
   }
 
-  /**
-   * 필드 업데이트
-   */
+  // Update a single field in edit data
   updateField<K extends keyof EditableNodeDetail>(
     field: K,
     value: EditableNodeDetail[K]
@@ -442,17 +390,15 @@ class NodeDetailCrdtService {
 
     const yNodeDetail = this.yNodeDetailsRef.get(selectedNodeId);
     if (!yNodeDetail) {
-      console.warn('[NodeDetailCrdtService] 편집 중인 노드가 없습니다.');
+      console.warn('[NodeDetailCrdtService] no editing node.');
       return;
     }
 
     yNodeDetail.set(field, value as YNodeDetailValue);
-    console.log('[NodeDetailCrdtService] 필드 업데이트:', field, value);
+    console.log('[NodeDetailCrdtService] field update:', field, value);
   }
 
-  /**
-   * Y.js에서 로컬 store로 데이터 동기화
-   */
+  // Sync edit data from Y.js to local store
   private syncFromYjs(): void {
     const { selectedNodeId } = useNodeDetailStore.getState();
 
@@ -460,14 +406,11 @@ class NodeDetailCrdtService {
 
     const yNodeDetail = this.yNodeDetailsRef.get(selectedNodeId);
     if (!yNodeDetail) {
-      // 편집 데이터가 없으면 편집 모드 종료
       const store = useNodeDetailStore.getState();
       store.setIsEditing(false);
       store.setEditData(null);
       return;
     }
-
-    // Y.Map에서 데이터 읽어오기
     const data: EditableNodeDetail = {
       status: (yNodeDetail.get('status') as NodeStatus) || 'TODO',
       priority: yNodeDetail.get('priority') as Priority | undefined,
@@ -481,68 +424,50 @@ class NodeDetailCrdtService {
     store.setIsEditing(true);
   }
 
-  /**
-   * 사이드바 열기 시 편집 데이터 복원 확인
-   */
   checkAndRestoreEditData(nodeId: string): void {
     if (this.yNodeDetailsRef && this.yNodeDetailsRef.has(nodeId)) {
       setTimeout(() => {
         this.syncFromYjs();
         console.log(
-          '[NodeDetailCrdtService] 노드 선택 시 편집 데이터 복원:',
+          '[NodeDetailCrdtService] restore edit data on node select:',
           nodeId
         );
       }, 0);
     }
   }
 
-  /**
-   * Candidates 업데이트 (편집 모드와 무관, 즉시 확정)
-   * - Y.Map에 저장 → 다른 클라이언트에 자동 브로드캐스트
-   * - 로컬 store에도 즉시 반영
-   */
+  // Update candidates (broadcast + local store)
   updateCandidates(nodeId: string, candidates: Candidate[]): void {
     const client = getCrdtClient();
     if (!client || !this.yNodeCandidatesRef) {
-      console.warn('[NodeDetailCrdtService] CRDT 클라이언트가 없습니다.');
-      // Fallback: update local store immediately so UI reflects server response
-      useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates });
+      console.warn('[NodeDetailCrdtService] CRDT client is not available.');
       return;
     }
-
-    // Y.Map에 저장 (다른 클라이언트에 브로드캐스트)
     this.yNodeCandidatesRef.set(nodeId, candidates);
     this.setCandidatesPending(nodeId, false);
-
-    // 로컬 store에도 즉시 반영 [임시]
     useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates });
 
     console.log(
-      '[NodeDetailCrdtService] Candidates 업데이트:',
+      '[NodeDetailCrdtService] candidates updated:',
       nodeId,
       candidates
     );
   }
 
-  /**
-   * TechRecommendations 업데이트 (실시간 동기화)
-   */
+  // Update tech recommendations (broadcast + local store)
   updateTechRecommendations(nodeId: string, techs: TechRecommendation[]): void {
     const client = getCrdtClient();
     if (!client || !this.yNodeTechRecommendationsRef) {
-      console.warn('[NodeDetailCrdtService] CRDT 클라이언트가 없습니다.');
-      // Fallback: update local store immediately so UI reflects server response
-      useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs });
+      console.warn('[NodeDetailCrdtService] CRDT client is not available.');
       return;
     }
 
     this.yNodeTechRecommendationsRef.set(nodeId, techs);
     this.setTechsPending(nodeId, false);
-    // [임시]
     useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs });
 
     console.log(
-      '[NodeDetailCrdtService] TechRecommendations 업데이트:',
+      '[NodeDetailCrdtService] tech recommendations updated:',
       nodeId,
       techs
     );
@@ -564,6 +489,8 @@ class NodeDetailCrdtService {
       .updateNodeDetail(Number(nodeId), { techsPending: pending });
   }
 }
-
-// 싱글톤 인스턴스 export
 export const nodeDetailCrdtService = NodeDetailCrdtService.getInstance();
+
+
+
+
