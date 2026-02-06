@@ -40,7 +40,7 @@ router.post("/:nodeId/candidate", (req: Request, res: Response) => {
       yNodeCandidatesPending = new (nodeCandidatesPending.constructor as any)();
       nodeCandidatesPending.set(nodeId, yNodeCandidatesPending);
     }
-    yNodeCandidatesPending.set(nodeId, false);
+    yNodeCandidatesPending = false;
   });
 
   console.log("New candidates:", old);
