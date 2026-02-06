@@ -162,18 +162,17 @@ export const getWorkspaceDetail = async (
 
 // ===== 워크스페이스 수정 =====
 
+/**
+ * [타입] 워크스페이스 수정 요청 (API 명세 기준)
+ */
 export interface UpdateWorkspaceRequest {
-  memberRoles?: Record<string, Role>;
-  domain?: string;
-  endDate?: string | null;
+  id: number;
   name?: string;
-  epics?: Array<{ name: string; description: string }>;
-  serviceType?: string;
   startDate?: string | null;
-  workspaceTechStacks?: number[] | string;
-  identifierPrefix?: string;
-  description?: string;
+  endDate?: string | null;
   purpose?: string;
+  workspaceTechStacks?: number[];
+  deleteFiles?: number[];
 }
 
 /**
@@ -181,14 +180,19 @@ export interface UpdateWorkspaceRequest {
  */
 export const updateWorkspace = async (
   workspaceId: number,
-  data: UpdateWorkspaceRequest,
+  data: Omit<UpdateWorkspaceRequest, 'id'>,
   files: File[] = []
 ): Promise<ApiResponse<unknown>> => {
   const formData = new FormData();
 
+  const requestData: UpdateWorkspaceRequest = {
+    id: workspaceId,
+    ...data,
+  };
+
   formData.append(
     'data',
-    new Blob([JSON.stringify(data)], { type: 'application/json' })
+    new Blob([JSON.stringify(requestData)], { type: 'application/json' })
   );
 
   files.forEach((file) => formData.append('files', file));
@@ -197,7 +201,6 @@ export const updateWorkspace = async (
     '/workspaces',
     formData,
     {
-      params: { workspaceId },
       headers: {
         'Content-Type': undefined,
       },
