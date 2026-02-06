@@ -3,11 +3,7 @@ import { useUserStore } from '@/shared/stores/userStore';
 import { useEffect, useCallback } from 'react';
 import { chatSocket } from '../services/chatSocket';
 import { useChatStore } from '../store/chatStore';
-import type {
-  ChatMessage,
-  TypingPayload,
-  UserStatusPayload,
-} from '../types/chat.types';
+import type { ChatMessage, UserStatusPayload } from '../types/chat.types';
 
 import { useWorkspaceStore } from '@/features/workspace-core';
 
