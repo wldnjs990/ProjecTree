@@ -41,8 +41,8 @@ export function LeftSidebar({
         <ResizablePanel defaultSize={50} minSize={20}>
           <div className="flex h-full flex-col">
             <div className="flex items-center justify-between px-4 py-2 border-b">
-              <h2 className="text-sm font-semibold tracking-tight">
-                Project Explorer
+              <h2 className="text-sm font-medium text-[#0B0B0B] tracking-tight">
+                프로젝트 탐색
               </h2>
             </div>
             <ScrollArea className="flex-1">
@@ -70,10 +70,10 @@ export function LeftSidebar({
           <div className="h-full">
             {/* ChatPanel already has its own layout, so we just stick it here */}
             {/* Passing "Team Chat" as workspace name to match requirements */}
-            <ChatPanel workspaceId={workspaceId} workspaceName="Team Chat" />
+            <ChatPanel workspaceId={workspaceId} workspaceName="팀 채팅" />
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
-    </aside>
+    </aside >
   );
 }
