@@ -16,7 +16,6 @@ export function Header({
   onlineUsers,
   onSettingsClick,
   onVoiceCallClick,
-  onInviteClick, // 기존 핸들러는 일단 미사용 (모달 내부 기능 구현 시 사용 예정)
   isVoiceChatActive,
   isVoiceChatBarVisible,
 }: HeaderProps) {

@@ -35,7 +35,6 @@ import {
   useNodeDetailCrdtObservers,
 } from '@/features/workspace-core';
 import { useUserStore } from '@/shared/stores/userStore';
-import type { AvatarColor } from '@/shared/components/UserAvatar';
 import { getAvatarColor } from '@/shared/lib/utils';
 import { useNodeDetailEdit } from '@/features/workspace-node-detail';
 import { useMemo } from 'react';
