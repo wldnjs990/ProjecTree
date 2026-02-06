@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import {
   ChevronRight,
   ChevronDown,
-  Box,
-  Bookmark,
+  Notebook,
+  BookOpen,
   CheckSquare,
-  Cpu,
-  Briefcase,
+  Pin,
+  FolderOpen,
+  Folder,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { ServerNodeType } from '@/features/workspace-core';
@@ -27,11 +28,11 @@ interface ProjectTreeItemProps {
 }
 
 const TYPE_ICONS = {
-  PROJECT: { icon: Briefcase, color: 'text-indigo-600' },
-  EPIC: { icon: Box, color: 'text-purple-500' },
-  STORY: { icon: Bookmark, color: 'text-blue-500' },
-  TASK: { icon: CheckSquare, color: 'text-green-500' },
-  ADVANCE: { icon: Cpu, color: 'text-orange-500' },
+  PROJECT: { icon: FolderOpen, color: 'text-indigo-600' },
+  EPIC: { icon: Notebook, color: 'text-violet-600' },
+  STORY: { icon: BookOpen, color: 'text-lime-600' },
+  TASK: { icon: CheckSquare, color: 'text-sky-600' },
+  ADVANCE: { icon: Pin, color: 'text-gray-500' },
 };
 
 export function ProjectTreeItem({
@@ -44,7 +45,13 @@ export function ProjectTreeItem({
 
   const [isOpen, setIsOpen] = useState(true);
   const IconConfig = TYPE_ICONS[item.type];
-  const Icon = IconConfig.icon;
+
+  // Project 타입일 경우 isOpen 상태에 따라 아이콘 변경
+  let Icon = IconConfig.icon;
+  if (item.type === 'PROJECT') {
+    Icon = isOpen ? FolderOpen : Folder;
+  }
+
   const hasChildren = item.children && item.children.length > 0;
   const isSelected = selectedId === item.id;
 
@@ -85,7 +92,7 @@ export function ProjectTreeItem({
           )}
         </div>
 
-        <Icon className={cn('h-4 w-4', IconConfig.color)} />
+        {Icon && <Icon className={cn('h-4 w-4', IconConfig.color)} />}
         <span className="truncate flex-1">{item.title}</span>
       </div>
 

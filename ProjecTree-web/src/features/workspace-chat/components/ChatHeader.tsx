@@ -14,7 +14,7 @@ export const ChatHeader = ({
   return (
     <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2">
       <div className="flex items-center gap-2">
-        <h2 className="text-lg font-semibold text-gray-900">{workspaceName}</h2>
+        <h2 className="text-sm font-medium text-[#0B0B0B]">{workspaceName}</h2>
         {isConnected ? (
           <Wifi className="h-4 w-4 text-green-500" />
         ) : (
