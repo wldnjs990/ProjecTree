@@ -39,7 +39,9 @@ export const useWebSocket = (workspaceId: string | null) => {
     });
 
     return () => {
-      chatSocket.disconnect();
+      // 🔧 소켓 연결은 유지하고 상태만 업데이트
+      // disconnect()를 호출하면 페이지 이동 시 소켓이 끊기고
+      // 재연결 시 이벤트 리스너가 제대로 등록되지 않음
       setConnected(false);
     };
   }, []);
