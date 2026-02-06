@@ -163,7 +163,8 @@ export const useChat = (workspaceId: string) => {
       try {
         setPaginationState({ isLoading: true });
 
-        // 2. 메시지 로드 (chatRoomId가 있을 때만 요청)
+        // 2. 메시지 로드 (WebSocket chat:history 이벤트로 처리됨)
+        // REST API는 사용하지 않고 WebSocket 이벤트에만 의존
         let messages: any[] = [];
         // if (chatRoomId) {
         //   try {
@@ -176,15 +177,16 @@ export const useChat = (workspaceId: string) => {
         //   }
         // }
 
-        // response = { status: 'success', data: ChatMessage[] }
+        // 🎯 빈 배열로 초기화만 하고, 실제 메시지는 WebSocket chat:history 이벤트에서 로드됨
+        // initialLoaded 플래그는 chat:history 이벤트 핸들러에서 설정됨
         useChatStore.getState().setMessages(workspaceId, messages);
 
+        // 🎯 initialLoaded를 false로 유지하여 WebSocket 이벤트가 처리되도록 함
         setPaginationState({
-          hasMore: messages.length === CHAT_PAGINATION_CONFIG.initialLoad,
+          hasMore: false,
           isLoading: false,
-          oldestLoadedId:
-            messages.length > 0 ? messages[messages.length - 1].id : null,
-          initialLoaded: true,
+          oldestLoadedId: null,
+          initialLoaded: false, // WebSocket chat:history에서 true로 설정됨
         });
       } catch (error) {
         console.warn('[useChat] 초기화 실패:', error);
@@ -192,7 +194,7 @@ export const useChat = (workspaceId: string) => {
           hasMore: false,
           isLoading: false,
           oldestLoadedId: null,
-          initialLoaded: true,
+          initialLoaded: false, // 실패해도 WebSocket에서 재시도 가능하도록
         });
       }
     };
