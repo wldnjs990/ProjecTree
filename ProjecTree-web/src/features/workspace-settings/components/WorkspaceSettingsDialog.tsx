@@ -28,12 +28,6 @@ import {
   type WorkspaceDetailData,
   type TechStackItem,
 } from '@/apis/workspace.api';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
 import { cn } from '@/shared/lib/utils';
 
 interface WorkspaceSettingsDialogProps {
@@ -44,11 +38,6 @@ interface WorkspaceSettingsDialogProps {
   onUpdated?: (detail: Partial<WorkspaceDetailData>) => void;
 }
 
-type Epic = { name: string; description: string };
-
-
-
-
 interface WorkspaceSettingsForm {
   name: string;
   description: string;
@@ -58,7 +47,6 @@ interface WorkspaceSettingsForm {
   startDate: Date | null;
   endDate: Date | null;
   techStacks: number[];
-  epics: Epic[];
 }
 
 const SERVICE_TYPE_OPTIONS = [
@@ -97,6 +85,36 @@ const parseTechsToMap = (
   return map;
 };
 
+const TECH_ORDER_KEY_PREFIX = 'workspace-tech-order';
+
+const getTechOrderKey = (workspaceId: number) =>
+  `${TECH_ORDER_KEY_PREFIX}:${workspaceId}`;
+
+const loadTechOrder = (workspaceId: number): number[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(getTechOrderKey(workspaceId));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((id) => Number.isInteger(id));
+  } catch {
+    return [];
+  }
+};
+
+const saveTechOrder = (workspaceId: number, ids: number[]) => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(
+      getTechOrderKey(workspaceId),
+      JSON.stringify(ids)
+    );
+  } catch {
+    // ignore storage errors
+  }
+};
+
 export function WorkspaceSettingsDialog({
   isOpen,
   onOpenChange,
@@ -113,7 +131,6 @@ export function WorkspaceSettingsDialog({
     startDate: null,
     endDate: null,
     techStacks: [],
-    epics: [],
   });
 
   const [selectedTechMap, setSelectedTechMap] = useState<Map<number, string>>(
@@ -137,9 +154,18 @@ export function WorkspaceSettingsDialog({
     // API 응답 구조 대응: 기본 정보가 info 객체 안에 있을 수 있음
     const info = (workspaceDetail as any).info || workspaceDetail;
 
-    // 백엔드에서 techs 필드로 기술 스택 반환 (workspaceTechStacks가 아님)
-    const techIds = parseTechsToIds(info.techs);
+    const apiTechIds = parseTechsToIds(info.techs);
+    const savedOrder = loadTechOrder(workspaceId);
+    const apiIdSet = new Set(apiTechIds);
+    const savedFiltered = savedOrder.filter((id) => apiIdSet.has(id));
+    const savedSet = new Set(savedFiltered);
+    const newOnes = apiTechIds.filter((id) => !savedSet.has(id));
+    const techIds =
+      savedOrder.length > 0
+        ? [...savedFiltered, ...newOnes]
+        : apiTechIds.slice().reverse();
     const techMap = parseTechsToMap(info.techs);
+    saveTechOrder(workspaceId, techIds);
 
     setForm({
       name: info.name ?? '',
@@ -150,7 +176,6 @@ export function WorkspaceSettingsDialog({
       startDate: parseDate(info.startDate),
       endDate: parseDate(info.endDate),
       techStacks: techIds,
-      epics: info.epics ?? [],  // info 안에 epics가 있음
     });
     setSelectedTechMap(techMap);
     setOriginalTechIds(new Set(techIds)); // 서버에서 받은 기존 기술스택 ID 저장
@@ -188,20 +213,28 @@ export function WorkspaceSettingsDialog({
 
   const handleAddTech = (tech: TechStackItem) => {
     if (form.techStacks.includes(tech.id)) return;
-    setForm((prev) => ({
-      ...prev,
-      techStacks: [...prev.techStacks, tech.id],
-    }));
+    setForm((prev) => {
+      const next = [...prev.techStacks, tech.id];
+      saveTechOrder(workspaceId, next);
+      return {
+        ...prev,
+        techStacks: next,
+      };
+    });
     setSelectedTechMap((prev) => new Map(prev).set(tech.id, tech.name));
     setSearchTerm('');
     setShowSuggestions(false);
   };
 
   const handleRemoveTech = (techId: number) => {
-    setForm((prev) => ({
-      ...prev,
-      techStacks: prev.techStacks.filter((id) => id !== techId),
-    }));
+    setForm((prev) => {
+      const next = prev.techStacks.filter((id) => id !== techId);
+      saveTechOrder(workspaceId, next);
+      return {
+        ...prev,
+        techStacks: next,
+      };
+    });
   };
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -623,42 +656,6 @@ export function WorkspaceSettingsDialog({
                 </div>
               </div>
 
-              {/* 에픽 정보 */}
-              <div className="space-y-3 pt-4 border-t border-zinc-100">
-                <Label className="text-sm font-bold text-zinc-700">에픽 정보</Label>
-
-                {form.epics.length > 0 ? (
-                  <Accordion type="multiple" className="space-y-2">
-                    {form.epics.map((epic, idx) => (
-                      <AccordionItem
-                        key={idx}
-                        value={`epic-${idx}`}
-                        className="border border-zinc-200/60 rounded-xl overflow-hidden bg-zinc-50/50 data-[state=open]:bg-white data-[state=open]:shadow-sm transition-all"
-                      >
-                        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-zinc-50 text-sm">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-md">
-                              {idx + 1}
-                            </span>
-                            <span className="font-bold text-zinc-700">
-                              {epic.name || '(이름 없음)'}
-                            </span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-3">
-                          <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-wrap">
-                            {epic.description || '설명이 없습니다.'}
-                          </p>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                ) : (
-                  <div className="text-center py-6 text-zinc-400 text-sm bg-zinc-100 rounded-xl border border-zinc-200">
-                    등록된 에픽이 없습니다.
-                  </div>
-                )}
-              </div>
             </div>
           )}
 
