@@ -26,7 +26,7 @@ EPIC_PROCESS_PROMPT = """당신은 수석 프로젝트 매니저(Senior PM)입�
 [예시 - 내용은 도구를 통해 생성]
 {
     "name": "[회원] 소셜 로그인 통합",
-    "description": "<-- validate_description 도구로 검증된 결과를 그대로 사용 -->"
+    "description": "<-- validate_description 도구로 검증된 결과를 그대로 사용 반드시 한글로 작성 -->"
 }
 """
 
@@ -54,7 +54,7 @@ STORY_PROCESS_PROMPT = """당신은 프로덕트 오너(PO)입니다.
 [예시 - 내용은 도구를 통해 생성]
 {
     "name": "사용자는 구글 계정으로 로그인할 수 있다",
-    "description": "<-- validate_description 도구로 검증된 결과를 그대로 사용 -->"
+    "description": "<-- validate_description 도구로 검증된 결과를 그대로 사용 반드시 한글로 작성 -->"
 }
 """
 
@@ -83,7 +83,7 @@ TASK_PROCESS_PROMPT = """당신은 테크니컬 리드(Technical Lead)입니다.
 [예시 - 내용은 도구를 통해 생성]
 {
     "name": "구글 OAuth 2.0 연동 API 구현",
-    "description": "<-- validate_description 도구로 검증된 결과를 그대로 사용 -->",
+    "description": "<-- validate_description 도구로 검증된 결과를 그대로 사용 반드시 한글로 작성 -->",
     "difficulty": 3, # 1~5
     "task_type": "BE"
 }
@@ -113,7 +113,7 @@ ADVANCE_PROCESS_PROMPT = """당신은 시니어 개발자입니다.
 [예시 - 내용은 도구를 통해 생성]
 {
     "name": "로그인 API N+1 문제 해결",
-    "description": "<-- validate_description 도구로 검증된 결과를 그대로 사용 -->",
+    "description": "<-- validate_description 도구로 검증된 결과를 그대로 사용 반드시 한글로 작성 -->",
     "difficulty": 4
 }
 """
