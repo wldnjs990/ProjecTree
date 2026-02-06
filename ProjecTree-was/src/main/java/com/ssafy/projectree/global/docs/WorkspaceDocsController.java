@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -89,10 +90,14 @@ public interface WorkspaceDocsController {
 
     @Operation(summary = "워크 스페이스 수정 API", description = "워크 스페이스 정보를 수정합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successfully Completed"),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully Completed",
+                    content = @Content(schema = @Schema(implementation = WorkspaceDto.UpdateResponse.class))
+            ),
     })
     @PatchMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    CommonResponse<?> update(Member member, WorkspaceDto.Insert dto, List<MultipartFile> multipartFiles) throws IOException;
+    CommonResponse<?> update(Member member, WorkspaceDto.UpdateRequest dto, List<MultipartFile> multipartFiles) throws IOException;
 
     @Operation(summary = "워크 스페이스 상세조회 API", description = "워크 스페이스 진입 시 보여주는 정보입니다.")
     @ApiResponses({
@@ -122,4 +127,17 @@ public interface WorkspaceDocsController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @PathVariable(name = "workspace-id") Long workspaceId);
+
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully Completed",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = WorkspaceDto.Info.class)
+                    )),
+    })
+    @Operation(summary = "워크 스페이스 정보 조회 API", description = "설정 탭에서 보여줄 워크 스페이스 정보")
+    @GetMapping("/{workspace-id}/settings")
+    CommonResponse<?> getWorkspaceInfo(@AuthenticationPrincipal Member member, @PathVariable(name = "workspace-id") Long id);
 }

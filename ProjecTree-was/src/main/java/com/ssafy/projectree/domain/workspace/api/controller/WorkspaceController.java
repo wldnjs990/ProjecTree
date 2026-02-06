@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,10 +42,10 @@ public class WorkspaceController implements WorkspaceDocsController {
 
     @Override
     public CommonResponse<?> update(@AuthenticationPrincipal Member member,
-                                    @RequestPart(value = "data") WorkspaceDto.Insert dto,
+                                    @RequestPart(value = "data") WorkspaceDto.UpdateRequest dto,
                                     @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles
     ) throws IOException {
-        return null;
+        return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.update(member, dto, multipartFiles));
     }
 
     @Override
@@ -59,5 +58,9 @@ public class WorkspaceController implements WorkspaceDocsController {
         return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.getWorkspaceFiles(page, size, workspaceId));
     }
 
+    @Override
+    public CommonResponse<?> getWorkspaceInfo(Member member, Long id) {
+        return CommonResponse.success(SuccessCode.SUCCESS, workspaceService.getWorkspaceInfo(member, id));
+    }
 
 }

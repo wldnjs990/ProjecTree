@@ -14,7 +14,6 @@ import com.ssafy.projectree.domain.workspace.api.dto.FunctionSpecificationDto;
 import com.ssafy.projectree.domain.workspace.api.dto.TeamDto;
 import com.ssafy.projectree.domain.workspace.api.dto.WorkspaceDto;
 import com.ssafy.projectree.domain.workspace.enums.Role;
-import com.ssafy.projectree.domain.workspace.model.entity.FunctionSpecification;
 import com.ssafy.projectree.domain.workspace.model.entity.Team;
 import com.ssafy.projectree.domain.workspace.model.entity.Workspace;
 import com.ssafy.projectree.domain.workspace.model.repository.TeamRepository;
@@ -131,17 +130,6 @@ public class WorkspaceService {
 
         List<FileReadDto.Response> files = fileService.findByWorkspaceId(workspace);
 
-        List<FunctionSpecification> functionSpecifications = functionSpecificationService.findAllByWorkspace(workspace);
-        List<FunctionSpecificationDto.EpicInfo> epics = new ArrayList<>();
-
-        for (FunctionSpecification fs : functionSpecifications) {
-            epics.add(FunctionSpecificationDto.EpicInfo.builder()
-                    .name(fs.getName())
-                    .description(fs.getDescription())
-                    .build()
-            );
-        }
-
         List<Team> teams = teamService.findAllByWorkspace(workspace);
 
         List<MemberDto.Info> memberInfos = teams.stream()
@@ -153,18 +141,24 @@ public class WorkspaceService {
                 .memberInfos(memberInfos)
                 .build();
 
+        List<WorkspaceDto.Tech> techs = workspaceTechStackService.findAllbyWorkspace(workspace)
+                .stream()
+                .map(WorkspaceDto.Tech::from)
+                .collect(Collectors.toUnmodifiableList());
+
+        List<FunctionSpecificationDto.EpicInfo> epics = functionSpecificationService.getEpics(workspace);
+
         return WorkspaceDto.Detail.builder()
-                .info(WorkspaceDto.Info.from(workspace))
+                .info(WorkspaceDto.Info.from(workspace, epics, techs))
                 .nodeTree(nodeService.getNodeTree(workspaceId))
                 .files(files)
-                .epics(epics)
                 .teamInfo(teamInfo)
                 .build();
     }
 
     public Page<FileReadDto.Response> getWorkspaceFiles(int page, int size, Long workspaceId) {
         Member currentMember = SecurityUtils.getCurrentMember();
-        Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(() -> new BusinessLogicException(ErrorCode.WORKSPACE_NOT_FOUND));
+        Workspace workspace = findById(workspaceId);
         if (!teamRepository.isParticipant(workspace, currentMember)) {
             throw new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND_IN_WORKSPACE, "해당 워크스페이스에 참여중이지 않은 사용자입니다.");
         }
@@ -178,4 +172,77 @@ public class WorkspaceService {
                         .build()
         );
     }
+
+    @Transactional
+    public WorkspaceDto.UpdateResponse update(Member member, WorkspaceDto.UpdateRequest dto, List<MultipartFile> multipartFiles) throws IOException {
+
+        Workspace workspace = findById(dto.getId());
+
+        if (!teamRepository.isParticipant(workspace, member)) {
+            throw new BusinessLogicException(ErrorCode.MEMBER_NOT_FOUND_IN_WORKSPACE, "해당 워크스페이스에 참여중이지 않은 사용자입니다.");
+        }
+
+        // 기본 정보 수정
+        if (dto.getName() != null) {
+            workspace.setName(dto.getName());
+        }
+        if (dto.getStartDate() != null) {
+            workspace.setStartDate(dto.getStartDate());
+        }
+        if (dto.getEndDate() != null) {
+            workspace.setEndDate(dto.getEndDate());
+        }
+        if (dto.getPurpose() != null) {
+            workspace.setPurpose(dto.getPurpose());
+        }
+
+        // 기술 스택 수정 (기존 전부 삭제 후 새로 추가)
+        if (dto.getWorkspaceTechStacks() != null) {
+            workspaceTechStackService.deleteByWorkspace(workspace);
+            workspaceTechStackService.create(dto.getWorkspaceTechStacks(), workspace);
+        }
+
+        // 파일 삭제
+        if (dto.getDeleteFiles() != null && !dto.getDeleteFiles().isEmpty()) {
+            dto.getDeleteFiles().forEach(fileService::deleteFile);
+        }
+
+        // 파일 추가
+        if (multipartFiles != null && !multipartFiles.isEmpty()) {
+            fileService.uploadFiles(multipartFiles, workspace);
+        }
+
+
+        return WorkspaceDto.UpdateResponse.builder()
+                .name(workspace.getName())
+                .startDate(workspace.getStartDate())
+                .endDate(workspace.getEndDate())
+                .purpose(workspace.getPurpose())
+                .workspaceTechStacks(workspaceTechStackService.findAllbyWorkspace(workspace)
+                        .stream()
+                        .map(WorkspaceDto.Tech::from)
+                        .collect(Collectors.toList()))
+                .files(fileService.findByWorkspaceId(workspace))
+                .build();
+    }
+
+    public WorkspaceDto.Info getWorkspaceInfo(Member member, Long id) {
+
+        Workspace workspace = findById(id);
+        Team team = teamService.findByWorkspaceAndMember(workspace, member);
+
+        if (team == null || !team.getWorkspace().equals(workspace)) {
+            throw new BusinessLogicException(ErrorCode.WORKSPACE_NOT_FOUND);
+        }
+
+        List<FunctionSpecificationDto.EpicInfo> epics = functionSpecificationService.getEpics(workspace);
+
+        List<WorkspaceDto.Tech> techs = workspaceTechStackService.findAllbyWorkspace(workspace)
+                .stream()
+                .map(WorkspaceDto.Tech::from)
+                .collect(Collectors.toUnmodifiableList());
+
+        return WorkspaceDto.Info.from(workspace, epics, techs);
+    }
+
 }

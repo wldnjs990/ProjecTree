@@ -11,10 +11,15 @@ import java.util.List;
 public interface WorkspaceTechStackRepository extends JpaRepository<WorkspaceTechStack, Long> {
 
     @Query("""
-    SELECT tv.name
-    FROM WorkspaceTechStack wt
-    JOIN wt.techVocabulary tv
-    WHERE wt.workspace = :workspace
-""")
+                SELECT tv.name
+                FROM WorkspaceTechStack wt
+                JOIN wt.techVocabulary tv
+                WHERE wt.workspace = :workspace
+            """)
     List<String> findTechNamesByWorkspace(@Param("workspace") Workspace workspace);
+
+    List<WorkspaceTechStack> findALlByWorkspace(Workspace workspace);
+
+    void deleteAllByWorkspace(Workspace workspace);
+    
 }

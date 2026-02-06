@@ -7,6 +7,7 @@ import com.ssafy.projectree.domain.workspace.model.repository.FunctionSpecificat
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,4 +33,18 @@ public class FunctionSpecificationService {
         return functionSpecificationRepository.findAllByWorkspace(workspace);
     }
 
+    public List<FunctionSpecificationDto.EpicInfo> getEpics(Workspace workspace) {
+        List<FunctionSpecification> functionSpecifications = findAllByWorkspace(workspace);
+        List<FunctionSpecificationDto.EpicInfo> epics = new ArrayList<>();
+
+        for (FunctionSpecification fs : functionSpecifications) {
+            epics.add(FunctionSpecificationDto.EpicInfo.builder()
+                    .name(fs.getName())
+                    .description(fs.getDescription())
+                    .build()
+            );
+        }
+
+        return epics;
+    }
 }
