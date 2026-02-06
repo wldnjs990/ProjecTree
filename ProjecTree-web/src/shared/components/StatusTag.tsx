@@ -29,27 +29,27 @@ const tagStyles: Record<
   { bg: string; text: string; defaultLabel: string }
 > = {
   PROJECT: { bg: 'bg-[#64748B]', text: 'text-white', defaultLabel: '프로젝트' },
-  EPIC: { bg: 'bg-[#8B5CF6]', text: 'text-white', defaultLabel: 'Epic' },
-  STORY: { bg: 'bg-[#00D492]', text: 'text-white', defaultLabel: 'Story' },
+  EPIC: { bg: 'bg-[#8B5CF6]', text: 'text-white', defaultLabel: '에픽' },
+  STORY: { bg: 'bg-[#00D492]', text: 'text-white', defaultLabel: '스토리' },
   TASK: {
     bg: 'bg-[#2B7FFF]',
     text: 'text-white',
-    defaultLabel: 'Task',
+    defaultLabel: '태스크',
   },
   ADVANCE: {
     bg: 'bg-[#0891B2]',
     text: 'text-white',
-    defaultLabel: 'Advanced',
+    defaultLabel: '어드밴스',
   },
   FE: {
     bg: 'bg-[#F97316]',
     text: 'text-white',
-    defaultLabel: 'FrontEnd',
+    defaultLabel: '프론트엔드',
   },
   BE: {
     bg: 'bg-[#6366F1]',
     text: 'text-white',
-    defaultLabel: 'BackEnd',
+    defaultLabel: '백엔드',
   },
   // 노드 상태 (types2 NodeStatus)
   TODO: { bg: 'bg-[#64748B]', text: 'text-white', defaultLabel: '대기' },
