@@ -94,11 +94,10 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
         ws.description.toLowerCase().normalize('NFC').includes(query)
     );
 
-    // 기본 정렬: 생성일순 (최신순)
+    // 기본 정렬: 수정일순 (최신순)
     result.sort(
       (a, b) =>
-        new Date(b.updatedAt || b.lastModified).getTime() -
-        new Date(a.updatedAt || a.lastModified).getTime()
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
 
     return result;
@@ -176,7 +175,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
               >
                 <ProjectCard
                   project={workspace}
-                  timeLabel={workspace.updatedAt || workspace.lastModified}
+                  timeLabel={workspace.lastModified}
                 />
               </div>
             ))}
