@@ -61,21 +61,4 @@ export const ONBOARDING_TEXTS = {
 // 타입 추론을 위한 타입 export
 export type OnboardingStep = (typeof ONBOARDING_TEXTS.steps)[number];
 
-// 도메인 옵션 상수
-export const DOMAIN_OPTIONS = [
-  'AI/ML',
-  '게임',
-  '교육',
-  '금융',
-  '모빌리티',
-  '부동산/주거',
-  '생산성/협업',
-  '소셜미디어',
-  '여행',
-  '음식/배달',
-  '전자상거래',
-  '헬스케어',
-  '기타',
-] as const;
 
-export type DomainOption = (typeof DOMAIN_OPTIONS)[number];
