@@ -41,7 +41,7 @@ export function Header({
 
       <div className="flex items-center gap-2">
         <ActionButtons
-          onSettingsClick={onSettingsClick}
+          onSettingsClick={canManageMembers ? onSettingsClick : undefined}
           onVoiceCallClick={onVoiceCallClick}
           onInviteClick={canManageMembers ? () => setMemberModalOpen(true) : undefined}
           isVoiceChatActive={isVoiceChatActive}

@@ -18,22 +18,24 @@ export function ActionButtons({
   return (
     <TooltipProvider>
       <div className="flex items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2.5 gap-1.5 text-[#636363] hover:bg-white/60 hover:shadow-sm transition-all duration-200"
-              onClick={onSettingsClick}
-            >
-              <Settings className="h-4 w-4" />
-              <span className="text-sm font-medium">설정</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>프로젝트 설정</p>
-          </TooltipContent>
-        </Tooltip>
+        {onSettingsClick && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2.5 gap-1.5 text-[#636363] hover:bg-white/60 hover:shadow-sm transition-all duration-200"
+                onClick={onSettingsClick}
+              >
+                <Settings className="h-4 w-4" />
+                <span className="text-sm font-medium">설정</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>프로젝트 설정</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
 
         {/* ... 음성통화 부분 생략 ... */}
         <Tooltip>
