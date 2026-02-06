@@ -94,11 +94,10 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
         ws.description.toLowerCase().normalize('NFC').includes(query)
     );
 
-    // 기본 정렬: 생성일순 (최신순)
+    // 기본 정렬: 수정일순 (최신순)
     result.sort(
       (a, b) =>
-        new Date(b.updatedAt || b.lastModified).getTime() -
-        new Date(a.updatedAt || a.lastModified).getTime()
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
 
     return result;
@@ -136,7 +135,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
           </div>
 
           <Button
-            className="gap-2 bg-[#4ADE80]/80 hover:bg-[#4ADE80]/90 text-[#064E3B] font-bold shadow-lg shadow-green-500/20 border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_20px_rgba(74,222,128,0.4)]"
+            className="gap-2 bg-[#4ADE80]/80 hover:bg-[#4ADE80]/90 text-[#064E3B] font-bold border border-white/20 backdrop-blur-md rounded-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/30"
             onClick={() => navigate('/workspace-onboarding')}
           >
             <Plus className="h-4 w-4" />
@@ -176,7 +175,7 @@ export function WorkspaceContent({ filterType = 'all' }: ContentProps) {
               >
                 <ProjectCard
                   project={workspace}
-                  timeLabel={workspace.updatedAt || workspace.lastModified}
+                  timeLabel={workspace.lastModified}
                 />
               </div>
             ))}

@@ -86,6 +86,7 @@ const formatRelativeTime = (dateString?: string): string => {
   if (diffMinutes < 60) return `${diffMinutes}분 전`;
   if (diffHours < 24) return `${diffHours}시간 전`;
   if (diffDays < 7) return `${diffDays}일 전`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전`;
   return date.toLocaleDateString('ko-KR');
 };
 

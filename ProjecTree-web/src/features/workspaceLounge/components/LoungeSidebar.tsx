@@ -27,6 +27,11 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
   FolderOpen,
   UserStar,
   Users,
@@ -35,7 +40,7 @@ import {
   Settings,
   Pencil,
   LogOut,
-  TreeDeciduous,
+  House,
 } from 'lucide-react';
 
 import type { FilterType } from '../types';
@@ -93,7 +98,7 @@ function useProfileDialogState(nickname: string) {
   };
 }
 
-function ProfileDialog({ nickname }: { nickname: string }) {
+function ProfileDialog({ nickname, email }: { nickname: string; email: string }) {
   const navigate = useNavigate();
   const updateStoreNickname = useUpdateNickname();
   const {
@@ -254,7 +259,7 @@ function ProfileDialog({ nickname }: { nickname: string }) {
               </div>
             ) : (
               <div className="px-6">
-                <div className="flex items-center justify-between rounded-xl border-transparent bg-white/50 shadow-sm px-3 py-2 h-10 mb-8 hover:bg-white/60 transition-colors duration-300">
+                <div className="flex items-center justify-between rounded-xl border-transparent bg-white/50 shadow-sm px-3 py-2 h-10 mb-4 hover:bg-white/60 transition-colors duration-300">
                   <span className="text-zinc-800 font-medium">{nickname}</span>
                   <Button
                     variant="ghost"
@@ -268,6 +273,20 @@ function ProfileDialog({ nickname }: { nickname: string }) {
                 </div>
               </div>
             )}
+          </div>
+
+          <div className="grid gap-2 mt-2">
+            <Label
+              htmlFor="email"
+              className="text-zinc-700 px-6 text-xs font-bold uppercase tracking-wider opacity-70"
+            >
+              이메일
+            </Label>
+            <div className="px-6">
+              <div className="flex items-center rounded-xl px-3 py-2 h-10 mb-4">
+                <span className="text-zinc-500 font-medium">{email}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -392,8 +411,9 @@ export function LoungeSidebar({
     return null;
   }
 
-  // user 확정 - 닉네임 직접 사용
+  // user 확정 - 닉네임, 이메일 직접 사용
   const nickname = user.nickname;
+  const email = user.email;
   const initialLetter = nickname?.trim().charAt(0) || '?';
 
   return (
@@ -422,68 +442,92 @@ export function LoungeSidebar({
           collapsed && 'flex-col gap-2 p-2'
         )}
       >
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <button
-              className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 group',
-                'hover:bg-white/70 hover:shadow-sm hover:backdrop-blur-md',
-                collapsed && 'flex-col gap-1'
-              )}
+        <div
+          className={cn(
+            'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-300 group',
+            collapsed && 'flex-col gap-1'
+          )}
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--figma-forest-bg)] to-emerald-50 text-[var(--figma-tech-green)] text-sm font-bold shadow-inner ring-1 ring-[var(--figma-forest-accent)]/30">
+            {initialLetter}
+          </div>
+          {!collapsed && (
+            <span
+              className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px]"
+              title={nickname}
             >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--figma-forest-bg)] to-emerald-50 text-[var(--figma-tech-green)] text-sm font-bold shadow-inner ring-1 ring-[var(--figma-forest-accent)]/30">
-                {initialLetter}
-              </div>
-              {!collapsed && (
-                <span
-                  className="font-semibold text-zinc-800 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px]"
-                  title={nickname}
-                >
-                  {nickname}
-                </span>
-              )}
-            </button>
-          </AlertDialogTrigger>
-          <AlertDialogContent
-            className="
-            bg-white/92
-            backdrop-blur-2xl
-            border border-white/60
-            rounded-3xl
-            shadow-2xl
-            z-[1001]
-            p-0
-            overflow-hidden
-          "
-          >
-            <AlertDialogHeader className="p-6">
-              <AlertDialogTitle className="text-zinc-900 font-bold">
-                로그아웃 하시겠습니까?
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-zinc-500">
-                로그아웃하면 다시 로그인해야 합니다.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-100">
-              <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
-                취소
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={async () => {
-                  await logout();
-                  useUserStore.getState().clearUser();
-                  navigate('/login');
-                }}
-                className="border border-zinc-200 text-zinc-600 hover:bg-zinc-200 bg-zinc-100 rounded-xl"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                로그아웃
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              {nickname}
+            </span>
+          )}
+        </div>
 
-        {!collapsed && <ProfileDialog nickname={nickname} />}
+        {!collapsed && (
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-zinc-100/50 transition-colors"
+                        aria-label="로그아웃"
+                      >
+                        <LogOut className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent
+                      className="
+                      bg-white/92
+                      backdrop-blur-2xl
+                      border border-white/60
+                      rounded-3xl
+                      shadow-2xl
+                      z-[1001]
+                      p-0
+                      overflow-hidden
+                    "
+                    >
+                      <AlertDialogHeader className="p-6">
+                        <AlertDialogTitle className="text-zinc-900 font-bold">
+                          로그아웃 하시겠습니까?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-zinc-500">
+                          로그아웃하면 다시 로그인해야 합니다.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-100">
+                        <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
+                          취소
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            await logout();
+                            useUserStore.getState().clearUser();
+                            navigate('/login');
+                          }}
+                          className="border border-zinc-200 text-zinc-600 hover:bg-zinc-200 bg-zinc-100 rounded-xl"
+                        >
+                          로그아웃
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">로그아웃</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <ProfileDialog nickname={nickname} email={email} />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">프로필 설정</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
@@ -526,12 +570,12 @@ export function LoungeSidebar({
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-white/20 p-3 flex justify-center">
+      <div className="border-t border-white/20 p-3">
         <button
-          className="flex w-full items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-sm text-zinc-400 hover:text-emerald-600 hover:bg-white/70 hover:shadow-sm transition-all duration-300"
+          className="flex w-full items-center justify-start gap-3 rounded-xl px-3 py-2.5 text-sm text-zinc-400 hover:text-emerald-600 hover:bg-white/70 transition-all duration-300"
           onClick={() => navigate('/')}
         >
-          <TreeDeciduous className="h-4 w-4" />
+          <House className="h-4 w-4" />
           {!collapsed && <span>홈으로 가기</span>}
         </button>
       </div>
