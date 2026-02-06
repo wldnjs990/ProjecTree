@@ -19,36 +19,21 @@ TASK_SYSTEM_PROMPT = """
   - Task: "이미지 업로드 API 구현" → 핵심 기능: "이미지 파일 업로드 처리" (파일 업로드 라이브러리 선택 필요)
   - Task: "채팅 기능 개발" → 핵심 기능: "실시간 양방향 통신" (WebSocket 라이브러리 선택 필요)
   - Task: "이미지 썸네일 생성" → 핵심 기능: "이미지 리사이징/변환" (이미지 처리 라이브러리 선택 필요)
-- **[주의]** 하나의 핵심 기능에 집중하고, 그 기능을 구현할 수 있는 대안 기술들을 찾아야 합니다.
+- [주의] 하나의 핵심 기능에 집중하고, 그 기능을 구현할 수 있는 대안 기술들을 찾아야 합니다.
 
-**Step 1. 대안 기술 후보 선정 (Alternative Candidates Nomination)**
-- **Step 0에서 추출한 핵심 기능**을 구현할 수 있는 **서로 대체 가능한** 기술 3가지를 선정하십시오.
-- 반드시 **같은 카테고리/역할**의 기술이어야 합니다:
-  - 파일 업로드: multer, busboy, formidable, multiparty
-  - 이미지 처리: sharp, jimp, imagemagick, gm
-  - WebSocket: Socket.IO, ws, SockJS, µWebSockets
-  - 폼 유효성 검사: react-hook-form, formik, react-final-form
-  - 상태 관리: Redux, Zustand, Recoil, Jotai
-  - HTTP 클라이언트: axios, fetch, ky, superagent
-- (Internal Thought): "핵심 기능 '파일 업로드'를 구현하기 위해 multer, busboy, formidable 중 선택할 수 있다."
+Step 1. 대안 기술 후보 선정 (Alternative Candidates Nomination)
+- **Step 0에서 추출한 핵심 기능**을 구현할 수 있는 서로 대체 가능한 기술 3가지를 선정하십시오.
+- 해당 작업은 sub agent인 tech_selector_agent가 수행합니다.
 
-**Step 2. 기술별 개별 심층 조사 (Sequential Deep Dive) - 필수 단계**
-⚠️ **[절대 필수]** 이 단계에서 반드시 `restricted_search` 도구를 **최소 3회 이상** 호출해야 합니다.
-⚠️ **검색 없이 결과를 출력하면 실패입니다.** 검색 도구를 사용하지 않고 응답하면 안 됩니다.
-- 'restricted_search' tool의 'include_domains'를 반드시 참고해야합니다. 해당 도메인이 아닌 곳에서 `ref`가 생성되면 안됩니다.
-- 'restricted_search' tool의 query는 반드시 한국어로 작성하세요.
-- **[중요]** 검색 쿼리에 **Step 0에서 추출한 핵심 기능**을 포함하세요.
-- **Loop 1 (기술 A):** "기술 A [핵심 기능] 구현 방법" 검색 -> **기술 A 전용 URL 확보**
-- **Loop 2 (기술 B):** "기술 B [핵심 기능] 튜토리얼" 검색 -> **기술 B 전용 URL 확보**
-- **Loop 3 (기술 C):** "기술 C [핵심 기능] 사용법" 검색 -> **기술 C 전용 URL 확보**
-- *주의: 각 Loop에서 확보한 URL은 해당 기술에만 매핑되어야 하며, 다른 기술의 레퍼런스로 재사용되면 안 됩니다.*
+Step 2. 기술별 개별 심층 조사 (Sequential Deep Dive)
+- 해당 작업은 sub agent인 deep_researcher_agent가 수행합니다.
 
-**Step 3. 대안 기술 검증 (Alternative Technology Verification)**
-- 선정된 3가지 기술이 **진정으로 서로 대체 가능한지** 확인하십시오.
-- 검증 질문: "프로젝트에서 기술 A 대신 기술 B를 사용해도 **동일한 기능**을 구현할 수 있는가?"
+Step 3. 대안 기술 검증 (Alternative Technology Verification)
+- 선정된 3가지 기술이 진정으로 서로 대체 가능한지 확인하십시오.
+- 검증 질문: "프로젝트에서 기술 A 대신 기술 B를 사용해도 동일한 기능을 구현할 수 있는가?"
   - 답이 "예"라면 → 올바른 대안 기술
   - 답이 "아니오"라면 → 다른 기술을 찾아야 함
-- **[핵심 검증]** 3가지 기술이 각각 다른 역할을 담당하고 있다면 실패입니다. Step 1로 돌아가세요.
+- [핵심 검증] 3가지 기술이 각각 다른 역할을 담당하고 있다면 실패입니다. Step 1로 돌아가세요.
 
 **Step 4. 최종 출력 (Final Construction)**
 - 위 조사 내용을 바탕으로 지정된 JSON 포맷을 완성하십시오.

@@ -8,6 +8,7 @@ from deepagents import create_deep_agent
 from langchain.agents.structured_output import ProviderStrategy
 from app.agents.recommend.state import RecommendationState
 from app.agents.tools.search import restricted_search
+from app.agents.tools.check_url_validity import check_url_validity
 from app.agents.recommend.schemas.expert import TechList
 from typing import Any
 from app.agents.recommend.prompts.user_prompts import EXPERT_USER_PROMPT
@@ -16,6 +17,8 @@ from app.agents.recommend.prompts.system_prompts import (
     BE_SYSTEM_PROMPT,
     ADVANCE_SYSTEM_PROMPT,
 )
+from app.agents.recommend.prompts.sub_agent.researcher import RESEARCHER_PROMPT
+from app.agents.recommend.prompts.sub_agent.tech_selector import TECH_SELECTOR_SYSTEM_PROMPT
 from app.agents.prompts.system.global_context import GLOBAL_CONTEXT
 import logging
 
@@ -26,6 +29,22 @@ load_dotenv()
 llm = openai_mini_llm
 tools = [restricted_search]
 
+tech_selector_agent = {
+    "name": "tech_selector",
+    "description": "사용자 요구사항을 분석하여 핵심 기능을 도출하고, 이를 구현할 수 있는 기술적으로 구별되는 3가지 대안 방식을 선정합니다.",
+    "tools": [], 
+    "system_prompt": TECH_SELECTOR_SYSTEM_PROMPT,
+}
+
+deep_researcher_agent = {
+    "name": "deep_researcher",
+    "description": "주어진 3가지 기술 후보에 대해 구체적인 검색(restricted_search)을 수행하여 장단점, 특징, 레퍼런스 URL을 수집합니다.",
+    "tools": [restricted_search, check_url_validity],  # 검색 툴 필수
+    "system_prompt": RESEARCHER_PROMPT,
+    "model": openai_nano_llm,
+}
+
+
 
 def create_expert_agent(system_prompt: str):
     return create_deep_agent(
@@ -33,6 +52,7 @@ def create_expert_agent(system_prompt: str):
         tools, 
         system_prompt=system_prompt, 
         response_format=ProviderStrategy(TechList),
+        subagents=[deep_researcher_agent, tech_selector_agent],
     )
 
 
