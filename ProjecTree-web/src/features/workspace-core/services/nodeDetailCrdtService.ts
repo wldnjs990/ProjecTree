@@ -30,7 +30,8 @@ class NodeDetailCrdtService {
   private yNodeDetailsRef: Y.Map<Y.Map<YNodeDetailValue>> | null = null;
   private yConfirmedRef: Y.Map<ConfirmedNodeData> | null = null;
   private yNodeCandidatesRef: Y.Map<Candidate[]> | null = null;
-  private yNodeTechRecommendationsRef: Y.Map<TechRecommendation[]> | null = null;
+  private yNodeTechRecommendationsRef: Y.Map<TechRecommendation[]> | null =
+    null;
   private yNodeCandidatesPendingRef: Y.Map<boolean> | null = null;
   private yNodeTechsPendingRef: Y.Map<boolean> | null = null;
   private cleanupFn: (() => void) | null = null;
@@ -90,12 +91,13 @@ class NodeDetailCrdtService {
     const yNodeDetails = client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
     const yConfirmed = client.getYMap<ConfirmedNodeData>('confirmedNodeData');
     const yNodeCandidates = client.getYMap<Candidate[]>('nodeCandidates');
-    const yNodeTechRecommendations =
-      client.getYMap<TechRecommendation[]>('nodeTechRecommendations');
-    const yNodeCandidatesPending =
-      client.getYMap<boolean>('nodeCandidatesPending');
-    const yNodeTechsPending =
-      client.getYMap<boolean>('nodeTechsPending');
+    const yNodeTechRecommendations = client.getYMap<TechRecommendation[]>(
+      'nodeTechRecommendations'
+    );
+    const yNodeCandidatesPending = client.getYMap<boolean>(
+      'nodeCandidatesPending'
+    );
+    const yNodeTechsPending = client.getYMap<boolean>('nodeTechsPending');
 
     // 편집 데이터 변경 감지
     const editObserveHandler = () => {
@@ -503,6 +505,8 @@ class NodeDetailCrdtService {
     const client = getCrdtClient();
     if (!client || !this.yNodeCandidatesRef) {
       console.warn('[NodeDetailCrdtService] CRDT 클라이언트가 없습니다.');
+      // Fallback: update local store immediately so UI reflects server response
+      useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates });
       return;
     }
 
@@ -510,27 +514,31 @@ class NodeDetailCrdtService {
     this.yNodeCandidatesRef.set(nodeId, candidates);
     this.setCandidatesPending(nodeId, false);
 
-    // 로컬 store에도 즉시 반영
+    // 로컬 store에도 즉시 반영 [임시]
     useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates });
 
-    console.log('[NodeDetailCrdtService] Candidates 업데이트:', nodeId, candidates);
+    console.log(
+      '[NodeDetailCrdtService] Candidates 업데이트:',
+      nodeId,
+      candidates
+    );
   }
 
   /**
    * TechRecommendations 업데이트 (실시간 동기화)
    */
-  updateTechRecommendations(
-    nodeId: string,
-    techs: TechRecommendation[]
-  ): void {
+  updateTechRecommendations(nodeId: string, techs: TechRecommendation[]): void {
     const client = getCrdtClient();
     if (!client || !this.yNodeTechRecommendationsRef) {
       console.warn('[NodeDetailCrdtService] CRDT 클라이언트가 없습니다.');
+      // Fallback: update local store immediately so UI reflects server response
+      useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs });
       return;
     }
 
     this.yNodeTechRecommendationsRef.set(nodeId, techs);
     this.setTechsPending(nodeId, false);
+    // [임시]
     useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs });
 
     console.log(
