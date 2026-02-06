@@ -1,5 +1,6 @@
 package com.ssafy.projectree.domain.node.usecase;
 
+import com.ssafy.projectree.domain.ai.dto.AiCandidateCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodePositionUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
@@ -35,6 +36,9 @@ public class NodeCrdtService {
 
     @Value("${crdt-server.new-tech-path}")
     private String techPath;
+
+    @Value("${crdt-server.new-candidate-path}")
+    private String candidatePath;
 
     @Async("nodePositionExecutor")
     @Transactional
@@ -88,6 +92,21 @@ public class NodeCrdtService {
                 .toUriString();
 
         sendNodeDataToCrdt(uriString, workspaceId, nodeId, response);
+    }
+
+    public void sendCandidatesCreationToCrdt(
+            Long workspaceId,
+            Long nodeId,
+            AiCandidateCreateDto.Response response) {
+
+        String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
+                .path(pathPrefix)
+                .path(candidatePath)
+                .build()
+                .toUriString();
+
+        sendNodeDataToCrdt(uriString, workspaceId, nodeId, response);
+
     }
 
     private void sendNodeDataToCrdt(String uriString, Long workspaceId, Long nodeId, Object payload) {
