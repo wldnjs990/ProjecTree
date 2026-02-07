@@ -24,8 +24,9 @@ class NodeDetailCrdtService {
   private yNodeDetailsRef: Y.Map<Y.Map<YNodeDetailValue>> | null = null;
   private yConfirmedRef: Y.Map<ConfirmedNodeData> | null = null;
   private yNodeCandidatesRef: Y.Map<Candidate[]> | null = null;
-  private yNodeTechRecommendationsRef: Y.Map<TechRecommendation[]> | null =
-    null;
+  private yNodeTechRecommendationsRef: Y.Map<
+    Y.Array<TechRecommendation>
+  > | null = null;
   private yNodeCandidatesPendingRef: Y.Map<boolean> | null = null;
   private yNodeTechsPendingRef: Y.Map<boolean> | null = null;
   private cleanupFn: (() => void) | null = null;
@@ -83,9 +84,9 @@ class NodeDetailCrdtService {
     const yNodeDetails = client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
     const yConfirmed = client.getYMap<ConfirmedNodeData>('confirmedNodeData');
     const yNodeCandidates = client.getYMap<Candidate[]>('nodeCandidates');
-    const yNodeTechRecommendations = client.getYMap<TechRecommendation[]>(
-      'nodeTechRecommendations'
-    );
+    const yNodeTechRecommendations = client.getYMap<
+      Y.Array<TechRecommendation>
+    >('nodeTechRecommendations');
     const yNodeCandidatesPending = client.getYMap<boolean>(
       'nodeCandidatesPending'
     );
@@ -124,11 +125,12 @@ class NodeDetailCrdtService {
     };
 
     const techRecommendationsHandler = (
-      event: Y.YMapEvent<TechRecommendation[]>
+      event: Y.YMapEvent<Y.Array<TechRecommendation>>
     ) => {
       event.keysChanged.forEach((key) => {
-        const techs = yNodeTechRecommendations.get(key);
-        if (techs) {
+        const yArray = yNodeTechRecommendations.get(key);
+        if (yArray) {
+          const techs = yArray.toArray();
           console.log(
             '[NodeDetailCrdtService] tech recommendations received:',
             key,
@@ -194,6 +196,18 @@ class NodeDetailCrdtService {
         useNodeStore
           .getState()
           .updateNodeDetail(Number(key), { techsPending: pending });
+      });
+      // 기존 tech recommendations 로드
+      yNodeTechRecommendations.forEach((yArray, key) => {
+        const techs = yArray.toArray();
+        if (techs.length > 0) {
+          console.log(
+            '[NodeDetailCrdtService] tech recommendations load:',
+            key,
+            techs
+          );
+          useNodeStore.getState().updateNodeDetail(Number(key), { techs });
+        }
       });
     };
     const syncHandler = (isSynced: boolean) => {
@@ -454,7 +468,7 @@ class NodeDetailCrdtService {
     );
   }
 
-  // Update tech recommendations (broadcast + local store)
+  // Update tech recommendations - 전체 교체 (AI 추천 시 기존 것 덮어씌움)
   updateTechRecommendations(nodeId: string, techs: TechRecommendation[]): void {
     const client = getCrdtClient();
     if (!client || !this.yNodeTechRecommendationsRef) {
@@ -462,7 +476,22 @@ class NodeDetailCrdtService {
       return;
     }
 
-    this.yNodeTechRecommendationsRef.set(nodeId, techs);
+    client.yDoc.transact(() => {
+      let yArray = this.yNodeTechRecommendationsRef!.get(nodeId);
+
+      if (!yArray) {
+        // Y.Array가 없으면 새로 생성
+        yArray = new Y.Array<TechRecommendation>();
+        this.yNodeTechRecommendationsRef!.set(nodeId, yArray);
+      } else {
+        // 기존 배열 비우기
+        yArray.delete(0, yArray.length);
+      }
+
+      // 새로운 techs 추가
+      yArray.push(techs);
+    });
+
     this.setTechsPending(nodeId, false);
     useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs });
 
@@ -470,6 +499,40 @@ class NodeDetailCrdtService {
       '[NodeDetailCrdtService] tech recommendations updated:',
       nodeId,
       techs
+    );
+  }
+
+  // Add single tech recommendation - 개별 추가 (커스텀 기술 추가 시)
+  addTechRecommendation(nodeId: string, tech: TechRecommendation): void {
+    const client = getCrdtClient();
+    if (!client || !this.yNodeTechRecommendationsRef) {
+      console.warn('[NodeDetailCrdtService] CRDT client is not available.');
+      return;
+    }
+
+    client.yDoc.transact(() => {
+      let yArray = this.yNodeTechRecommendationsRef!.get(nodeId);
+
+      if (!yArray) {
+        // Y.Array가 없으면 새로 생성
+        yArray = new Y.Array<TechRecommendation>();
+        this.yNodeTechRecommendationsRef!.set(nodeId, yArray);
+      }
+
+      // 새로운 tech 추가
+      yArray.push([tech]);
+    });
+
+    // 로컬 스토어 업데이트
+    const currentTechs =
+      useNodeStore.getState().nodeDetails[Number(nodeId)]?.techs ?? [];
+    const updatedTechs = [...currentTechs, tech];
+    useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs: updatedTechs });
+
+    console.log(
+      '[NodeDetailCrdtService] tech recommendation added:',
+      nodeId,
+      tech
     );
   }
 
