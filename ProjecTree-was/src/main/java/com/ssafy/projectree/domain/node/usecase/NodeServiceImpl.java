@@ -441,7 +441,7 @@ public class NodeServiceImpl implements NodeService {
 
         nodeTechStackRepository.save(nodeTechStack);
 
-        nodeCrdtService.sendTechCreationToCrdt(workspaceId, nodeId, CustomTechCreateDto.Response.builder()
+        nodeCrdtService.sendCustomTechCreationToCrdt(workspaceId, nodeId, CustomTechCreateDto.Response.builder()
                 .techVocaId(techVocaId)
                 .techName(techVocabulary.getName())
                 .build());

@@ -34,8 +34,8 @@ public class NodeCrdtService {
     @Value("${crdt-server.new-node-path}")
     private String nodePath;
 
-    @Value("${crdt-server.new-tech-path}")
-    private String techPath;
+    @Value("${crdt-server.new-custom-tech-path}")
+    private String customTechPath;
 
     @Value("${crdt-server.new-candidate-path}")
     private String candidatePath;
@@ -82,12 +82,12 @@ public class NodeCrdtService {
         }
     }
 
-    public void sendTechCreationToCrdt(
+    public void sendCustomTechCreationToCrdt(
             Long workspaceId,
             Long nodeId, CustomTechCreateDto.Response response) {
         String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
                 .path(pathPrefix)
-                .path(techPath)
+                .path(customTechPath)
                 .build()
                 .toUriString();
 
