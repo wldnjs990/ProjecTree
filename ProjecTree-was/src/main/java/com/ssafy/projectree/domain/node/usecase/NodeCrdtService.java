@@ -65,6 +65,7 @@ public class NodeCrdtService {
         }
     }
 
+    @Async("nodeCreateExecutor")
     public void sendNodeCreationToCrdt(Long workspaceId, NodeSchema payload) {
         String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
                 .path(pathPrefix)
@@ -85,6 +86,7 @@ public class NodeCrdtService {
         }
     }
 
+    @Async("techCreateExecutor")
     public void sendTechCreationToCrdt(Long workspaceId, Long nodeId, AiTechRecommendDto.Response response) {
         String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
                 .path(pathPrefix)
@@ -95,6 +97,7 @@ public class NodeCrdtService {
         sendNodeDataToCrdt(uriString, workspaceId, nodeId, response.getTechs());
     }
 
+    @Async("customTechCreateExecutor")
     public void sendCustomTechCreationToCrdt(
             Long workspaceId,
             Long nodeId, CustomTechCreateDto.Response response) {
@@ -107,6 +110,7 @@ public class NodeCrdtService {
         sendNodeDataToCrdt(uriString, workspaceId, nodeId, response);
     }
 
+    @Async("candidateCreateExecutor")
     public void sendCandidatesCreationToCrdt(
             Long workspaceId,
             Long nodeId,
