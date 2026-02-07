@@ -6,7 +6,6 @@ export interface SendNodePosition {
 }
 
 interface SaveNodePositionsBatchPayload {
-  workspaceId: number;
   nodes: SendNodePosition[];
 }
 /**
@@ -22,13 +21,12 @@ export async function sendBatchToSpring(
     console.log(
       "[sendBatchToSpring] 위치 저장 요청",
       {
-        workspaceId: payload.workspaceId,
         nodeCount: payload.nodes.length,
       },
       new Date().toISOString(),
     );
     const result = await springInternalClient.patch(
-      `/api/internal/workspaces/${payload.workspaceId}/nodes/positions`,
+      `/api/internal/nodes/positions`,
       {
         nodes: payload.nodes,
       },
@@ -39,7 +37,6 @@ export async function sendBatchToSpring(
     console.error(
       "Spring batch 위치 저장 실패",
       {
-        workspaceId: payload.workspaceId,
         nodeCount: payload.nodes?.length,
         message: error?.message,
         response: error?.response?.data,
