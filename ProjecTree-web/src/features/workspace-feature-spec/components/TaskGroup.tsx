@@ -103,7 +103,7 @@ export function TaskGroup({ task, advanceds }: TaskGroupProps) {
             color={data.assignee.color}
             size="sm"
           />
-        ) : null}
+        ) : <span className="text-xs text-gray-400">미정</span>}
       </div>
     </div>
   );
@@ -199,7 +199,7 @@ export function TaskGroup({ task, advanceds }: TaskGroupProps) {
                     color={advancedData.assignee.color}
                     size="sm"
                   />
-                ) : null}
+                ) : <span className="text-xs text-gray-400">미정</span>}
               </div>
             </div>
           );
