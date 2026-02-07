@@ -8,13 +8,16 @@ import { getYDocByRoom } from "../../yjs/ydoc-gateway";
 const router: Router = Router({ mergeParams: true });
 
 router.post("/", (req: Request, res: Response) => {
+  console.log("create nodes start", new Date().toISOString());
   const { workspaceId } = req.params;
   const body = req.body;
 
   if (!workspaceId || typeof workspaceId !== "string") {
+    console.error("Invalid workspace Id", new Date().toLocaleDateString());
     return res.status(400).json({ message: "Invalid workspace Id" });
   }
   if (!isValidNodePayload(body)) {
+    console.error("Invalid node payload", new Date().toLocaleDateString());
     return res.status(400).json({ message: "Invalid node payload" });
   }
 
@@ -52,6 +55,7 @@ router.post("/", (req: Request, res: Response) => {
     details.set(String(node.id), detail);
   });
 
+  console.log("create nodes success", new Date().toISOString());
   res.status(200).json({ status: "ok" });
 });
 
