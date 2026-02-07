@@ -13,8 +13,8 @@ export function Logo({ className }: LogoProps) {
         className
       )}
       style={{ boxShadow: '0 0 20px rgba(16, 185, 129, 0.15)' }}
-      onClick={() => navigate('/')}
-      title="홈으로 이동"
+      onClick={() => navigate('/workspace-lounge')}
+      title="라운지로 이동"
     >
       <TreeDeciduous className="h-4 w-4 text-emerald-600" />
     </div>
