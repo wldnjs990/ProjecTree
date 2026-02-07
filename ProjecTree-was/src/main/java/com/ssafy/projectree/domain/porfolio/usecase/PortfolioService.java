@@ -24,7 +24,6 @@ import com.ssafy.projectree.domain.workspace.model.repository.WorkspaceRepositor
 import com.ssafy.projectree.global.api.code.ErrorCode;
 import com.ssafy.projectree.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,8 +81,8 @@ public class PortfolioService {
 
         AiPortfolioGenerateDto.Request request = AiPortfolioGenerateDto.Request.builder()
                 .projectTitle(workspace.getName())
-                .projectStartAt(workspace.getStartDate())
-                .projectEndAt(workspace.getEndDate())
+                .projectStartDate(workspace.getStartDate())
+                .projectEndDate(workspace.getEndDate())
                 .projectTechStack(workspaceTechStacks)
                 .projectDescription(workspace.getDescription())
                 .projectHeadCount(headCount)
