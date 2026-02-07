@@ -243,7 +243,7 @@ export default function WorkSpacePage() {
         <LeftSidebar
           workspaceId={workspaceId}
           workspaceName="AI 여행 추천 서비스"
-          className="h-full border-r border-zinc-300/60 w-75 flex-none z-50"
+          className="h-full flex-none z-50"
           nodes={nodes as Node[]}
           edges={edges}
         />

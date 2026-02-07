@@ -60,7 +60,10 @@ export const ChatInput = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-t border-gray-200 p-4">
+    <form
+      onSubmit={handleSubmit}
+      className="border-t border-white/40 bg-white/60 backdrop-blur-sm p-4"
+    >
       <div className="flex flex-col gap-2">
         <div className="flex items-end gap-2">
           <textarea
@@ -71,12 +74,12 @@ export const ChatInput = ({
             disabled={disabled}
             maxLength={8192}
             rows={1}
-            className="flex-1 resize-none rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none disabled:bg-gray-100"
+            className="flex-1 resize-none rounded-lg border border-white/60 bg-white/80 px-4 py-2 text-sm text-zinc-900 shadow-sm focus:border-[var(--figma-neon-green)] focus:outline-none focus:ring-2 focus:ring-[var(--figma-neon-green)]/30 placeholder:text-zinc-400 transition-colors disabled:bg-white/40"
           />
           <button
             type="submit"
             disabled={!message.trim() || disabled}
-            className="rounded-lg bg-blue-500 p-2 text-white hover:bg-blue-600 disabled:bg-gray-300"
+            className="rounded-lg bg-[var(--figma-neon-green)] p-2 text-[var(--figma-tech-green)] shadow-sm hover:bg-[var(--figma-neon-green)]/90 hover:shadow-[0_0_12px_rgba(74,222,128,0.35)] transition-all disabled:bg-zinc-200 disabled:text-zinc-400"
           >
             <Send className="h-5 w-5" />
           </button>

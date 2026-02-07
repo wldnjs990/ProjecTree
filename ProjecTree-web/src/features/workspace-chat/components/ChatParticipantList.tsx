@@ -14,15 +14,15 @@ export const ChatParticipantList = ({
   const onlineCount = participants.filter((p) => p.isOnline).length;
 
   return (
-    <div className="flex h-full flex-col bg-white">
-      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
-        <h3 className="text-sm font-semibold text-gray-900">
+    <div className="flex h-full flex-col bg-white/80 backdrop-blur-sm">
+      <div className="flex items-center justify-between border-b border-white/40 bg-white/60 px-4 py-3">
+        <h3 className="text-sm font-semibold text-[var(--figma-tech-green)]">
           참여자 ({onlineCount}/{participants.length})
         </h3>
         {onClose && (
           <button
             onClick={onClose}
-            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+            className="rounded-full p-1 text-zinc-400 hover:bg-white/70 hover:text-zinc-600 transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -33,7 +33,7 @@ export const ChatParticipantList = ({
         {participants.map((participant) => (
           <div
             key={participant.id}
-            className="flex items-center gap-2 rounded-lg px-3 py-1.5 hover:bg-gray-50"
+            className="flex items-center gap-2 rounded-lg px-3 py-1.5 hover:bg-white/60"
           >
             <div className="relative">
               <Avatar className="h-6 w-6">
@@ -47,10 +47,12 @@ export const ChatParticipantList = ({
               )}
             </div>
             <div className="flex-1">
-              <p className="text-xs font-medium text-gray-900">
+              <p className="text-xs font-medium text-zinc-900">
                 {participant.name}
               </p>
-              <p className="text-[10px] text-gray-500">{participant.role}</p>
+              <p className="text-[10px] text-zinc-500">
+                {participant.role}
+              </p>
             </div>
           </div>
         ))}

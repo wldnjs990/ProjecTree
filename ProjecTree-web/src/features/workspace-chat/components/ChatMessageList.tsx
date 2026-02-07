@@ -38,8 +38,10 @@ export const ChatMessageList = ({
       className="flex-1 flex flex-col min-h-0 overflow-y-auto px-4 py-4 chat-scrollbar"
     >
       {messages.length === 0 ? (
-        <div className="flex h-full items-center justify-center text-gray-400">
-          <p>메시지가 없습니다. 첫 메시지를 보내보세요!</p>
+        <div className="flex h-full items-center justify-center">
+          <p className="text-sm font-medium text-zinc-500">
+            메시지가 없습니다. 첫 메시지를 보내보세요!
+          </p>
         </div>
       ) : (
         <div className="space-y-1.5 mt-auto">
@@ -49,13 +51,13 @@ export const ChatMessageList = ({
           {/* 🆕 로딩 인디케이터 */}
           {isLoading && (
             <div className="flex justify-center py-2">
-              <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+              <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
             </div>
           )}
 
           {/* 🆕 끝 표시 */}
           {!hasMore && messages.length > 0 && (
-            <div className="text-center py-2 text-xs text-gray-400">
+            <div className="text-center py-2 text-xs text-zinc-400">
               대화의 시작입니다
             </div>
           )}
