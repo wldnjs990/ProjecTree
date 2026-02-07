@@ -14,6 +14,7 @@ import {
   useNodeStore,
   useNodes,
   calculateChildNodePosition,
+  getChildNodeType,
   type FlowNode,
 } from '@/features/workspace-core';
 import { useUser } from '@/shared/stores/userStore';
@@ -57,6 +58,9 @@ export default function NodeDetailContainer({
   const updateNodeDetail = useNodeStore((state) => state.updateNodeDetail);
   const enterCandidatePreview = useNodeDetailStore(
     (state) => state.enterCandidatePreview
+  );
+  const enterCustomPreview = useNodeDetailStore(
+    (state) => state.enterCustomPreview
   );
   const currentUser = useUser();
 
@@ -141,7 +145,44 @@ export default function NodeDetailContainer({
   };
 
   const handleCandidateAddManual = () => {
-    console.log('Candidate add manual clicked');
+    if (!selectedNodeId || !workspaceId) return;
+
+    const parentNode = nodes.find((n) => n.id === selectedNodeId);
+    if (!parentNode) return;
+
+    const nextType = getChildNodeType(parentNode.type);
+    if (!nextType) return;
+
+    const position = calculateChildNodePosition(nodes, selectedNodeId);
+    const currentUserId = currentUser?.memberId ?? currentUser?.id;
+    const previewNodeId = `preview-custom-${Date.now()}`;
+    const previewNode: FlowNode = {
+      id: previewNodeId,
+      type: 'PREVIEW',
+      position: { x: position.xpos, y: position.ypos },
+      parentId: selectedNodeId,
+      data: {
+        title: '새 노드',
+        status: 'TODO',
+        taskId: '#preview',
+        taskType: parentNode.data.taskType ?? null,
+        ...(currentUserId ? { lockedBy: String(currentUserId) } : {}),
+      },
+    };
+
+    previewNodesCrdtService.addPreviewNode(previewNode);
+    enterCustomPreview(
+      {
+        name: '',
+        description: '',
+        nodeType: nextType,
+        taskType: parentNode.data.taskType ?? null,
+        parentNodeId: Number(selectedNodeId),
+        workspaceId,
+        previewNodeId,
+      },
+      position
+    );
   };
 
   // AI 기술 추천 생성 핸들러
