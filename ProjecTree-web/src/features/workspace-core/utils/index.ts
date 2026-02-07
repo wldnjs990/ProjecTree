@@ -18,3 +18,5 @@ export {
 export { transformNodesForSpecView } from './transformNodeData';
 
 export { calculateChildNodePosition } from './calculateNodePosition';
+
+export { getChildNodeType } from './getChildNodeType';
