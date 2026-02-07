@@ -17,8 +17,6 @@ public class TechStackRecommendDto {
     @Builder
     @Schema(name = "TechStackRecommendDto.Response", description = "기술 스택 생성 응답")
     public static class Response{
-        @Builder.Default
-        private List<TechRecommendSchema> techs = new ArrayList<>();
-        private String comparison;
+        private Long nodeId;
     }
 }
