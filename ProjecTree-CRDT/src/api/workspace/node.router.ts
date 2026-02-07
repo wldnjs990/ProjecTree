@@ -12,6 +12,8 @@ router.post("/", (req: Request, res: Response) => {
   const { workspaceId } = req.params;
   const body = req.body;
 
+  console.log({ "node payload": body });
+
   if (!workspaceId || typeof workspaceId !== "string") {
     console.error("Invalid workspace Id", new Date().toLocaleDateString());
     return res.status(400).json({ message: "Invalid workspace Id" });
