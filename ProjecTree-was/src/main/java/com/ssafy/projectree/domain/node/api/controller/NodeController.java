@@ -49,7 +49,8 @@ public class NodeController implements NodeDocsController {
     }
 
     @PostMapping("/nodes/{node-id}/candidates")
-    public CommonResponse<CandidateCreateDto.Response> generateCandidates(@PathVariable(name = "node-id") Long parentId) {
+    public CommonResponse<CandidateCreateDto.Response> generateCandidates(@PathVariable(name = "node-id") Long parentId
+                                                                          ) {
 
         return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.CANDIDATE, String.valueOf(parentId), () -> nodeService.generateCandidate(parentId)));
     }
@@ -73,7 +74,7 @@ public class NodeController implements NodeDocsController {
 
     @Override
     @PostMapping("/nodes/custom")
-    public CommonResponse<?> createCustom(@AuthenticationPrincipal Member member, @RequestBody CustomNodeDto.Request dto) {
+    public CommonResponse<CustomNodeDto.Response> createCustom(@AuthenticationPrincipal Member member, @RequestBody CustomNodeDto.Request dto) {
         return CommonResponse.success(SuccessCode.SUCCESS, nodeService.createCustom(dto));
     }
 }

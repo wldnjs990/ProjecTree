@@ -299,7 +299,7 @@ public class NodeServiceImpl implements NodeService {
                 .candidateCount(3)
                 .build());
 
-        nodeCrdtService.sendCandidatesCreationToCrdt(workspaceId, parentId, candidate);
+        nodeCrdtService.sendCandidatesCreationToCrdt(projectNode.getWorkspace().getId(), parentId, candidate);
 
         return CandidateCreateDto.Response.builder()
                 .nodeId(parentId)
