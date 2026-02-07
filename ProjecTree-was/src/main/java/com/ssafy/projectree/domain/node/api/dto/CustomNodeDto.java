@@ -1,5 +1,6 @@
 package com.ssafy.projectree.domain.node.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ssafy.projectree.domain.node.enums.NodeType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,9 @@ public class CustomNodeDto {
         private NodeType nodeType;
         private Long parentNodeId;
         private Long workspaceId;
+        @JsonProperty("xpos")
         private Double xPos;
+        @JsonProperty("ypos")
         private Double yPos;
 
     }

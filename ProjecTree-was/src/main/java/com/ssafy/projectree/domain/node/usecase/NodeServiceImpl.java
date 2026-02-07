@@ -321,12 +321,12 @@ public class NodeServiceImpl implements NodeService {
         nodeCrdtService.sendNodeCreationToCrdt(dto.getWorkspaceId(), nodeSchema);
 
         return CustomNodeDto.Response.builder()
-                .name(dto.getName())
-                .description(dto.getDescription())
-                .nodeType(dto.getNodeType())
+                .name(node.getName())
+                .description(node.getDescription())
+                .nodeType(node.getNodeType())
                 .parentNodeId(dto.getParentNodeId())
-                .xPos(dto.getXPos())
-                .yPos(dto.getYPos())
+                .xPos(node.getXPos())
+                .yPos(node.getYPos())
                 .build();
     }
 

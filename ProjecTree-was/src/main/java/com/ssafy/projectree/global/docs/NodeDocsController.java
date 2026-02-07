@@ -202,6 +202,7 @@ public interface NodeDocsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "노드 생성 성공"),
             @ApiResponse(responseCode = "401", description = "토큰 만료로 인한 노드 생성 실패")
+
     })
-    CommonResponse<?> createCustom(Member member, CustomNodeDto.Request dto);
+    CommonResponse<CustomNodeDto.Response> createCustom(Member member, CustomNodeDto.Request dto);
 }
