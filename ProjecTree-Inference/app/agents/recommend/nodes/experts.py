@@ -3,7 +3,7 @@ Expert nodes for tech stack recommendation.
 """
 from dotenv import load_dotenv
 from langchain_core.runnables import RunnableConfig
-from app.core.llm import openai_mini_llm
+from app.core.llm import openai_gpt_5_2, openai_mini_llm
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ProviderStrategy
 from app.agents.recommend.state import RecommendationState
@@ -24,9 +24,7 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-# [변경] 메인 모델을 gpt-5.2로 교체
 llm = openai_mini_llm
-# [변경] 검색 툴을 메인 에이전트가 직접 사용
 tools = [restricted_search, url_validator]
 
 def create_expert_agent(system_prompt: str):

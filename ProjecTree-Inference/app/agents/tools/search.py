@@ -56,7 +56,6 @@ def restricted_search(query: str) -> str:
         search_tool = TavilySearch(
             include_domains=TRUSTED_DOMAINS,
             search_depth="advanced",
-            include_raw_content=True,
             max_results=3  # 결과 개수 제한 (토큰 비용 최적화)
         )
         return search_tool.invoke({"query": query})
