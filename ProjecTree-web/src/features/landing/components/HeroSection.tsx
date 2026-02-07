@@ -96,16 +96,6 @@ function GlassMockupCard() {
 
           {/* Mockup Content */}
           <div className="relative rounded-xl bg-white/90 p-6 shadow-inner">
-            {/* Window Controls */}
-            <div className="mb-4 flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-red-400/80" />
-              <div className="h-3 w-3 rounded-full bg-yellow-400/80" />
-              <div className="h-3 w-3 rounded-full bg-green-400/80" />
-              <span className="ml-4 text-xs text-zinc-400">
-                ProjecTree - {images[currentIndex].label}
-              </span>
-            </div>
-
             {/* Mockup UI - Carousel */}
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
               {images.map((image, index) => (

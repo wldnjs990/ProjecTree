@@ -22,18 +22,15 @@ import type { NodeData } from '../types';
 interface StoryGroupProps {
   story: Node;
   tasks: Array<Node & { advanceds: Node[] }>;
-  onNodeClick?: (nodeId: string) => void;
   TaskGroupComponent: React.ComponentType<{
     task: Node;
     advanceds: Node[];
-    onNodeClick?: (nodeId: string) => void;
   }>;
 }
 
 export function StoryGroup({
   story,
   tasks,
-  onNodeClick,
   TaskGroupComponent,
 }: StoryGroupProps) {
   const data = story.data as unknown as NodeData;
@@ -79,11 +76,7 @@ export function StoryGroup({
       <div className="flex justify-center w-full min-w-0 px-3">
         <TruncatedLabel
           text={data.label}
-          className="font-medium text-sm cursor-pointer hover:underline text-center"
-          onClick={(e) => {
-            e.stopPropagation();
-            onNodeClick?.(story.id);
-          }}
+          className="font-medium text-sm text-center"
         />
       </div>
       <div className="flex justify-center">
@@ -103,7 +96,7 @@ export function StoryGroup({
             color={data.assignee.color}
             size="sm"
           />
-        ) : null}
+        ) : <span className="text-xs text-gray-400">미정</span>}
       </div>
     </div>
   );
@@ -129,7 +122,6 @@ export function StoryGroup({
               key={task.id}
               task={task}
               advanceds={task.advanceds}
-              onNodeClick={onNodeClick}
             />
           ))}
         </Accordion>

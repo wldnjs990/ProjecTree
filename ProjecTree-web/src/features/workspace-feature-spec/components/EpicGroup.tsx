@@ -22,18 +22,15 @@ import type { NodeData } from '../types';
 interface EpicGroupProps {
   epic: Node;
   stories: Array<Node & { tasks: Array<Node & { advanceds: Node[] }> }>;
-  onNodeClick?: (nodeId: string) => void;
   StoryGroupComponent: React.ComponentType<{
     story: Node;
     tasks: Array<Node & { advanceds: Node[] }>;
-    onNodeClick?: (nodeId: string) => void;
   }>;
 }
 
 export function EpicGroup({
   epic,
   stories,
-  onNodeClick,
   StoryGroupComponent,
 }: EpicGroupProps) {
   const data = epic.data as unknown as NodeData;
@@ -79,11 +76,7 @@ export function EpicGroup({
       <div className="flex justify-center w-full min-w-0 px-3">
         <TruncatedLabel
           text={data.label}
-          className="font-medium text-sm cursor-pointer hover:underline text-center"
-          onClick={(e) => {
-            e.stopPropagation();
-            onNodeClick?.(epic.id);
-          }}
+          className="font-medium text-sm text-center"
         />
       </div>
       <div className="flex justify-center">
@@ -103,7 +96,7 @@ export function EpicGroup({
             color={data.assignee.color}
             size="sm"
           />
-        ) : null}
+        ) : <span className="text-xs text-gray-400">미정</span>}
       </div>
     </div>
   );
@@ -129,7 +122,6 @@ export function EpicGroup({
               key={story.id}
               story={story}
               tasks={story.tasks}
-              onNodeClick={onNodeClick}
             />
           ))}
         </Accordion>

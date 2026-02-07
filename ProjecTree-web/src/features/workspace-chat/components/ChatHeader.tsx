@@ -17,7 +17,7 @@ export const ChatHeader = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-between border-b border-zinc-300/60 bg-white/60 backdrop-blur-sm px-4 py-2',
+        'flex items-center justify-between border-b border-zinc-300/60 bg-white/60 backdrop-blur-sm px-4 h-10',
         collapsed && 'justify-center px-0 border-b-0 bg-transparent'
       )}
     >
@@ -37,14 +37,6 @@ export const ChatHeader = ({
         )}
       </div>
 
-      {!collapsed && (
-        <div className="flex items-center gap-1.5 rounded-full bg-white/70 border border-white/60 px-2.5 py-1">
-          <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-xs font-medium text-zinc-700">
-            {participantCount}
-          </span>
-        </div>
-      )}
     </div>
   );
 };

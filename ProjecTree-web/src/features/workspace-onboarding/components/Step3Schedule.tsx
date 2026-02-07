@@ -130,8 +130,7 @@ export default function Step3Schedule({
             value={data.description}
             onChange={(e) => onChange({ description: e.target.value })}
             maxLength={500}
-            rows={5}
-            className="resize-none font-['Pretendard'] font-normal text-[13.5px] leading-relaxed p-[10px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors overflow-y-auto chat-scrollbar"
+            className="resize-none h-[120px] font-['Pretendard'] font-normal text-[13.5px] leading-relaxed p-[10px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors overflow-y-auto chat-scrollbar"
           />
           <div className="flex justify-end">
             <span className="font-['Pretendard'] font-normal text-[11px] leading-3 text-[var(--figma-text-dove-gray)]">
@@ -158,7 +157,8 @@ export default function Step3Schedule({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`
-              p-3 text-center rounded-lg transition-all duration-200 border-2 border-dashed
+              text-center rounded-lg transition-all duration-200 border-2 border-dashed
+              ${data.specFiles.length > 0 ? 'p-2' : 'p-3'}
               ${
                 isDragging
                   ? 'border-[var(--figma-forest-accent)] bg-green-50'
@@ -166,12 +166,8 @@ export default function Step3Schedule({
               }
             `}
           >
-            <div className="flex flex-col items-center gap-1.5">
-              <Upload className="h-6 w-6 text-[var(--figma-text-emperor)]" />
-              <p className="font-['Pretendard'] font-normal text-[12.5px] text-[var(--figma-text-cod-gray)]">
-                PDF 파일을 여기에 놓아주세요
-              </p>
-              <label>
+            {data.specFiles.length > 0 ? (
+              <label className="flex items-center justify-center gap-2 cursor-pointer">
                 <input
                   type="file"
                   onChange={handleFileChange}
@@ -179,20 +175,40 @@ export default function Step3Schedule({
                   multiple
                   className="hidden"
                 />
-                <Button
-                  type="button"
-                  onClick={() => {
-                    const input = document.querySelector(
-                      'input[type="file"]'
-                    ) as HTMLInputElement;
-                    input?.click();
-                  }}
-                  className="font-['Pretendard'] font-normal text-[11px] h-[28px] px-2.5 bg-[var(--figma-forest-primary)] text-[var(--figma-white)] rounded-md hover:bg-[#1B5E20] transition-colors mt-0.5"
-                >
-                  파일 업로드 (최대 10MB)
-                </Button>
+                <Upload className="h-4 w-4 text-[var(--figma-text-emperor)]" />
+                <span className="font-['Pretendard'] font-normal text-[12px] text-[var(--figma-text-cod-gray)]">
+                  파일 추가 (최대 10MB)
+                </span>
               </label>
-            </div>
+            ) : (
+              <div className="flex flex-col items-center gap-1.5">
+                <Upload className="h-6 w-6 text-[var(--figma-text-emperor)]" />
+                <p className="font-['Pretendard'] font-normal text-[12.5px] text-[var(--figma-text-cod-gray)]">
+                  PDF 파일을 여기에 놓아주세요
+                </p>
+                <label>
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    accept=".pdf"
+                    multiple
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      const input = document.querySelector(
+                        'input[type="file"]'
+                      ) as HTMLInputElement;
+                      input?.click();
+                    }}
+                    className="font-['Pretendard'] font-normal text-[11px] h-[28px] px-2.5 bg-[var(--figma-forest-primary)] text-[var(--figma-white)] rounded-md hover:bg-[#1B5E20] transition-colors mt-0.5"
+                  >
+                    파일 업로드 (최대 10MB)
+                  </Button>
+                </label>
+              </div>
+            )}
           </div>
 
           {/* 업로드된 파일 목록 */}

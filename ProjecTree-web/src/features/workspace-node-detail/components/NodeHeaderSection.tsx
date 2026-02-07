@@ -89,7 +89,7 @@ export function NodeHeaderSection({
           {/* Task ID */}
           {nodeInfo.identifier && (
             <span className="text-xs text-[#64748B]">
-              #{nodeInfo.identifier}
+              {nodeInfo.identifier}
             </span>
           )}
         </div>

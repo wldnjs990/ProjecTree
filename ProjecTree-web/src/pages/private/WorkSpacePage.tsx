@@ -268,7 +268,7 @@ export default function WorkSpacePage() {
             ))}
 
           {activeTab === 'feature-spec' && (
-            <FeatureSpecView onNodeClick={handleNodeClick} />
+            <FeatureSpecView />
           )}
 
           {activeTab === 'tech-selection' && (
