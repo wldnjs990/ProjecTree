@@ -3,14 +3,12 @@ import { cn } from '@/shared/lib/utils';
 
 interface ChatHeaderProps {
   workspaceName: string;
-  participantCount: number;
   isConnected: boolean;
   collapsed?: boolean;
 }
 
 export const ChatHeader = ({
   workspaceName,
-  participantCount,
   isConnected,
   collapsed = false,
 }: ChatHeaderProps) => {

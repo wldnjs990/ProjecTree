@@ -1,6 +1,6 @@
 import type { AvatarColor } from '@/shared/components/UserAvatar';
 
-export type ViewTab = 'tree-editor' | 'feature-spec' | 'tech-selection';
+export type ViewTab = 'tree-editor' | 'feature-spec' | 'tech-selection' | 'portfolio';
 
 export interface OnlineUser {
   id: string;
