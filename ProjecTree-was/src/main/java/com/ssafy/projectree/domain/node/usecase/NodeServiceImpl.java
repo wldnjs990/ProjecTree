@@ -222,13 +222,13 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public NodeCreateDto.Response createNode(Long candidateId, Long parentId, NodeCreateDto.Request request) {
+    public NodeCreateDto.Response generateNode(Long candidateId, Long parentId, NodeCreateDto.Request request) {
 
         ProjectNode projectNode = findRootNode(parentId);
 
         Long workspaceId = projectNode.getWorkspace().getId();
 
-        AiNodeCreateDto.Response response = inferenceService.createNode(AiNodeCreateDto.Request.builder()
+        AiNodeCreateDto.Response response = inferenceService.generateNode(AiNodeCreateDto.Request.builder()
                 .candidateId(candidateId)
                 .parentId(parentId)
                 .xPos(request.getXPos())
@@ -287,10 +287,13 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public CandidateCreateDto.Response createCandidate(Long parentId) {
+    public CandidateCreateDto.Response generateCandidate(Long parentId) {
         ProjectNode projectNode = findRootNode(parentId);
-
-        AiCandidateCreateDto.Response candidate = inferenceService.createCandidate(AiCandidateCreateDto.Request.builder()
+        Node node = nodeRepository.findById(parentId).orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
+        if(node.getCandidateLimit() <= candidateRepository.countCandidateByParent(node)){
+            throw new BusinessLogicException(ErrorCode.CANDIDATE_GENERATE_LIMIT, "후보 노드 생성 개수를 초과하였습니다.");
+        }
+        AiCandidateCreateDto.Response candidate = inferenceService.generateCandidate(AiCandidateCreateDto.Request.builder()
                 .workspaceId(projectNode.getWorkspace().getId())
                 .nodeId(parentId)
                 .candidateCount(3)
@@ -308,6 +311,7 @@ public class NodeServiceImpl implements NodeService {
         node.setDescription(dto.getDescription());
         node.setXPos(dto.getXPos());
         node.setYPos(dto.getYPos());
+        node.setStatus(NodeStatus.TODO);
         nodeRepository.saveWithParent(dto.getParentNodeId(), node);
 
         NodeSchema nodeSchema = NodeSchema.convertToSchema(node, dto.getParentNodeId());
@@ -408,6 +412,14 @@ public class NodeServiceImpl implements NodeService {
         nodeRepository.deleteNodeAndDescendants(nodeId);
         candidateRepository.deleteByParentId(nodeId);
         candidateRepository.disConnectDerivation(nodeId);
+    }
+
+    @Override
+    public void deleteCandidate(Long candidateId) {
+        Candidate candidate = candidateRepository.findById(candidateId)
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.CANDIDATE_NOT_FOUND_ERROR));
+
+        candidateRepository.delete(candidate);
     }
 
     @Transactional

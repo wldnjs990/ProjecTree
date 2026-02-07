@@ -23,13 +23,13 @@ public interface NodeService {
 
     WorkspaceDto.ProgressInfo getStatistics(Long workspaceId);
 
-    NodeCreateDto.Response createNode(Long candidateId, Long parentId, NodeCreateDto.Request request);
+    NodeCreateDto.Response generateNode(Long candidateId, Long parentId, NodeCreateDto.Request request);
 
     ProjectNode createProjectNode(Workspace workspace);
 
     void createEpicNodes(Workspace workspace, Node projectNode, List<FunctionSpecificationDto.EpicInfo> epics);
 
-    CandidateCreateDto.Response createCandidate(Long parentId);
+    CandidateCreateDto.Response generateCandidate(Long parentId);
 
     CustomNodeDto.Response createCustom(CustomNodeDto.Request dto);
 
@@ -42,6 +42,8 @@ public interface NodeService {
     void selectNodeTech(Long nodeId, Long selectedTechId);
 
     void deleteNode(Long nodeId);
+
+    void deleteCandidate(Long candidateId);
 
     void createCustomTechStack(Long nodeId,Long workspaceId, Long techStackId);
 }

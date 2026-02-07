@@ -148,6 +148,19 @@ public interface NodeDocsController {
     );
 
     @Operation(
+            summary = "후보 노드 삭제",
+            description = "특정 후보 노드를 삭제합니다. (소프트 딜리트)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 후보 노드")
+    })
+    CommonResponse<Void> deleteCandidate(
+            @Parameter(description = "삭제할 후보 노드 ID", example = "1")
+            @PathVariable(name = "candidate-id") Long candidateId
+    );
+
+    @Operation(
             summary = "기술 스택 추천",
             description = "특정 노드 구현에 적합한 기술 스택을 추천받습니다."
     )

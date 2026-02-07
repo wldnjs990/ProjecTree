@@ -10,9 +10,8 @@ import java.util.List;
 
 public interface CandidateRepository extends JpaRepository<Candidate, Long> {
 
-    List<Candidate> findByParent(Node parent);
 
-    @Modifying(clearAutomatically = true) // 이 옵션 추가 권장
+    @Modifying(clearAutomatically = true)
     @Query("""
              update Candidate c 
              set c.deletedAt = CURRENT_TIMESTAMP
@@ -27,4 +26,8 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
         where c.derivationNode.id = :nodeId 
     """)
     void disConnectDerivation(Long nodeId);
+
+    List<Candidate> findByParent(Node parent);
+
+    double countCandidateByParent(Node parent);
 }

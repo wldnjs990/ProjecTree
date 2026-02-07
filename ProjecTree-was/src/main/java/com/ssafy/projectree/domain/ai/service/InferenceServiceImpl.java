@@ -49,7 +49,7 @@ public class InferenceServiceImpl implements InferenceService {
             backoff = @Backoff(delay = 1000), // 재시도 간격 1초
             listeners = "retryLoggingListener" // << 여기에 추가
     )
-    public AiCandidateCreateDto.Response createCandidate(AiCandidateCreateDto.Request request) {
+    public AiCandidateCreateDto.Response generateCandidate(AiCandidateCreateDto.Request request) {
         log.info("Candidate create start {}", request);
         String uriString = UriComponentsBuilder.fromUriString(serverUrl)
                 .path(pathPrefix)
@@ -80,7 +80,7 @@ public class InferenceServiceImpl implements InferenceService {
             listeners = "retryLoggingListener" // << 여기에 추가
 
     )
-    public AiNodeCreateDto.Response createNode(AiNodeCreateDto.Request request) {
+    public AiNodeCreateDto.Response generateNode(AiNodeCreateDto.Request request) {
         return restClient.post().uri(UriComponentsBuilder.fromUriString(serverUrl)
                         .path(pathPrefix)
                         .path(nodePath)

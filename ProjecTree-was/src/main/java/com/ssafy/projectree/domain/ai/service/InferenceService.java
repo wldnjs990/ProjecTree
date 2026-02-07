@@ -7,8 +7,8 @@ import com.ssafy.projectree.domain.ai.dto.AiTechRecommendDto;
 
 public interface InferenceService {
 
-    AiCandidateCreateDto.Response createCandidate(AiCandidateCreateDto.Request request);
-    AiNodeCreateDto.Response createNode(AiNodeCreateDto.Request request);
+    AiCandidateCreateDto.Response generateCandidate(AiCandidateCreateDto.Request request);
+    AiNodeCreateDto.Response generateNode(AiNodeCreateDto.Request request);
     AiTechRecommendDto.Response recommendTechStack(AiTechRecommendDto.Request request);
     AiPortfolioGenerateDto.Response generatePortfolio(AiPortfolioGenerateDto.Request request);
 }
