@@ -132,7 +132,7 @@ export default function Step6EpicSetup({
         {/* 에픽 목록 */}
         {data.epics.length > 0 && (
           <div className="flex flex-col gap-2">
-            <div className="max-h-[220px] overflow-y-auto chat-scrollbar pr-1 flex flex-col gap-2">
+            <div className="max-h-[140px] overflow-y-auto chat-scrollbar pr-1 flex flex-col gap-2">
               {data.epics.map((epic, index) => (
                 <div
                   key={index}
