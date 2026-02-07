@@ -130,8 +130,7 @@ export default function Step3Schedule({
             value={data.description}
             onChange={(e) => onChange({ description: e.target.value })}
             maxLength={500}
-            rows={5}
-            className="resize-none font-['Pretendard'] font-normal text-[13.5px] leading-relaxed p-[10px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors overflow-y-auto chat-scrollbar"
+            className="resize-none h-[120px] font-['Pretendard'] font-normal text-[13.5px] leading-relaxed p-[10px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors overflow-y-auto chat-scrollbar"
           />
           <div className="flex justify-end">
             <span className="font-['Pretendard'] font-normal text-[11px] leading-3 text-[var(--figma-text-dove-gray)]">
