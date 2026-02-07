@@ -30,7 +30,7 @@ EPIC_PROCESS_PROMPT = f"""당신은 수석 프로젝트 매니저(Senior PM)입�
    
    **[Description 구조 준수]**
    - 아래 제공된 `Description 구조`를 반드시 따르세요.(MarkDown 형식)
-   {{EPIC_DESCRIPTION_STRUCTURE}}
+   {EPIC_DESCRIPTION_STRUCTURE}
 
    **[Description 작성 시 주의사항 - 중요]**
    - 아래 `Few-Shot 예시`의 **구조(Format)**만 완벽하게 따르세요.
@@ -42,7 +42,7 @@ EPIC_PROCESS_PROMPT = f"""당신은 수석 프로젝트 매니저(Senior PM)입�
 - **In-Scope(할 것)**와 **Out-of-Scope(이번엔 안 할 것)**를 명확히 구분하여 개발 범위를 한정해 주세요.
 
 [Few-Shot 예시 (구조만 참고하세요)]
-{{EPIC_FEW_SHOT_EXAMPLE}}
+{EPIC_FEW_SHOT_EXAMPLE}
 
 [예시 - 내용은 도구를 통해 생성]
 {{
@@ -70,7 +70,7 @@ STORY_PROCESS_PROMPT = f"""당신은 프로덕트 오너(PO)입니다.
 
    **[Description 구조 준수]**
    - 아래 제공된 `Description 구조`를 **Markdown 포맷**으로 반드시 따르세요.
-   {{STORY_DESCRIPTION_STRUCTURE}}
+   {STORY_DESCRIPTION_STRUCTURE}
 
    **[Description 작성 시 주의사항 - 중요]**
    - 아래 `Few-Shot 예시`의 **구조(Format)**만 완벽하게 따르세요.
@@ -82,7 +82,7 @@ STORY_PROCESS_PROMPT = f"""당신은 프로덕트 오너(PO)입니다.
 - 인수 조건은 'Given/When/Then' 형식을 사용하여 테스트가 가능하도록 아주 구체적으로 작성하세요. 모호한 표현(예: '적절하게', '빠르게')은 지양하세요.
 
 [Few-Shot 예시 (구조만 참고하세요)]
-{{STORY_FEW_SHOT_EXAMPLE}}
+{STORY_FEW_SHOT_EXAMPLE}
 
 [예시 - 내용은 도구를 통해 생성]
 {{
@@ -115,7 +115,7 @@ TASK_PROCESS_PROMPT = f"""당신은 테크니컬 리드(Technical Lead)입니다
    
    **[Description 구조 준수]**
    - 아래 제공된 `Description 구조`를 **Markdown 포맷**으로 반드시 따르세요.
-   {{TASK_DESCRIPTION_STRUCTURE}}
+   {TASK_DESCRIPTION_STRUCTURE}
 
    **[Description 작성 시 주의사항 - 중요]**
    - 아래 `Few-Shot 예시`를 참고하여 작성하세요.
@@ -128,7 +128,7 @@ TASK_PROCESS_PROMPT = f"""당신은 테크니컬 리드(Technical Lead)입니다
 - 작업의 난이도(1~5)를 추산하세요.
 
 [Few-Shot 예시 (구조만 참고하세요)]
-{{TASK_SMJ_FEW_SHOT_EXAMPLE}}
+{TASK_SMJ_FEW_SHOT_EXAMPLE}
 
 [예시 - 내용은 도구를 통해 생성]
 {{
