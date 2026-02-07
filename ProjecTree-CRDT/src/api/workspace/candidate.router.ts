@@ -14,15 +14,24 @@ export interface Candidate {
 
 const router: Router = Router({ mergeParams: true });
 router.post("/:nodeId/candidate", (req: Request, res: Response) => {
+  console.log("create candidates start", new Date().toISOString());
   const { workspaceId, nodeId } = req.params;
   const body = req.body;
 
   if (!workspaceId || typeof workspaceId !== "string") {
-    return res.status(400).json({ message: "Invalid workspace Id" });
+    console.error("Invalid workspace Id", new Date().toLocaleDateString());
+    return res.status(400).json({
+      message: "Invalid workspace Id",
+      timeStamp: new Date().toISOString(),
+    });
   }
 
   if (!nodeId) {
-    return res.status(400).json({ message: "Invalid request" });
+    console.error("Invalid request", new Date().toLocaleDateString());
+    return res.status(400).json({
+      message: "Invalid request",
+      timeStamp: new Date().toISOString(),
+    });
   }
 
   const candidates: Partial<Candidate>[] = body.candidates;
@@ -45,9 +54,9 @@ router.post("/:nodeId/candidate", (req: Request, res: Response) => {
 
     const nodeCandidatesPending = doc.getMap("nodeCandidatesPending");
     nodeCandidatesPending.set(nodeId, false);
-
   });
 
+  console.log("create candidates success", new Date().toISOString());
   res.status(200).json({ status: "ok" });
 });
 

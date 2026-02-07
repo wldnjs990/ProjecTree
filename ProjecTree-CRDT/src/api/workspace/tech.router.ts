@@ -4,13 +4,17 @@ import { getYDocByRoom } from "../../yjs/ydoc-gateway";
 const router: Router = Router({ mergeParams: true });
 
 router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
+  console.log("create tech-stacks start", new Date().toISOString());
+
   const { workspaceId, nodeId } = req.params;
   const body = req.body;
 
   if (!workspaceId || !nodeId) {
+    console.error("Invalid params", new Date().toLocaleDateString());
     return res.status(400).json({ message: "Invalid params" });
   }
   if (!workspaceId || typeof workspaceId !== "string") {
+    console.error("Invalid workspace Id", new Date().toLocaleDateString());
     return res.status(400).json({ message: "Invalid workspace Id" });
   }
 
@@ -34,6 +38,7 @@ router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
     yNodeTech.set("selected", false);
   });
 
+  console.log("create tech-stacks success", new Date().toISOString());
   res.status(200).json({ status: "ok" });
 });
 
