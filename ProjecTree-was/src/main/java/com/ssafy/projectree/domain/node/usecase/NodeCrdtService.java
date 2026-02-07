@@ -1,6 +1,7 @@
 package com.ssafy.projectree.domain.node.usecase;
 
 import com.ssafy.projectree.domain.ai.dto.AiCandidateCreateDto;
+import com.ssafy.projectree.domain.ai.dto.AiTechRecommendDto;
 import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodePositionUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
@@ -36,6 +37,9 @@ public class NodeCrdtService {
 
     @Value("${crdt-server.new-custom-tech-path}")
     private String customTechPath;
+
+    @Value("${crdt-server.new-tech-path}")
+    private String techPath;
 
     @Value("${crdt-server.new-candidate-path}")
     private String candidatePath;
@@ -80,6 +84,16 @@ public class NodeCrdtService {
             // Transaction 과 별개로 동작하여 예외 반환 로직을 구현하는 것이 더 좋을 것같음
             log.error("CRDT 서버 전송 실패: {}", e.getMessage());
         }
+    }
+
+    public void sendTechCreationToCrdt(Long workspaceId, Long nodeId, AiTechRecommendDto.Response response) {
+        String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
+                .path(pathPrefix)
+                .path(techPath)
+                .build()
+                .toUriString();
+
+        sendNodeDataToCrdt(uriString, workspaceId, nodeId, response.getTechs());
     }
 
     public void sendCustomTechCreationToCrdt(

@@ -340,16 +340,23 @@ public class NodeServiceImpl implements NodeService {
     public TechStackRecommendDto.Response recommendTechStack(Long nodeId) {
         ProjectNode projectNode = findRootNode(nodeId);
         Class<? extends Node> nodeClass = nodeRepository.findNodeTypeById(nodeId).orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR, "노드를 찾을 수 없습니다"));
+
         if (!(nodeClass.equals(TaskNode.class) || nodeClass.equals(AdvanceNode.class))) {
             throw new BusinessLogicException(ErrorCode.NODE_TYPE_NOT_SUPPORT_ERROR, "해당 작업은 Task와 Advance 노드에서만 수행할 수 있습니다.");
         }
+
+        Long workspaceId = projectNode.getWorkspace().getId();
+
         AiTechRecommendDto.Response response = inferenceService.recommendTechStack(AiTechRecommendDto.Request.builder()
                 .nodeId(nodeId)
-                .workspaceId(projectNode.getWorkspace().getId())
+                .workspaceId(workspaceId)
                 .build());
+
+        nodeCrdtService.sendTechCreationToCrdt(workspaceId,
+                nodeId, response);
+
         return TechStackRecommendDto.Response.builder()
-                .techs(response.getTechs())
-                .comparison(response.getComparison())
+                .nodeId(nodeId)
                 .build();
     }
 
