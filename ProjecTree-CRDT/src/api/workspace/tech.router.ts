@@ -1,4 +1,5 @@
 import { Router, type Request, type Response } from "express";
+import * as Y from "yjs";
 import { getYDocByRoom } from "../../yjs/ydoc-gateway";
 
 export interface TechRecommendation {
@@ -14,7 +15,7 @@ export interface TechRecommendation {
 
 const router: Router = Router({ mergeParams: true });
 
-// tech-stacks 전체 교체 API (AI 추천 결과 저장)
+// AI 추천 - 전체 교체 API
 router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
   console.log("create tech-stacks start", new Date().toISOString());
 
@@ -40,11 +41,62 @@ router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
   const doc = getYDocByRoom(workspaceId as string);
   doc.transact(() => {
     const nodeTechRecommendations = doc.getMap("nodeTechRecommendations");
-    // 배열 전체를 한 번에 저장 (기존 것 덮어씌움)
-    nodeTechRecommendations.set(nodeId, techs);
+
+    let yArray = nodeTechRecommendations.get(nodeId) as Y.Array<TechRecommendation>;
+    if (!yArray) {
+      yArray = new Y.Array<TechRecommendation>();
+      nodeTechRecommendations.set(nodeId, yArray);
+    }
+
+    // 전체 교체: 기존 삭제 후 새로 추가
+    if (yArray.length > 0) {
+      yArray.delete(0, yArray.length);
+    }
+    yArray.push(techs);
   });
 
   console.log("create tech-stacks success", new Date().toISOString());
+  res.status(200).json({ status: "ok" });
+});
+
+// 커스텀 기술 추가 API - 기존 배열에 1개 추가
+router.post("/:nodeId/custom-tech-stacks", (req: Request, res: Response) => {
+  console.log("add custom tech-stack start", new Date().toISOString());
+
+  const { workspaceId, nodeId } = req.params;
+  const { tech } = req.body as { tech: TechRecommendation };
+
+  if (!workspaceId || !nodeId) {
+    console.error("Invalid params", new Date().toISOString());
+    return res.status(400).json({
+      message: "Invalid params",
+      timeStamp: new Date().toISOString(),
+    });
+  }
+
+  if (!tech) {
+    console.error("Invalid tech data", new Date().toISOString());
+    return res.status(400).json({
+      message: "Invalid tech data",
+      timeStamp: new Date().toISOString(),
+    });
+  }
+
+  const doc = getYDocByRoom(workspaceId as string);
+  doc.transact(() => {
+    const nodeTechRecommendations = doc.getMap("nodeTechRecommendations");
+
+    let yArray = nodeTechRecommendations.get(nodeId) as Y.Array<TechRecommendation>;
+    if (!yArray) {
+      yArray = new Y.Array<TechRecommendation>();
+      nodeTechRecommendations.set(nodeId, yArray);
+    }
+
+    // 기존 배열에 1개 추가
+    yArray.push([tech]);
+  });
+
+  console.log("add custom tech-stack success", new Date().toISOString());
   res.status(200).json({ status: "ok" });
 });
 
