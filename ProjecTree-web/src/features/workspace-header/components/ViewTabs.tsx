@@ -4,7 +4,6 @@ import type { ViewTab, ViewTabsProps } from '../types';
 const tabs: { value: ViewTab; label: string }[] = [
   { value: 'tree-editor', label: '트리 에디터' },
   { value: 'feature-spec', label: '기능 명세서' },
-  { value: 'tech-selection', label: '기술 선택 현황' },
   { value: 'portfolio', label: '포트폴리오' },
 ];
 
