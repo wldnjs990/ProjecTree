@@ -4,6 +4,8 @@ import type {
   Priority,
   Assignee,
   Candidate,
+  NodeType,
+  TaskType,
 } from '../types/nodeDetail';
 
 // 편집 가능한 노드 상세 필드 타입
@@ -28,8 +30,18 @@ interface NodeDetailState {
 
   // === 후보 미리보기 상태 ===
   candidatePreviewMode: boolean;
+  previewKind: 'candidate' | 'custom' | null;
   previewCandidate: Candidate | null;
   previewNodePosition: { xpos: number; ypos: number } | null;
+  customDraft: {
+    name: string;
+    description: string;
+    nodeType: NodeType;
+    taskType: TaskType;
+    parentNodeId: number;
+    workspaceId: number;
+    previewNodeId: string;
+  } | null;
   isCreatingNode: boolean;
 
   // === 단순 setter ===
@@ -42,12 +54,30 @@ interface NodeDetailState {
   setSelectedCandidateIds: (ids: number[]) => void;
   setIsCreatingNode: (creating: boolean) => void;
   setPreviewNodePosition: (position: { xpos: number; ypos: number }) => void;
+  updateCustomDraft: (
+    patch: Partial<{
+      name: string;
+      description: string;
+    }>
+  ) => void;
 
   // === 복합 setter ===
   openSidebar: (nodeId: string) => void;
   closeSidebar: () => void;
   enterCandidatePreview: (
     candidate: Candidate,
+    position: { xpos: number; ypos: number }
+  ) => void;
+  enterCustomPreview: (
+    draft: {
+      name: string;
+      description: string;
+      nodeType: NodeType;
+      taskType: TaskType;
+      parentNodeId: number;
+      workspaceId: number;
+      previewNodeId: string;
+    },
     position: { xpos: number; ypos: number }
   ) => void;
   exitCandidatePreview: () => void;
@@ -66,8 +96,10 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
 
   // === 후보 미리보기 초기 상태 ===
   candidatePreviewMode: false,
+  previewKind: null,
   previewCandidate: null,
   previewNodePosition: null,
+  customDraft: null,
   isCreatingNode: false,
 
   // === 단순 setter ===
@@ -80,6 +112,10 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   setSelectedCandidateIds: (ids) => set({ selectedCandidateIds: ids }),
   setIsCreatingNode: (creating) => set({ isCreatingNode: creating }),
   setPreviewNodePosition: (position) => set({ previewNodePosition: position }),
+  updateCustomDraft: (patch) =>
+    set((state) =>
+      state.customDraft ? { customDraft: { ...state.customDraft, ...patch } } : {}
+    ),
 
   // === 복합 setter ===
   openSidebar: (nodeId) => {
@@ -95,8 +131,10 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       selectedTechId: null,
       selectedCandidateIds: [],
       candidatePreviewMode: false,
+      previewKind: null,
       previewCandidate: null,
       previewNodePosition: null,
+      customDraft: null,
       isCreatingNode: false,
     });
   },
@@ -104,16 +142,29 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   enterCandidatePreview: (candidate, position) => {
     set({
       candidatePreviewMode: true,
+      previewKind: 'candidate',
       previewCandidate: candidate,
       previewNodePosition: position,
+      customDraft: null,
+    });
+  },
+  enterCustomPreview: (draft, position) => {
+    set({
+      candidatePreviewMode: true,
+      previewKind: 'custom',
+      previewCandidate: null,
+      previewNodePosition: position,
+      customDraft: draft,
     });
   },
 
   exitCandidatePreview: () => {
     set({
       candidatePreviewMode: false,
+      previewKind: null,
       previewCandidate: null,
       previewNodePosition: null,
+      customDraft: null,
       isCreatingNode: false,
     });
   },
@@ -128,8 +179,10 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       selectedTechId: null,
       selectedCandidateIds: [],
       candidatePreviewMode: false,
+      previewKind: null,
       previewCandidate: null,
       previewNodePosition: null,
+      customDraft: null,
       isCreatingNode: false,
     }),
 }));
@@ -170,9 +223,15 @@ export const useSelectedCandidateIds = () =>
 export const useCandidatePreviewMode = () =>
   useNodeDetailStore((state) => state.candidatePreviewMode);
 
+export const usePreviewKind = () =>
+  useNodeDetailStore((state) => state.previewKind);
+
 /** 미리보기 중인 후보 노드 */
 export const usePreviewCandidate = () =>
   useNodeDetailStore((state) => state.previewCandidate);
+
+export const useCustomPreviewDraft = () =>
+  useNodeDetailStore((state) => state.customDraft);
 
 /** 미리보기 노드 위치 (서버 전송용) */
 export const usePreviewNodePosition = () =>
