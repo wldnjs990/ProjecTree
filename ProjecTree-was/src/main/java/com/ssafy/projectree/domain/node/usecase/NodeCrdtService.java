@@ -1,6 +1,7 @@
 package com.ssafy.projectree.domain.node.usecase;
 
 import com.ssafy.projectree.domain.ai.dto.AiCandidateCreateDto;
+import com.ssafy.projectree.domain.ai.dto.AiTechRecommendDto;
 import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodePositionUpdateDto;
 import com.ssafy.projectree.domain.node.api.dto.schema.NodeSchema;
@@ -34,6 +35,9 @@ public class NodeCrdtService {
     @Value("${crdt-server.new-node-path}")
     private String nodePath;
 
+    @Value("${crdt-server.new-custom-tech-path}")
+    private String customTechPath;
+
     @Value("${crdt-server.new-tech-path}")
     private String techPath;
 
@@ -42,7 +46,7 @@ public class NodeCrdtService {
 
     @Async("nodePositionExecutor")
     @Transactional
-    public void savePositionAsync(Long workspaceId, List<NodePositionUpdateDto.NodePositionItem> nodes) {
+    public void savePositionAsync( List<NodePositionUpdateDto.NodePositionItem> nodes) {
         try {
             for (NodePositionUpdateDto.NodePositionItem dto : nodes) {
                 //https://ssafy.atlassian.net/browse/S14P11D107-286
@@ -50,7 +54,6 @@ public class NodeCrdtService {
                 // gpt 는 Spring Batch는 쓰지 말고, @Async + JDBC batchUpdate 또는
                 // PostgreSQL JSON bulk update가 정답이라 함
                 nodeRepository.updatePosition(
-//                        workspaceId,
                         dto.getNodeId(),
                         dto.getPosition().getX(),
                         dto.getPosition().getY()
@@ -82,12 +85,22 @@ public class NodeCrdtService {
         }
     }
 
-    public void sendTechCreationToCrdt(
+    public void sendTechCreationToCrdt(Long workspaceId, Long nodeId, AiTechRecommendDto.Response response) {
+        String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
+                .path(pathPrefix)
+                .path(techPath)
+                .build()
+                .toUriString();
+
+        sendNodeDataToCrdt(uriString, workspaceId, nodeId, response.getTechs());
+    }
+
+    public void sendCustomTechCreationToCrdt(
             Long workspaceId,
             Long nodeId, CustomTechCreateDto.Response response) {
         String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
                 .path(pathPrefix)
-                .path(techPath)
+                .path(customTechPath)
                 .build()
                 .toUriString();
 
