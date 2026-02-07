@@ -79,11 +79,7 @@ export function EpicGroup({
       <div className="flex justify-center w-full min-w-0 px-3">
         <TruncatedLabel
           text={data.label}
-          className="font-medium text-sm cursor-pointer hover:underline text-center"
-          onClick={(e) => {
-            e.stopPropagation();
-            onNodeClick?.(epic.id);
-          }}
+          className="font-medium text-sm text-center"
         />
       </div>
       <div className="flex justify-center">
