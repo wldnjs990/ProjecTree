@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/internal")
+@RequestMapping("/internal/nodes")
 @RequiredArgsConstructor
 public class NodeInternalController {
 
     private final NodeCrdtService nodeCrdtService;
     private final NodeService nodeService;
 
-    @PatchMapping("/nodes/{nodeId}/detail")
+    @PatchMapping("/{nodeId}/detail")
     public CommonResponse<Void> saveNodeDetail(
             @PathVariable Long nodeId,
             @RequestBody NodeUpdateDto.Request request
@@ -35,20 +35,18 @@ public class NodeInternalController {
         return CommonResponse.success(SuccessCode.UPDATED, null);
     }
 
-    @PatchMapping("/workspaces/{workspaceId}/nodes/positions")
+    @PatchMapping("/positions")
     public CommonResponse<Void> updateNodePositions(
-            @PathVariable Long workspaceId,
             @RequestBody NodePositionUpdateDto.Request request
     ) {
         nodeCrdtService.savePositionAsync(
-                workspaceId,
                 request.getNodes()
         );
 
         return CommonResponse.success(SuccessCode.UPDATED, null); // 202
     }
 
-    @PostMapping("/nodes/{nodeId}/tech")
+    @PostMapping("/{nodeId}/tech")
     public CommonResponse<Void> selectNodeTech(
             @PathVariable Long nodeId, @RequestBody NodeTechSelectDto.Request request
     ) {
@@ -57,7 +55,7 @@ public class NodeInternalController {
         return CommonResponse.success(SuccessCode.UPDATED, null);
     }
 
-    @DeleteMapping("/nodes/{nodeId}")
+    @DeleteMapping("/{nodeId}")
     public CommonResponse<Void> deleteNode(
             @PathVariable Long nodeId
     ) {

@@ -8,8 +8,8 @@ import com.ssafy.projectree.domain.member.api.dto.schemas.MemberSchema;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.domain.member.model.repository.MemberRepository;
 import com.ssafy.projectree.domain.node.api.dto.CandidateCreateDto;
-import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.CustomNodeDto;
+import com.ssafy.projectree.domain.node.api.dto.CustomTechCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeCreateDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeReadDto;
 import com.ssafy.projectree.domain.node.api.dto.NodeTreeReadDto;
@@ -173,7 +173,7 @@ public class NodeServiceImpl implements NodeService {
 
         for (NodeWithParentSchema node : flatNodes) {
             Priority priority = node.getPriority() != null ? Priority.valueOf(node.getPriority()) : null;
-            boolean isCompleted = "COMPLETED".equals(node.getStatus());
+            boolean isCompleted = "DONE".equals(node.getStatus());
 
             if (priority != null) {
                 switch (priority) {
@@ -298,8 +298,11 @@ public class NodeServiceImpl implements NodeService {
                 .nodeId(parentId)
                 .candidateCount(3)
                 .build());
+
+        nodeCrdtService.sendCandidatesCreationToCrdt(workspaceId, parentId, candidate);
+
         return CandidateCreateDto.Response.builder()
-                .candidates(candidate.getCandidates())
+                .nodeId(parentId)
                 .build();
     }
 
@@ -341,16 +344,23 @@ public class NodeServiceImpl implements NodeService {
     public TechStackRecommendDto.Response recommendTechStack(Long nodeId) {
         ProjectNode projectNode = findRootNode(nodeId);
         Class<? extends Node> nodeClass = nodeRepository.findNodeTypeById(nodeId).orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR, "노드를 찾을 수 없습니다"));
+
         if (!(nodeClass.equals(TaskNode.class) || nodeClass.equals(AdvanceNode.class))) {
             throw new BusinessLogicException(ErrorCode.NODE_TYPE_NOT_SUPPORT_ERROR, "해당 작업은 Task와 Advance 노드에서만 수행할 수 있습니다.");
         }
+
+        Long workspaceId = projectNode.getWorkspace().getId();
+
         AiTechRecommendDto.Response response = inferenceService.recommendTechStack(AiTechRecommendDto.Request.builder()
                 .nodeId(nodeId)
-                .workspaceId(projectNode.getWorkspace().getId())
+                .workspaceId(workspaceId)
                 .build());
+
+        nodeCrdtService.sendTechCreationToCrdt(workspaceId,
+                nodeId, response);
+
         return TechStackRecommendDto.Response.builder()
-                .techs(response.getTechs())
-                .comparison(response.getComparison())
+                .nodeId(nodeId)
                 .build();
     }
 
@@ -450,7 +460,7 @@ public class NodeServiceImpl implements NodeService {
 
         nodeTechStackRepository.save(nodeTechStack);
 
-        nodeCrdtService.sendTechCreationToCrdt(workspaceId, nodeId, CustomTechCreateDto.Response.builder()
+        nodeCrdtService.sendCustomTechCreationToCrdt(workspaceId, nodeId, CustomTechCreateDto.Response.builder()
                 .techVocaId(techVocaId)
                 .techName(techVocabulary.getName())
                 .build());

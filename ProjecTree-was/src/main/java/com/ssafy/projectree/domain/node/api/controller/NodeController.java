@@ -49,6 +49,7 @@ public class NodeController implements NodeDocsController {
     }
 
     @PostMapping("/nodes/{node-id}/candidates")
+<<<<<<< ProjecTree-was/src/main/java/com/ssafy/projectree/domain/node/api/controller/NodeController.java
     public CommonResponse<CandidateCreateDto.Response> createCandidates(@PathVariable(name = "node-id") Long parentId) {
 
         return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.CANDIDATE, String.valueOf(parentId), () -> nodeService.generateCandidate(parentId)));
@@ -59,6 +60,11 @@ public class NodeController implements NodeDocsController {
         nodeService.deleteCandidate(candidateId);
         return CommonResponse.success(SuccessCode.SUCCESS, null);
     }
+    
+    public CommonResponse<CandidateCreateDto.Response> createCandidates(@PathVariable(name = "node-id") Long parentId,
+                                                                        @RequestBody CandidateCreateDto.Request request) {
+        return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.CANDIDATE, String.valueOf(parentId), () -> nodeService.createCandidate(parentId, request.getWorkspaceId())));
+    }
 
     @PostMapping("/nodes/{node-id}/tech-stack/recommendation")
     public CommonResponse<TechStackRecommendDto.Response> recommendTechStack(@PathVariable(name = "node-id") Long nodeId) {
@@ -67,7 +73,7 @@ public class NodeController implements NodeDocsController {
 
     @PostMapping("/nodes/{nodeId}/tech-stack")
     public CommonResponse<Void> createCustomTechStack(@PathVariable Long nodeId, @RequestBody CustomTechCreateDto.Request request) {
-        nodeService.createCustomTechStack(nodeId,request.getWorkspaceId(), request.getTechVocaId());
+        nodeService.createCustomTechStack(nodeId, request.getWorkspaceId(), request.getTechVocaId());
         return CommonResponse.success(SuccessCode.SUCCESS, null);
     }
 

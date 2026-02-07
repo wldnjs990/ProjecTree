@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
 
 @Getter
 @Setter
@@ -22,17 +23,18 @@ import lombok.Setter;
 @Table(name = "workspace_tech_stack")
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE workspace_tech_stack SET deleted_at = NOW() WHERE id = ?")
 public class WorkspaceTechStack extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "workspace_id", nullable = false)
-	private Workspace workspace;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workspace_id", nullable = false)
+    private Workspace workspace;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "tech_vocab_id", nullable = false)
-	private TechVocabulary techVocabulary;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tech_vocab_id", nullable = false)
+    private TechVocabulary techVocabulary;
 }

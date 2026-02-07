@@ -88,6 +88,8 @@ public class SecurityConfig {
                                 .requestMatchers("/internal/**").permitAll()
                                 .requestMatchers("/auth/members/signup").hasAuthority(AuthRole.ROLE_GUEST.name())
                                 .requestMatchers("/", "/login/**", "/oauth2/**").permitAll()
+                                .requestMatchers("/teams/**").authenticated()
+                                .requestMatchers("/workspaces/**").authenticated()
                                 .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(auth -> auth

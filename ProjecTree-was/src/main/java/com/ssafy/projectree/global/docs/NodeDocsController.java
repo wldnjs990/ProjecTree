@@ -144,7 +144,8 @@ public interface NodeDocsController {
     })
     CommonResponse<CandidateCreateDto.Response> createCandidates(
             @Parameter(description = "부모 노드 ID", example = "1")
-            @PathVariable(name = "node-id") Long parentId
+            @PathVariable(name = "node-id") Long parentId,
+            @RequestBody CandidateCreateDto.Request request
     );
 
     @Operation(

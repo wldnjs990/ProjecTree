@@ -44,4 +44,9 @@ public class S3Service {
         return amazonS3Client.getUrl(bucket, path).toString();
     }
 
+    public void delete(Long workspaceId, String savedFileName) {
+        String path = "workspace/" + workspaceId + "/" + savedFileName;
+        amazonS3Client.deleteObject(bucket, path);
+    }
+
 }
