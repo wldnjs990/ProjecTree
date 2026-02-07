@@ -29,7 +29,7 @@ pipeline {
                         -v ${HOST_WORKSPACE}/ProjecTree-web:/app \
                         -w /app \
                         node:24-alpine \
-                        sh -c "npm install -g pnpm && pnpm install && pnpm build"
+                        sh -c "npm install -g pnpm && pnpm install && pnpm vite build"
                 '''
             }
         }
