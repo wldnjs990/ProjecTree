@@ -3,7 +3,7 @@ Expert nodes for tech stack recommendation.
 """
 from dotenv import load_dotenv
 from langchain_core.runnables import RunnableConfig
-from app.core.llm import openai_gpt_5_2
+from app.core.llm import openai_mini_llm
 from deepagents import create_deep_agent
 from langchain.agents.structured_output import ProviderStrategy
 from app.agents.recommend.state import RecommendationState
