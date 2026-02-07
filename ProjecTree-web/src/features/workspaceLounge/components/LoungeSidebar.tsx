@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useUserStore, useUpdateNickname } from '@/shared/stores/userStore';
-import { updateNickname, deleteMember } from '@/apis/member.api';
+import { updateNickname } from '@/apis/member.api';
 import { logout } from '@/apis/oauth.api';
 import {
   Dialog,
@@ -39,7 +39,6 @@ import {
   ChevronRight,
   Settings,
   Pencil,
-  LogOut,
   House,
 } from 'lucide-react';
 
@@ -154,16 +153,11 @@ function ProfileDialog({ nickname, email }: { nickname: string; email: string })
     }
   }, [temp, updateStoreNickname, setEditing, isValid]);
 
-  const handleDeleteAccount = useCallback(async () => {
-    try {
-      await deleteMember();
-      setOpen(false);
-      await logout(); // accessToken + user 모두 정리
-      navigate('/'); // 홈으로 이동
-    } catch (_error) {
-      alert('회원 탈퇴에 실패했습니다. 다시 시도해주세요.');
-    }
-  }, [setOpen, navigate]);
+  const handleLogout = useCallback(async () => {
+    await logout();
+    useUserStore.getState().clearUser();
+    navigate('/login');
+  }, [navigate]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -295,7 +289,7 @@ function ProfileDialog({ nickname, email }: { nickname: string; email: string })
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <button className="text-sm text-zinc-400 hover:text-zinc-500 transition-colors">
-                  탈퇴하기
+                  로그아웃
                 </button>
               </AlertDialogTrigger>
 
@@ -313,11 +307,10 @@ function ProfileDialog({ nickname, email }: { nickname: string; email: string })
               >
                 <AlertDialogHeader className="p-6">
                   <AlertDialogTitle className="text-zinc-900 font-bold">
-                    정말 탈퇴하시겠습니까?
+                    로그아웃 하시겠습니까?
                   </AlertDialogTitle>
                   <AlertDialogDescription className="text-zinc-500">
-                    이 작업은 되돌릴 수 없습니다. 계정과 관련된 모든 데이터가
-                    영구적으로 삭제됩니다.
+                    로그아웃하면 다시 로그인해야 합니다.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-100">
@@ -325,10 +318,10 @@ function ProfileDialog({ nickname, email }: { nickname: string; email: string })
                     취소
                   </AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={handleDeleteAccount}
+                    onClick={handleLogout}
                     className="border border-zinc-200 text-zinc-600 hover:bg-zinc-200 bg-zinc-100 rounded-xl"
                   >
-                    탈퇴하기
+                    로그아웃
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -463,61 +456,6 @@ export function LoungeSidebar({
 
         {!collapsed && (
           <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-zinc-100/50 transition-colors"
-                        aria-label="로그아웃"
-                      >
-                        <LogOut className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent
-                      className="
-                      bg-white/92
-                      backdrop-blur-2xl
-                      border border-white/60
-                      rounded-3xl
-                      shadow-2xl
-                      z-[1001]
-                      p-0
-                      overflow-hidden
-                    "
-                    >
-                      <AlertDialogHeader className="p-6">
-                        <AlertDialogTitle className="text-zinc-900 font-bold">
-                          로그아웃 하시겠습니까?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-zinc-500">
-                          로그아웃하면 다시 로그인해야 합니다.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter className="px-6 py-4 bg-zinc-50/50 border-t border-zinc-100">
-                        <AlertDialogCancel className="border-zinc-200 text-zinc-600 hover:bg-white bg-transparent rounded-xl">
-                          취소
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={async () => {
-                            await logout();
-                            useUserStore.getState().clearUser();
-                            navigate('/login');
-                          }}
-                          className="border border-zinc-200 text-zinc-600 hover:bg-zinc-200 bg-zinc-100 rounded-xl"
-                        >
-                          로그아웃
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">로그아웃</TooltipContent>
-            </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div>
