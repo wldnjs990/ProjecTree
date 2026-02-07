@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 # [변경] 메인 모델을 gpt-5.2로 교체
-llm = openai_gpt_5_2
+llm = openai_mini_llm
 # [변경] 검색 툴을 메인 에이전트가 직접 사용
 tools = [restricted_search, url_validator]
 
