@@ -66,11 +66,10 @@ class PortfolioGenerateRequest(BaseModel):
 class PortfolioGenerateResponse(BaseModel):
     """포트폴리오 생성 응답 스키마"""
 
-    portfolio_content: str = Field(
-        ..., alias="portfolioContent", description="생성된 포트폴리오 내용 (Markdown)"
+    content: str = Field(
+        ..., alias="content", description="생성된 포트폴리오 내용 (Markdown)"
     )
-    summary: Optional[str] = Field(None, description="포트폴리오 요약")
-
+    
     class Config:
         populate_by_name = True
         by_alias = True

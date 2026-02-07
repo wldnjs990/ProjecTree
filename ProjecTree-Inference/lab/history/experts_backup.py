@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from langchain_core.runnables import RunnableConfig
 from app.core.llm import openai_gpt_5_2
 from deepagents import create_deep_agent
+from langchain.agents import create_agent
 from langchain.agents.structured_output import ProviderStrategy
 from app.agents.recommend.state import RecommendationState
 from app.agents.tools.search import restricted_search
@@ -32,13 +33,12 @@ tools = [restricted_search]
 
 
 def create_expert_agent(system_prompt: str):
-    return create_deep_agent(
+    return create_agent(
         llm, 
         tools, 
         system_prompt=system_prompt, 
         response_format=ProviderStrategy(TechList),
-        # [변경] 서브 에이전트 제거
-        subagents=[],
+ 
     )
 
 

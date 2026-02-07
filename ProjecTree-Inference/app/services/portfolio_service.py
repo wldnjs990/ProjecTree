@@ -74,13 +74,11 @@ class PortfolioService:
             logger.info(f"[PortfolioService] portfolio_graph 호출 완료")
             
             portfolio_content = result.get("portfolio_content", "포트폴리오 생성에 실패했습니다.")
-            summary = result.get("summary", f"{request.project_title} 프로젝트 포트폴리오")
             
             logger.info(f"[PortfolioService] 포트폴리오 생성 완료 - project_title: {request.project_title}")
             
             return PortfolioGenerateResponse(
-                portfolio_content=portfolio_content,
-                summary=summary
+                content=portfolio_content,
             )
             
         except Exception as e:

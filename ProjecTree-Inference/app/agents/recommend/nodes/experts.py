@@ -4,7 +4,7 @@ Expert nodes for tech stack recommendation.
 from dotenv import load_dotenv
 from langchain_core.runnables import RunnableConfig
 from app.core.llm import openai_mini_llm
-from deepagents import create_deep_agent
+from langchain.agents import create_agent
 from langchain.agents.structured_output import ProviderStrategy
 from app.agents.recommend.state import RecommendationState
 from app.agents.tools.search import restricted_search
@@ -30,13 +30,11 @@ llm = openai_mini_llm
 tools = [restricted_search, url_validator]
 
 def create_expert_agent(system_prompt: str):
-    return create_deep_agent(
+    return create_agent(
         llm, 
         tools, 
         system_prompt=system_prompt, 
-        response_format=ProviderStrategy(TechList),
-        # [변경] 서브 에이전트 제거: 메인 에이전트가 단독 수행
-        subagents=[],
+        response_format=ProviderStrategy(TechList)
     )
 
 

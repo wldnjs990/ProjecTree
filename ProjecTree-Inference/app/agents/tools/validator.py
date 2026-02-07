@@ -51,8 +51,16 @@ def url_validator(url: str) -> bool:
     `ref` 필드에 URL을 넣기 전에 반드시 이 도구로 검증해야 합니다.
     """
     import requests
+    from urllib.parse import urlparse
+
     try:
-        # 2초 타임아웃으로 빠르게 검증
+        # 1. 루트 도메인 체크 (메인 페이지 방지)
+        parsed = urlparse(url)
+        # path가 비어있거나 '/' 인 경우, 혹은 쿼리/프래그먼트 없이 도메인만 있는 경우
+        if parsed.path in ["", "/"]:
+            return False
+            
+        # 2. HTTP 상태 코드 확인 (2초 타임아웃)
         response = requests.head(url, timeout=2, allow_redirects=True)
         return response.status_code == 200
     except Exception:
