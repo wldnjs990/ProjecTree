@@ -18,27 +18,27 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
     Optional<Class<? extends Node>> findNodeTypeById(@Param("nodeId") Long nodeId);
 
     @Query("""
-        SELECT tn
-        FROM TaskNode tn
-        JOIN NodeTree nt ON tn.id = nt.descendant.id
-        JOIN ProjectNode pn ON nt.ancestor.id = pn.id
-        WHERE pn.workspace.id = :workspaceId
-        AND tn.member.id = :memberId
-        AND tn.status = 'DONE'
-        AND tn.deletedAt IS NULL
-    """)
+                SELECT tn
+                FROM TaskNode tn
+                JOIN NodeTree nt ON tn.id = nt.descendant.id
+                JOIN ProjectNode pn ON nt.ancestor.id = pn.id
+                WHERE pn.workspace.id = :workspaceId
+                AND tn.member.id = :memberId
+                AND tn.status = 'DONE'
+                AND tn.deletedAt IS NULL
+            """)
     List<TaskNode> findTaskNodesByWorkspaceAndMember(@Param("workspaceId") Long workspaceId, @Param("memberId") Long memberId);
 
     @Query("""
-        SELECT an
-        FROM AdvanceNode an
-        JOIN NodeTree nt ON an.id = nt.descendant.id
-        JOIN ProjectNode pn ON nt.ancestor.id = pn.id
-        WHERE pn.workspace.id = :workspaceId
-        AND an.member.id = :memberId
-        AND an.status = 'DONE'
-        AND an.deletedAt IS NULL
-    """)
+                SELECT an
+                FROM AdvanceNode an
+                JOIN NodeTree nt ON an.id = nt.descendant.id
+                JOIN ProjectNode pn ON nt.ancestor.id = pn.id
+                WHERE pn.workspace.id = :workspaceId
+                AND an.member.id = :memberId
+                AND an.status = 'DONE'
+                AND an.deletedAt IS NULL
+            """)
     List<AdvanceNode> findAdvanceNodesByWorkspaceAndMember(@Param("workspaceId") Long workspaceId, @Param("memberId") Long memberId);
 
     @Modifying
@@ -48,8 +48,7 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
             n.yPos = :y
             where n.id = :id
             """)
-    void updatePosition(Long id, /*Long workspaceId,*/ double x, double y);
-
+    void updatePosition(Long id, double x, double y);
 
 
     @Query("""
@@ -73,7 +72,7 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
                     ON n.id = tn.id
                 LEFT JOIN AdvanceNode an
                     on n.id = an.id
-                    
+            
                 WHERE n.id IN (
                     SELECT child.descendant.id
                     FROM NodeTree child

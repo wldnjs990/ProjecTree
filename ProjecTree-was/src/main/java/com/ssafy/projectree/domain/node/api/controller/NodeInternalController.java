@@ -41,7 +41,6 @@ public class NodeInternalController {
             @RequestBody NodePositionUpdateDto.Request request
     ) {
         nodeCrdtService.savePositionAsync(
-                workspaceId,
                 request.getNodes()
         );
 

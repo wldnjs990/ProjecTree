@@ -46,7 +46,7 @@ public class NodeCrdtService {
 
     @Async("nodePositionExecutor")
     @Transactional
-    public void savePositionAsync(Long workspaceId, List<NodePositionUpdateDto.NodePositionItem> nodes) {
+    public void savePositionAsync( List<NodePositionUpdateDto.NodePositionItem> nodes) {
         try {
             for (NodePositionUpdateDto.NodePositionItem dto : nodes) {
                 //https://ssafy.atlassian.net/browse/S14P11D107-286
@@ -54,7 +54,6 @@ public class NodeCrdtService {
                 // gpt 는 Spring Batch는 쓰지 말고, @Async + JDBC batchUpdate 또는
                 // PostgreSQL JSON bulk update가 정답이라 함
                 nodeRepository.updatePosition(
-//                        workspaceId,
                         dto.getNodeId(),
                         dto.getPosition().getX(),
                         dto.getPosition().getY()
