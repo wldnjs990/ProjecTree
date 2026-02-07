@@ -178,7 +178,7 @@ export function MemberManagementModal({
                                 <Button
                                     onClick={handleSendInvite}
                                     disabled={isLoading}
-                                    className="w-full h-11 mt-8 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full h-11 mt-8 bg-[var(--figma-neon-green)] text-[var(--figma-tech-green)] font-bold rounded-xl transition-all hover:bg-[var(--figma-neon-green)]/90 hover:shadow-[0_0_15px_rgba(74,222,128,0.4)] gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Mail className="h-4 w-4" />
                                     {isLoading ? '전송 중...' : '초대 메일 보내기'}
