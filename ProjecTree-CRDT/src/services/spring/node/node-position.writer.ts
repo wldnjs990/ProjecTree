@@ -26,7 +26,7 @@ export async function sendBatchToSpring(
       new Date().toISOString(),
     );
     const result = await springInternalClient.patch(
-      `/api/internal//nodes/positions`,
+      `/api/internal/nodes/positions`,
       {
         nodes: payload.nodes,
       },
