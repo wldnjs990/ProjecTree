@@ -92,7 +92,7 @@ export function LeftSidebar({
           <div className="flex h-full flex-col min-w-0 w-full overflow-hidden">
             <div
               className={cn(
-                'flex items-center justify-between px-4 py-2 border-b border-zinc-300/60 bg-white/60 backdrop-blur-sm',
+                'flex items-center justify-between px-4 h-10 border-b border-zinc-300/60 bg-white/60 backdrop-blur-sm',
                 collapsed && 'justify-center px-0 border-b-0 bg-transparent'
               )}
             >

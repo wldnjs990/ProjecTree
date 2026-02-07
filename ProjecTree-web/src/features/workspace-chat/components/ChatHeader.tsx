@@ -17,7 +17,7 @@ export const ChatHeader = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-between border-b border-zinc-300/60 bg-white/60 backdrop-blur-sm px-4 py-2',
+        'flex items-center justify-between border-b border-zinc-300/60 bg-white/60 backdrop-blur-sm px-4 h-10',
         collapsed && 'justify-center px-0 border-b-0 bg-transparent'
       )}
     >
