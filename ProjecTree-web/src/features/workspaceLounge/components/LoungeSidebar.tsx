@@ -161,16 +161,21 @@ function ProfileDialog({ nickname, email }: { nickname: string; email: string })
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7 text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-zinc-100/50 transition-colors"
-          aria-label="프로필 설정 열기"
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
-      </DialogTrigger>
+      <Tooltip open={open ? false : undefined}>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-zinc-100/50 transition-colors"
+              aria-label="프로필 설정 열기"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">프로필 설정</TooltipContent>
+      </Tooltip>
 
       <DialogContent
         className="
@@ -456,14 +461,7 @@ export function LoungeSidebar({
 
         {!collapsed && (
           <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  <ProfileDialog nickname={nickname} email={email} />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">프로필 설정</TooltipContent>
-            </Tooltip>
+            <ProfileDialog nickname={nickname} email={email} />
           </div>
         )}
       </div>
