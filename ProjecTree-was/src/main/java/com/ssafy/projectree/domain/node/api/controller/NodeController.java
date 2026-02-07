@@ -16,6 +16,7 @@ import com.ssafy.projectree.global.api.response.CommonResponse;
 import com.ssafy.projectree.global.docs.NodeDocsController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,10 +45,22 @@ public class NodeController implements NodeDocsController {
     public CommonResponse<NodeCreateDto.Response> createNode(@PathVariable(name = "candidate-id") Long candidateId,
                                                              @PathVariable(name = "node-id") Long parentId,
                                                              @RequestBody NodeCreateDto.Request request) {
-        return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.NODE, String.valueOf(candidateId), () -> nodeService.createNode(candidateId, parentId, request)));
+        return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.NODE, String.valueOf(candidateId), () -> nodeService.generateNode(candidateId, parentId, request)));
     }
 
     @PostMapping("/nodes/{node-id}/candidates")
+<<<<<<< ProjecTree-was/src/main/java/com/ssafy/projectree/domain/node/api/controller/NodeController.java
+    public CommonResponse<CandidateCreateDto.Response> createCandidates(@PathVariable(name = "node-id") Long parentId) {
+
+        return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.CANDIDATE, String.valueOf(parentId), () -> nodeService.generateCandidate(parentId)));
+    }
+
+    @DeleteMapping("/nodes/candidates/{candidate-id}")
+    public CommonResponse<Void> deleteCandidate(@PathVariable(name = "candidate-id") Long candidateId) {
+        nodeService.deleteCandidate(candidateId);
+        return CommonResponse.success(SuccessCode.SUCCESS, null);
+    }
+    
     public CommonResponse<CandidateCreateDto.Response> createCandidates(@PathVariable(name = "node-id") Long parentId,
                                                                         @RequestBody CandidateCreateDto.Request request) {
         return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.CANDIDATE, String.valueOf(parentId), () -> nodeService.createCandidate(parentId, request.getWorkspaceId())));

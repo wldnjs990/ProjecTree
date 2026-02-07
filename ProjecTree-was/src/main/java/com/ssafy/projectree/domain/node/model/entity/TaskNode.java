@@ -38,6 +38,6 @@ public class TaskNode extends Node{
 
 	@Override
 	public int getCandidateLimit() {
-		return 0;
+		return 6;
 	}
 }
