@@ -13,6 +13,4 @@ export interface NodeData {
   assignee?: { id: string; name: string; initials: string; color: AvatarColor };
 }
 
-export interface FeatureSpecViewProps {
-  onNodeClick?: (nodeId: string) => void;
-}
+export interface FeatureSpecViewProps {}

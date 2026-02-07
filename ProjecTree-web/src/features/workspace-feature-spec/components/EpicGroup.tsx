@@ -22,18 +22,15 @@ import type { NodeData } from '../types';
 interface EpicGroupProps {
   epic: Node;
   stories: Array<Node & { tasks: Array<Node & { advanceds: Node[] }> }>;
-  onNodeClick?: (nodeId: string) => void;
   StoryGroupComponent: React.ComponentType<{
     story: Node;
     tasks: Array<Node & { advanceds: Node[] }>;
-    onNodeClick?: (nodeId: string) => void;
   }>;
 }
 
 export function EpicGroup({
   epic,
   stories,
-  onNodeClick,
   StoryGroupComponent,
 }: EpicGroupProps) {
   const data = epic.data as unknown as NodeData;
@@ -125,7 +122,6 @@ export function EpicGroup({
               key={story.id}
               story={story}
               tasks={story.tasks}
-              onNodeClick={onNodeClick}
             />
           ))}
         </Accordion>

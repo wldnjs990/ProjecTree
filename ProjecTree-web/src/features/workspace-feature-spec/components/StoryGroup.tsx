@@ -22,18 +22,15 @@ import type { NodeData } from '../types';
 interface StoryGroupProps {
   story: Node;
   tasks: Array<Node & { advanceds: Node[] }>;
-  onNodeClick?: (nodeId: string) => void;
   TaskGroupComponent: React.ComponentType<{
     task: Node;
     advanceds: Node[];
-    onNodeClick?: (nodeId: string) => void;
   }>;
 }
 
 export function StoryGroup({
   story,
   tasks,
-  onNodeClick,
   TaskGroupComponent,
 }: StoryGroupProps) {
   const data = story.data as unknown as NodeData;
@@ -125,7 +122,6 @@ export function StoryGroup({
               key={task.id}
               task={task}
               advanceds={task.advanceds}
-              onNodeClick={onNodeClick}
             />
           ))}
         </Accordion>

@@ -21,10 +21,9 @@ import type { NodeData } from '../types';
 interface TaskGroupProps {
   task: Node;
   advanceds: Node[];
-  onNodeClick?: (nodeId: string) => void;
 }
 
-export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
+export function TaskGroup({ task, advanceds }: TaskGroupProps) {
   const data = task.data as unknown as NodeData;
 
   const taskContent = (

@@ -17,7 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Mail, X } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import type { OnlineUser } from '../types';
 import { UserAvatar } from '@/shared/components/UserAvatar';
@@ -234,14 +234,6 @@ export function MemberManagementModal({
                                                         <SelectItem value="VIEWER" className="text-xs">열람자</SelectItem>
                                                     </SelectContent>
                                                 </Select>
-
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </Button>
                                             </div>
                                         </div>
                                     ))}
