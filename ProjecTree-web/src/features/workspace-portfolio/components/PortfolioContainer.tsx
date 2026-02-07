@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Loader2, AlertCircle, FileText } from 'lucide-react';
+import { Loader2, AlertCircle, FileText, ClipboardList } from 'lucide-react';
 import { getPortfolio, generatePortfolio, updatePortfolio } from '@/apis/portfolio.api';
 import { PortfolioSkeleton } from './PortfolioSkeleton';
 import { PortfolioViewer } from './PortfolioViewer';
@@ -134,7 +134,7 @@ export function PortfolioContainer({ workspaceId }: PortfolioContainerProps) {
                     <div className="absolute inset-0 h-16 w-16 animate-ping rounded-full bg-[var(--figma-neon-green)]/20" />
                 </div>
                 <p className="text-xl font-bold text-zinc-700 mb-2">
-                    🤖 포트폴리오를 생성하고 있습니다
+                    포트폴리오를 생성하고 있습니다
                 </p>
                 <p className="text-sm text-zinc-500 text-center max-w-md">
                     프로젝트 정보와 담당 업무를 AI가 분석하여
@@ -182,19 +182,11 @@ export function PortfolioContainer({ workspaceId }: PortfolioContainerProps) {
             <div className="flex h-full flex-col items-center justify-center text-zinc-500">
                 <AlertCircle className="h-12 w-12 text-amber-400 mb-4" />
                 <p className="text-lg font-bold text-zinc-700 mb-2">
-                    포트폴리오를 생성할 수 없습니다
+                    포트폴리오 생성에 실패했습니다
                 </p>
-                <div className="text-sm text-zinc-500 text-center max-w-md mb-2">
-                    <p>현재 이 워크스페이스에서 담당한 업무가 부족하거나,</p>
-                    <p>AI 분석에 필요한 정보가 충분하지 않습니다.</p>
-                </div>
-                <div className="text-sm text-zinc-400 text-center max-w-md mb-6 bg-zinc-100 rounded-lg p-4">
-                    <p className="font-medium text-zinc-600 mb-2">💡 포트폴리오를 생성하려면:</p>
-                    <ul className="text-left space-y-1">
-                        <li>• 트리 에디터에서 <strong>Task</strong> 또는 <strong>Advance</strong> 노드를 생성하세요</li>
-                        <li>• 노드에 본인을 담당자로 지정하세요</li>
-                        <li>• 노드에 설명과 노트를 충분히 작성하세요</li>
-                    </ul>
+                <div className="text-sm text-zinc-500 text-center max-w-md mb-6">
+                    <p>일시적인 오류가 발생했습니다.</p>
+                    <p>잠시 후 다시 시도해주세요.</p>
                 </div>
                 <Button
                     onClick={handleGenerate}
@@ -225,7 +217,7 @@ export function PortfolioContainer({ workspaceId }: PortfolioContainerProps) {
                     <p>AI가 맞춤형 포트폴리오를 자동 생성합니다.</p>
                 </div>
                 <div className="text-sm text-zinc-400 text-center max-w-md mb-6 bg-zinc-100 rounded-lg p-4">
-                    <p className="font-medium text-zinc-600 mb-2">📋 포트폴리오에 포함되는 정보:</p>
+                    <p className="font-medium text-zinc-600 mb-2 flex items-center gap-1"><ClipboardList className="h-4 w-4" /> 포트폴리오에 포함되는 정보:</p>
                     <ul className="text-left space-y-1">
                         <li>• 프로젝트 개요 및 기술 스택</li>
                         <li>• 본인이 담당한 Task / Advance 업무</li>
@@ -242,7 +234,7 @@ export function PortfolioContainer({ workspaceId }: PortfolioContainerProps) {
                         'transition-all duration-300'
                     )}
                 >
-                    🚀 포트폴리오 생성하기
+                    포트폴리오 생성하기
                 </Button>
             </div>
         );

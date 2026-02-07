@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/shared/lib/utils';
 import { useUser } from '@/shared/stores/userStore';
-import { Download } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { PortfolioViewerProps } from '../types';
@@ -40,8 +40,9 @@ export function PortfolioViewer({ content, onEdit }: PortfolioViewerProps) {
         <div className="flex flex-col h-full bg-transparent">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/30 bg-white/60 backdrop-blur-sm">
-                <h2 className="text-lg font-bold text-zinc-800 tracking-tight">
-                    {nickname}님의 포트폴리오
+                <h2 className="flex items-center gap-2 text-lg font-bold text-zinc-800 tracking-tight min-w-0">
+                    <FileText className="h-5 w-5 flex-shrink-0 text-zinc-500" />
+                    <span className="truncate"><span className="text-2xl">{nickname}</span>{' '}님의 포트폴리오</span>
                 </h2>
                 <div className="flex items-center gap-2">
                     <Button
