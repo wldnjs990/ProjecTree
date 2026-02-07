@@ -49,8 +49,7 @@ public class NodeController implements NodeDocsController {
     }
 
     @PostMapping("/nodes/{node-id}/candidates")
-<<<<<<< ProjecTree-was/src/main/java/com/ssafy/projectree/domain/node/api/controller/NodeController.java
-    public CommonResponse<CandidateCreateDto.Response> createCandidates(@PathVariable(name = "node-id") Long parentId) {
+    public CommonResponse<CandidateCreateDto.Response> generateCandidates(@PathVariable(name = "node-id") Long parentId) {
 
         return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.CANDIDATE, String.valueOf(parentId), () -> nodeService.generateCandidate(parentId)));
     }
@@ -59,11 +58,6 @@ public class NodeController implements NodeDocsController {
     public CommonResponse<Void> deleteCandidate(@PathVariable(name = "candidate-id") Long candidateId) {
         nodeService.deleteCandidate(candidateId);
         return CommonResponse.success(SuccessCode.SUCCESS, null);
-    }
-    
-    public CommonResponse<CandidateCreateDto.Response> createCandidates(@PathVariable(name = "node-id") Long parentId,
-                                                                        @RequestBody CandidateCreateDto.Request request) {
-        return CommonResponse.success(SuccessCode.SUCCESS, lockService.execute(LockType.CANDIDATE, String.valueOf(parentId), () -> nodeService.createCandidate(parentId, request.getWorkspaceId())));
     }
 
     @PostMapping("/nodes/{node-id}/tech-stack/recommendation")

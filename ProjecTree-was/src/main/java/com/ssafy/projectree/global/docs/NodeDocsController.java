@@ -135,18 +135,7 @@ public interface NodeDocsController {
             @RequestBody NodeCreateDto.Request request
     );
 
-    @Operation(
-            summary = "노드 후보 생성",
-            description = "특정 부모 노드 하위에 생성 가능한 노드 후보들을 AI를 통해 생성합니다."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "생성 성공")
-    })
-    CommonResponse<CandidateCreateDto.Response> createCandidates(
-            @Parameter(description = "부모 노드 ID", example = "1")
-            @PathVariable(name = "node-id") Long parentId,
-            @RequestBody CandidateCreateDto.Request request
-    );
+
 
     @Operation(
             summary = "후보 노드 삭제",
