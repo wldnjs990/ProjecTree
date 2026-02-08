@@ -383,24 +383,36 @@ export function AITechRecommendSection({
                   </button>
                 )}
 
-                {/* AI 재생성 버튼 */}
-                <button
-                  onClick={onGenerateTechs}
-                  disabled={isGenerating}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      생성 중...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4" />
-                      AI 다시 추천받기
-                    </>
-                  )}
-                </button>
+                {/* AI 재생성 버튼 - 경고 모달 포함 */}
+                <Confirm
+                  trigger={
+                    <ConfirmTrigger
+                      className={cn(
+                        'w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm',
+                        isGenerating && 'opacity-50 cursor-not-allowed pointer-events-none'
+                      )}
+                    >
+                      <span className="flex items-center gap-2">
+                        {isGenerating ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            생성 중...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            AI 다시 추천받기
+                          </>
+                        )}
+                      </span>
+                    </ConfirmTrigger>
+                  }
+                  title="기술 추천을 다시 받으시겠습니까?"
+                  description="AI가 새로운 기술을 추천합니다. 기존에 추천받은 기술과 직접 추가한 기술이 모두 삭제됩니다."
+                  cancelText="취소"
+                  actionText="다시 추천받기"
+                  onAction={onGenerateTechs}
+                />
               </div>
             </>
           ) : (

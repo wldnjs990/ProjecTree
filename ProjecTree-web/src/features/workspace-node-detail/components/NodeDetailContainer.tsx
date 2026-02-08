@@ -25,7 +25,6 @@ import {
   getAiNodeTechRecommendation,
   postCustomNodeTechRecommendation,
 } from '@/apis/node.api';
-import { toast } from 'sonner';
 
 interface NodeDetailContainerProps {
   nodeInfo?: {
@@ -46,7 +45,9 @@ export default function NodeDetailContainer({
   isExpanded,
 }: NodeDetailContainerProps) {
   // URL에서 workspaceId 가져오기
-  const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
+  const { workspaceId: paramWorkspaceId } = useParams<{
+    workspaceId: string;
+  }>();
   const workspaceId = paramWorkspaceId ? Number(paramWorkspaceId) : null;
 
   // Store state subscriptions
@@ -161,7 +162,9 @@ export default function NodeDetailContainer({
     const yNode = yPreviewNodes.get(previewNodeId);
     if (!yNode) return;
 
-    const position = yNode.get('position') as { x?: number; y?: number } | undefined;
+    const position = yNode.get('position') as
+      | { x?: number; y?: number }
+      | undefined;
     const xpos = Number(position?.x ?? 0);
     const ypos = Number(position?.y ?? 0);
 
@@ -171,7 +174,9 @@ export default function NodeDetailContainer({
     // pending 상태 확인 및 설정
     const yNodeCreatingPending = client.getYMap<boolean>('nodeCreatingPending');
     const isPending = yNodeCreatingPending.get(previewNodeId) === true;
-    useNodeDetailStore.getState().setIsCreatingNode(isPending);
+    if (isPending) {
+      useNodeDetailStore.getState().addCreatingPreviewId(previewNodeId);
+    }
 
     console.log('[NodeDetailContainer] Re-enter locked preview:', {
       candidate,
@@ -234,7 +239,6 @@ export default function NodeDetailContainer({
       console.log('[NodeDetailContainer] AI 기술 추천 요청 완료');
     } catch (error) {
       console.error('AI 기술 추천 생성 실패:', error);
-      toast.error('AI 기술 추천 생성에 실패했습니다.');
       // 에러 시에만 클라이언트에서 pending=false 전송 (서버 응답 없으므로)
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
@@ -252,7 +256,6 @@ export default function NodeDetailContainer({
       console.log('[NodeDetailContainer] AI 노드 후보 생성 요청 완료');
     } catch (error) {
       console.error('AI 노드 후보 생성 실패:', error);
-      toast.error('AI 노드 후보 생성에 실패했습니다.');
       nodeDetailCrdtService.setCandidatesPending(selectedNodeId, false);
     }
   };
@@ -270,10 +273,8 @@ export default function NodeDetailContainer({
         workspaceId,
         techVocaId,
       });
-      toast.success('기술스택이 추가되었습니다.');
     } catch (error) {
       console.error('커스텀 기술스택 추가 실패:', error);
-      toast.error('기술스택 추가에 실패했습니다.');
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
   };
@@ -324,5 +325,3 @@ export default function NodeDetailContainer({
     </div>
   );
 }
-
-
