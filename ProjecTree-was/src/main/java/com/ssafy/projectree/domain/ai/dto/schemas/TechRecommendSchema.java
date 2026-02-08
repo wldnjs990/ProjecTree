@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TechRecommendSchema {
+    private Long id;
     private String name;
     private String advantage;
     private String disadvantage;
