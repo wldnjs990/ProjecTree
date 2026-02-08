@@ -5,7 +5,7 @@ import { EpicGroup } from './EpicGroup';
 import { StoryGroup } from './StoryGroup';
 import { TaskGroup } from './TaskGroup';
 import { specGridCols } from '../constants';
-import type { NodeData, FeatureSpecViewProps } from '../types';
+import type { NodeData } from '../types';
 import { Accordion } from '@/components/ui/accordion';
 
 // 계층 구조로 노드 그룹화 (Edge 기반)
@@ -46,7 +46,7 @@ function groupNodesByHierarchy(nodes: Node[], edges: Edge[] = []) {
   });
 }
 
-export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
+export function FeatureSpecView() {
   // Zustand 스토어에서 노드/엣지 가져오기
   const realNodes = useNodes();
   const realEdges = useEdges();
@@ -89,7 +89,6 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
                   key={epic.id}
                   epic={epic}
                   stories={epic.stories}
-                  onNodeClick={onNodeClick}
                   StoryGroupComponent={(props) => (
                     <StoryGroup {...props} TaskGroupComponent={TaskGroup} />
                   )}

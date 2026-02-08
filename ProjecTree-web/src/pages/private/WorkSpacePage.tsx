@@ -14,7 +14,7 @@ import {
 } from '@/features/workspace-header';
 import { TreeCanvas } from '@/features/workspace-canvas';
 import { FeatureSpecView } from '@/features/workspace-feature-spec';
-import { TechStackStatusView } from '@/features/workspace-tech-status';
+import { PortfolioContainer } from '@/features/workspace-portfolio';
 import { LeftSidebar } from '@/features/workspace-aside';
 import {
   VoiceChatBar,
@@ -268,11 +268,11 @@ export default function WorkSpacePage() {
             ))}
 
           {activeTab === 'feature-spec' && (
-            <FeatureSpecView onNodeClick={handleNodeClick} />
+            <FeatureSpecView />
           )}
 
-          {activeTab === 'tech-selection' && (
-            <TechStackStatusView onNodeClick={handleNodeClick} />
+          {activeTab === 'portfolio' && (
+            <PortfolioContainer workspaceId={Number(workspaceId)} />
           )}
         </main>
       </div>

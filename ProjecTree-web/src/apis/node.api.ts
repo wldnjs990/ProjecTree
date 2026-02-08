@@ -43,3 +43,25 @@ const getAiNodeTechRecommendation = async (
 };
 
 export { postCreateNode, getAiNodeTechRecommendation };
+
+interface CreateCustomNodeBody {
+  name: string;
+  description: string;
+  nodeType: string;
+  parentNodeId: number;
+  workspaceId: number;
+  xpos: number;
+  ypos: number;
+}
+
+const postCreateCustomNode = async (
+  body: CreateCustomNodeBody
+): Promise<ApiResponse<CreateNodeResponse>> => {
+  const response = await wasApiClient.post<ApiResponse<CreateNodeResponse>>(
+    '/nodes/custom',
+    body
+  );
+  return response.data;
+};
+
+export { postCreateCustomNode };

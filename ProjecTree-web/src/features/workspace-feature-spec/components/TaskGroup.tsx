@@ -21,10 +21,9 @@ import type { NodeData } from '../types';
 interface TaskGroupProps {
   task: Node;
   advanceds: Node[];
-  onNodeClick?: (nodeId: string) => void;
 }
 
-export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
+export function TaskGroup({ task, advanceds }: TaskGroupProps) {
   const data = task.data as unknown as NodeData;
 
   const taskContent = (
@@ -68,11 +67,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
       <div className="flex justify-center w-full min-w-0 px-3">
         <TruncatedLabel
           text={data.label}
-          className="font-medium text-sm cursor-pointer hover:underline text-center"
-          onClick={(e) => {
-            e.stopPropagation();
-            onNodeClick?.(task.id);
-          }}
+          className="font-medium text-sm text-center"
         />
       </div>
       <div className="flex justify-center">
@@ -108,7 +103,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
             color={data.assignee.color}
             size="sm"
           />
-        ) : null}
+        ) : <span className="text-xs text-gray-400">미정</span>}
       </div>
     </div>
   );
@@ -165,16 +160,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
               <div className="flex justify-center w-full min-w-0 px-3">
                 <TruncatedLabel
                   text={advancedData.label}
-                  role="button"
-                  tabIndex={0}
-                  className="font-medium text-sm cursor-pointer hover:underline text-center"
-                  onClick={() => onNodeClick?.(advanced.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      onNodeClick?.(advanced.id);
-                    }
-                  }}
+                  className="font-medium text-sm text-center"
                 />
               </div>
               <div className="flex justify-center">
@@ -213,7 +199,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
                     color={advancedData.assignee.color}
                     size="sm"
                   />
-                ) : null}
+                ) : <span className="text-xs text-gray-400">미정</span>}
               </div>
             </div>
           );

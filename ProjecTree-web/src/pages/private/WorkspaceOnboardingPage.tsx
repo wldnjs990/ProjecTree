@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, ChevronLeft } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Stepper,
   Step1BasicInfo,
@@ -97,14 +98,13 @@ export default function WorkspaceOnboardingPage() {
           ...formData,
           techStacks: formData.techStacks.map((tech) => tech.id),
         };
-        const response = await createWorkspace(apiFormData);
+        await createWorkspace(apiFormData);
 
         // 성공 시 워크스페이스 라운지로 이동
-        alert(`워크스페이스가 생성되었습니다! (ID: ${response.data})`);
+        toast.success(`워크스페이스가 생성되었습니다!`);
         navigate('/workspace-lounge');
       } catch (error) {
-        console.error('[API] 워크스페이스 생성 실패:', error);
-        alert('워크스페이스 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+        toast.error('워크스페이스 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
       } finally {
         setIsLoading(false);
       }
