@@ -1,4 +1,6 @@
 import type { Node } from '@xyflow/react';
+import type { NodeDetailData } from '../types/nodeDetail';
+import { getAvatarColor } from '@/shared/lib/utils';
 
 /**
  * 노드 타입을 계층 레벨로 매핑
@@ -29,17 +31,32 @@ function mapStatus(status: string): 'TODO' | 'IN_PROGRESS' | 'DONE' {
 /**
  * 노드 데이터를 FeatureSpecView가 사용할 수 있는 형식으로 변환
  */
-export function transformNodesForSpecView(nodes: Node[]) {
-  return nodes.map((node) => ({
-    ...node,
-    data: {
-      ...node.data,
-      label: node.data.title || '',
-      level: getNodeLevel(node.type ?? 'ADVANCE'),
-      complexity: node.data.difficult,
-      status: mapStatus((node.data.status as string) ?? 'TODO'),
-      priority: node.data.priority || 'P2',
-      assignee: node.data.assignee,
-    },
-  }));
+export function transformNodesForSpecView(
+  nodes: Node[],
+  nodeDetails?: Record<number, NodeDetailData>,
+) {
+  return nodes.map((node) => {
+    const assignee = nodeDetails?.[Number(node.id)]?.assignee;
+    const specAssignee = assignee
+      ? {
+          id: assignee.id,
+          name: assignee.name || assignee.nickname || '',
+          initials: (assignee.nickname?.[0] || assignee.name?.[0] || 'U').toUpperCase(),
+          color: getAvatarColor(assignee.id),
+        }
+      : undefined;
+
+    return {
+      ...node,
+      data: {
+        ...node.data,
+        label: node.data.title || '',
+        level: getNodeLevel(node.type ?? 'ADVANCE'),
+        complexity: node.data.difficult,
+        status: mapStatus((node.data.status as string) ?? 'TODO'),
+        priority: node.data.priority || 'P2',
+        assignee: specAssignee,
+      },
+    };
+  });
 }

@@ -4,6 +4,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { ChevronDown, CheckSquare, Pin } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { Node } from '@xyflow/react';
@@ -98,11 +104,22 @@ export function TaskGroup({ task, advanceds }: TaskGroupProps) {
       </div>
       <div className="flex justify-center">
         {data.assignee ? (
-          <UserAvatar
-            initials={data.assignee.initials}
-            color={data.assignee.color}
-            size="sm"
-          />
+          <TooltipProvider>
+            <Tooltip delayDuration={300}>
+              <TooltipTrigger asChild>
+                <span>
+                  <UserAvatar
+                    initials={data.assignee.initials}
+                    color={data.assignee.color}
+                    size="sm"
+                  />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">
+                <p>{data.assignee.name}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ) : <span className="text-xs text-gray-400">미정</span>}
       </div>
     </div>
@@ -194,11 +211,22 @@ export function TaskGroup({ task, advanceds }: TaskGroupProps) {
               </div>
               <div className="flex justify-center">
                 {advancedData.assignee ? (
-                  <UserAvatar
-                    initials={advancedData.assignee.initials}
-                    color={advancedData.assignee.color}
-                    size="sm"
-                  />
+                  <TooltipProvider>
+                    <Tooltip delayDuration={300}>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <UserAvatar
+                            initials={advancedData.assignee.initials}
+                            color={advancedData.assignee.color}
+                            size="sm"
+                          />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-xs">
+                        <p>{advancedData.assignee.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 ) : <span className="text-xs text-gray-400">미정</span>}
               </div>
             </div>
