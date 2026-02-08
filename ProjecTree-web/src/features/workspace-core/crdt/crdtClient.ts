@@ -5,6 +5,7 @@ import type { Awareness } from 'y-protocols/awareness';
 import { toast } from 'sonner';
 import { useWorkspaceStore } from '../stores/workspaceStore';
 import { useNodeStore } from '../stores/nodeStore';
+import { useNodeDetailStore } from '../stores/nodeDetailStore';
 
 // Awareness 상태 타입
 export interface AwarenessState {
@@ -92,11 +93,27 @@ class CrdtClient {
     type: string;
     action?: string;
     nodeId?: number;
+    text?: string;
+    streamType?: 'candidates' | 'techs';
+    isComplete?: boolean;
     [key: string]: unknown;
   }) {
+    const { setAiStreamingText, setAiStreamingType, clearAiStreaming } =
+      useNodeDetailStore.getState();
+
     switch (message.type) {
       case 'AI_MESSAGE':
         console.log('[CRDT] AI_MESSAGE 수신:', message);
+        if (message.isComplete) {
+          // 스트리밍 완료 시 상태 초기화
+          clearAiStreaming();
+        } else if (message.text) {
+          // 스트리밍 텍스트 업데이트
+          setAiStreamingText(message.text as string);
+          if (message.streamType) {
+            setAiStreamingType(message.streamType);
+          }
+        }
         break;
       case 'save_error':
         console.error('[CRDT] 저장 에러 수신:', message);
@@ -119,10 +136,15 @@ class CrdtClient {
     if (!ws) return;
 
     ws.addEventListener('message', (event: MessageEvent) => {
-      if (event.type === 'AI_MESSAGE') {
-        console.log('[CRDT] AI_MESSAGE 수신:', event);
+      // y-websocket은 바이너리 데이터도 주고받으므로 문자열만 처리
+      if (typeof event.data === 'string') {
+        try {
+          const message = JSON.parse(event.data);
+          this.handleServerMessage(message);
+        } catch {
+          // JSON 파싱 실패 시 무시
+        }
       }
-      return;
     });
 
     console.log('[CRDT] 메시지 리스너 설정됨');

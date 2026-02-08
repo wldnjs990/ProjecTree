@@ -14,9 +14,12 @@ import {
   calculateChildNodePosition,
   useSelectedCandidateIds,
   usePreviewNodes,
+  useAiStreamingText,
+  useAiStreamingType,
 } from '@/features/workspace-core';
 import { SubNodeCard } from './SubNodeCard';
 import { CandidateEmptyState } from './CandidateEmptyState';
+import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 
 interface AINodeCandidateSectionProps {
   candidates: Candidate[];
@@ -45,6 +48,11 @@ export function AINodeCandidateSection({
   const nodes = useNodes();
   const selectedCandidateIds = useSelectedCandidateIds();
   const previewNodes = usePreviewNodes();
+  const streamingText = useAiStreamingText();
+  const streamingType = useAiStreamingType();
+
+  // candidates 타입일 때만 스트리밍 텍스트 표시
+  const showStreamingText = isGenerating && streamingType === 'candidates' && streamingText;
 
   const lockedCandidateIds = new Set(
     previewNodes
@@ -107,24 +115,28 @@ export function AINodeCandidateSection({
                 })}
               </div>
 
-              {/* AI 재생성 버튼 */}
-              <button
-                onClick={onGenerateCandidates}
-                disabled={isGenerating}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    생성 중...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    AI 다시 추천받기
-                  </>
-                )}
-              </button>
+              {/* AI 재생성 버튼 또는 스트리밍 텍스트 */}
+              {showStreamingText ? (
+                <AiStreamingCard text={streamingText} />
+              ) : (
+                <button
+                  onClick={onGenerateCandidates}
+                  disabled={isGenerating}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      생성 중...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      AI 다시 추천받기
+                    </>
+                  )}
+                </button>
+              )}
             </>
           ) : (
             <CandidateEmptyState

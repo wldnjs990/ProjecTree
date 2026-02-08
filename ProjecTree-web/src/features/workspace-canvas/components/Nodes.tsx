@@ -10,7 +10,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import type { FlowNodeData } from '@/features/workspace-core';
-import { useIsPreviewCreating, useNodes } from '@/features/workspace-core';
+import {
+  useAiStreamingText,
+  useAiStreamingType,
+  useIsPreviewCreating,
+  useNodes,
+} from '@/features/workspace-core';
+import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 
 /** 노드 고정 크기 상수 */
 export const NODE_DIMENSIONS = {
@@ -339,6 +345,10 @@ export interface PreviewNodeData extends FlowNodeData {
 export type PreviewNodeType = Node<PreviewNodeData, 'PREVIEW'>;
 function PreviewNodeComponent({ id, data }: NodeProps<PreviewNodeType>) {
   const isCreating = useIsPreviewCreating(id);
+  const streamingText = useAiStreamingText();
+  const streamingType = useAiStreamingType();
+  const showStreamingText =
+    isCreating && streamingType === 'candidates' && streamingText;
 
   return (
     <div
@@ -380,15 +390,23 @@ function PreviewNodeComponent({ id, data }: NodeProps<PreviewNodeType>) {
         {data.title}
       </p>
 
-      {/* 로딩 오버레이 */}
+      {/* 로딩/스트리밍 오버레이 */}
       {isCreating && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-2xl">
-          <div className="flex flex-col items-center gap-2">
-            <Loader2 className="w-6 h-6 text-[#1C69E3] animate-spin" />
-            <span className="text-xs text-[#1C69E3] font-medium">
-              생성 중...
-            </span>
-          </div>
+        <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-2xl p-2">
+          {showStreamingText ? (
+            <AiStreamingCard
+              text={streamingText}
+              compact
+              className="w-full max-w-[160px]"
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="w-6 h-6 text-[#1C69E3] animate-spin" />
+              <span className="text-xs text-[#1C69E3] font-medium">
+                생성 중...
+              </span>
+            </div>
+          )}
         </div>
       )}
 
