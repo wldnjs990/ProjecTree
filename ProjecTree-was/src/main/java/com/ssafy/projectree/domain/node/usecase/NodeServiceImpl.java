@@ -238,7 +238,9 @@ public class NodeServiceImpl implements NodeService {
                 .build()
         );
 
-        nodeCrdtService.sendNodeCreationToCrdt(workspaceId, getNodeSchemaDetail(response.getNodeId(), response.getParentId()));
+        NodeSchema nodeSchema = getNodeSchemaDetail(response.getNodeId(), response.getParentId());
+        nodeSchema.setPreviewNodeId(request.getPreviewNodeId());
+        nodeCrdtService.sendNodeCreationToCrdt(workspaceId, nodeSchema);
 
         return NodeCreateDto.Response.builder().nodeId(response.getNodeId()).build();
     }
