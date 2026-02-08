@@ -25,6 +25,15 @@ import java.util.List;
 @SuperBuilder
 @SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")
+@Table(
+        name = "member",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_member_email_oauth_provider",
+                        columnNames = {"email", "oauth_provider"}
+                )
+        }
+)
 public class Member extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

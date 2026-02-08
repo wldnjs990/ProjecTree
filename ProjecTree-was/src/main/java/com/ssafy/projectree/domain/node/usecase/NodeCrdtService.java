@@ -79,9 +79,6 @@ public class NodeCrdtService {
                     .body(payload)
                     .retrieve().toBodilessEntity();
         } catch (Exception e) {
-            // https://ssafy.atlassian.net/browse/S14P11D107-285
-            // TODO: 현재는 트랜잭션과 같이 동작 하기에 로그만 띄우지만
-            // Transaction 과 별개로 동작하여 예외 반환 로직을 구현하는 것이 더 좋을 것같음
             log.error("CRDT 서버 전송 실패: {}", e.getMessage());
         }
     }
