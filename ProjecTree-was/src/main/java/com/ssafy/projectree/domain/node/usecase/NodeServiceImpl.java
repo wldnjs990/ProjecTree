@@ -291,7 +291,7 @@ public class NodeServiceImpl implements NodeService {
     public CandidateCreateDto.Response generateCandidate(Long parentId) {
         ProjectNode projectNode = findRootNode(parentId);
         Node node = nodeRepository.findById(parentId).orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
-        if(node.getCandidateLimit() <= candidateRepository.countCandidateByParent(node)){
+        if (node.getCandidateLimit() <= candidateRepository.countCandidateByParent(node)) {
             throw new BusinessLogicException(ErrorCode.CANDIDATE_GENERATE_LIMIT, "후보 노드 생성 개수를 초과하였습니다.");
         }
         AiCandidateCreateDto.Response candidate = inferenceService.generateCandidate(AiCandidateCreateDto.Request.builder()
@@ -370,6 +370,8 @@ public class NodeServiceImpl implements NodeService {
     public void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request) {
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
+
+        if (request.getDescription() != null) node.setDescription(request.getDescription());
 
         if (request.getDifficult() != null) {
             if (node instanceof TaskNode taskNode) {
