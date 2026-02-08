@@ -55,6 +55,17 @@ router.post("/", (req: Request, res: Response) => {
       Object.entries(node.data).filter(([, v]) => v !== undefined),
     );
     details.set(String(node.id), detail);
+
+    // previewNodeId가 있으면 preview 노드 삭제 + pending 해제
+    if (node.previewNodeId) {
+      const previewNodes = doc.getMap("previewNodes");
+      const nodeCreatingPending = doc.getMap("nodeCreatingPending");
+
+      if (previewNodes.has(node.previewNodeId)) {
+        previewNodes.delete(node.previewNodeId);
+      }
+      nodeCreatingPending.set(node.previewNodeId, false);
+    }
   });
 
   console.log("create nodes success", new Date().toISOString());

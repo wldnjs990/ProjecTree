@@ -23,6 +23,7 @@ export interface IncomingNodePayload {
     ypos: number;
   };
   parentId: string | null;
+  previewNodeId?: string;
   data: {
     priority?: Priority;
     identifier?: string;
