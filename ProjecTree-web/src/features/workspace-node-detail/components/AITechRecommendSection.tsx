@@ -16,6 +16,7 @@ import { ConfirmTrigger } from '@/shared/components/ConfirmTrigger';
 import TechDetailContent from './TechDetailContent';
 import TechDetailTitle from './TechDetailTitle';
 import { CustomTechAddDialog } from './CustomTechAddDialog';
+import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 import {
   useSelectedNodeId,
   getCrdtClient,
@@ -293,17 +294,7 @@ function TechEmptyState({
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-3">
       {showStreamingText ? (
-        <div className="w-full">
-          <div className="flex items-center gap-2 mb-2">
-            <Loader2 className="w-4 h-4 animate-spin text-[#1C69E3]" />
-            <span className="text-xs font-medium text-[#1C69E3]">AI 추론 중...</span>
-          </div>
-          <div className="p-3 bg-[rgba(28,105,227,0.05)] border border-[rgba(28,105,227,0.2)] rounded-lg">
-            <p className="text-xs text-[#4A4A4A] leading-relaxed whitespace-pre-wrap">
-              {streamingText}
-            </p>
-          </div>
-        </div>
+        <AiStreamingCard text={streamingText} />
       ) : (
         <>
           <div className="text-center">

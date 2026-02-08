@@ -8,6 +8,7 @@ import {
 } from '@/features/workspace-core';
 import type { Candidate } from '@/features/workspace-core';
 import { cn } from '@/shared/lib/utils';
+import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 
 interface CandidateNodeContainerProps {
   candidate: Candidate;
@@ -111,17 +112,7 @@ export default function CandidateNodeContainer({
         </p>
 
         {showStreamingText ? (
-          <div className="w-full">
-            <div className="flex items-center gap-2 mb-2">
-              <Loader2 className="w-4 h-4 animate-spin text-[#1C69E3]" />
-              <span className="text-xs font-medium text-[#1C69E3]">AI 추론 중...</span>
-            </div>
-            <div className="p-3 bg-[rgba(28,105,227,0.05)] border border-[rgba(28,105,227,0.2)] rounded-lg max-h-40 overflow-y-auto">
-              <p className="text-xs text-[#4A4A4A] leading-relaxed whitespace-pre-wrap">
-                {streamingText}
-              </p>
-            </div>
-          </div>
+          <AiStreamingCard text={streamingText} className="max-h-40 overflow-y-auto" />
         ) : (
           <button
             onClick={onConfirm}
