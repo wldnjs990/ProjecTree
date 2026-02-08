@@ -32,6 +32,16 @@ interface AITechRecommendSectionProps {
   onAddCustomTech?: (techVocaId: number) => Promise<void>;
 }
 
+// 커스텀 기술 여부 판별 (AI 추천이 아닌 직접 추가한 기술)
+function isCustomTech(tech: TechRecommendation): boolean {
+  return (
+    !tech.description &&
+    !tech.advantage &&
+    !tech.disAdvantage &&
+    tech.recommendScore <= 0
+  );
+}
+
 // 기술 카드 컴포넌트
 function TechCard({
   tech,
@@ -42,6 +52,7 @@ function TechCard({
 }) {
   // 추천 점수가 4점 이상이면 AI 추천 태그 붙여줌
   const isHighRecommended = tech.recommendScore >= 4;
+  const isCustom = isCustomTech(tech);
 
   return (
     <div
@@ -53,32 +64,50 @@ function TechCard({
       )}
     >
       {/* 헤더 */}
-      <div className="flex items-start justify-between mb-1.5">
-        <span className="text-sm font-medium text-[#0B0B0B]">{tech.name}</span>
+      <div className="flex items-start justify-between gap-2 mb-1.5">
+        <span className="text-sm font-medium text-[#0B0B0B] flex-1">
+          {tech.name}
+        </span>
         {isHighRecommended && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-medium text-[#1C69E3] bg-[rgba(28,105,227,0.1)] border border-[rgba(28,105,227,0.2)] rounded-md whitespace-nowrap">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-medium text-[#1C69E3] bg-[rgba(28,105,227,0.1)] border border-[rgba(28,105,227,0.2)] rounded-md whitespace-nowrap shrink-0">
             <Sparkles className="w-3 h-3" />
             AI 추천
+          </span>
+        )}
+        {isCustom && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-medium text-[#6363C6] bg-[rgba(99,99,198,0.1)] border border-[rgba(99,99,198,0.2)] rounded-md whitespace-nowrap shrink-0">
+            <Plus className="w-3 h-3" />
+            직접 추가
           </span>
         )}
       </div>
 
       {/* 설명 */}
       <p className="text-[10px] text-[rgba(99,99,99,0.8)] leading-relaxed mb-2">
-        {tech.description}
+        {isCustom
+          ? '직접 추가한 기술입니다. 클릭하여 확정할 수 있습니다.'
+          : tech.description}
       </p>
 
       {/* 장단점 태그 */}
       <div className="flex flex-wrap gap-1">
-        {tech.advantage && (
-          <span className="px-1.5 py-0.5 text-[9px] rounded bg-[#ECFDF5] text-[#007A55]">
-            +{tech.advantage.slice(0, 30)}...
+        {isCustom ? (
+          <span className="px-1.5 py-0.5 text-[9px] rounded bg-[rgba(99,99,198,0.1)] text-[#6363C6] italic">
+            사용자 지정 기술
           </span>
-        )}
-        {tech.disAdvantage && (
-          <span className="px-1.5 py-0.5 text-[9px] rounded bg-[#F8F8F8] text-[#C10007]">
-            -{tech.disAdvantage.slice(0, 30)}...
-          </span>
+        ) : (
+          <>
+            {tech.advantage && (
+              <span className="px-1.5 py-0.5 text-[9px] rounded bg-[#ECFDF5] text-[#007A55]">
+                +{tech.advantage.slice(0, 30)}...
+              </span>
+            )}
+            {tech.disAdvantage && (
+              <span className="px-1.5 py-0.5 text-[9px] rounded bg-[#F8F8F8] text-[#C10007]">
+                -{tech.disAdvantage.slice(0, 30)}...
+              </span>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -216,12 +245,12 @@ function TechCardList({
 
   return (
     <>
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2 w-full">
         {recommendations.map((tech) => (
           <Confirm
             key={tech.id}
             trigger={
-              <ConfirmTrigger>
+              <ConfirmTrigger className="w-full">
                 <TechCard tech={tech} isSelected={selectedTechId === tech.id} />
               </ConfirmTrigger>
             }

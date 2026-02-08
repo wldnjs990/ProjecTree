@@ -7,6 +7,7 @@ import {
   useEditData,
   useIsSaving,
   nodeDetailCrdtService,
+  previewNodesCrdtService,
   type EditableNodeDetail,
 } from '@/features/workspace-core';
 
@@ -48,6 +49,23 @@ export function useNodeDetailEdit() {
     if (isEditing) {
       nodeDetailCrdtService.cancelEdit();
     }
+
+    // 프리뷰 모드인 경우, pending 중이 아닌 preview 노드 제거
+    // closure 문제를 피하기 위해 최신 상태를 직접 확인
+    const store = useNodeDetailStore.getState();
+    if (store.candidatePreviewMode) {
+      let previewNodeId: string | null = null;
+      if (store.previewKind === 'candidate' && store.previewCandidate) {
+        previewNodeId = `preview-${store.previewCandidate.id}`;
+      } else if (store.previewKind === 'custom' && store.customDraft) {
+        previewNodeId = store.customDraft.previewNodeId;
+      }
+
+      if (previewNodeId && !store.creatingPreviewIds.has(previewNodeId)) {
+        previewNodesCrdtService.removePreviewNode(previewNodeId);
+      }
+    }
+
     storeCloseSidebar();
   }, [isEditing, storeCloseSidebar]);
 

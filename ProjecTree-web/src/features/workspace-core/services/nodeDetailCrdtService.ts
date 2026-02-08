@@ -185,8 +185,15 @@ class NodeDetailCrdtService {
         const pending = yNodeCreatingPending.get(previewNodeId);
         if (pending === undefined) return;
 
-        // pending=false → 노드 생성 완료 → preview 노드 제거 + pending 엔트리 정리
-        if (!pending) {
+        const store = useNodeDetailStore.getState();
+
+        // pending 상태에 따라 creatingPreviewIds 업데이트
+        if (pending) {
+          store.addCreatingPreviewId(previewNodeId);
+        } else {
+          store.removeCreatingPreviewId(previewNodeId);
+
+          // pending=false → 노드 생성 완료 → preview 노드 제거 + pending 엔트리 정리
           const yPreviewNodes = client.getYMap<Y.Map<YNodeValue>>('previewNodes');
           yPreviewNodes.delete(previewNodeId);
           yNodeCreatingPending.delete(previewNodeId);
@@ -196,19 +203,15 @@ class NodeDetailCrdtService {
           );
         }
 
-        // 현재 클라이언트의 프리뷰 노드인 경우 UI 상태 업데이트
-        const store = useNodeDetailStore.getState();
+        // 현재 사이드바에서 보고 있는 프리뷰 노드인 경우 UI 상태 업데이트
         const currentPreviewId =
           store.previewKind === 'candidate' && store.previewCandidate
             ? `preview-${store.previewCandidate.id}`
             : store.customDraft?.previewNodeId;
 
-        if (currentPreviewId === previewNodeId) {
-          if (!pending) {
-            store.exitCandidatePreview();
-          } else {
-            store.setIsCreatingNode(true);
-          }
+        if (currentPreviewId === previewNodeId && !pending) {
+          // 현재 보고 있는 프리뷰 노드 생성 완료 → 프리뷰 모드 종료
+          store.exitCandidatePreview();
         }
       });
     };
@@ -601,18 +604,25 @@ class NodeDetailCrdtService {
   setNodeCreatingPending(previewNodeId: string, pending: boolean): void {
     if (!this.yNodeCreatingPendingRef) return;
     this.yNodeCreatingPendingRef.set(previewNodeId, pending);
-    useNodeDetailStore.getState().setIsCreatingNode(pending);
+    // 로컬 상태도 즉시 업데이트 (CRDT 옵저버가 처리하기 전까지)
+    const store = useNodeDetailStore.getState();
+    if (pending) {
+      store.addCreatingPreviewId(previewNodeId);
+    } else {
+      store.removeCreatingPreviewId(previewNodeId);
+    }
   }
 
   /**
    * 새로고침/재연결 시 pending 중인 preview 노드의 상태 복원
-   * pending 중인 내 preview 노드가 있으면 isCreatingNode를 true로 설정
+   * pending 중인 내 preview 노드가 있으면 creatingPreviewIds에 추가
    */
   restorePendingPreviewState(ownerId: string): void {
     const client = getCrdtClient();
     if (!client || !this.yNodeCreatingPendingRef) return;
 
     const yPreviewNodes = client.getYMap<Y.Map<YNodeValue>>('previewNodes');
+    const store = useNodeDetailStore.getState();
 
     yPreviewNodes.forEach((yNode, previewNodeId) => {
       const isPending = this.yNodeCreatingPendingRef?.get(previewNodeId) === true;
@@ -623,8 +633,8 @@ class NodeDetailCrdtService {
         ((yNode.get('data') as { lockedBy?: string } | undefined)?.lockedBy);
 
       if (lockedBy === ownerId) {
-        // 내 pending preview 노드가 있으면 isCreatingNode를 true로 설정
-        useNodeDetailStore.getState().setIsCreatingNode(true);
+        // 내 pending preview 노드가 있으면 creatingPreviewIds에 추가
+        store.addCreatingPreviewId(previewNodeId);
         console.log(
           '[NodeDetailCrdtService] restored pending state for:',
           previewNodeId

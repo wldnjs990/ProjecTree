@@ -42,7 +42,8 @@ interface NodeDetailState {
     workspaceId: number;
     previewNodeId: string;
   } | null;
-  isCreatingNode: boolean;
+  // 생성 중인 preview 노드 ID Set (CRDT의 yNodeCreatingPending과 동기화)
+  creatingPreviewIds: Set<string>;
 
   // === 단순 setter ===
   setSelectedNodeId: (id: string | null) => void;
@@ -52,7 +53,8 @@ interface NodeDetailState {
   setIsSaving: (saving: boolean) => void;
   setSelectedTechId: (techId: number | null) => void;
   setSelectedCandidateIds: (ids: number[]) => void;
-  setIsCreatingNode: (creating: boolean) => void;
+  addCreatingPreviewId: (previewNodeId: string) => void;
+  removeCreatingPreviewId: (previewNodeId: string) => void;
   setPreviewNodePosition: (position: { xpos: number; ypos: number }) => void;
   updateCustomDraft: (
     patch: Partial<{
@@ -100,7 +102,7 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   previewCandidate: null,
   previewNodePosition: null,
   customDraft: null,
-  isCreatingNode: false,
+  creatingPreviewIds: new Set<string>(),
 
   // === 단순 setter ===
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
@@ -110,7 +112,16 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   setIsSaving: (saving) => set({ isSaving: saving }),
   setSelectedTechId: (techId) => set({ selectedTechId: techId }),
   setSelectedCandidateIds: (ids) => set({ selectedCandidateIds: ids }),
-  setIsCreatingNode: (creating) => set({ isCreatingNode: creating }),
+  addCreatingPreviewId: (previewNodeId) =>
+    set((state) => ({
+      creatingPreviewIds: new Set([...state.creatingPreviewIds, previewNodeId]),
+    })),
+  removeCreatingPreviewId: (previewNodeId) =>
+    set((state) => {
+      const newSet = new Set(state.creatingPreviewIds);
+      newSet.delete(previewNodeId);
+      return { creatingPreviewIds: newSet };
+    }),
   setPreviewNodePosition: (position) => set({ previewNodePosition: position }),
   updateCustomDraft: (patch) =>
     set((state) =>
@@ -119,7 +130,11 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
 
   // === 복합 setter ===
   openSidebar: (nodeId) => {
-    set({ selectedNodeId: nodeId, isOpen: true });
+    set({
+      selectedNodeId: nodeId,
+      isOpen: true,
+      // creatingPreviewIds는 CRDT 옵저버가 관리하므로 여기서 초기화하지 않음
+    });
   },
 
   closeSidebar: () => {
@@ -135,7 +150,7 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       previewCandidate: null,
       previewNodePosition: null,
       customDraft: null,
-      isCreatingNode: false,
+      // isCreatingNode는 CRDT 옵저버가 관리하므로 여기서 설정하지 않음
     });
   },
 
@@ -165,7 +180,7 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       previewCandidate: null,
       previewNodePosition: null,
       customDraft: null,
-      isCreatingNode: false,
+      // isCreatingNode는 CRDT 옵저버가 관리하므로 여기서 설정하지 않음
     });
   },
 
@@ -183,7 +198,7 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       previewCandidate: null,
       previewNodePosition: null,
       customDraft: null,
-      isCreatingNode: false,
+      creatingPreviewIds: new Set<string>(),
     }),
 }));
 
@@ -237,6 +252,12 @@ export const useCustomPreviewDraft = () =>
 export const usePreviewNodePosition = () =>
   useNodeDetailStore((state) => state.previewNodePosition);
 
-/** AI 노드 생성 중 상태 */
-export const useIsCreatingNode = () =>
-  useNodeDetailStore((state) => state.isCreatingNode);
+/** 생성 중인 preview 노드 ID Set */
+export const useCreatingPreviewIds = () =>
+  useNodeDetailStore((state) => state.creatingPreviewIds);
+
+/** 특정 preview 노드가 생성 중인지 확인 */
+export const useIsPreviewCreating = (previewNodeId: string | null) =>
+  useNodeDetailStore((state) =>
+    previewNodeId ? state.creatingPreviewIds.has(previewNodeId) : false
+  );
