@@ -103,7 +103,6 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
     exitCandidatePreview();
   }, [exitCandidatePreview, previewKind, previewCandidate, customDraft, isCreatingNode]);
 
-
   const handleCustomNameChange = useCallback(
     (value: string) => {
       updateCustomDraft({ name: value });
