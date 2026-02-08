@@ -14,6 +14,7 @@ import {
   useAiStreamingText,
   useAiStreamingType,
   useIsPreviewCreating,
+  useNodePresence,
   useNodes,
 } from '@/features/workspace-core';
 import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
@@ -25,6 +26,38 @@ export const NODE_DIMENSIONS = {
 } as const;
 
 type Tags = Array<TagType | null | undefined>;
+
+function NodePresenceAvatars({ nodeId }: { nodeId: string }) {
+  const { getUsersForNode } = useNodePresence();
+  const users = getUsersForNode(nodeId);
+  if (users.length === 0) return null;
+
+  const visible = users.slice(0, 3);
+  const remaining = users.length - visible.length;
+
+  return (
+    <div className="absolute -top-2 -right-2 flex items-center">
+      {visible.map((user, index) => (
+        <div
+          key={user.id}
+          className={cn(
+            'h-6 w-6 rounded-full border-2 border-white text-[10px] font-semibold text-white flex items-center justify-center shadow-sm',
+            index > 0 && '-ml-2'
+          )}
+          style={{ backgroundColor: user.color }}
+          title={user.name}
+        >
+          {user.initials}
+        </div>
+      ))}
+      {remaining > 0 && (
+        <div className="h-6 w-6 -ml-2 rounded-full border-2 border-white bg-[#E2E8F0] text-[10px] font-semibold text-[#475569] flex items-center justify-center shadow-sm">
+          +{remaining}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function PriorityBadgeSlot({
   priority,
@@ -128,7 +161,11 @@ function NodeTitle({
 
 // Project 노드
 export type ProjectNodeType = Node<FlowNodeData, 'PROJECT'>;
-function ProjectNodeComponent({ data, selected }: NodeProps<ProjectNodeType>) {
+function ProjectNodeComponent({
+  id,
+  data,
+  selected,
+}: NodeProps<ProjectNodeType>) {
   const nodeData = data;
 
   return (
@@ -140,6 +177,7 @@ function ProjectNodeComponent({ data, selected }: NodeProps<ProjectNodeType>) {
       )}
     >
       <PriorityBadgeSlot priority={nodeData.priority} />
+      <NodePresenceAvatars nodeId={id} />
 
       <NodeTags tags={['PROJECT', nodeData.status]} />
 
@@ -158,7 +196,7 @@ function ProjectNodeComponent({ data, selected }: NodeProps<ProjectNodeType>) {
 
 // Epic 노드
 export type EpicNodeType = Node<FlowNodeData, 'EPIC'>;
-function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
+function EpicNodeComponent({ id, data, selected }: NodeProps<EpicNodeType>) {
   const nodeData = data;
 
   return (
@@ -171,6 +209,7 @@ function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
       )}
     >
       <PriorityBadgeSlot priority={nodeData.priority} />
+      <NodePresenceAvatars nodeId={id} />
 
       <Handle
         type="target"
@@ -195,7 +234,7 @@ function EpicNodeComponent({ data, selected }: NodeProps<EpicNodeType>) {
 
 // Story 노드
 export type StoryNodeType = Node<FlowNodeData, 'STORY'>;
-function StoryNodeComponent({ data, selected }: NodeProps<StoryNodeType>) {
+function StoryNodeComponent({ id, data, selected }: NodeProps<StoryNodeType>) {
   const nodeData = data;
 
   return (
@@ -207,6 +246,7 @@ function StoryNodeComponent({ data, selected }: NodeProps<StoryNodeType>) {
       )}
     >
       <PriorityBadgeSlot priority={nodeData.priority} />
+      <NodePresenceAvatars nodeId={id} />
 
       <Handle
         type="target"
@@ -231,7 +271,7 @@ function StoryNodeComponent({ data, selected }: NodeProps<StoryNodeType>) {
 
 // Task 노드
 export type TaskNodeType = Node<FlowNodeData, 'TASK'>;
-function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
+function TaskNodeComponent({ id, data, selected }: NodeProps<TaskNodeType>) {
   const nodeData = data;
 
   const borderColor =
@@ -250,6 +290,7 @@ function TaskNodeComponent({ data, selected }: NodeProps<TaskNodeType>) {
       )}
     >
       <PriorityBadgeSlot priority={nodeData.priority} />
+      <NodePresenceAvatars nodeId={id} />
 
       <Handle
         type="target"
@@ -313,6 +354,7 @@ function AdvanceNodeComponent({
       )}
     >
       <PriorityBadgeSlot priority={nodeData.priority} />
+      <NodePresenceAvatars nodeId={id} />
 
       <Handle
         type="target"
@@ -361,6 +403,7 @@ function PreviewNodeComponent({ id, data }: NodeProps<PreviewNodeType>) {
         'transition-all duration-300'
       )}
     >
+      <NodePresenceAvatars nodeId={id} />
       <Handle
         type="target"
         position={Position.Top}

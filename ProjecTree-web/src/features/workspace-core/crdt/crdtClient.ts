@@ -17,6 +17,7 @@ export interface AwarenessState {
     name: string;
     color: string;
   };
+  activeNodeId?: string | null;
 }
 
 // Y.Map에 저장되는 노드 값 타입
