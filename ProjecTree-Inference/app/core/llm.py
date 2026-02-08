@@ -15,6 +15,7 @@ openai_gpt_5_2 = ChatOpenAI(
     api_key=settings.AI_API_KEY
 )
 
+# 내일 여기서 모델 수정
 openai_mini_llm = ChatOpenAI(
     model="gpt-5-nano", 
     name="gpt-5-nano", 
