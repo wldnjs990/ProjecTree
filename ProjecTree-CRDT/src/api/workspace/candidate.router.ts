@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { getYDocByRoom } from "../../yjs/ydoc-gateway";
+import { getYDocByRoom, Y } from "../../yjs/ydoc-gateway";
 
 export type TaskType = "FE" | "BE" | null;
 
@@ -42,17 +42,24 @@ router.post("/:nodeId/candidate", (req: Request, res: Response) => {
 
   doc.transact(() => {
     const nodeCandidates = doc.getMap("nodeCandidates");
-    let yNodeCandidates = nodeCandidates.get(nodeId);
-    if (!yNodeCandidates) {
-      yNodeCandidates = new (nodeCandidates.constructor as any)();
-      nodeCandidates.set(nodeId, yNodeCandidates);
+
+    let yArray = nodeCandidates.get(nodeId) as Y.Array<Candidate>;
+    if (!yArray) {
+      yArray = new Y.Array<Candidate>();
+      nodeCandidates.set(nodeId, yArray);
     }
+
     const newCandidates = candidates.map((c) => ({
       ...c,
       taskType: null,
       selected: false,
-    }));
-    yNodeCandidates.set(nodeId, newCandidates);
+    })) as Candidate[];
+
+    // 전체 교체: 기존 삭제 후 새로 추가
+    if (yArray.length > 0) {
+      yArray.delete(0, yArray.length);
+    }
+    yArray.push(newCandidates);
 
     const nodeCandidatesPending = doc.getMap("nodeCandidatesPending");
     nodeCandidatesPending.set(nodeId, false);
