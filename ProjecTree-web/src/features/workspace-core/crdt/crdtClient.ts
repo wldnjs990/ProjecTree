@@ -58,14 +58,14 @@ class CrdtClient {
     this.provider.on('status', ({ status }: { status: string }) => {
       if (status === 'connected') {
         setConnectionStatus('connected');
-        console.log('[CRDT] ?œë²„ ?°ê²°??);
+        console.log('[CRDT] server connected');
         this.setupMessageListener();
       } else if (status === 'connecting') {
         setConnectionStatus('connecting');
-        console.log('[CRDT] ?°ê²° ì¤?..');
+        console.log('[CRDT] connecting...');
       } else if (status === 'disconnected') {
         setConnectionStatus('disconnected');
-        console.log('[CRDT] ?°ê²° ?´ì œ??);
+        console.log('[CRDT] disconnected');
       }
     });
 
@@ -411,5 +411,6 @@ export const getCrdtClient = CrdtClient.getInstance;
 export const destroyCrdtClient = CrdtClient.destroy;
 
 export default CrdtClient;
+
 
 
