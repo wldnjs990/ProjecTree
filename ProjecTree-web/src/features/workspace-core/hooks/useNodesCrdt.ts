@@ -31,6 +31,9 @@ export const useNodesCrdt = ({
   const setNodes = useNodeStore((state) => state.setNodes);
   const setNodeListData = useNodeStore((state) => state.setNodeListData);
   const updateNodePosition = useNodeStore((state) => state.updateNodePosition);
+  const cleanupDeletedNodeData = useNodeStore(
+    (state) => state.cleanupDeletedNodeData
+  );
 
   // Y.Map에서 노드 배열로 변환 후 전역 스토어 업데이트
   const syncFromYjs = useCallback(() => {
@@ -41,8 +44,12 @@ export const useNodesCrdt = ({
     const nodes: FlowNode[] = [];
     // nodeListData도 함께 구성 (O(1) 조회용)
     const nodeListDataMap: Record<number, NodeData> = {};
+    // 현재 활성 노드 ID Set (삭제된 노드 정리용)
+    const activeNodeIds = new Set<string>();
 
     yNodesRef.current.forEach((yNode, nodeId) => {
+      activeNodeIds.add(nodeId);
+
       // 현재 노드의 부모id
       const rawParentId = yNode.get('parentId');
       const data = yNode.get('data') as FlowNodeData;
@@ -73,7 +80,9 @@ export const useNodesCrdt = ({
 
     setNodes(nodes);
     setNodeListData(nodeListDataMap);
-  }, [setNodes, setNodeListData]);
+    // 삭제된 노드의 관련 데이터(nodeDetails 등) 정리
+    cleanupDeletedNodeData(activeNodeIds);
+  }, [setNodes, setNodeListData, cleanupDeletedNodeData]);
 
   const shouldAutoLayout = useCallback((nodes: FlowNode[]) => {
     if (nodes.length === 0) return false;

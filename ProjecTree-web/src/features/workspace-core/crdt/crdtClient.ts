@@ -2,6 +2,7 @@ import * as Y from 'yjs';
 import { UndoManager } from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import type { Awareness } from 'y-protocols/awareness';
+import { toast } from 'sonner';
 import { useWorkspaceStore } from '../stores/workspaceStore';
 import { useNodeStore } from '../stores/nodeStore';
 
@@ -89,11 +90,21 @@ class CrdtClient {
 
   private handleServerMessage(message: {
     type: string;
+    action?: string;
+    nodeId?: number;
     [key: string]: unknown;
   }) {
     switch (message.type) {
       case 'AI_MESSAGE':
         console.log('[CRDT] AI_MESSAGE 수신:', message);
+        break;
+      case 'save_error':
+        console.error('[CRDT] 저장 에러 수신:', message);
+        if (message.action === 'delete_node') {
+          toast.error('노드 삭제에 실패했습니다.');
+        } else {
+          toast.error('저장에 실패했습니다.');
+        }
         break;
       default:
         break;
@@ -271,6 +282,30 @@ class CrdtClient {
    */
   getSelectedNodeTechs(): Y.Map<number> {
     return this.getYMap<number>('selectedNodeTechs');
+  }
+
+  /**
+   * 노드 삭제 요청을 CRDT 서버로 전송
+   * CRDT 서버가 Spring DELETE 호출 후 Y.Doc에서 노드+자식노드 일괄 삭제
+   * @param nodeId 삭제할 노드 ID
+   */
+  deleteNode(nodeId: string): string | null {
+    const requestId = crypto.randomUUID();
+    const message = JSON.stringify({
+      type: 'delete_node',
+      requestId,
+      nodeId: Number(nodeId),
+    });
+
+    const ws = this.provider.ws;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(message);
+      console.log('[CRDT] 노드 삭제 요청 전송:', { requestId, nodeId });
+      return requestId;
+    }
+
+    console.warn('[CRDT] WebSocket이 연결되지 않아 삭제 요청 실패');
+    return null;
   }
 
   /**

@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import type { FlowNodeData } from '@/features/workspace-core';
-import { useIsCreatingNode, useNodes } from '@/features/workspace-core';
+import { useIsPreviewCreating, useNodes } from '@/features/workspace-core';
 
 /** 노드 고정 크기 상수 */
 export const NODE_DIMENSIONS = {
@@ -337,8 +337,8 @@ export interface PreviewNodeData extends FlowNodeData {
   isPreview: true;
 }
 export type PreviewNodeType = Node<PreviewNodeData, 'PREVIEW'>;
-function PreviewNodeComponent({ data }: NodeProps<PreviewNodeType>) {
-  const isCreating = useIsCreatingNode();
+function PreviewNodeComponent({ id, data }: NodeProps<PreviewNodeType>) {
+  const isCreating = useIsPreviewCreating(id);
 
   return (
     <div

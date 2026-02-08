@@ -33,6 +33,7 @@ export {
   usePreviewCandidate,
   useCustomPreviewDraft,
   usePreviewNodePosition,
-  useIsCreatingNode,
+  useCreatingPreviewIds,
+  useIsPreviewCreating,
   type EditableNodeDetail,
 } from './nodeDetailStore';

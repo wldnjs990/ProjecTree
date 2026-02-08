@@ -6,6 +6,7 @@ import { AITechRecommendSection } from './AITechRecommendSection';
 import { AINodeCandidateSection } from './AINodeCandidateSection';
 import { MemoSection } from './MemoSection';
 import { useSelectedNodeDetail, useNodeDetailEdit } from '../hooks';
+import * as Y from 'yjs';
 import {
   useSelectedNodeId,
   nodeDetailCrdtService,
@@ -14,7 +15,9 @@ import {
   useNodes,
   calculateChildNodePosition,
   getChildNodeType,
+  getCrdtClient,
   type FlowNode,
+  type Candidate,
 } from '@/features/workspace-core';
 import { useUser } from '@/shared/stores/userStore';
 import { generateNodeCandidates } from '@/apis/workspace.api';
@@ -22,7 +25,6 @@ import {
   getAiNodeTechRecommendation,
   postCustomNodeTechRecommendation,
 } from '@/apis/node.api';
-import { toast } from 'sonner';
 
 interface NodeDetailContainerProps {
   nodeInfo?: {
@@ -43,7 +45,9 @@ export default function NodeDetailContainer({
   isExpanded,
 }: NodeDetailContainerProps) {
   // URL에서 workspaceId 가져오기
-  const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
+  const { workspaceId: paramWorkspaceId } = useParams<{
+    workspaceId: string;
+  }>();
   const workspaceId = paramWorkspaceId ? Number(paramWorkspaceId) : null;
 
   // Store state subscriptions
@@ -146,6 +150,41 @@ export default function NodeDetailContainer({
     });
   };
 
+  // locked 후보(생성 중) 클릭 시 해당 preview로 재진입
+  const handleLockedCandidateClick = (candidate: Candidate) => {
+    const previewNodeId = `preview-${candidate.id}`;
+
+    // CRDT에서 preview 노드 찾기
+    const client = getCrdtClient();
+    if (!client) return;
+
+    const yPreviewNodes = client.getYMap<Y.Map<unknown>>('previewNodes');
+    const yNode = yPreviewNodes.get(previewNodeId);
+    if (!yNode) return;
+
+    const position = yNode.get('position') as
+      | { x?: number; y?: number }
+      | undefined;
+    const xpos = Number(position?.x ?? 0);
+    const ypos = Number(position?.y ?? 0);
+
+    // preview 모드로 진입
+    enterCandidatePreview(candidate, { xpos, ypos });
+
+    // pending 상태 확인 및 설정
+    const yNodeCreatingPending = client.getYMap<boolean>('nodeCreatingPending');
+    const isPending = yNodeCreatingPending.get(previewNodeId) === true;
+    if (isPending) {
+      useNodeDetailStore.getState().addCreatingPreviewId(previewNodeId);
+    }
+
+    console.log('[NodeDetailContainer] Re-enter locked preview:', {
+      candidate,
+      previewNodeId,
+      isPending,
+    });
+  };
+
   const handleCandidateAddManual = () => {
     if (!selectedNodeId || !workspaceId) return;
 
@@ -200,7 +239,6 @@ export default function NodeDetailContainer({
       console.log('[NodeDetailContainer] AI 기술 추천 요청 완료');
     } catch (error) {
       console.error('AI 기술 추천 생성 실패:', error);
-      toast.error('AI 기술 추천 생성에 실패했습니다.');
       // 에러 시에만 클라이언트에서 pending=false 전송 (서버 응답 없으므로)
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
@@ -218,7 +256,6 @@ export default function NodeDetailContainer({
       console.log('[NodeDetailContainer] AI 노드 후보 생성 요청 완료');
     } catch (error) {
       console.error('AI 노드 후보 생성 실패:', error);
-      toast.error('AI 노드 후보 생성에 실패했습니다.');
       nodeDetailCrdtService.setCandidatesPending(selectedNodeId, false);
     }
   };
@@ -236,12 +273,29 @@ export default function NodeDetailContainer({
         workspaceId,
         techVocaId,
       });
-      toast.success('기술스택이 추가되었습니다.');
     } catch (error) {
       console.error('커스텀 기술스택 추가 실패:', error);
-      toast.error('기술스택 추가에 실패했습니다.');
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
+  };
+
+  // 노드 삭제 핸들러
+  // CRDT 서버에 삭제 요청 전송 → Spring DELETE 호출 → Y.Doc에서 노드+자식 일괄 삭제
+  const handleDeleteNode = () => {
+    if (!selectedNodeId) return;
+
+    const client = getCrdtClient();
+    if (!client) {
+      console.warn('[NodeDetailContainer] CRDT 클라이언트가 초기화되지 않았습니다.');
+      return;
+    }
+
+    // 사이드바 먼저 닫기
+    closeSidebar();
+
+    // CRDT 서버에 삭제 요청 전송
+    client.deleteNode(selectedNodeId);
+    console.log('[NodeDetailContainer] 노드 삭제 요청:', selectedNodeId);
   };
 
   return (
@@ -256,6 +310,7 @@ export default function NodeDetailContainer({
         onShowDescription={onShowDescription}
         onToggleExpand={onToggleExpand}
         isExpanded={isExpanded}
+        onDelete={handleDeleteNode}
       />
 
       {/* Status & Meta section */}
@@ -281,6 +336,7 @@ export default function NodeDetailContainer({
         <AINodeCandidateSection
           candidates={nodeDetail.candidates || []}
           onCandidateClick={handleCandidateClick}
+          onLockedCandidateClick={handleLockedCandidateClick}
           onAddManual={handleCandidateAddManual}
           onGenerateCandidates={handleGenerateCandidates}
           isGenerating={isGeneratingCandidates}
@@ -289,5 +345,3 @@ export default function NodeDetailContainer({
     </div>
   );
 }
-
-

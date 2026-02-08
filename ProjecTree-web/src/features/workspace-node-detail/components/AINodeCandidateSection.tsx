@@ -25,6 +25,7 @@ interface AINodeCandidateSectionProps {
     candidateId: number,
     body: { xpos: number; ypos: number }
   ) => void;
+  onLockedCandidateClick?: (candidate: Candidate) => void;
   onAddManual?: () => void;
   onGenerateCandidates?: () => Promise<void>;
   isGenerating?: boolean;
@@ -33,6 +34,7 @@ interface AINodeCandidateSectionProps {
 export function AINodeCandidateSection({
   candidates,
   onCandidateClick,
+  onLockedCandidateClick,
   onAddManual,
   onGenerateCandidates,
   isGenerating = false,
@@ -54,7 +56,11 @@ export function AINodeCandidateSection({
 
   const handleCandidateClick = (candidate: Candidate) => {
     if (!selectedNodeId) return;
-    if (lockedCandidateIds.has(candidate.id)) return;
+    // locked 후보(생성 중) 클릭 시 해당 preview로 재진입
+    if (lockedCandidateIds.has(candidate.id)) {
+      onLockedCandidateClick?.(candidate);
+      return;
+    }
     const position = calculateChildNodePosition(nodes, selectedNodeId);
     onCandidateClick(Number(selectedNodeId), candidate.id, position);
   };
@@ -86,15 +92,19 @@ export function AINodeCandidateSection({
             <>
               {/* 추천 노드 목록 */}
               <div className="space-y-2">
-                {candidates.map((node) => (
-                  <SubNodeCard
-                    key={node.id}
-                    node={node}
-                    onClick={() => handleCandidateClick(node)}
-                    isSelected={selectedCandidateIds.includes(node.id)}
-                    disabled={lockedCandidateIds.has(node.id)}
-                  />
-                ))}
+                {candidates.map((node) => {
+                  const isLocked = lockedCandidateIds.has(node.id);
+                  const isSelected = selectedCandidateIds.includes(node.id);
+                  return (
+                    <SubNodeCard
+                      key={node.id}
+                      node={node}
+                      onClick={() => handleCandidateClick(node)}
+                      isSelected={isSelected || isLocked}
+                      disabled={isSelected} // locked는 클릭 가능 (재진입), selected만 비활성화
+                    />
+                  );
+                })}
               </div>
 
               {/* AI 재생성 버튼 */}

@@ -32,6 +32,7 @@ class NodeDetailCrdtService {
   private yNodeCreatingPendingRef: Y.Map<boolean> | null = null;
   private cleanupFn: (() => void) | null = null;
   private isInitialized = false;
+  private currentUserId: string | null = null;
 
   private constructor() { }
 
@@ -71,11 +72,12 @@ class NodeDetailCrdtService {
   }
 
   // Initialize CRDT observers (call once per connection)
-  initObservers(): void {
+  initObservers(userId?: string): void {
     if (this.isInitialized) {
       console.log('[NodeDetailCrdtService] already initialized');
       return;
     }
+    this.currentUserId = userId ?? null;
 
     const client = getCrdtClient();
     if (!client) {
@@ -183,20 +185,33 @@ class NodeDetailCrdtService {
         const pending = yNodeCreatingPending.get(previewNodeId);
         if (pending === undefined) return;
 
-        // 현재 클라이언트의 프리뷰 노드인지 확인
         const store = useNodeDetailStore.getState();
+
+        // pending 상태에 따라 creatingPreviewIds 업데이트
+        if (pending) {
+          store.addCreatingPreviewId(previewNodeId);
+        } else {
+          store.removeCreatingPreviewId(previewNodeId);
+
+          // pending=false → 노드 생성 완료 → preview 노드 제거 + pending 엔트리 정리
+          const yPreviewNodes = client.getYMap<Y.Map<YNodeValue>>('previewNodes');
+          yPreviewNodes.delete(previewNodeId);
+          yNodeCreatingPending.delete(previewNodeId);
+          console.log(
+            '[NodeDetailCrdtService] preview node cleaned up after creation:',
+            previewNodeId
+          );
+        }
+
+        // 현재 사이드바에서 보고 있는 프리뷰 노드인 경우 UI 상태 업데이트
         const currentPreviewId =
           store.previewKind === 'candidate' && store.previewCandidate
             ? `preview-${store.previewCandidate.id}`
             : store.customDraft?.previewNodeId;
 
-        if (currentPreviewId === previewNodeId) {
-          store.setIsCreatingNode(pending);
-          console.log(
-            '[NodeDetailCrdtService] node creating pending:',
-            previewNodeId,
-            pending
-          );
+        if (currentPreviewId === previewNodeId && !pending) {
+          // 현재 보고 있는 프리뷰 노드 생성 완료 → 프리뷰 모드 종료
+          store.exitCandidatePreview();
         }
       });
     };
@@ -260,6 +275,12 @@ class NodeDetailCrdtService {
             .updateNodeDetail(Number(key), { comparison });
         }
       });
+
+      // 새로고침/재연결 시 preview 노드 정리 및 pending 상태 복원
+      if (this.currentUserId) {
+        this.clearNonPendingPreviewNodes(this.currentUserId);
+        this.restorePendingPreviewState(this.currentUserId);
+      }
     };
     const syncHandler = (isSynced: boolean) => {
       if (isSynced) {
@@ -583,7 +604,108 @@ class NodeDetailCrdtService {
   setNodeCreatingPending(previewNodeId: string, pending: boolean): void {
     if (!this.yNodeCreatingPendingRef) return;
     this.yNodeCreatingPendingRef.set(previewNodeId, pending);
-    useNodeDetailStore.getState().setIsCreatingNode(pending);
+    // 로컬 상태도 즉시 업데이트 (CRDT 옵저버가 처리하기 전까지)
+    const store = useNodeDetailStore.getState();
+    if (pending) {
+      store.addCreatingPreviewId(previewNodeId);
+    } else {
+      store.removeCreatingPreviewId(previewNodeId);
+    }
+  }
+
+  /**
+   * 새로고침/재연결 시 pending 중인 preview 노드의 상태 복원
+   * pending 중인 내 preview 노드가 있으면 creatingPreviewIds에 추가
+   */
+  restorePendingPreviewState(ownerId: string): void {
+    const client = getCrdtClient();
+    if (!client || !this.yNodeCreatingPendingRef) return;
+
+    const yPreviewNodes = client.getYMap<Y.Map<YNodeValue>>('previewNodes');
+    const store = useNodeDetailStore.getState();
+
+    yPreviewNodes.forEach((yNode, previewNodeId) => {
+      const isPending = this.yNodeCreatingPendingRef?.get(previewNodeId) === true;
+      if (!isPending) return;
+
+      const lockedBy =
+        (yNode.get('lockedBy') as string | undefined) ??
+        ((yNode.get('data') as { lockedBy?: string } | undefined)?.lockedBy);
+
+      if (lockedBy === ownerId) {
+        // 내 pending preview 노드가 있으면 creatingPreviewIds에 추가
+        store.addCreatingPreviewId(previewNodeId);
+        console.log(
+          '[NodeDetailCrdtService] restored pending state for:',
+          previewNodeId
+        );
+      }
+    });
+  }
+
+  /**
+   * 새로고침/재연결 시 preview 노드 정리
+   * - 커스텀 노드: pending 여부와 관계없이 삭제 (서버에 이미 요청 전송됨)
+   * - 실제 노드가 이미 생성된 경우: preview 노드 + pending 엔트리 삭제
+   * - pending이 아닌 경우: preview 노드 삭제
+   */
+  clearNonPendingPreviewNodes(ownerId: string): void {
+    const client = getCrdtClient();
+    if (!client) return;
+
+    const yPreviewNodes = client.getYMap<Y.Map<YNodeValue>>('previewNodes');
+
+    client.yDoc.transact(() => {
+      yPreviewNodes.forEach((yNode, previewNodeId) => {
+        const lockedBy =
+          (yNode.get('lockedBy') as string | undefined) ??
+          ((yNode.get('data') as { lockedBy?: string } | undefined)
+            ?.lockedBy);
+
+        // 내 preview 노드만 처리
+        if (lockedBy !== ownerId) return;
+
+        // 커스텀 노드: pending 여부와 관계없이 삭제
+        // 서버에 요청이 이미 전송된 상태이므로 결과는 서버가 처리
+        if (previewNodeId.startsWith('preview-custom-')) {
+          yPreviewNodes.delete(previewNodeId);
+          this.yNodeCreatingPendingRef?.delete(previewNodeId);
+          console.log('[NodeDetailCrdtService] cleaned up custom preview:', previewNodeId);
+          return;
+        }
+
+        // candidate 기반 preview인 경우, 해당 candidate의 실제 노드가 생성되었는지 확인
+        const candidateIdMatch = previewNodeId.match(/^preview-(\d+)$/);
+        if (candidateIdMatch) {
+          const candidateId = candidateIdMatch[1];
+          // nodeCandidates에서 해당 candidate가 selected인지 확인
+          const parentNodeId = yNode.get('parentId') as string | undefined;
+          if (parentNodeId) {
+            const candidates = this.yNodeCandidatesRef?.get(parentNodeId);
+            const candidate = candidates?.find(c => String(c.id) === candidateId);
+            if (candidate?.selected) {
+              // 이미 노드가 생성됨 → preview 노드 + pending 엔트리 삭제
+              yPreviewNodes.delete(previewNodeId);
+              this.yNodeCreatingPendingRef?.delete(previewNodeId);
+              console.log('[NodeDetailCrdtService] cleaned up stale preview (node created):', previewNodeId);
+              return;
+            }
+          }
+        }
+
+        // pending 중인 preview 노드는 건너뜀
+        if (this.yNodeCreatingPendingRef?.get(previewNodeId) === true) return;
+
+        // non-pending preview 노드 삭제
+        yPreviewNodes.delete(previewNodeId);
+        console.log('[NodeDetailCrdtService] cleaned up non-pending preview:', previewNodeId);
+      });
+    });
+
+    console.log(
+      '[NodeDetailCrdtService] preview nodes cleanup completed for:',
+      ownerId
+    );
   }
 }
 export const nodeDetailCrdtService = NodeDetailCrdtService.getInstance();
