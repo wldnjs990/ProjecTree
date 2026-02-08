@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { getYDocByRoom } from "../../yjs/ydoc-gateway";
+import { deleteCandidateToSpring } from "../../services/spring/node/node-candidate-delete.writer";
 
 export type TaskType = "FE" | "BE" | null;
 
@@ -83,6 +84,66 @@ router.post("/:nodeId/candidate", (req: Request, res: Response) => {
 });
 
 // Pending 리셋 API - AI 호출 실패 시 fallback용
+router.delete(
+  "/:nodeId/candidate/:candidateId",
+  async (req: Request, res: Response) => {
+    console.log("delete candidate start", new Date().toISOString());
+
+    const { workspaceId, nodeId, candidateId } = req.params;
+
+    if (!workspaceId || typeof workspaceId !== "string") {
+      console.error("Invalid workspace Id", new Date().toISOString());
+      return res.status(400).json({
+        message: "Invalid workspace Id",
+        timeStamp: new Date().toISOString(),
+      });
+    }
+
+    if (!nodeId || !candidateId) {
+      console.error("Invalid request", new Date().toISOString());
+      return res.status(400).json({
+        message: "Invalid request",
+        timeStamp: new Date().toISOString(),
+      });
+    }
+
+    const candidateIdValue = Number(candidateId);
+    if (!Number.isFinite(candidateIdValue)) {
+      console.error("Invalid candidateId", new Date().toISOString());
+      return res.status(400).json({
+        message: "Invalid candidateId",
+        timeStamp: new Date().toISOString(),
+      });
+    }
+
+    const deleted = await deleteCandidateToSpring({
+      candidateId: candidateIdValue,
+    });
+
+    if (!deleted) {
+      return res.status(500).json({
+        status: "error",
+        message: "spring_delete_failed",
+        timeStamp: new Date().toISOString(),
+      });
+    }
+
+    const doc = getYDocByRoom(workspaceId);
+
+    doc.transact(() => {
+      const nodeCandidates = doc.getMap("nodeCandidates");
+      const currentCandidates = (nodeCandidates.get(nodeId) as Candidate[]) ?? [];
+      const nextCandidates = currentCandidates.filter(
+        (c) => c?.id !== candidateIdValue,
+      );
+      nodeCandidates.set(nodeId, nextCandidates);
+    });
+
+    console.log("delete candidate success", new Date().toISOString());
+    res.status(200).json({ status: "ok" });
+  },
+);
+
 router.post("/:nodeId/candidate/pending-reset", (req: Request, res: Response) => {
   console.log("reset candidate pending start", new Date().toISOString());
 

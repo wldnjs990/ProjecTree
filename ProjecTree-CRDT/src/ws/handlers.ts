@@ -8,17 +8,23 @@ import { addPendingPosition } from "./sync/pending-store";
 import { flushWorkspace, scheduleFlush } from "./sync/debounce";
 import { getRoom } from "./room-registry";
 import { deleteNodeToSpring } from "../services/spring/node/node-delete.writer";
+import { deleteCandidateToSpring } from "../services/spring/node/node-candidate-delete.writer";
 
 function sendError(
   ws: WebSocket,
   payload: {
     type: "save_error";
-    action: "save_node_detail" | "select_node_tech" | "delete_node";
+    action:
+      | "save_node_detail"
+      | "select_node_tech"
+      | "delete_node"
+      | "delete_candidate";
     message: string;
     requestId?: string;
     workspaceId?: number;
     nodeId?: number;
     selectedTechId?: number;
+    candidateId?: number;
     prevDetail?: unknown;
   },
 ) {
@@ -173,6 +179,40 @@ export async function handleMessage(ws: WebSocket, data: Buffer, room: string) {
       targetIds,
       new Date().toISOString(),
     );
+  }
+  // delete candidate
+  else if (parsed?.type === "delete_candidate") {
+    const { nodeId, candidateId, requestId } = parsed;
+    if (!nodeId || candidateId === undefined || candidateId === null) return;
+
+    const candidateIdValue = Number(candidateId);
+    if (!Number.isFinite(candidateIdValue)) return;
+
+    const deleted = await deleteCandidateToSpring({
+      candidateId: candidateIdValue,
+    });
+    if (!deleted) {
+      sendError(ws, {
+        type: "save_error",
+        action: "delete_candidate",
+        message: "spring_delete_failed",
+        requestId,
+        nodeId: Number(nodeId),
+        candidateId: candidateIdValue,
+      });
+      return;
+    }
+
+    const doc = getYDocByRoom(room);
+    doc.transact(() => {
+      const nodeCandidates = doc.getMap("nodeCandidates");
+      const key = String(nodeId);
+      const currentCandidates = (nodeCandidates.get(key) as any[]) ?? [];
+      const nextCandidates = currentCandidates.filter(
+        (c) => c?.id !== candidateIdValue,
+      );
+      nodeCandidates.set(key, nextCandidates);
+    });
   }
 }
 
