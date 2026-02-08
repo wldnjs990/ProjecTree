@@ -635,6 +635,7 @@ class NodeDetailCrdtService {
 
   /**
    * 새로고침/재연결 시 preview 노드 정리
+   * - 커스텀 노드: pending 여부와 관계없이 삭제 (서버에 이미 요청 전송됨)
    * - 실제 노드가 이미 생성된 경우: preview 노드 + pending 엔트리 삭제
    * - pending이 아닌 경우: preview 노드 삭제
    */
@@ -653,6 +654,15 @@ class NodeDetailCrdtService {
 
         // 내 preview 노드만 처리
         if (lockedBy !== ownerId) return;
+
+        // 커스텀 노드: pending 여부와 관계없이 삭제
+        // 서버에 요청이 이미 전송된 상태이므로 결과는 서버가 처리
+        if (previewNodeId.startsWith('preview-custom-')) {
+          yPreviewNodes.delete(previewNodeId);
+          this.yNodeCreatingPendingRef?.delete(previewNodeId);
+          console.log('[NodeDetailCrdtService] cleaned up custom preview:', previewNodeId);
+          return;
+        }
 
         // candidate 기반 preview인 경우, 해당 candidate의 실제 노드가 생성되었는지 확인
         const candidateIdMatch = previewNodeId.match(/^preview-(\d+)$/);
