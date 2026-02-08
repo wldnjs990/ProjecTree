@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { Layers } from 'lucide-react';
 import { HomeButtonWithConfirm } from './HomeButtonWithConfirm';
 import forestImage from '@/assets/images/forest2.jpg';
+import logoImage from '@/assets/images/logo2.png';
 
 /**
  * [컴포넌트] 사용자 온보딩 좌측 브랜드 패널
@@ -29,12 +29,11 @@ export function BrandPanel() {
       <div className="flex flex-col justify-between h-full z-10 relative">
         {/* Logo Area */}
         <div className="flex items-center gap-3 z-10">
-          <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm">
-            <Layers className="text-white h-7 w-7" />
-          </div>
-          <span className="text-2xl font-bold text-white tracking-tight">
-            ProjecTree
-          </span>
+          <img
+            src={logoImage}
+            alt="ProjecTree Logo"
+            className="h-10"
+          />
           <HomeButtonWithConfirm className="-mr-2 hover:bg-white/10 text-white/70 hover:text-white ml-auto" />
         </div>
 

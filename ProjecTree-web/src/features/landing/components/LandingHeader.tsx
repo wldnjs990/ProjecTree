@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
-import { TreeDeciduous } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/shared/stores/authStore';
 import { logout } from '@/apis/oauth.api';
+import logoImage from '@/assets/images/logo.png';
 
 export function LandingHeader() {
   const navigate = useNavigate();
@@ -26,15 +26,11 @@ export function LandingHeader() {
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => navigate('/')}
         >
-          <div
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 border border-emerald-200"
-            style={{ boxShadow: '0 0 20px rgba(16, 185, 129, 0.15)' }}
-          >
-            <TreeDeciduous className="h-4 w-4 text-emerald-600" />
-          </div>
-          <span className="text-lg font-bold text-zinc-900 tracking-tight">
-            ProjecTree
-          </span>
+          <img
+            src={logoImage}
+            alt="ProjecTree Logo"
+            className="h-8"
+          />
         </div>
 
         {/* Auth Buttons */}
