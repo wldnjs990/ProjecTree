@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { PortfolioViewerProps } from '../types';
 import { markdownComponents } from './markdownComponents';
+import { useWorkspaceName } from '@/features/workspace-core';
 
 /**
  * 마크다운 파일 다운로드 함수
@@ -30,10 +31,11 @@ function downloadMarkdown(content: string, filename: string = 'portfolio.md') {
 export function PortfolioViewer({ content, onEdit }: PortfolioViewerProps) {
     const user = useUser();
     const nickname = user?.nickname || '사용자';
+    const workspaceName = useWorkspaceName() || '프로젝트';
 
     const handleExport = () => {
         const dateStr = new Date().toISOString().split('T')[0];
-        downloadMarkdown(content, `portfolio_${nickname}_${dateStr}.md`);
+        downloadMarkdown(content, `포트폴리오_${workspaceName}_${nickname}_${dateStr}.md`);
     };
 
     return (

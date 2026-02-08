@@ -27,13 +27,14 @@ class NodeDetailCrdtService {
   private yNodeTechRecommendationsRef: Y.Map<TechRecommendation[]> | null = null;
   private yNodeCandidatesPendingRef: Y.Map<boolean> | null = null;
   private yNodeTechsPendingRef: Y.Map<boolean> | null = null;
+  // @ts-expect-error - Used in initObservers and cleanupObservers
   private yNodeTechComparisonsRef: Y.Map<string> | null = null;
   private yNodeCreatingPendingRef: Y.Map<boolean> | null = null;
   private cleanupFn: (() => void) | null = null;
   private isInitialized = false;
   private currentUserId: string | null = null;
 
-  private constructor() {}
+  private constructor() { }
 
   // Sync confirmed data back into the node graph data (for ReactFlow UI)
 
