@@ -124,7 +124,55 @@ export async function handleMessage(ws: WebSocket, data: Buffer, room: string) {
         message: "spring_delete_failed",
         nodeId: nodeIdValue,
       });
+      return;
     }
+
+    // Spring 삭제 성공 → Y.Doc에서 해당 노드 + 자식 노드 일괄 제거
+    const doc = getYDocByRoom(room);
+    const nodes = doc.getMap<any>("nodes");
+
+    // parentId 기반으로 자식 노드를 재귀 탐색
+    const nodeIdStr = String(nodeId);
+    const targetIds: string[] = [nodeIdStr];
+    const collectDescendants = (parentId: string) => {
+      nodes.forEach((_value: any, key: string) => {
+        const node = nodes.get(key);
+        if (node?.get?.("parentId") === parentId) {
+          targetIds.push(key);
+          collectDescendants(key);
+        }
+      });
+    };
+    collectDescendants(nodeIdStr);
+
+    doc.transact(() => {
+      const nodeDetails = doc.getMap("nodeDetails");
+      const nodeCandidates = doc.getMap("nodeCandidates");
+      const nodeCandidatesPending = doc.getMap("nodeCandidatesPending");
+      const nodeTechRecommendations = doc.getMap("nodeTechRecommendations");
+      const nodeTechComparisons = doc.getMap("nodeTechComparisons");
+      const nodeTechsPending = doc.getMap("nodeTechsPending");
+      const nodeCreatingPending = doc.getMap("nodeCreatingPending");
+      const previewNodes = doc.getMap("previewNodes");
+
+      for (const id of targetIds) {
+        nodes.delete(id);
+        nodeDetails.delete(id);
+        nodeCandidates.delete(id);
+        nodeCandidatesPending.delete(id);
+        nodeTechRecommendations.delete(id);
+        nodeTechComparisons.delete(id);
+        nodeTechsPending.delete(id);
+        nodeCreatingPending.delete(id);
+        previewNodes.delete(id);
+      }
+    });
+
+    console.log(
+      `[Delete Node] Removed ${targetIds.length} nodes from Y.Doc:`,
+      targetIds,
+      new Date().toISOString(),
+    );
   }
 }
 
