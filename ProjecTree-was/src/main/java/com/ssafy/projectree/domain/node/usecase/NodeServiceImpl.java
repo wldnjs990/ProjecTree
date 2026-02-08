@@ -3,6 +3,7 @@ package com.ssafy.projectree.domain.node.usecase;
 import com.ssafy.projectree.domain.ai.dto.AiCandidateCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiNodeCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiTechRecommendDto;
+import com.ssafy.projectree.domain.ai.dto.schemas.AiCandidateSchema;
 import com.ssafy.projectree.domain.ai.service.InferenceService;
 import com.ssafy.projectree.domain.member.api.dto.schemas.MemberSchema;
 import com.ssafy.projectree.domain.member.model.entity.Member;
@@ -296,13 +297,17 @@ public class NodeServiceImpl implements NodeService {
         if (node.getCandidateLimit() <= candidateRepository.countCandidateByParent(node)) {
             throw new BusinessLogicException(ErrorCode.CANDIDATE_GENERATE_LIMIT, "후보 노드 생성 개수를 초과하였습니다.");
         }
-        AiCandidateCreateDto.Response candidate = inferenceService.generateCandidate(AiCandidateCreateDto.Request.builder()
+        inferenceService.generateCandidate(AiCandidateCreateDto.Request.builder()
                 .workspaceId(projectNode.getWorkspace().getId())
                 .nodeId(parentId)
                 .candidateCount(3)
                 .build());
+        List<Candidate> candidates = candidateRepository.findByParent(node);
+        AiCandidateCreateDto.Response aiCandidate = AiCandidateCreateDto.Response.builder().candidates(
+                candidates.stream().map(c -> AiCandidateSchema.builder().id(c.getId()).name(c.getName()).description(c.getDescription()).summary(c.getSummary()).build()).toList()
+        ).build();
 
-        nodeCrdtService.sendCandidatesCreationToCrdt(projectNode.getWorkspace().getId(), parentId, candidate);
+        nodeCrdtService.sendCandidatesCreationToCrdt(projectNode.getWorkspace().getId(), parentId, aiCandidate);
 
         return CandidateCreateDto.Response.builder()
                 .nodeId(parentId)
