@@ -24,9 +24,7 @@ class NodeDetailCrdtService {
   private yNodeDetailsRef: Y.Map<Y.Map<YNodeDetailValue>> | null = null;
   private yConfirmedRef: Y.Map<ConfirmedNodeData> | null = null;
   private yNodeCandidatesRef: Y.Map<Candidate[]> | null = null;
-  private yNodeTechRecommendationsRef: Y.Map<
-    Y.Array<TechRecommendation>
-  > | null = null;
+  private yNodeTechRecommendationsRef: Y.Map<TechRecommendation[]> | null = null;
   private yNodeCandidatesPendingRef: Y.Map<boolean> | null = null;
   private yNodeTechsPendingRef: Y.Map<boolean> | null = null;
   private yNodeTechComparisonsRef: Y.Map<string> | null = null;
@@ -86,9 +84,7 @@ class NodeDetailCrdtService {
     const yNodeDetails = client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
     const yConfirmed = client.getYMap<ConfirmedNodeData>('confirmedNodeData');
     const yNodeCandidates = client.getYMap<Candidate[]>('nodeCandidates');
-    const yNodeTechRecommendations = client.getYMap<
-      Y.Array<TechRecommendation>
-    >('nodeTechRecommendations');
+    const yNodeTechRecommendations = client.getYMap<TechRecommendation[]>('nodeTechRecommendations');
     const yNodeCandidatesPending = client.getYMap<boolean>(
       'nodeCandidatesPending'
     );
@@ -129,12 +125,11 @@ class NodeDetailCrdtService {
     };
 
     const techRecommendationsHandler = (
-      event: Y.YMapEvent<Y.Array<TechRecommendation>>
+      event: Y.YMapEvent<TechRecommendation[]>
     ) => {
       event.keysChanged.forEach((key) => {
-        const yArray = yNodeTechRecommendations.get(key);
-        if (yArray) {
-          const techs = yArray.toArray();
+        const techs = yNodeTechRecommendations.get(key);
+        if (techs) {
           console.log(
             '[NodeDetailCrdtService] tech recommendations received:',
             key,
@@ -242,9 +237,8 @@ class NodeDetailCrdtService {
           .updateNodeDetail(Number(key), { techsPending: pending });
       });
       // 기존 tech recommendations 로드
-      yNodeTechRecommendations.forEach((yArray, key) => {
-        const techs = yArray.toArray();
-        if (techs.length > 0) {
+      yNodeTechRecommendations.forEach((techs, key) => {
+        if (techs && techs.length > 0) {
           console.log(
             '[NodeDetailCrdtService] tech recommendations load:',
             key,
@@ -512,48 +506,34 @@ class NodeDetailCrdtService {
     }
   }
 
-  // Update candidates (broadcast + local store)
-  updateCandidates(nodeId: string, candidates: Candidate[]): void {
-    const client = getCrdtClient();
-    if (!client || !this.yNodeCandidatesRef) {
+  // Update candidates - 기존 후보에 새 후보 병합 (AI 후보 생성 시)
+  updateCandidates(nodeId: string, newCandidates: Candidate[]): void {
+    if (!this.yNodeCandidatesRef) {
       console.warn('[NodeDetailCrdtService] CRDT client is not available.');
       return;
     }
-    this.yNodeCandidatesRef.set(nodeId, candidates);
+
+    const currentCandidates = this.yNodeCandidatesRef.get(nodeId) ?? [];
+    const mergedCandidates = [...currentCandidates, ...newCandidates];
+    this.yNodeCandidatesRef.set(nodeId, mergedCandidates);
     this.setCandidatesPending(nodeId, false);
-    useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates });
+    useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates: mergedCandidates });
 
     console.log(
-      '[NodeDetailCrdtService] candidates updated:',
+      '[NodeDetailCrdtService] candidates merged:',
       nodeId,
-      candidates
+      { existing: currentCandidates.length, new: newCandidates.length, total: mergedCandidates.length }
     );
   }
 
   // Update tech recommendations - 전체 교체 (AI 추천 시 기존 것 덮어씌움)
   updateTechRecommendations(nodeId: string, techs: TechRecommendation[]): void {
-    const client = getCrdtClient();
-    if (!client || !this.yNodeTechRecommendationsRef) {
+    if (!this.yNodeTechRecommendationsRef) {
       console.warn('[NodeDetailCrdtService] CRDT client is not available.');
       return;
     }
 
-    client.yDoc.transact(() => {
-      let yArray = this.yNodeTechRecommendationsRef!.get(nodeId);
-
-      if (!yArray) {
-        // Y.Array가 없으면 새로 생성
-        yArray = new Y.Array<TechRecommendation>();
-        this.yNodeTechRecommendationsRef!.set(nodeId, yArray);
-      } else {
-        // 기존 배열 비우기
-        yArray.delete(0, yArray.length);
-      }
-
-      // 새로운 techs 추가
-      yArray.push(techs);
-    });
-
+    this.yNodeTechRecommendationsRef.set(nodeId, techs);
     this.setTechsPending(nodeId, false);
     useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs });
 
@@ -566,29 +546,14 @@ class NodeDetailCrdtService {
 
   // Add single tech recommendation - 개별 추가 (커스텀 기술 추가 시)
   addTechRecommendation(nodeId: string, tech: TechRecommendation): void {
-    const client = getCrdtClient();
-    if (!client || !this.yNodeTechRecommendationsRef) {
+    if (!this.yNodeTechRecommendationsRef) {
       console.warn('[NodeDetailCrdtService] CRDT client is not available.');
       return;
     }
 
-    client.yDoc.transact(() => {
-      let yArray = this.yNodeTechRecommendationsRef!.get(nodeId);
-
-      if (!yArray) {
-        // Y.Array가 없으면 새로 생성
-        yArray = new Y.Array<TechRecommendation>();
-        this.yNodeTechRecommendationsRef!.set(nodeId, yArray);
-      }
-
-      // 새로운 tech 추가
-      yArray.push([tech]);
-    });
-
-    // 로컬 스토어 업데이트
-    const currentTechs =
-      useNodeStore.getState().nodeDetails[Number(nodeId)]?.techs ?? [];
+    const currentTechs = this.yNodeTechRecommendationsRef.get(nodeId) ?? [];
     const updatedTechs = [...currentTechs, tech];
+    this.yNodeTechRecommendationsRef.set(nodeId, updatedTechs);
     useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs: updatedTechs });
 
     console.log(

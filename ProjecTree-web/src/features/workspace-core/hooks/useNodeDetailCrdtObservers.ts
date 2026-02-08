@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { nodeDetailCrdtService } from '../services/nodeDetailCrdtService';
+import { previewNodesCrdtService } from '../services/previewNodesCrdtService';
 import { useConnectionStatus } from '../stores/nodeStore';
+import { useUser } from '@/shared/stores/userStore';
 
 /**
  * CRDT 옵저버 생명주기 관리 Hook
@@ -9,6 +11,8 @@ import { useConnectionStatus } from '../stores/nodeStore';
  */
 export function useNodeDetailCrdtObservers() {
   const connectionStatus = useConnectionStatus();
+  const currentUser = useUser();
+  const currentUserId = String(currentUser?.memberId ?? currentUser?.id ?? '');
 
   useEffect(() => {
     // CRDT 클라이언트가 연결된 후에만 옵저버 초기화
@@ -18,8 +22,13 @@ export function useNodeDetailCrdtObservers() {
 
     nodeDetailCrdtService.initObservers();
 
+    // 새로고침/재연결 시 이전 세션에서 남은 preview 노드 정리
+    if (currentUserId) {
+      previewNodesCrdtService.clearPreviewNodesByOwner(currentUserId);
+    }
+
     return () => {
       nodeDetailCrdtService.cleanupObservers();
     };
-  }, [connectionStatus]);
+  }, [connectionStatus, currentUserId]);
 }
