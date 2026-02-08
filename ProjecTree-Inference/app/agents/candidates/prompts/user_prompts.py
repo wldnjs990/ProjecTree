@@ -6,6 +6,14 @@ CANDIDATE_USER_PROMPT = """
 
 ## 생성할 후보 개수
 {count_instruction}
+
+## [필수 실행 규칙 - Summary 중복 방지]
+각 후보(Item)는 서로 다른 내용(`description`)을 가지고 있습니다.
+따라서 `validate_summary` 도구를 **각 후보마다 개별적으로 실행(Execute Separately)**해야 합니다.
+
+**[검증 로직]**
+만약 생성된 후보 1, 2, 3의 `summary`가 모두 똑같다면, 당신은 지시를 어긴 것입니다.
+각 후보의 설명에 맞는 **고유한(Unique) 요약문**을 생성하세요.
 """
 
 

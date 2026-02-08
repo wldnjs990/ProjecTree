@@ -20,6 +20,7 @@ CANDIDATE_VALIDATION_SYSTEM_PROMPT = """당신은 프로젝트 기획 검토 전
 ### 4. 중복 없음 (No Duplication)
 - 후보들 간에 기능적 중복이 없는가?
 - 각 후보가 독립적인 가치를 제공하는가?
+- summary 필드가 중복된 텍스트가 아닌가?
 
 ## 출력 형식
 반드시 다음 JSON 형식으로 응답하세요:
