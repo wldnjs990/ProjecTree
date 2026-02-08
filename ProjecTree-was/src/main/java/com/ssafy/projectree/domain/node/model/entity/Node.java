@@ -11,8 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @NoArgsConstructor
@@ -22,6 +22,8 @@ import org.hibernate.annotations.GenerationTime;
 @DiscriminatorColumn(name = "node_type") // 구분 컬럼
 @Inheritance(strategy = InheritanceType.JOINED)
 @SuperBuilder
+@SQLDelete(sql = "UPDATE node SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public abstract class Node extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

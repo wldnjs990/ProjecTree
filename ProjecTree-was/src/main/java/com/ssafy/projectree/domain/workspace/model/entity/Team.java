@@ -19,6 +19,8 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Setter
@@ -30,6 +32,8 @@ import lombok.Setter;
 				@UniqueConstraint(columnNames = {"member_id", "workspace_id"})
 		}
 )
+@SQLDelete(sql = "UPDATE team SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Team extends BaseEntity {
 
 	@Id
