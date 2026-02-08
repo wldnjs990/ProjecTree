@@ -194,6 +194,10 @@ function TreeCanvasInner({
         const lockedBy = String((node as FlowNode).data?.lockedBy ?? '');
         if (lockedBy && lockedBy !== currentUserId) return;
       }
+      const client = getCrdtClient();
+      if (client && node.type !== 'PREVIEW') {
+        client.awareness.setLocalStateField('activeNodeId', node.id);
+      }
       fitView({
         nodes: [{ id: node.id }],
         duration: 300,
@@ -239,6 +243,13 @@ function TreeCanvasInner({
     [setEdges]
   );
 
+  const handlePaneClick = useCallback(() => {
+    const client = getCrdtClient();
+    if (client) {
+      client.awareness.setLocalStateField('activeNodeId', null);
+    }
+  }, []);
+
   return (
     <div className="relative w-full h-full bg-canvas">
       <ReactFlow
@@ -249,6 +260,7 @@ function TreeCanvasInner({
         onEdgesChange={handleEdgesChange}
         onConnect={handleConnect}
         onNodeClick={handleNodeClick}
+        onPaneClick={handlePaneClick}
         onNodeDragStop={handleNodeDragStop}
         nodeTypes={nodeTypes}
         fitView
