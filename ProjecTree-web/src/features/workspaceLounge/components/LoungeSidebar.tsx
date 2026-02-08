@@ -413,6 +413,31 @@ export function LoungeSidebar({
   const nickname = user.nickname;
   const email = user.email;
   const initialLetter = nickname?.trim().charAt(0) || '?';
+  const toggleLabel = collapsed ? '\uC0AC\uC774\uB4DC\uBC14 \uC5F4\uAE30' : '\uC0AC\uC774\uB4DC\uBC14 \uB2EB\uAE30';
+  const tooltipSide = collapsed ? 'right' : 'bottom';
+  const toggleButton = (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onToggle}
+          className={cn(
+            'h-7 w-7 text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-zinc-100/50 transition-colors',
+            !collapsed && 'opacity-0 group-hover/header:opacity-100 transition-opacity duration-200'
+          )}
+          aria-label={toggleLabel}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side={tooltipSide}>{toggleLabel}</TooltipContent>
+    </Tooltip>
+  );
 
   return (
     <aside
@@ -421,22 +446,10 @@ export function LoungeSidebar({
         collapsed ? 'w-16' : 'w-75'
       )}
     >
-      {/* Floating Toggle Button */}
-      <button
-        onClick={onToggle}
-        className="absolute -right-3 top-15 h-6 w-6 rounded-full bg-white border border-[var(--figma-forest-bg)] shadow-md flex items-center justify-center text-[var(--figma-forest-accent)] hover:text-[var(--figma-tech-green)] hover:scale-110 hover:border-[var(--figma-forest-accent)] transition-all z-50 outline-none focus:ring-2 focus:ring-[var(--figma-forest-bg)] opacity-0 group-hover/sidebar:opacity-100"
-        aria-label={collapsed ? '사이드바 펼치기' : '사이드바 접기'}
-      >
-        {collapsed ? (
-          <ChevronRight className="h-3.5 w-3.5" />
-        ) : (
-          <ChevronLeft className="h-3.5 w-3.5" />
-        )}
-      </button>
       {/* User Profile */}
       <div
         className={cn(
-          'flex items-center justify-between border-b border-white/20 p-3',
+          'group/header flex items-center justify-between border-b border-white/20 p-3',
           collapsed && 'flex-col gap-2 p-2'
         )}
       >
@@ -461,7 +474,14 @@ export function LoungeSidebar({
 
         {!collapsed && (
           <div className="flex items-center gap-1">
+            {toggleButton}
             <ProfileDialog nickname={nickname} email={email} />
+          </div>
+        )}
+
+        {collapsed && (
+          <div className="flex w-full justify-end px-2">
+            {toggleButton}
           </div>
         )}
       </div>
