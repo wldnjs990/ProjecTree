@@ -280,17 +280,12 @@ export function WorkspaceSettingsDialog({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // 기존 기술스택은 이미 DB에 있으므로, 새로 추가된 것만 전송
-      const newTechStacks = form.techStacks.filter(
-        (id) => !originalTechIds.has(id)
-      );
-
       const requestData = {
         name: form.name,
         startDate: form.startDate ? format(form.startDate, 'yyyy-MM-dd') : null,
         endDate: form.endDate ? format(form.endDate, 'yyyy-MM-dd') : null,
         purpose: form.purpose,
-        workspaceTechStacks: newTechStacks,
+        workspaceTechStacks: [...new Set(form.techStacks)],
         ...(deleteFileIds.length > 0 && { deleteFiles: deleteFileIds }),
       };
 
