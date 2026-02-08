@@ -279,6 +279,25 @@ export default function NodeDetailContainer({
     }
   };
 
+  // 노드 삭제 핸들러
+  // CRDT 서버에 삭제 요청 전송 → Spring DELETE 호출 → Y.Doc에서 노드+자식 일괄 삭제
+  const handleDeleteNode = () => {
+    if (!selectedNodeId) return;
+
+    const client = getCrdtClient();
+    if (!client) {
+      console.warn('[NodeDetailContainer] CRDT 클라이언트가 초기화되지 않았습니다.');
+      return;
+    }
+
+    // 사이드바 먼저 닫기
+    closeSidebar();
+
+    // CRDT 서버에 삭제 요청 전송
+    client.deleteNode(selectedNodeId);
+    console.log('[NodeDetailContainer] 노드 삭제 요청:', selectedNodeId);
+  };
+
   return (
     <div className="p-4 space-y-4 pt-20">
       {/* Node header */}
@@ -291,6 +310,7 @@ export default function NodeDetailContainer({
         onShowDescription={onShowDescription}
         onToggleExpand={onToggleExpand}
         isExpanded={isExpanded}
+        onDelete={handleDeleteNode}
       />
 
       {/* Status & Meta section */}
