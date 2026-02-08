@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { getYDocByRoom, Y } from "../../yjs/ydoc-gateway";
+import { getYDocByRoom } from "../../yjs/ydoc-gateway";
 
 export interface TechRecommendation {
   id: number;
@@ -44,40 +44,52 @@ router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
   }
 
   const doc = getYDocByRoom(workspaceId as string);
-  doc.transact(() => {
-    const nodeTechRecommendations = doc.getMap("nodeTechRecommendations");
 
-    let yArray = nodeTechRecommendations.get(nodeId) as Y.Array<TechRecommendation>;
-    if (!yArray) {
-      yArray = new Y.Array<TechRecommendation>();
-      nodeTechRecommendations.set(nodeId, yArray);
+  try {
+    doc.transact(() => {
+      const nodeTechRecommendations = doc.getMap("nodeTechRecommendations");
+
+      // 각 tech에 selected: false 추가
+      const techsWithSelected = techs.map((tech) => ({
+        ...tech,
+        selected: tech.selected ?? false,
+      }));
+
+      // 일반 배열로 전체 교체 (Y.Array는 Y.Map에 직접 set 불가)
+      nodeTechRecommendations.set(nodeId, techsWithSelected);
+
+      // comparison 저장 (신규)
+      if (comparison) {
+        const nodeTechComparisons = doc.getMap("nodeTechComparisons");
+        nodeTechComparisons.set(nodeId, comparison);
+      }
+
+      // pending 상태 해제
+      const techsPending = doc.getMap("techsPending");
+      techsPending.set(nodeId, false);
+    });
+
+    console.log("create tech-stacks success", new Date().toISOString());
+    res.status(200).json({ status: "ok" });
+  } catch (error) {
+    console.error("create tech-stacks failed", error);
+
+    // Fallback: pending 해제
+    try {
+      doc.transact(() => {
+        const techsPending = doc.getMap("techsPending");
+        techsPending.set(nodeId, false);
+      });
+    } catch (fallbackError) {
+      console.error("fallback pending reset failed", fallbackError);
     }
 
-    // 전체 교체: 기존 삭제 후 새로 추가
-    if (yArray.length > 0) {
-      yArray.delete(0, yArray.length);
-    }
-
-    // 각 tech에 selected: false 추가
-    const techsWithSelected = techs.map((tech) => ({
-      ...tech,
-      selected: tech.selected ?? false,
-    }));
-    yArray.push(techsWithSelected);
-
-    // comparison 저장 (신규)
-    if (comparison) {
-      const nodeTechComparisons = doc.getMap("nodeTechComparisons");
-      nodeTechComparisons.set(nodeId, comparison);
-    }
-
-    // pending 상태 해제
-    const techsPending = doc.getMap("techsPending");
-    techsPending.set(nodeId, false);
-  });
-
-  console.log("create tech-stacks success", new Date().toISOString());
-  res.status(200).json({ status: "ok" });
+    res.status(500).json({
+      status: "error",
+      message: String(error),
+      timeStamp: new Date().toISOString(),
+    });
+  }
 });
 
 // 커스텀 기술 추가 API - 기존 배열에 1개 추가
@@ -107,35 +119,55 @@ router.post("/:nodeId/custom-tech-stacks", (req: Request, res: Response) => {
   }
 
   const doc = getYDocByRoom(workspaceId as string);
-  doc.transact(() => {
-    const nodeTechRecommendations = doc.getMap("nodeTechRecommendations");
 
-    let yArray = nodeTechRecommendations.get(nodeId) as Y.Array<TechRecommendation>;
-    if (!yArray) {
-      yArray = new Y.Array<TechRecommendation>();
-      nodeTechRecommendations.set(nodeId, yArray);
+  try {
+    doc.transact(() => {
+      const nodeTechRecommendations = doc.getMap("nodeTechRecommendations");
+
+      // 기존 배열 가져오기 (없으면 빈 배열)
+      const existingTechs = (nodeTechRecommendations.get(nodeId) as TechRecommendation[]) || [];
+
+      // 기존 배열에 1개 추가 (기본값 채워서 저장)
+      const customTech: TechRecommendation = {
+        id: tech.id,
+        name: tech.name,
+        advantage: tech.advantage ?? "",
+        disAdvantage: tech.disAdvantage ?? "",
+        description: tech.description ?? "",
+        ref: tech.ref ?? "",
+        recommendScore: tech.recommendScore ?? -1,
+        selected: tech.selected ?? false,
+      };
+
+      // 일반 배열로 저장 (Y.Array는 Y.Map에 직접 set 불가)
+      nodeTechRecommendations.set(nodeId, [...existingTechs, customTech]);
+
+      // pending 상태 해제
+      const techsPending = doc.getMap("techsPending");
+      techsPending.set(nodeId, false);
+    });
+
+    console.log("add custom tech-stack success", new Date().toISOString());
+    res.status(200).json({ status: "ok" });
+  } catch (error) {
+    console.error("add custom tech-stack failed", error);
+
+    // Fallback: pending 해제
+    try {
+      doc.transact(() => {
+        const techsPending = doc.getMap("techsPending");
+        techsPending.set(nodeId, false);
+      });
+    } catch (fallbackError) {
+      console.error("fallback pending reset failed", fallbackError);
     }
 
-    // 기존 배열에 1개 추가 (기본값 채워서 저장)
-    const customTech: TechRecommendation = {
-      id: tech.id,
-      name: tech.name,
-      advantage: tech.advantage ?? "",
-      disAdvantage: tech.disAdvantage ?? "",
-      description: tech.description ?? "",
-      ref: tech.ref ?? "",
-      recommendScore: tech.recommendScore ?? -1,
-      selected: tech.selected ?? false,
-    };
-    yArray.push([customTech]);
-
-    // pending 상태 해제
-    const techsPending = doc.getMap("techsPending");
-    techsPending.set(nodeId, false);
-  });
-
-  console.log("add custom tech-stack success", new Date().toISOString());
-  res.status(200).json({ status: "ok" });
+    res.status(500).json({
+      status: "error",
+      message: String(error),
+      timeStamp: new Date().toISOString(),
+    });
+  }
 });
 
 // Pending 리셋 API - AI 호출 실패 시 fallback용

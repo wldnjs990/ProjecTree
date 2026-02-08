@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { getYDocByRoom, Y } from "../../yjs/ydoc-gateway";
+import { getYDocByRoom } from "../../yjs/ydoc-gateway";
 
 export type TaskType = "FE" | "BE" | null;
 
@@ -40,33 +40,46 @@ router.post("/:nodeId/candidate", (req: Request, res: Response) => {
 
   const doc = getYDocByRoom(workspaceId);
 
-  doc.transact(() => {
-    const nodeCandidates = doc.getMap("nodeCandidates");
+  try {
+    doc.transact(() => {
+      const nodeCandidates = doc.getMap("nodeCandidates");
 
-    let yArray = nodeCandidates.get(nodeId) as Y.Array<Candidate>;
-    if (!yArray) {
-      yArray = new Y.Array<Candidate>();
-      nodeCandidates.set(nodeId, yArray);
+      const newCandidates = candidates.map((c) => ({
+        ...c,
+        taskType: null,
+        selected: false,
+      })) as Candidate[];
+
+      // 기존 배열에 새 배열 병합
+      const currentCandidates = (nodeCandidates.get(nodeId) as Candidate[]) ?? [];
+      const mergedCandidates = [...currentCandidates, ...newCandidates];
+      nodeCandidates.set(nodeId, mergedCandidates);
+
+      const nodeCandidatesPending = doc.getMap("nodeCandidatesPending");
+      nodeCandidatesPending.set(nodeId, false);
+    });
+
+    console.log("create candidates success", new Date().toISOString());
+    res.status(200).json({ status: "ok" });
+  } catch (error) {
+    console.error("create candidates failed", error);
+
+    // Fallback: pending 해제
+    try {
+      doc.transact(() => {
+        const nodeCandidatesPending = doc.getMap("nodeCandidatesPending");
+        nodeCandidatesPending.set(nodeId, false);
+      });
+    } catch (fallbackError) {
+      console.error("fallback pending reset failed", fallbackError);
     }
 
-    const newCandidates = candidates.map((c) => ({
-      ...c,
-      taskType: null,
-      selected: false,
-    })) as Candidate[];
-
-    // 전체 교체: 기존 삭제 후 새로 추가
-    if (yArray.length > 0) {
-      yArray.delete(0, yArray.length);
-    }
-    yArray.push(newCandidates);
-
-    const nodeCandidatesPending = doc.getMap("nodeCandidatesPending");
-    nodeCandidatesPending.set(nodeId, false);
-  });
-
-  console.log("create candidates success", new Date().toISOString());
-  res.status(200).json({ status: "ok" });
+    res.status(500).json({
+      status: "error",
+      message: String(error),
+      timeStamp: new Date().toISOString(),
+    });
+  }
 });
 
 // Pending 리셋 API - AI 호출 실패 시 fallback용
