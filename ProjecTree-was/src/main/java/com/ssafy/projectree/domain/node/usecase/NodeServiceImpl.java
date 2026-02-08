@@ -50,6 +50,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -309,7 +310,7 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public CustomNodeDto.Response createCustom(CustomNodeDto.Request dto) {
 
-        Node node = createByNodeType(dto.getNodeType());
+        Node node = createByNodeType(dto.getNodeType(), dto.getTaskType());
         node.setName(dto.getName());
         node.setDescription(dto.getDescription());
         node.setXPos(dto.getXPos());
@@ -330,10 +331,10 @@ public class NodeServiceImpl implements NodeService {
                 .build();
     }
 
-    private Node createByNodeType(NodeType nodeType) {
+    private Node createByNodeType(NodeType nodeType, @Nullable TaskType taskType) {
         if (nodeType.equals(NodeType.EPIC)) return new EpicNode();
         else if (nodeType.equals(NodeType.STORY)) return new StoryNode();
-        else if (nodeType.equals(NodeType.TASK)) return new TaskNode();
+        else if (nodeType.equals(NodeType.TASK)) return TaskNode.builder().type(taskType).build();
         else if (nodeType.equals(NodeType.ADVANCE)) return new AdvanceNode();
         else {
             throw new BusinessLogicException(ErrorCode.NODE_TYPE_NOT_SUPPORT_ERROR, "유효하지 않는 노드 타입입니다.");
