@@ -88,7 +88,11 @@ export function LeftSidebar({
         )}
       >
         {/* Top Panel: Project Explorer */}
-        <ResizablePanel defaultSize={50} minSize={20} className="min-w-0">
+        <ResizablePanel
+          defaultSize="40%"
+          minSize="40px"
+          className="min-w-0 min-h-0"
+        >
           <div className="flex h-full flex-col min-w-0 w-full overflow-hidden">
             <div
               className={cn(
@@ -134,7 +138,11 @@ export function LeftSidebar({
         />
 
         {/* Bottom Panel: Team Chat */}
-        <ResizablePanel defaultSize={70} minSize={20} className="min-w-0">
+        <ResizablePanel
+          defaultSize="60%"
+          minSize="40px"
+          className="min-w-0 min-h-0"
+        >
           <div className="h-full w-full min-w-0">
             {/* ChatPanel already has its own layout, so we just stick it here */}
             {/* Passing "Team Chat" as workspace name to match requirements */}
