@@ -5,6 +5,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { ChevronDown, BookOpen } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { Node } from '@xyflow/react';
@@ -91,11 +97,22 @@ export function StoryGroup({
       </div>
       <div className="flex justify-center">
         {data.assignee ? (
-          <UserAvatar
-            initials={data.assignee.initials}
-            color={data.assignee.color}
-            size="sm"
-          />
+          <TooltipProvider>
+            <Tooltip delayDuration={300}>
+              <TooltipTrigger asChild>
+                <span>
+                  <UserAvatar
+                    initials={data.assignee.initials}
+                    color={data.assignee.color}
+                    size="sm"
+                  />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">
+                <p>{data.assignee.name}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ) : <span className="text-xs text-gray-400">미정</span>}
       </div>
     </div>

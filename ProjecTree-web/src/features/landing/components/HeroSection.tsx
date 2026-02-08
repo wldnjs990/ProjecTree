@@ -54,6 +54,7 @@ function GlassMockupCard() {
   const images = [
     { src: '/tree.png', alt: 'ProjecTree - 트리 시각화', label: '트리 시각화' },
     { src: '/spec.png', alt: 'ProjecTree - 명세서', label: '명세서 생성' },
+    { src: '/portfolio.png', alt: 'ProjecTree - 포트폴리오', label: '포트폴리오' },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -96,6 +97,13 @@ function GlassMockupCard() {
 
           {/* Mockup Content */}
           <div className="relative rounded-xl bg-white/90 p-6 shadow-inner">
+            {/* Carousel Label */}
+            <div className="mb-3 text-center">
+              <span className="text-lg font-semibold text-zinc-700">
+                {images[currentIndex].label}
+              </span>
+            </div>
+
             {/* Mockup UI - Carousel */}
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
               {images.map((image, index) => (
@@ -117,19 +125,21 @@ function GlassMockupCard() {
               ))}
 
               {/* Carousel Indicators */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                {images.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentIndex(index)}
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      index === currentIndex
-                        ? 'bg-emerald-500 w-6'
-                        : 'bg-zinc-300 hover:bg-zinc-400 w-2'
-                    }`}
-                    aria-label={`${index + 1}번 슬라이드로 이동`}
-                  />
-                ))}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+                <div className="flex gap-2">
+                  {images.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentIndex(index)}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        index === currentIndex
+                          ? 'bg-emerald-500 w-6'
+                          : 'bg-zinc-300 hover:bg-zinc-400 w-2'
+                      }`}
+                      aria-label={`${index + 1}번 슬라이드로 이동`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
