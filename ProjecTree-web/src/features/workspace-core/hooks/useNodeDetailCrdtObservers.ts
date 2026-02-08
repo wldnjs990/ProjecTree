@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { nodeDetailCrdtService } from '../services/nodeDetailCrdtService';
-import { previewNodesCrdtService } from '../services/previewNodesCrdtService';
 import { useConnectionStatus } from '../stores/nodeStore';
 import { useUser } from '@/shared/stores/userStore';
 
@@ -20,12 +19,9 @@ export function useNodeDetailCrdtObservers() {
       return;
     }
 
-    nodeDetailCrdtService.initObservers();
-
-    // 새로고침/재연결 시 이전 세션에서 남은 preview 노드 정리
-    if (currentUserId) {
-      previewNodesCrdtService.clearPreviewNodesByOwner(currentUserId);
-    }
+    // userId를 전달하여 sync 완료 후 loadExistingData에서
+    // preview 노드 정리 + pending 상태 복원이 수행됨
+    nodeDetailCrdtService.initObservers(currentUserId || undefined);
 
     return () => {
       nodeDetailCrdtService.cleanupObservers();

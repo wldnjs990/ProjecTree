@@ -23,10 +23,10 @@ import CandidateNodeContainer from './CandidateNodeContainer';
 import CustomNodeContainer from './CustomNodeContainer';
 import NodeDetailContainer from './NodeDetailContainer';
 import NodeDescriptionMarkdown from './NodeDescriptionMarkdown';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { postCreateCustomNode, postCreateNode } from '@/apis/node.api';
-import { useUser } from '@/shared/stores/userStore';
+
 import * as Y from 'yjs';
 
 // 노드 기본 정보 (헤더용) - WorkSpacePage에서 전달받음
@@ -43,6 +43,16 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   const selectedNodeId = useSelectedNodeId();
   const [isDescriptionView, setIsDescriptionView] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [prevNodeId, setPrevNodeId] = useState(selectedNodeId);
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+
+  // selectedNodeId나 isOpen이 변경되면 상태 리셋 (렌더링 중 처리)
+  if (selectedNodeId !== prevNodeId || isOpen !== prevIsOpen) {
+    setPrevNodeId(selectedNodeId);
+    setPrevIsOpen(isOpen);
+    setIsDescriptionView(false);
+    setIsExpanded(false);
+  }
   const { closeSidebar } = useNodeDetailEdit();
 
   // 후보 미리보기 상태
@@ -51,16 +61,9 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   const previewCandidate = usePreviewCandidate();
   const customDraft = useCustomPreviewDraft();
   const isCreatingNode = useIsCreatingNode();
-  const currentUser = useUser();
-  const currentUserId = String(currentUser?.memberId ?? currentUser?.id ?? '');
-
   // 스토어 액션
   const { exitCandidatePreview, updateCustomDraft } =
     useNodeDetailStore();
-
-  // isCreatingNode가 true→false로 변할 때 감지용
-  const wasCreatingRef = useRef(false);
-
 
   // 디버깅용 로그
   console.log('[NodeDetailSidebar] 상태 확인:', {
@@ -85,29 +88,20 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   }, [selectedNodeId, nodes]);
 
   // 미리보기 종료 핸들러
+  // pending 중인 preview 노드는 유지, 현재 보고 있는 non-pending 노드만 제거
   const handleExitPreview = useCallback(() => {
-    if (currentUserId) {
-      previewNodesCrdtService.clearPreviewNodesByOwner(currentUserId);
+    const currentPreviewNodeId =
+      previewKind === 'candidate' && previewCandidate
+        ? `preview-${previewCandidate.id}`
+        : previewKind === 'custom' && customDraft
+          ? customDraft.previewNodeId
+          : null;
+
+    if (currentPreviewNodeId && !isCreatingNode) {
+      previewNodesCrdtService.removePreviewNode(currentPreviewNodeId);
     }
     exitCandidatePreview();
-  }, [exitCandidatePreview, currentUserId]);
-
-  useEffect(() => {
-    setIsDescriptionView(false);
-    setIsExpanded(false);
-  }, [selectedNodeId, isOpen]);
-
-  // CRDT 서버가 nodeCreatingPending=false를 브로드캐스트하면
-  // isCreatingNode가 true→false로 변함 → 프리뷰 정리 + 미리보기 종료
-  useEffect(() => {
-    if (wasCreatingRef.current && !isCreatingNode && candidatePreviewMode) {
-      if (currentUserId) {
-        previewNodesCrdtService.clearPreviewNodesByOwner(currentUserId);
-      }
-      exitCandidatePreview();
-    }
-    wasCreatingRef.current = isCreatingNode;
-  }, [isCreatingNode, candidatePreviewMode, currentUserId, exitCandidatePreview]);
+  }, [exitCandidatePreview, previewKind, previewCandidate, customDraft, isCreatingNode]);
 
   const handleCustomNameChange = useCallback(
     (value: string) => {
@@ -120,7 +114,7 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
       const data = (yNode.get('data') ?? {}) as Record<string, unknown>;
       yNode.set('data', { ...data, title: value.trim() || '새 노드' });
     },
-    [customDraft?.previewNodeId, updateCustomDraft]
+    [customDraft, updateCustomDraft]
   );
 
   const handleCustomDescriptionChange = useCallback(
@@ -165,7 +159,7 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
         if (!position) return;
 
         await postCreateNode(
-          { xpos: position.xpos, ypos: position.ypos },
+          { xpos: position.xpos, ypos: position.ypos, previewNodeId },
           Number(selectedNodeId),
           previewCandidate.id
         );
@@ -181,14 +175,14 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
           workspaceId: customDraft.workspaceId,
           xpos: position.xpos,
           ypos: position.ypos,
+          previewNodeId,
         });
       }
-      // 성공 시: 클라이언트가 직접 pending=false 처리
-      // → wasCreatingRef useEffect가 프리뷰 노드 정리 + 미리보기 종료 수행
+      // 성공 시: CRDT 서버가 Spring 콜백을 통해 pending=false + preview 노드 삭제 처리
       console.log('[NodeDetailSidebar] 노드 생성 요청 완료:', previewNodeId);
-      nodeDetailCrdtService.setNodeCreatingPending(previewNodeId, false);
     } catch (error) {
       console.error('노드 생성 실패:', error);
+      // 에러 시에만 클라이언트에서 pending 해제 (서버 응답이 없으므로)
       nodeDetailCrdtService.setNodeCreatingPending(previewNodeId, false);
     }
   }, [

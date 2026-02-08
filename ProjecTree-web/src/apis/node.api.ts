@@ -4,6 +4,7 @@ import wasApiClient from './client';
 interface CreateNodeBody {
   xpos: number;
   ypos: number;
+  previewNodeId: string;
 }
 interface CreateNodeResponse {
   nodeId: number;
@@ -50,6 +51,7 @@ interface CreateCustomNodeBody {
   workspaceId: number;
   xpos: number;
   ypos: number;
+  previewNodeId: string;
 }
 
 const postCreateCustomNode = async (
