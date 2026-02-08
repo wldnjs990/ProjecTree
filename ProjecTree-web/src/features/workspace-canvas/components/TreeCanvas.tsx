@@ -17,7 +17,6 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { CollabPanel } from './CollabPanel';
 import { MinimapPanel } from './MinimapPanel';
 import { ZoomControls } from './ZoomControls';
 import type { AvatarColor } from '@/shared/components/UserAvatar';
@@ -274,9 +273,6 @@ function TreeCanvasInner({
 
       {/* 참여자 마우스 포인터 */}
       <CursorPointers cursors={cursors} />
-
-      {/* Collaboration Panel - Top Left */}
-      <CollabPanel users={onlineUsers} className="absolute top-6 left-6 z-10" />
 
       {/* Minimap Panel - Bottom Right */}
       <MinimapPanel className="absolute bottom-6 right-6 z-10" />

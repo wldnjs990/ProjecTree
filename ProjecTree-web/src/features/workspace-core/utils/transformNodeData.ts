@@ -1,5 +1,5 @@
 import type { Node } from '@xyflow/react';
-import type { NodeDetailData } from '../types/nodeDetail';
+import type { NodeData, NodeDetailData } from '../types/nodeDetail';
 import { getAvatarColor } from '@/shared/lib/utils';
 
 /**
@@ -24,6 +24,9 @@ function mapStatus(status: string): 'TODO' | 'IN_PROGRESS' | 'DONE' {
     pending: 'TODO',
     progress: 'IN_PROGRESS',
     completed: 'DONE',
+    TODO: 'TODO',
+    IN_PROGRESS: 'IN_PROGRESS',
+    DONE: 'DONE',
   };
   return statusMap[status] ?? 'TODO';
 }
@@ -34,9 +37,12 @@ function mapStatus(status: string): 'TODO' | 'IN_PROGRESS' | 'DONE' {
 export function transformNodesForSpecView(
   nodes: Node[],
   nodeDetails?: Record<number, NodeDetailData>,
+  nodeListData?: Record<number, NodeData>,
 ) {
   return nodes.map((node) => {
-    const assignee = nodeDetails?.[Number(node.id)]?.assignee;
+    const nodeId = Number(node.id);
+    const listItem = nodeListData?.[nodeId];
+    const assignee = nodeDetails?.[nodeId]?.assignee;
     const specAssignee = assignee
       ? {
           id: assignee.id,
@@ -52,9 +58,9 @@ export function transformNodesForSpecView(
         ...node.data,
         label: node.data.title || '',
         level: getNodeLevel(node.type ?? 'ADVANCE'),
-        complexity: node.data.difficult,
-        status: mapStatus((node.data.status as string) ?? 'TODO'),
-        priority: node.data.priority || 'P2',
+        complexity: listItem?.difficult ?? node.data.difficult,
+        status: mapStatus((listItem?.status ?? node.data.status as string) ?? 'TODO'),
+        priority: listItem?.priority || node.data.priority || 'P2',
         assignee: specAssignee,
       },
     };

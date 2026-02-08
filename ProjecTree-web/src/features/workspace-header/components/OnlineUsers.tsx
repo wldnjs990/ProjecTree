@@ -12,7 +12,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { UserAvatar } from '@/shared/components/UserAvatar';
-import { cn } from '@/shared/lib/utils';
 import type { OnlineUsersProps } from '../types';
 
 export function OnlineUsers({ users }: OnlineUsersProps) {
@@ -65,10 +64,7 @@ export function OnlineUsers({ users }: OnlineUsersProps) {
               <Tooltip key={user.id} delayDuration={300}>
                 <TooltipTrigger asChild>
                   <div
-                    className={cn(
-                      'flex items-center gap-3 p-2 rounded-lg cursor-default transition-colors hover:bg-zinc-100/50',
-                      !user.isOnline && 'opacity-50 grayscale'
-                    )}
+                    className="flex items-center gap-3 p-2 rounded-lg cursor-default transition-colors hover:bg-zinc-100/50"
                   >
                     <UserAvatar
                       initials={user.initials}
@@ -78,10 +74,7 @@ export function OnlineUsers({ users }: OnlineUsersProps) {
                     />
                     <div className="flex flex-col min-w-0">
                       <span
-                        className={cn(
-                          'text-sm truncate text-zinc-700 font-medium',
-                          !user.isOnline && 'font-normal'
-                        )}
+                        className="text-sm truncate text-zinc-700 font-medium"
                       >
                         {user.nickname || user.name}
                       </span>
