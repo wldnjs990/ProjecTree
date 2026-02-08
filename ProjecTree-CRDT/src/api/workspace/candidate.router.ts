@@ -15,6 +15,8 @@ export interface Candidate {
 const router: Router = Router({ mergeParams: true });
 router.post("/:nodeId/candidate", (req: Request, res: Response) => {
   console.log("create candidates start", new Date().toISOString());
+  console.log("req.body:", JSON.stringify(req.body, null, 2));
+
   const { workspaceId, nodeId } = req.params;
   const body = req.body;
 
