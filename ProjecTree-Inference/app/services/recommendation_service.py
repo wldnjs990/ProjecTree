@@ -155,6 +155,9 @@ class RecommendationService:
                 )
                 self.node_tech_stack_repository.create(db, obj_in=node_tech_stack_create)
 
+                # 응답을 위해 생성된 TechStackInfo ID 설정
+                tech.id = str(tech_info.id)
+
             logger.info(f"[RecommendationService] 기술 스택 저장 완료 - node_id: {request.node_id}")
             return TechStackRecommendResponse(
                 techs=[tech.model_dump() for tech in tech_list], 

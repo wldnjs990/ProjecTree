@@ -5,6 +5,7 @@ from app.agents.enums import NodeType
 
 class TechRecommendationItem(BaseModel):
     """개별 기술 추천 정보"""
+    id: int = Field(..., description="TechStackInfo ID")
     name: str = Field(..., description="기술 명칭 (kebab-case)")
     advantage: str = Field(..., description="해당 기술의 핵심 장점 한 줄 요약")
     disadvantage: str = Field(..., description="해당 기술의 핵심 단점 한 줄 요약")
