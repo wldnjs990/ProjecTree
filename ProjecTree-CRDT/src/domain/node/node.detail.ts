@@ -6,6 +6,7 @@ export interface Assignee {
 }
 
 export interface EditableNodeDetail {
+  description: string;
   nodeType: NodeType;
   status: NodeStatus;
   priority?: Priority;
@@ -15,6 +16,7 @@ export interface EditableNodeDetail {
 }
 
 export interface SendNodeDetail {
+  description: string;
   nodeType: NodeType;
   status: NodeStatus;
   priority?: Priority;
@@ -25,6 +27,7 @@ export interface SendNodeDetail {
 
 export function toSendNodeDetail(detail: EditableNodeDetail): SendNodeDetail {
   return {
+    description: detail.description,
     nodeType: detail.nodeType,
     status: detail.status,
     ...(detail.priority !== undefined && { priority: detail.priority }),
