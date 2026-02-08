@@ -7,7 +7,7 @@ import { useWorkspaceStore } from '../stores/workspaceStore';
 import { useNodeStore } from '../stores/nodeStore';
 import { useNodeDetailStore } from '../stores/nodeDetailStore';
 
-// Awareness ?�태 ?�??
+// Awareness 상태 정보
 export interface AwarenessState {
   cursor?: {
     x: number;
@@ -20,7 +20,7 @@ export interface AwarenessState {
   activeNodeId?: string | null;
 }
 
-// Y.Map???�?�되???�드 �??�??
+// Y.Map에 저장되는 노드 값 타입
 export type YNodeValue =
   | string
   | undefined
@@ -28,7 +28,7 @@ export type YNodeValue =
   | Record<string, unknown>;
 
 /**
- * ?��???CRDT ?�라?�언??
+ * 기본 CRDT 클라이언트
  */
 class CrdtClient {
   private static instance: CrdtClient | null = null;
@@ -45,7 +45,7 @@ class CrdtClient {
 
     const serverUrl =
       import.meta.env.VITE_CRDT_SERVER_URL || 'ws://localhost:1234';
-    // yDoc ?�료구조???�환?�는 websocket ?�라?�언?�로 변??
+    // yDoc 자료구조를 동기화하는 websocket 클라이언트로 변환
     this.provider = new WebsocketProvider(serverUrl, roomId, this.yDoc);
     this.awareness = this.provider.awareness;
 
@@ -58,33 +58,33 @@ class CrdtClient {
     this.provider.on('status', ({ status }: { status: string }) => {
       if (status === 'connected') {
         setConnectionStatus('connected');
-        console.log('[CRDT] server connected');
+        console.log('[CRDT] 서버 연결됨');
         this.setupMessageListener();
       } else if (status === 'connecting') {
         setConnectionStatus('connecting');
-        console.log('[CRDT] connecting...');
+        console.log('[CRDT] 연결 중...');
       } else if (status === 'disconnected') {
         setConnectionStatus('disconnected');
-        console.log('[CRDT] disconnected');
+        console.log('[CRDT] 연결 해제됨');
       }
     });
 
     this.provider.on('sync', (isSynced: boolean) => {
       setIsSynced(isSynced);
       if (isSynced) {
-        console.log('[CRDT] ?�기???�료');
+        console.log('[CRDT] 동기화 완료');
       }
     });
 
-    // ?�버로�???메시지 ?�신 리스??
+    // 서버로부터 메시지 수신 리스너
     this.provider.ws?.addEventListener('message', (event: MessageEvent) => {
-      // y-websocket?� 바이?�리 ?�이?�도 주고받으므�?문자?�만 처리
+      // y-websocket은 바이너리 데이터도 주고받으므로 문자형만 처리
       if (typeof event.data === 'string') {
         try {
           const message = JSON.parse(event.data);
           this.handleServerMessage(message);
         } catch {
-          // JSON ?�싱 ?�패 ??무시
+          // JSON 파싱 실패 시 무시
         }
       }
     });
@@ -104,12 +104,12 @@ class CrdtClient {
 
     switch (message.type) {
       case 'AI_MESSAGE':
-        console.log('[CRDT] AI_MESSAGE ?�신:', message);
+        console.log('[CRDT] AI_MESSAGE 수신:', message);
         if (message.isComplete) {
-          // ?�트리밍 ?�료 ???�태 초기??
+          // 스트리밍 완료 시 상태 초기화
           clearAiStreaming();
         } else if (message.text) {
-          // ?�트리밍 ?�스???�데?�트
+          // 스트리밍 텍스트 업데이트
           setAiStreamingText(message.text as string);
           if (message.streamType) {
             setAiStreamingType(message.streamType);
@@ -117,13 +117,13 @@ class CrdtClient {
         }
         break;
       case 'save_error':
-        console.error('[CRDT] ?�???�러 ?�신:', message);
+        console.error('[CRDT] 서버 에러 수신:', message);
         if (message.action === 'delete_node') {
-          toast.error('?�드 ??��???�패?�습?�다.');
+          toast.error('노드 삭제에 실패했습니다.');
         } else if (message.action === 'delete_candidate') {
-          toast.error('?���??�드 ??��???�패?�습?�다.');
+          toast.error('후보 노드 삭제에 실패했습니다.');
         } else {
-          toast.error('?�?�에 ?�패?�습?�다.');
+          toast.error('저장에 실패했습니다.');
         }
         break;
       default:
@@ -132,36 +132,36 @@ class CrdtClient {
   }
 
   /**
-   * WebSocket 메시지 ?�신 리스???�정
+   * WebSocket 메시지 수신 리스너 설정
    */
   private setupMessageListener() {
     const ws = this.provider.ws;
     if (!ws) return;
 
     ws.addEventListener('message', (event: MessageEvent) => {
-      // y-websocket?� 바이?�리 ?�이?�도 주고받으므�?문자?�만 처리
+      // y-websocket은 바이너리 데이터도 주고받으므로 문자형만 처리
       if (typeof event.data === 'string') {
         try {
           const message = JSON.parse(event.data);
           this.handleServerMessage(message);
         } catch {
-          // JSON ?�싱 ?�패 ??무시
+          // JSON 파싱 실패 시 무시
         }
       }
     });
 
-    console.log('[CRDT] 메시지 리스???�정??);
+    console.log('[CRDT] 메시지 리스너 설정됨');
   }
 
   /**
-   * Y.Map 가?�오�?(?�???�전)
+   * Y.Map 가져오기(구버전)
    */
   getYMap<T>(name: string): Y.Map<T> {
     return this.yDoc.getMap(name) as Y.Map<T>;
   }
 
   /**
-   * UndoManager 초기??(nodes Y.Map ?�용)
+   * UndoManager 초기화(nodes Y.Map 전용)
    */
   initUndoManager(): UndoManager {
     if (this.undoManager) {
@@ -171,35 +171,35 @@ class CrdtClient {
     const yNodes = this.getYMap<Y.Map<YNodeValue>>('nodes');
 
     this.undoManager = new UndoManager(yNodes, {
-      // 로컬 변경만 추적 (?�격 변경�? undo ?�???�님)
+      // 로컬 변경만 추적 (원격 변경은 undo 아님)
       trackedOrigins: new Set([null]),
-      // ?�속 ?�래그�? ?�나??undo ?�위�?묶음 (ms)
+      // 연속 드래그를 하나의 undo 단위로 묶음 (ms)
       captureTimeout: 300,
     });
 
-    console.log('[CRDT] UndoManager 초기?�됨');
+    console.log('[CRDT] UndoManager 초기화됨');
     return this.undoManager;
   }
 
   /**
-   * Undo ?�행
+   * Undo 실행
    */
   undo(): boolean {
     if (this.undoManager?.canUndo()) {
       this.undoManager.undo();
-      console.log('[CRDT] Undo ?�행');
+      console.log('[CRDT] Undo 실행');
       return true;
     }
     return false;
   }
 
   /**
-   * Redo ?�행
+   * Redo 실행
    */
   redo(): boolean {
     if (this.undoManager?.canRedo()) {
       this.undoManager.redo();
-      console.log('[CRDT] Redo ?�행');
+      console.log('[CRDT] Redo 실행');
       return true;
     }
     return false;
@@ -214,9 +214,9 @@ class CrdtClient {
   }
 
   /**
-   * ?�드 ?�세?�보 ?�집 ?�이???�???�청??CRDT ?�버�??�송
-   * CRDT ?�버가 REST API�??�해 ?�프�??�버�??�송
-   * ?�프�??�버?�서 DB???�??
+   * 노드 상세정보 편집 데이터 저장 요청을 CRDT 서버로 전송
+   * CRDT 서버가 REST API로 스프링 서버에 전송
+   * 스프링 서버에서 DB에 저장
    */
   saveNodeDetail(nodeId: string): string | null {
     const requestId = crypto.randomUUID();
@@ -229,18 +229,18 @@ class CrdtClient {
     const ws = this.provider.ws;
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
-      console.log('[CRDT] ?�크?�페?�스 ?�???�청 ?�송:', {
+      console.log('[CRDT] 노드 상세 저장 요청 전송:', {
         requestId,
       });
       return requestId;
     }
 
-    console.warn('[CRDT] WebSocket???�결?��? ?�아 ?�???�청 ?�패');
+    console.warn('[CRDT] WebSocket 연결되지 않아 저장 요청 실패');
     return null;
   }
 
   /**
-   * ?�드 ?�치?�보 ?�집 ?�이???�???�청??CRDT ?�버�??�송
+   * 노드 위치정보 편집 데이터 저장 요청을 CRDT 서버로 전송
    */
   saveNodePosition(nodeId: string): string | null {
     const requestId = crypto.randomUUID();
@@ -256,30 +256,30 @@ class CrdtClient {
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
-      console.log('[CRDT] ?�드 ?�치 ?�???�청 ?�송:', {
+      console.log('[CRDT] 노드 위치 저장 요청 전송:', {
         requestId,
         nodeId,
       });
       return requestId;
     }
 
-    console.warn('[CRDT] WebSocket???�결?��? ?�아 ?�???�청 ?�패');
+    console.warn('[CRDT] WebSocket 연결되지 않아 저장 요청 실패');
     return null;
   }
 
   /**
-   * ?�드 기술?�택 ?�택 ?�벤?��? CRDT ?�버�??�송 �?YMap 브로?�캐?�트
-   * @param nodeId ?�드 ID
-   * @param selectedTechId ?�택??기술?�택 ID
+   * 노드 기술스택 선택 이벤트를 CRDT 서버로 전송 및 YMap 브로드캐스트
+   * @param nodeId 노드 ID
+   * @param selectedTechId 선택된 기술스택 ID
    */
   selectNodeTech(nodeId: string, selectedTechId: number): string | null {
     const requestId = crypto.randomUUID();
 
-    // YMap???�택??기술?�택 ?�??(브로?�캐?�트)
+    // YMap에 선택된 기술스택 저장(브로드캐스트)
     const selectedNodeTechs = this.getYMap<number>('selectedNodeTechs');
     selectedNodeTechs.set(nodeId, selectedTechId);
 
-    // CRDT ?�버???�벤???�송
+    // CRDT 서버로 이벤트 전송
     const ws = this.provider.ws;
     const message = JSON.stringify({
       type: 'select_node_tech',
@@ -290,7 +290,7 @@ class CrdtClient {
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
-      console.log('[CRDT] ?�드 기술?�택 ?�택 ?�청 ?�송:', {
+      console.log('[CRDT] 노드 기술스택 선택 요청 전송:', {
         requestId,
         nodeId,
         selectedTechId,
@@ -298,21 +298,21 @@ class CrdtClient {
       return requestId;
     }
 
-    console.warn('[CRDT] WebSocket???�결?��? ?�아 기술?�택 ?�택 ?�청 ?�패');
+    console.warn('[CRDT] WebSocket 연결되지 않아 기술스택 선택 요청 실패');
     return null;
   }
 
   /**
-   * ?�택???�드 기술?�택 YMap 가?�오�?
+   * 선택된 노드 기술스택 YMap 가져오기
    */
   getSelectedNodeTechs(): Y.Map<number> {
     return this.getYMap<number>('selectedNodeTechs');
   }
 
   /**
-   * ?�드 ??�� ?�청??CRDT ?�버�??�송
-   * CRDT ?�버가 Spring DELETE ?�출 ??Y.Doc?�서 ?�드+?�식?�드 ?�괄 ??��
-   * @param nodeId ??��???�드 ID
+   * 노드 삭제 요청을 CRDT 서버로 전송
+   * CRDT 서버가 Spring DELETE 호출 후 Y.Doc에서 노드+자식 일괄 삭제
+   * @param nodeId 삭제 대상 노드 ID
    */
   deleteNode(nodeId: string): string | null {
     const requestId = crypto.randomUUID();
@@ -325,19 +325,19 @@ class CrdtClient {
     const ws = this.provider.ws;
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
-      console.log('[CRDT] ?�드 ??�� ?�청 ?�송:', { requestId, nodeId });
+      console.log('[CRDT] 노드 삭제 요청 전송:', { requestId, nodeId });
       return requestId;
     }
 
-    console.warn('[CRDT] WebSocket???�결?��? ?�아 ??�� ?�청 ?�패');
+    console.warn('[CRDT] WebSocket 연결되지 않아 삭제 요청 실패');
     return null;
   }
 
   /**
-   * ?�드 ?�보 ??�� ?�청??CRDT ?�버�??�송
-   * CRDT ?�버가 Spring DELETE ȣ�� ??Y.Doc?�서 �ĺ� ����
-   * @param nodeId ??�� ��� �θ� ��� ID
-   * @param candidateId ??�� ��� �ĺ� ID
+   * 노드 후보 삭제 요청을 CRDT 서버로 전송
+   * CRDT 서버가 Spring DELETE 호출 후 Y.Doc에서 후보 삭제
+   * @param nodeId 삭제 대상 부모 노드 ID
+   * @param candidateId 삭제 대상 후보 ID
    */
   deleteCandidate(nodeId: string, candidateId: number): string | null {
     const requestId = crypto.randomUUID();
@@ -351,7 +351,7 @@ class CrdtClient {
     const ws = this.provider.ws;
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
-      console.log('[CRDT] ?�드 ?�보 ??�� ?�청 ?�송:', {
+      console.log('[CRDT] 노드 후보 삭제 요청 전송:', {
         requestId,
         nodeId,
         candidateId,
@@ -359,29 +359,29 @@ class CrdtClient {
       return requestId;
     }
 
-    console.warn('[CRDT] WebSocket???�결?��? ?�아 �ĺ� ??�� ?�청 ?�패');
+    console.warn('[CRDT] WebSocket 연결되지 않아 후보 삭제 요청 실패');
     return null;
   }
 
   /**
-   * ?��????�스?�스 가?�오�?
+   * 싱글턴 인스턴스 가져오기
    */
   static getInstance(): CrdtClient | null {
     return CrdtClient.instance;
   }
 
   /**
-   * ?��???초기??(roomId 변�????�생??
+   * 싱글턴 초기화(roomId 변경 시 발생)
    */
   static init(roomId: string): CrdtClient {
     if (CrdtClient.instance && CrdtClient.instance.roomId === roomId) {
       return CrdtClient.instance;
     }
 
-    // 기존 ?�스?�스 ?�리
+    // 기존 인스턴스 정리
     CrdtClient.destroy();
 
-    // ???�스?�스 ?�성
+    // 새 인스턴스 생성
     CrdtClient.instance = new CrdtClient(roomId);
     useWorkspaceStore.getState().setRoomId(roomId);
 
@@ -389,7 +389,7 @@ class CrdtClient {
   }
 
   /**
-   * ?��????�리
+   * 싱글턴 정리
    */
   static destroy() {
     if (CrdtClient.instance) {
@@ -400,17 +400,13 @@ class CrdtClient {
       CrdtClient.instance = null;
       useWorkspaceStore.getState().reset();
       useNodeStore.getState().reset();
-      console.log('[CRDT] ?�라?�언???�리??);
     }
   }
 }
 
-// ?�의 ?�수??
+// 유틸 함수
 export const initCrdtClient = CrdtClient.init;
 export const getCrdtClient = CrdtClient.getInstance;
 export const destroyCrdtClient = CrdtClient.destroy;
 
 export default CrdtClient;
-
-
-

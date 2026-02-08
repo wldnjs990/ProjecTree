@@ -53,8 +53,9 @@ export function AINodeCandidateSection({
   const streamingText = useAiStreamingText();
   const streamingType = useAiStreamingType();
 
-  // candidates ?�?�일 ?�만 ?�트리밍 ?�스???�시
-  const showStreamingText = isGenerating && streamingType === 'candidates' && streamingText;
+  // candidates 타입일 때만 스트리밍 텍스트 표시
+  const showStreamingText =
+    isGenerating && streamingType === 'candidates' && streamingText;
 
   const lockedCandidateIds = new Set(
     previewNodes
@@ -66,7 +67,7 @@ export function AINodeCandidateSection({
 
   const handleCandidateClick = (candidate: Candidate) => {
     if (!selectedNodeId) return;
-    // locked ?�보(?�성 �? ?�릭 ???�당 preview�??�진??
+    // locked 후보(생성 중) 클릭 시 해당 preview로 진입
     if (lockedCandidateIds.has(candidate.id)) {
       onLockedCandidateClick?.(candidate);
       return;
@@ -77,7 +78,7 @@ export function AINodeCandidateSection({
 
   return (
     <div className="rounded-[14px] border border-[rgba(227,228,235,0.5)] bg-[rgba(251,251,255,0.6)] backdrop-blur-sm overflow-hidden">
-      {/* ?�션 ?�더 (?�기/?�치�? */}
+      {/* 섹션 헤더 (열기/닫기) */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between p-4 hover:bg-[rgba(0,0,0,0.02)] transition-colors"
@@ -85,7 +86,7 @@ export function AINodeCandidateSection({
         <div className="flex items-center gap-2">
           <Lightbulb className="w-4 h-4 text-[#FD9A00]" />
           <span className="text-xs font-medium text-[#0B0B0B]">
-            ?�드 추�? + AI ?�음 ?�드 추천
+            노드 추가 + AI 다음 노드 추천
           </span>
         </div>
         {isExpanded ? (
@@ -95,12 +96,12 @@ export function AINodeCandidateSection({
         )}
       </button>
 
-      {/* 콘텐�?*/}
+      {/* 콘텐츠 */}
       {isExpanded && (
         <div className="px-4 pb-4 space-y-4">
           {hasCandidates ? (
             <>
-              {/* 추천 ?�드 목록 */}
+              {/* 추천 노드 목록 */}
               <div className="space-y-2">
                 {candidates.map((node) => {
                   const isLocked = lockedCandidateIds.has(node.id);
@@ -116,14 +117,14 @@ export function AINodeCandidateSection({
                           : undefined
                       }
                       isSelected={isSelected || isLocked}
-                      disabled={isSelected} // locked???�릭 가??(?�진??, selected�?비활?�화
+                      disabled={isSelected} // locked는 클릭 가능(재진입), selected만 비활성화
                       deleteDisabled={isSelected || isLocked}
                     />
                   );
                 })}
               </div>
 
-              {/* AI ?�생??버튼 ?�는 ?�트리밍 ?�스??*/}
+              {/* AI 생성 버튼 또는 스트리밍 텍스트 */}
               {showStreamingText ? (
                 <AiStreamingCard text={streamingText} />
               ) : (
@@ -135,12 +136,12 @@ export function AINodeCandidateSection({
                   {isGenerating ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      ?�성 �?..
+                      생성 중...
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4" />
-                      AI ?�시 추천받기
+                      AI 다시 추천받기
                     </>
                   )}
                 </button>
@@ -153,19 +154,16 @@ export function AINodeCandidateSection({
             />
           )}
 
-          {/* 직접 추�? 버튼 */}
+          {/* 직접 추가 버튼 */}
           <button
             onClick={onAddManual}
             className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#6363C6] border border-[rgba(99,99,198,0.3)] rounded-lg hover:bg-[rgba(99,99,198,0.05)] transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4" />
-            직접 추�?
+            직접 추가
           </button>
         </div>
       )}
     </div>
   );
 }
-
-
-
