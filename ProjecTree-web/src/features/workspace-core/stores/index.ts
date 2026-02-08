@@ -1,5 +1,5 @@
 // Workspace store
-export { useWorkspaceStore, useRoomId, useWorkspaceDetail } from './workspaceStore';
+export { useWorkspaceStore, useRoomId, useWorkspaceDetail, useWorkspaceName } from './workspaceStore';
 
 // Node store
 export {
