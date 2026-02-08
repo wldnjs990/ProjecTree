@@ -16,8 +16,8 @@ openai_gpt_5_2 = ChatOpenAI(
 )
 
 openai_mini_llm = ChatOpenAI(
-    model="gpt-5-mini", 
-    name="gpt-5-mini", 
+    model="gpt-5-nano", 
+    name="gpt-5-nano", 
     temperature=0, 
     max_retries=3, 
     base_url=settings.OPENAI_BASE_URL, 
