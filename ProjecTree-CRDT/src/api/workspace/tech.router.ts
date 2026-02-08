@@ -65,7 +65,7 @@ router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
       }
 
       // pending 상태 해제
-      const techsPending = doc.getMap("techsPending");
+      const techsPending = doc.getMap("nodeTechsPending");
       techsPending.set(nodeId, false);
     });
 
@@ -77,7 +77,7 @@ router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
     // Fallback: pending 해제
     try {
       doc.transact(() => {
-        const techsPending = doc.getMap("techsPending");
+        const techsPending = doc.getMap("nodeTechsPending");
         techsPending.set(nodeId, false);
       });
     } catch (fallbackError) {
@@ -143,7 +143,7 @@ router.post("/:nodeId/custom-tech-stacks", (req: Request, res: Response) => {
       nodeTechRecommendations.set(nodeId, [...existingTechs, customTech]);
 
       // pending 상태 해제
-      const techsPending = doc.getMap("techsPending");
+      const techsPending = doc.getMap("nodeTechsPending");
       techsPending.set(nodeId, false);
     });
 
@@ -155,7 +155,7 @@ router.post("/:nodeId/custom-tech-stacks", (req: Request, res: Response) => {
     // Fallback: pending 해제
     try {
       doc.transact(() => {
-        const techsPending = doc.getMap("techsPending");
+        const techsPending = doc.getMap("nodeTechsPending");
         techsPending.set(nodeId, false);
       });
     } catch (fallbackError) {
@@ -186,7 +186,7 @@ router.post("/:nodeId/tech-stacks/pending-reset", (req: Request, res: Response) 
 
   const doc = getYDocByRoom(workspaceId as string);
   doc.transact(() => {
-    const techsPending = doc.getMap("techsPending");
+    const techsPending = doc.getMap("nodeTechsPending");
     techsPending.set(nodeId, false);
   });
 
