@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { NodeHeaderSection } from './NodeHeaderSection';
 import { StatusMetaSection } from './StatusMetaSection';
@@ -19,7 +19,11 @@ import {
 } from '@/features/workspace-core';
 import { useUser } from '@/shared/stores/userStore';
 import { generateNodeCandidates } from '@/apis/workspace.api';
-import { getAiNodeTechRecommendation } from '@/apis/node.api';
+import {
+  getAiNodeTechRecommendation,
+  postCustomNodeTechRecommendation,
+} from '@/apis/node.api';
+import { toast } from 'sonner';
 
 interface NodeDetailContainerProps {
   nodeInfo?: {
@@ -66,6 +70,7 @@ export default function NodeDetailContainer({
 
   const isGeneratingCandidates = nodeDetail?.candidatesPending || false;
   const isGeneratingTechs = nodeDetail?.techsPending || false;
+  const [isAddingCustomTech, setIsAddingCustomTech] = useState(false);
 
   // Sync selected tech id on detail change
   useEffect(() => {
@@ -247,6 +252,27 @@ export default function NodeDetailContainer({
     }
   };
 
+  // 커스텀 기술스택 추가 핸들러
+  const handleAddCustomTech = async (techVocaId: number) => {
+    if (!selectedNodeId || !workspaceId) return;
+
+    setIsAddingCustomTech(true);
+    nodeDetailCrdtService.setTechsPending(selectedNodeId, true);
+
+    try {
+      await postCustomNodeTechRecommendation(Number(selectedNodeId), {
+        workspaceId,
+        techVocaId,
+      });
+      toast.success('기술스택이 추가되었습니다.');
+    } catch (error) {
+      console.error('커스텀 기술스택 추가 실패:', error);
+      toast.error('기술스택 추가에 실패했습니다.');
+      nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
+    } finally {
+      setIsAddingCustomTech(false);
+    }
+  };
 
   return (
     <div className="p-4 space-y-4 pt-20">
@@ -276,6 +302,8 @@ export default function NodeDetailContainer({
           comparison={nodeDetail.comparison}
           onGenerateTechs={handleGenerateTechs}
           isGenerating={isGeneratingTechs}
+          onAddCustomTech={handleAddCustomTech}
+          isAddingCustom={isAddingCustomTech}
         />
       )}
 

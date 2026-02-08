@@ -15,6 +15,7 @@ import { Confirm } from '@/shared/components/Confirm';
 import { ConfirmTrigger } from '@/shared/components/ConfirmTrigger';
 import TechDetailContent from './TechDetailContent';
 import TechDetailTitle from './TechDetailTitle';
+import { CustomTechAddDialog } from './CustomTechAddDialog';
 import {
   useSelectedNodeId,
   getCrdtClient,
@@ -28,6 +29,8 @@ interface AITechRecommendSectionProps {
   comparison?: string;
   onGenerateTechs?: () => Promise<void>;
   isGenerating?: boolean;
+  onAddCustomTech?: (techVocaId: number) => Promise<void>;
+  isAddingCustom?: boolean;
 }
 
 // 기술 카드 컴포넌트
@@ -246,10 +249,13 @@ function TechCardList({
 function TechEmptyState({
   onGenerate,
   isGenerating,
+  isAddingCustom,
 }: {
   onGenerate?: () => void;
   isGenerating?: boolean;
+  isAddingCustom?: boolean;
 }) {
+  const isDisabled = isGenerating || isAddingCustom || !onGenerate;
 
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-3">
@@ -261,7 +267,7 @@ function TechEmptyState({
       </div>
       <button
         onClick={onGenerate}
-        disabled={isGenerating || !onGenerate}
+        disabled={isDisabled}
         className="flex items-center justify-center gap-2 px-4 py-2 text-sm text-white bg-[#1C69E3] rounded-lg hover:bg-[#1557c0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isGenerating ? (
@@ -285,9 +291,12 @@ export function AITechRecommendSection({
   comparison,
   onGenerateTechs,
   isGenerating = false,
+  onAddCustomTech,
+  isAddingCustom = false,
 }: AITechRecommendSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [showComparison, setShowComparison] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const hasRecommendations = recommendations && recommendations.length > 0;
 
   const handleCompareClick = () => {
@@ -298,7 +307,9 @@ export function AITechRecommendSection({
     setShowComparison(false);
   };
 
-  const handleAddTech = () => {};
+  const handleAddTech = () => {
+    setIsDialogOpen(true);
+  };
 
   return (
     <div className="rounded-[14px] border border-[rgba(227,228,235,0.5)] bg-[rgba(251,251,255,0.6)] backdrop-blur-sm overflow-hidden">
@@ -350,7 +361,7 @@ export function AITechRecommendSection({
                 {/* AI 재생성 버튼 */}
                 <button
                   onClick={onGenerateTechs}
-                  disabled={isGenerating}
+                  disabled={isGenerating || isAddingCustom}
                   className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isGenerating ? (
@@ -371,17 +382,29 @@ export function AITechRecommendSection({
             <TechEmptyState
               onGenerate={onGenerateTechs}
               isGenerating={isGenerating}
+              isAddingCustom={isAddingCustom}
             />
           )}
 
           {/* 직접 추가 버튼 */}
           <button
             onClick={handleAddTech}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#6363C6] border border-[rgba(99,99,198,0.3)] rounded-lg hover:bg-[rgba(99,99,198,0.05)] transition-colors shadow-sm"
+            disabled={isAddingCustom || isGenerating}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#6363C6] border border-[rgba(99,99,198,0.3)] rounded-lg hover:bg-[rgba(99,99,198,0.05)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="w-4 h-4" />
             직접 추가
           </button>
+
+          {/* 커스텀 기술 추가 다이얼로그 */}
+          {onAddCustomTech && (
+            <CustomTechAddDialog
+              isOpen={isDialogOpen}
+              onOpenChange={setIsDialogOpen}
+              onAddTech={onAddCustomTech}
+              isAdding={isAddingCustom}
+            />
+          )}
         </div>
       )}
     </div>
