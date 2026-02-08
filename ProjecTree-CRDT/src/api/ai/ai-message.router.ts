@@ -7,6 +7,11 @@ const router: Router = Router();
 
 router.post("/messages", (req: Request, res: Response) => {
   const { workspaceId, nodeId, category, content } = req.body;
+  console.log(
+    "[AI_MESSAGE] incoming",
+    new Date().toISOString(),
+    JSON.stringify({ workspaceId, nodeId, category, content }),
+  );
 
   if (!workspaceId || !nodeId || !category || !content) {
     return res.status(400).json({
@@ -28,6 +33,7 @@ router.post("/messages", (req: Request, res: Response) => {
     category,
     content,
   });
+  console.log("[AI_MESSAGE] sent to room", workspaceId);
 
   res.status(200).json({ status: "ok" });
 });
