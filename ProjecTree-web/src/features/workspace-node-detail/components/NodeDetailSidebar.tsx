@@ -23,7 +23,7 @@ import CandidateNodeContainer from './CandidateNodeContainer';
 import CustomNodeContainer from './CustomNodeContainer';
 import NodeDetailContainer from './NodeDetailContainer';
 import NodeDescriptionMarkdown from './NodeDescriptionMarkdown';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { postCreateCustomNode, postCreateNode } from '@/apis/node.api';
 
@@ -43,6 +43,16 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   const selectedNodeId = useSelectedNodeId();
   const [isDescriptionView, setIsDescriptionView] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [prevNodeId, setPrevNodeId] = useState(selectedNodeId);
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+
+  // selectedNodeId나 isOpen이 변경되면 상태 리셋 (렌더링 중 처리)
+  if (selectedNodeId !== prevNodeId || isOpen !== prevIsOpen) {
+    setPrevNodeId(selectedNodeId);
+    setPrevIsOpen(isOpen);
+    setIsDescriptionView(false);
+    setIsExpanded(false);
+  }
   const { closeSidebar } = useNodeDetailEdit();
 
   // 후보 미리보기 상태
@@ -93,10 +103,6 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
     exitCandidatePreview();
   }, [exitCandidatePreview, previewKind, previewCandidate, customDraft, isCreatingNode]);
 
-  useEffect(() => {
-    setIsDescriptionView(false);
-    setIsExpanded(false);
-  }, [selectedNodeId, isOpen]);
 
   const handleCustomNameChange = useCallback(
     (value: string) => {
@@ -109,7 +115,7 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
       const data = (yNode.get('data') ?? {}) as Record<string, unknown>;
       yNode.set('data', { ...data, title: value.trim() || '새 노드' });
     },
-    [customDraft?.previewNodeId, updateCustomDraft]
+    [customDraft, updateCustomDraft]
   );
 
   const handleCustomDescriptionChange = useCallback(
