@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+﻿import { useEffect } from 'react';
 import { useParams } from 'react-router';
 import { NodeHeaderSection } from './NodeHeaderSection';
 import { StatusMetaSection } from './StatusMetaSection';
@@ -11,7 +11,6 @@ import {
   nodeDetailCrdtService,
   previewNodesCrdtService,
   useNodeDetailStore,
-  useNodeStore,
   useNodes,
   calculateChildNodePosition,
   getChildNodeType,
@@ -59,7 +58,6 @@ export default function NodeDetailContainer({
   const setSelectedCandidateIds = useNodeDetailStore(
     (state) => state.setSelectedCandidateIds
   );
-  const updateNodeDetail = useNodeStore((state) => state.updateNodeDetail);
   const enterCandidatePreview = useNodeDetailStore(
     (state) => state.enterCandidatePreview
   );
@@ -70,7 +68,6 @@ export default function NodeDetailContainer({
 
   const isGeneratingCandidates = nodeDetail?.candidatesPending || false;
   const isGeneratingTechs = nodeDetail?.techsPending || false;
-  const [isAddingCustomTech, setIsAddingCustomTech] = useState(false);
 
   // Sync selected tech id on detail change
   useEffect(() => {
@@ -191,72 +188,47 @@ export default function NodeDetailContainer({
   };
 
   // AI 기술 추천 생성 핸들러
+  // 클라이언트: pending=true 전송 + API 호출만 수행
+  // CRDT 서버: Spring 응답 받으면 Y.Array 업데이트 + pending=false 브로드캐스트
   const handleGenerateTechs = async () => {
     if (!selectedNodeId || !workspaceId) return;
 
     nodeDetailCrdtService.setTechsPending(selectedNodeId, true);
     try {
-      const response = await getAiNodeTechRecommendation(
-        Number(selectedNodeId),
-        workspaceId
-      );
-      const rawTechs = response?.data?.techs;
-      const techsArray = Array.isArray(rawTechs)
-        ? rawTechs
-        : rawTechs
-          ? [rawTechs]
-          : [];
-
-      const mappedTechs = techsArray.map((tech, index) => ({
-        id: tech.id ?? Date.now() + index,
-        name: tech.name,
-        advantage: tech.advantage ?? '',
-        disAdvantage: tech.disAdvantage ?? '',
-        description: tech.description ?? '',
-        ref: tech.ref ?? '',
-        recommendScore: tech.recommendScore ?? 0,
-        selected: false,
-      }));
-
-      nodeDetailCrdtService.updateTechRecommendations(
-        selectedNodeId,
-        mappedTechs
-      );
-
-      if (response?.data?.comparison) {
-        updateNodeDetail(Number(selectedNodeId), {
-          comparison: response.data.comparison,
-        });
-      }
+      await getAiNodeTechRecommendation(Number(selectedNodeId), workspaceId);
+      // 성공 시: CRDT 서버가 Spring 응답을 받아 Y.Array 업데이트 + pending=false 브로드캐스트
+      console.log('[NodeDetailContainer] AI 기술 추천 요청 완료');
     } catch (error) {
       console.error('AI 기술 추천 생성 실패:', error);
-    } finally {
+      toast.error('AI 기술 추천 생성에 실패했습니다.');
+      // 에러 시에만 클라이언트에서 pending=false 전송 (서버 응답 없으므로)
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
   };
 
   // AI 노드 후보 생성 핸들러
+  // 클라이언트: pending=true 전송 + API 호출만 수행
+  // CRDT 서버: Spring 응답 받으면 nodeCandidates 업데이트 + pending=false 브로드캐스트
   const handleGenerateCandidates = async () => {
     if (!selectedNodeId || !workspaceId) return;
 
     nodeDetailCrdtService.setCandidatesPending(selectedNodeId, true);
     try {
-      const candidates = await generateNodeCandidates(Number(selectedNodeId), workspaceId);
-      nodeDetailCrdtService.updateCandidates(selectedNodeId, candidates);
-
-      console.log('[NodeDetailContainer] AI 노드 후보 생성 완료');
+      await generateNodeCandidates(Number(selectedNodeId), workspaceId);
+      console.log('[NodeDetailContainer] AI 노드 후보 생성 요청 완료');
     } catch (error) {
       console.error('AI 노드 후보 생성 실패:', error);
-    } finally {
+      toast.error('AI 노드 후보 생성에 실패했습니다.');
       nodeDetailCrdtService.setCandidatesPending(selectedNodeId, false);
     }
   };
 
   // 커스텀 기술스택 추가 핸들러
+  // 클라이언트: pending=true 전송 + API 호출만 수행
+  // CRDT 서버: Spring 응답 받으면 Y.Array에 append + pending=false 브로드캐스트
   const handleAddCustomTech = async (techVocaId: number) => {
     if (!selectedNodeId || !workspaceId) return;
 
-    setIsAddingCustomTech(true);
     nodeDetailCrdtService.setTechsPending(selectedNodeId, true);
 
     try {
@@ -269,8 +241,6 @@ export default function NodeDetailContainer({
       console.error('커스텀 기술스택 추가 실패:', error);
       toast.error('기술스택 추가에 실패했습니다.');
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
-    } finally {
-      setIsAddingCustomTech(false);
     }
   };
 
@@ -303,7 +273,6 @@ export default function NodeDetailContainer({
           onGenerateTechs={handleGenerateTechs}
           isGenerating={isGeneratingTechs}
           onAddCustomTech={handleAddCustomTech}
-          isAddingCustom={isAddingCustomTech}
         />
       )}
 
