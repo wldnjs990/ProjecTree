@@ -34,7 +34,7 @@ export default function CandidateNodeContainer({
     <div className="p-4 space-y-4 pt-6">
       {/* 헤더 - 뒤로가기 버튼 */}
       <div className="flex items-center gap-2">
-        <NodeHeaderButton onClick={onBack} disabled={isCreating}>
+        <NodeHeaderButton onClick={onBack}>
           <ArrowLeft />
         </NodeHeaderButton>
         <h3 className="text-lg font-bold text-[#0B0B0B] line-clamp-1">

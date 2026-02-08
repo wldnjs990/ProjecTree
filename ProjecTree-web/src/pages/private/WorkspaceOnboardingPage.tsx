@@ -15,6 +15,7 @@ import {
 } from '@/features/workspace-onboarding';
 import { createWorkspace } from '@/apis/workspace.api';
 import type { Role, TechStackItem } from '@/apis/workspace.api';
+import logoImage from '@/assets/images/logo2.png';
 
 export default function WorkspaceOnboardingPage() {
   const navigate = useNavigate();
@@ -144,9 +145,11 @@ export default function WorkspaceOnboardingPage() {
       <div className="hidden lg:flex flex-1 relative flex-col justify-between p-12 overflow-hidden z-10">
         {/* Brand */}
         <div className="relative z-10">
-          <h1 className="text-xl font-bold text-[var(--figma-neon-green)] tracking-widest">
-            PROJECTREE
-          </h1>
+          <img
+            src={logoImage}
+            alt="ProjecTree Logo"
+            className="h-10"
+          />
         </div>
 
         {/* Stepper (Minimalist Overlay) */}

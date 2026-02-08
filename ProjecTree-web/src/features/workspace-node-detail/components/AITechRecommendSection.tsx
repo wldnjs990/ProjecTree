@@ -30,7 +30,6 @@ interface AITechRecommendSectionProps {
   onGenerateTechs?: () => Promise<void>;
   isGenerating?: boolean;
   onAddCustomTech?: (techVocaId: number) => Promise<void>;
-  isAddingCustom?: boolean;
 }
 
 // 기술 카드 컴포넌트
@@ -249,13 +248,11 @@ function TechCardList({
 function TechEmptyState({
   onGenerate,
   isGenerating,
-  isAddingCustom,
 }: {
   onGenerate?: () => void;
   isGenerating?: boolean;
-  isAddingCustom?: boolean;
 }) {
-  const isDisabled = isGenerating || isAddingCustom || !onGenerate;
+  const isDisabled = isGenerating || !onGenerate;
 
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-3">
@@ -292,7 +289,6 @@ export function AITechRecommendSection({
   onGenerateTechs,
   isGenerating = false,
   onAddCustomTech,
-  isAddingCustom = false,
 }: AITechRecommendSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [showComparison, setShowComparison] = useState(false);
@@ -361,7 +357,7 @@ export function AITechRecommendSection({
                 {/* AI 재생성 버튼 */}
                 <button
                   onClick={onGenerateTechs}
-                  disabled={isGenerating || isAddingCustom}
+                  disabled={isGenerating}
                   className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isGenerating ? (
@@ -382,14 +378,13 @@ export function AITechRecommendSection({
             <TechEmptyState
               onGenerate={onGenerateTechs}
               isGenerating={isGenerating}
-              isAddingCustom={isAddingCustom}
             />
           )}
 
           {/* 직접 추가 버튼 */}
           <button
             onClick={handleAddTech}
-            disabled={isAddingCustom || isGenerating}
+            disabled={isGenerating}
             className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#6363C6] border border-[rgba(99,99,198,0.3)] rounded-lg hover:bg-[rgba(99,99,198,0.05)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="w-4 h-4" />
@@ -402,7 +397,7 @@ export function AITechRecommendSection({
               isOpen={isDialogOpen}
               onOpenChange={setIsDialogOpen}
               onAddTech={onAddCustomTech}
-              isAdding={isAddingCustom}
+              isAdding={isGenerating}
             />
           )}
         </div>

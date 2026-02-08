@@ -24,15 +24,16 @@ class NodeDetailCrdtService {
   private yNodeDetailsRef: Y.Map<Y.Map<YNodeDetailValue>> | null = null;
   private yConfirmedRef: Y.Map<ConfirmedNodeData> | null = null;
   private yNodeCandidatesRef: Y.Map<Candidate[]> | null = null;
-  private yNodeTechRecommendationsRef: Y.Map<
-    Y.Array<TechRecommendation>
-  > | null = null;
+  private yNodeTechRecommendationsRef: Y.Map<TechRecommendation[]> | null = null;
   private yNodeCandidatesPendingRef: Y.Map<boolean> | null = null;
   private yNodeTechsPendingRef: Y.Map<boolean> | null = null;
+  // @ts-expect-error - Used in initObservers and cleanupObservers
+  private yNodeTechComparisonsRef: Y.Map<string> | null = null;
+  private yNodeCreatingPendingRef: Y.Map<boolean> | null = null;
   private cleanupFn: (() => void) | null = null;
   private isInitialized = false;
 
-  private constructor() {}
+  private constructor() { }
 
   // Sync confirmed data back into the node graph data (for ReactFlow UI)
 
@@ -84,13 +85,13 @@ class NodeDetailCrdtService {
     const yNodeDetails = client.getYMap<Y.Map<YNodeDetailValue>>('nodeDetails');
     const yConfirmed = client.getYMap<ConfirmedNodeData>('confirmedNodeData');
     const yNodeCandidates = client.getYMap<Candidate[]>('nodeCandidates');
-    const yNodeTechRecommendations = client.getYMap<
-      Y.Array<TechRecommendation>
-    >('nodeTechRecommendations');
+    const yNodeTechRecommendations = client.getYMap<TechRecommendation[]>('nodeTechRecommendations');
     const yNodeCandidatesPending = client.getYMap<boolean>(
       'nodeCandidatesPending'
     );
     const yNodeTechsPending = client.getYMap<boolean>('nodeTechsPending');
+    const yNodeTechComparisons = client.getYMap<string>('nodeTechComparisons');
+    const yNodeCreatingPending = client.getYMap<boolean>('nodeCreatingPending');
     const editObserveHandler = () => {
       this.syncFromYjs();
     };
@@ -125,12 +126,11 @@ class NodeDetailCrdtService {
     };
 
     const techRecommendationsHandler = (
-      event: Y.YMapEvent<Y.Array<TechRecommendation>>
+      event: Y.YMapEvent<TechRecommendation[]>
     ) => {
       event.keysChanged.forEach((key) => {
-        const yArray = yNodeTechRecommendations.get(key);
-        if (yArray) {
-          const techs = yArray.toArray();
+        const techs = yNodeTechRecommendations.get(key);
+        if (techs) {
           console.log(
             '[NodeDetailCrdtService] tech recommendations received:',
             key,
@@ -163,12 +163,52 @@ class NodeDetailCrdtService {
       });
     };
 
+    const techComparisonsHandler = (event: Y.YMapEvent<string>) => {
+      event.keysChanged.forEach((key) => {
+        const comparison = yNodeTechComparisons.get(key);
+        if (comparison !== undefined) {
+          console.log(
+            '[NodeDetailCrdtService] tech comparison received:',
+            key
+          );
+          useNodeStore
+            .getState()
+            .updateNodeDetail(Number(key), { comparison });
+        }
+      });
+    };
+
+    const nodeCreatingPendingHandler = (event: Y.YMapEvent<boolean>) => {
+      event.keysChanged.forEach((previewNodeId) => {
+        const pending = yNodeCreatingPending.get(previewNodeId);
+        if (pending === undefined) return;
+
+        // 현재 클라이언트의 프리뷰 노드인지 확인
+        const store = useNodeDetailStore.getState();
+        const currentPreviewId =
+          store.previewKind === 'candidate' && store.previewCandidate
+            ? `preview-${store.previewCandidate.id}`
+            : store.customDraft?.previewNodeId;
+
+        if (currentPreviewId === previewNodeId) {
+          store.setIsCreatingNode(pending);
+          console.log(
+            '[NodeDetailCrdtService] node creating pending:',
+            previewNodeId,
+            pending
+          );
+        }
+      });
+    };
+
     yNodeDetails.observeDeep(editObserveHandler);
     yConfirmed.observe(confirmedObserveHandler);
     yNodeCandidates.observe(candidatesHandler);
     yNodeTechRecommendations.observe(techRecommendationsHandler);
     yNodeCandidatesPending.observe(candidatesPendingHandler);
     yNodeTechsPending.observe(techsPendingHandler);
+    yNodeTechComparisons.observe(techComparisonsHandler);
+    yNodeCreatingPending.observe(nodeCreatingPendingHandler);
     const loadExistingData = () => {
       yConfirmed.forEach((confirmedData, key) => {
         console.log(
@@ -198,15 +238,26 @@ class NodeDetailCrdtService {
           .updateNodeDetail(Number(key), { techsPending: pending });
       });
       // 기존 tech recommendations 로드
-      yNodeTechRecommendations.forEach((yArray, key) => {
-        const techs = yArray.toArray();
-        if (techs.length > 0) {
+      yNodeTechRecommendations.forEach((techs, key) => {
+        if (techs && techs.length > 0) {
           console.log(
             '[NodeDetailCrdtService] tech recommendations load:',
             key,
             techs
           );
           useNodeStore.getState().updateNodeDetail(Number(key), { techs });
+        }
+      });
+      // 기존 tech comparisons 로드
+      yNodeTechComparisons.forEach((comparison, key) => {
+        if (comparison) {
+          console.log(
+            '[NodeDetailCrdtService] tech comparison load:',
+            key
+          );
+          useNodeStore
+            .getState()
+            .updateNodeDetail(Number(key), { comparison });
         }
       });
     };
@@ -233,6 +284,8 @@ class NodeDetailCrdtService {
       yNodeTechRecommendations.unobserve(techRecommendationsHandler);
       yNodeCandidatesPending.unobserve(candidatesPendingHandler);
       yNodeTechsPending.unobserve(techsPendingHandler);
+      yNodeTechComparisons.unobserve(techComparisonsHandler);
+      yNodeCreatingPending.unobserve(nodeCreatingPendingHandler);
       client.provider.off('sync', syncHandler);
     };
 
@@ -242,6 +295,8 @@ class NodeDetailCrdtService {
     this.yNodeTechRecommendationsRef = yNodeTechRecommendations;
     this.yNodeCandidatesPendingRef = yNodeCandidatesPending;
     this.yNodeTechsPendingRef = yNodeTechsPending;
+    this.yNodeTechComparisonsRef = yNodeTechComparisons;
+    this.yNodeCreatingPendingRef = yNodeCreatingPending;
     this.isInitialized = true;
 
     console.log('[NodeDetailCrdtService] observers initialized');
@@ -259,6 +314,8 @@ class NodeDetailCrdtService {
     this.yNodeTechRecommendationsRef = null;
     this.yNodeCandidatesPendingRef = null;
     this.yNodeTechsPendingRef = null;
+    this.yNodeTechComparisonsRef = null;
+    this.yNodeCreatingPendingRef = null;
     this.cleanupFn = null;
     this.isInitialized = false;
 
@@ -450,48 +507,34 @@ class NodeDetailCrdtService {
     }
   }
 
-  // Update candidates (broadcast + local store)
-  updateCandidates(nodeId: string, candidates: Candidate[]): void {
-    const client = getCrdtClient();
-    if (!client || !this.yNodeCandidatesRef) {
+  // Update candidates - 기존 후보에 새 후보 병합 (AI 후보 생성 시)
+  updateCandidates(nodeId: string, newCandidates: Candidate[]): void {
+    if (!this.yNodeCandidatesRef) {
       console.warn('[NodeDetailCrdtService] CRDT client is not available.');
       return;
     }
-    this.yNodeCandidatesRef.set(nodeId, candidates);
+
+    const currentCandidates = this.yNodeCandidatesRef.get(nodeId) ?? [];
+    const mergedCandidates = [...currentCandidates, ...newCandidates];
+    this.yNodeCandidatesRef.set(nodeId, mergedCandidates);
     this.setCandidatesPending(nodeId, false);
-    useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates });
+    useNodeStore.getState().updateNodeDetail(Number(nodeId), { candidates: mergedCandidates });
 
     console.log(
-      '[NodeDetailCrdtService] candidates updated:',
+      '[NodeDetailCrdtService] candidates merged:',
       nodeId,
-      candidates
+      { existing: currentCandidates.length, new: newCandidates.length, total: mergedCandidates.length }
     );
   }
 
   // Update tech recommendations - 전체 교체 (AI 추천 시 기존 것 덮어씌움)
   updateTechRecommendations(nodeId: string, techs: TechRecommendation[]): void {
-    const client = getCrdtClient();
-    if (!client || !this.yNodeTechRecommendationsRef) {
+    if (!this.yNodeTechRecommendationsRef) {
       console.warn('[NodeDetailCrdtService] CRDT client is not available.');
       return;
     }
 
-    client.yDoc.transact(() => {
-      let yArray = this.yNodeTechRecommendationsRef!.get(nodeId);
-
-      if (!yArray) {
-        // Y.Array가 없으면 새로 생성
-        yArray = new Y.Array<TechRecommendation>();
-        this.yNodeTechRecommendationsRef!.set(nodeId, yArray);
-      } else {
-        // 기존 배열 비우기
-        yArray.delete(0, yArray.length);
-      }
-
-      // 새로운 techs 추가
-      yArray.push(techs);
-    });
-
+    this.yNodeTechRecommendationsRef.set(nodeId, techs);
     this.setTechsPending(nodeId, false);
     useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs });
 
@@ -504,29 +547,14 @@ class NodeDetailCrdtService {
 
   // Add single tech recommendation - 개별 추가 (커스텀 기술 추가 시)
   addTechRecommendation(nodeId: string, tech: TechRecommendation): void {
-    const client = getCrdtClient();
-    if (!client || !this.yNodeTechRecommendationsRef) {
+    if (!this.yNodeTechRecommendationsRef) {
       console.warn('[NodeDetailCrdtService] CRDT client is not available.');
       return;
     }
 
-    client.yDoc.transact(() => {
-      let yArray = this.yNodeTechRecommendationsRef!.get(nodeId);
-
-      if (!yArray) {
-        // Y.Array가 없으면 새로 생성
-        yArray = new Y.Array<TechRecommendation>();
-        this.yNodeTechRecommendationsRef!.set(nodeId, yArray);
-      }
-
-      // 새로운 tech 추가
-      yArray.push([tech]);
-    });
-
-    // 로컬 스토어 업데이트
-    const currentTechs =
-      useNodeStore.getState().nodeDetails[Number(nodeId)]?.techs ?? [];
+    const currentTechs = this.yNodeTechRecommendationsRef.get(nodeId) ?? [];
     const updatedTechs = [...currentTechs, tech];
+    this.yNodeTechRecommendationsRef.set(nodeId, updatedTechs);
     useNodeStore.getState().updateNodeDetail(Number(nodeId), { techs: updatedTechs });
 
     console.log(
@@ -550,6 +578,12 @@ class NodeDetailCrdtService {
     useNodeStore
       .getState()
       .updateNodeDetail(Number(nodeId), { techsPending: pending });
+  }
+
+  setNodeCreatingPending(previewNodeId: string, pending: boolean): void {
+    if (!this.yNodeCreatingPendingRef) return;
+    this.yNodeCreatingPendingRef.set(previewNodeId, pending);
+    useNodeDetailStore.getState().setIsCreatingNode(pending);
   }
 }
 export const nodeDetailCrdtService = NodeDetailCrdtService.getInstance();
