@@ -43,7 +43,7 @@ export function LeftSidebar({
     () => buildProjectTree(nodes, edges),
     [nodes, edges]
   );
-  const toggleLabel = collapsed ? '\uC0AC\uC774\uB4DC\uBC14 \uC5F4\uAE30' : '\uC0AC\uC774\uB4DC\uBC14 \uB2EB\uAE30';
+  const toggleLabel = collapsed ? '사이드바 열기' : '사이드바 닫기';
   const tooltipSide = collapsed ? 'right' : 'bottom';
   const toggleButton = (
     <Tooltip>
