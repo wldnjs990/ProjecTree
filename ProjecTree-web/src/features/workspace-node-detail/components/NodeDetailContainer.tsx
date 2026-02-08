@@ -6,6 +6,7 @@ import { AITechRecommendSection } from './AITechRecommendSection';
 import { AINodeCandidateSection } from './AINodeCandidateSection';
 import { MemoSection } from './MemoSection';
 import { useSelectedNodeDetail, useNodeDetailEdit } from '../hooks';
+import * as Y from 'yjs';
 import {
   useSelectedNodeId,
   nodeDetailCrdtService,
@@ -14,7 +15,9 @@ import {
   useNodes,
   calculateChildNodePosition,
   getChildNodeType,
+  getCrdtClient,
   type FlowNode,
+  type Candidate,
 } from '@/features/workspace-core';
 import { useUser } from '@/shared/stores/userStore';
 import { generateNodeCandidates } from '@/apis/workspace.api';
@@ -143,6 +146,37 @@ export default function NodeDetailContainer({
       candidate,
       position,
       previewNode,
+    });
+  };
+
+  // locked 후보(생성 중) 클릭 시 해당 preview로 재진입
+  const handleLockedCandidateClick = (candidate: Candidate) => {
+    const previewNodeId = `preview-${candidate.id}`;
+
+    // CRDT에서 preview 노드 찾기
+    const client = getCrdtClient();
+    if (!client) return;
+
+    const yPreviewNodes = client.getYMap<Y.Map<unknown>>('previewNodes');
+    const yNode = yPreviewNodes.get(previewNodeId);
+    if (!yNode) return;
+
+    const position = yNode.get('position') as { x?: number; y?: number } | undefined;
+    const xpos = Number(position?.x ?? 0);
+    const ypos = Number(position?.y ?? 0);
+
+    // preview 모드로 진입
+    enterCandidatePreview(candidate, { xpos, ypos });
+
+    // pending 상태 확인 및 설정
+    const yNodeCreatingPending = client.getYMap<boolean>('nodeCreatingPending');
+    const isPending = yNodeCreatingPending.get(previewNodeId) === true;
+    useNodeDetailStore.getState().setIsCreatingNode(isPending);
+
+    console.log('[NodeDetailContainer] Re-enter locked preview:', {
+      candidate,
+      previewNodeId,
+      isPending,
     });
   };
 
@@ -281,6 +315,7 @@ export default function NodeDetailContainer({
         <AINodeCandidateSection
           candidates={nodeDetail.candidates || []}
           onCandidateClick={handleCandidateClick}
+          onLockedCandidateClick={handleLockedCandidateClick}
           onAddManual={handleCandidateAddManual}
           onGenerateCandidates={handleGenerateCandidates}
           isGenerating={isGeneratingCandidates}
