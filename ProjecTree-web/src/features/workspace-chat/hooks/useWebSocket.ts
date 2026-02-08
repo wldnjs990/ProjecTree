@@ -70,8 +70,11 @@ export const useWebSocket = (workspaceId: string | null) => {
           rawMsg.member?.name ||
           'Unknown',
         content: rawMsg.content || '',
-        timestamp:
-          rawMsg.timestamp || rawMsg.created_at || new Date().toISOString(),
+        timestamp: (() => {
+          const t =
+            rawMsg.timestamp || rawMsg.created_at || new Date().toISOString();
+          return t.endsWith('Z') || t.includes('+') ? t : t + 'Z';
+        })(),
         type: 'text',
       };
     };

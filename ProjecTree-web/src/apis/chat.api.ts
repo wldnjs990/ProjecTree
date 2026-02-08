@@ -44,7 +44,10 @@ export const fetchMessages = async (
       raw.name ||
       'Unknown',
     content: raw.content || '',
-    timestamp: raw.timestamp || raw.created_at || new Date().toISOString(),
+    timestamp: (() => {
+      const t = raw.timestamp || raw.created_at || new Date().toISOString();
+      return t.endsWith('Z') || t.includes('+') ? t : t + 'Z';
+    })(),
     type: 'text' as const,
     senderAvatar:
       raw.senderAvatar || raw.sender_avatar || raw.profile_image || undefined,
