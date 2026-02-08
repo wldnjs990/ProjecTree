@@ -21,6 +21,10 @@ public class OAuthAttributes {
     private String email;
     private OAuthProvider oauthProvider;
 
+    public Object get(String key){
+        return attributes.get(key);
+    }
+
 
     public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
         // registrationId(google, github)를 Enum으로 변환
@@ -43,9 +47,12 @@ public class OAuthAttributes {
     }
 
     private static OAuthAttributes ofGithub(String userNameAttributeName, Map<String, Object> attributes) {
+        String login = (String) attributes.get("login");
+        String email = (String) attributes.get("email");
+
         return OAuthAttributes.builder()
-                .name((String) attributes.get("login")) // 깃허브 ID를 이름 대신 사용 (name이 null일 수 있음)
-                .email((String) attributes.get("email"))
+                .name(login) // 깃허브 ID를 이름 대신 사용 (name이 null일 수 있음)
+                .email(email)
                 .oauthProvider(OAuthProvider.GITHUB)
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
@@ -60,5 +67,9 @@ public class OAuthAttributes {
                 .oauthProvider(oauthProvider)
                 .role(AuthRole.ROLE_GUEST) // 중요: 가입 초기 권한은 GUEST
                 .build();
+    }
+
+    public void put(String key, Object value) {
+        attributes.put(key,value);
     }
 }
