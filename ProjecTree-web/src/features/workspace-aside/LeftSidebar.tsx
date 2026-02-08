@@ -12,6 +12,11 @@ import {
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/shared/lib/utils';
 import { buildProjectTree } from '@/shared/lib/treeUtils';
 import { ChatPanel } from '@/features/workspace-chat';
@@ -38,6 +43,30 @@ export function LeftSidebar({
     () => buildProjectTree(nodes, edges),
     [nodes, edges]
   );
+  const toggleLabel = collapsed ? '사이드바 열기' : '사이드바 닫기';
+  const tooltipSide = collapsed ? 'right' : 'bottom';
+  const toggleButton = (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          onClick={() => setCollapsed((prev) => !prev)}
+          className={cn(
+            'grid h-7 w-7 place-items-center leading-none text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-zinc-100/50 transition-colors rounded-md',
+            !collapsed && 'opacity-0 group-hover/header:opacity-100 transition-opacity duration-200'
+          )}
+          aria-label={toggleLabel}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side={tooltipSide}>{toggleLabel}</TooltipContent>
+    </Tooltip>
+  );
 
   return (
     <aside
@@ -49,19 +78,9 @@ export function LeftSidebar({
         className
       )}
     >
-      <button
-        onClick={() => setCollapsed((prev) => !prev)}
-        className="absolute -right-3 top-15 h-6 w-6 rounded-full bg-white border border-[var(--figma-forest-bg)] shadow-md flex items-center justify-center text-[var(--figma-forest-accent)] hover:text-[var(--figma-tech-green)] hover:scale-110 hover:border-[var(--figma-forest-accent)] transition-all z-50 outline-none focus:ring-2 focus:ring-[var(--figma-forest-bg)] opacity-0 hover:opacity-100"
-        aria-label={collapsed ? '사이드바 펼치기' : '사이드바 접기'}
-      >
-        {collapsed ? (
-          <ChevronRight className="h-3.5 w-3.5" />
-        ) : (
-          <ChevronLeft className="h-3.5 w-3.5" />
-        )}
-      </button>
       {collapsed && (
         <div className="absolute inset-0 z-10 flex flex-col items-center gap-3 pt-4">
+          {toggleButton}
           <button
             type="button"
             onClick={() => setCollapsed(false)}
@@ -88,22 +107,36 @@ export function LeftSidebar({
         )}
       >
         {/* Top Panel: Project Explorer */}
-        <ResizablePanel defaultSize={50} minSize={20} className="min-w-0">
+        <ResizablePanel
+          defaultSize="40%"
+          minSize="40px"
+          className="min-w-0 min-h-0"
+        >
           <div className="flex h-full flex-col min-w-0 w-full overflow-hidden">
             <div
               className={cn(
-                'flex items-center justify-between px-4 h-10 border-b border-zinc-300/60 bg-white/60 backdrop-blur-sm',
+                'group/header flex items-center justify-between px-4 h-10 border-b border-zinc-300/60 bg-white/60 backdrop-blur-sm',
                 collapsed && 'justify-center px-0 border-b-0 bg-transparent'
               )}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center">
                 <Search className="h-4 w-4 text-zinc-500" />
-                {!collapsed && (
-                  <h2 className="text-sm font-medium text-[#0B0B0B] tracking-tight">
-                    프로젝트 탐색
-                  </h2>
-                )}
+                <h2
+                  className={cn(
+                    'text-sm font-medium text-[#0B0B0B] tracking-tight whitespace-nowrap overflow-hidden transition-[opacity,transform,max-width,margin] duration-300 ease-out',
+                    collapsed
+                      ? 'max-w-0 opacity-0 translate-x-1 ml-0'
+                      : 'max-w-[160px] opacity-100 translate-x-0 ml-2'
+                  )}
+                >
+                  프로젝트 탐색
+                </h2>
               </div>
+            {!collapsed && (
+              <div className="flex items-center">
+                {toggleButton}
+              </div>
+            )}
             </div>
             <ScrollArea
               className={cn(
@@ -134,7 +167,11 @@ export function LeftSidebar({
         />
 
         {/* Bottom Panel: Team Chat */}
-        <ResizablePanel defaultSize={70} minSize={20} className="min-w-0">
+        <ResizablePanel
+          defaultSize="60%"
+          minSize="40px"
+          className="min-w-0 min-h-0"
+        >
           <div className="h-full w-full min-w-0">
             {/* ChatPanel already has its own layout, so we just stick it here */}
             {/* Passing "Team Chat" as workspace name to match requirements */}

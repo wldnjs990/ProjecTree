@@ -289,6 +289,7 @@ export default function WorkSpacePage() {
         isVisible={isVoiceChatBarVisible}
         onClose={handleVoiceChatClose}
         workspaceId={workspaceId || 'default'}
+        members={members}
       />
 
       <WorkspaceSettingsDialog

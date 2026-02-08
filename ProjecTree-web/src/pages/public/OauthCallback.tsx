@@ -46,7 +46,7 @@ const OAuthCallback = () => {
         if (isUser) {
           const user = await getMemberInfo()
           setUser(user)
-          navigate('/');
+          navigate('/workspace-lounge');
         } else {
           navigate('/user-onboarding');
         }

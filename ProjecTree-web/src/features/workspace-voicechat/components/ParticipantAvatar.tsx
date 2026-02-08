@@ -2,6 +2,15 @@ import { MicOff } from 'lucide-react';
 
 import { cn } from '@/shared/lib/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import type { AvatarColor } from '@/shared/components/UserAvatar';
+
+const colorStyles: Record<AvatarColor, string> = {
+  blue: 'bg-[#2B7FFF]',
+  pink: 'bg-[#F6339A]',
+  orange: 'bg-[#FD9A00]',
+  green: 'bg-[#00C950]',
+  purple: 'bg-[#8B5CF6]',
+};
 
 type ParticipantAvatarProps = {
   name: string;
@@ -9,6 +18,7 @@ type ParticipantAvatarProps = {
   isSpeaking: boolean;
   isMuted?: boolean;
   isMe?: boolean;
+  color?: AvatarColor;
 };
 
 export default function ParticipantAvatar({
@@ -17,9 +27,12 @@ export default function ParticipantAvatar({
   isSpeaking,
   isMuted,
   isMe = false,
+  color,
 }: ParticipantAvatarProps) {
   const initial = name.charAt(0).toUpperCase();
   const label = displayName ?? name;
+  const fallbackColor = isMe ? 'bg-blue-600' : 'bg-slate-600';
+  const resolvedColor = color ? colorStyles[color] : fallbackColor;
 
   return (
     <div className="relative flex flex-col items-center gap-1">
@@ -34,7 +47,7 @@ export default function ParticipantAvatar({
           <AvatarFallback
             className={cn(
               'text-white font-semibold text-sm',
-              isMe ? 'bg-blue-600' : 'bg-slate-600'
+              resolvedColor
             )}
           >
             {initial}
