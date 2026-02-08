@@ -78,7 +78,6 @@ const fitviewOptions = { padding: 0.2 };
 
 function TreeCanvasInner({
   initialNodes = [],
-  onlineUsers,
   onNodeClick,
 }: TreeCanvasProps) {
   const { fitView } = useReactFlow();
