@@ -1,5 +1,6 @@
 package com.ssafy.projectree.domain.ai.dto.schemas;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,9 +15,12 @@ public class TechRecommendSchema {
     private Long id;
     private String name;
     private String advantage;
-    private String disadvantage;
+    @JsonProperty("disAdvantage")
+    @JsonAlias("disadvantage")
+    private String disAdvantage;
     private String description;
     private String ref;
-    @JsonProperty("recommendation_score")
-    private int recommendationScore;
+    @JsonProperty("recommendScore")
+    @JsonAlias("recommendation_score")
+    private int recommendScore;
 }

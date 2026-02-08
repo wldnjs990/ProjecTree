@@ -94,7 +94,7 @@ public class NodeCrdtService {
                 .build()
                 .toUriString();
 
-        sendNodeDataToCrdt(uriString, workspaceId, nodeId, response.getTechs());
+        sendNodeDataToCrdt(uriString, workspaceId, nodeId, response);
     }
 
     @Async
@@ -126,6 +126,35 @@ public class NodeCrdtService {
 
     }
 
+    public void sendTechPendingReset(Long workspaceId, Long nodeId) {
+        String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
+                .path(pathPrefix)
+                .path(techPath + "/pending-reset")
+                .build()
+                .toUriString();
+
+        sendPendingReset(uriString, workspaceId, nodeId);
+    }
+
+    public void sendCandidatePendingReset(Long workspaceId, Long nodeId) {
+        String uriString = UriComponentsBuilder.fromUriString(crdtServerUrl)
+                .path(pathPrefix)
+                .path(candidatePath + "/pending-reset")
+                .build()
+                .toUriString();
+
+        sendPendingReset(uriString, workspaceId, nodeId);
+    }
+
+    private void sendPendingReset(String uriString, Long workspaceId, Long nodeId) {
+        try {
+            restClient.post().uri(uriString, workspaceId, nodeId)
+                    .retrieve().toBodilessEntity();
+        } catch (Exception e) {
+            log.error("CRDT pending 리셋 실패: {}", e.getMessage());
+        }
+    }
+
     private void sendNodeDataToCrdt(String uriString, Long workspaceId, Long nodeId, Object payload) {
         try {
             restClient.post().uri(uriString, workspaceId, nodeId)
@@ -133,9 +162,6 @@ public class NodeCrdtService {
                     .body(payload)
                     .retrieve().toBodilessEntity();
         } catch (Exception e) {
-            // https://ssafy.atlassian.net/browse/S14P11D107-285
-            // TODO: 현재는 트랜잭션과 같이 동작 하기에 로그만 띄우지만
-            // Transaction 과 별개로 동작하여 예외 반환 로직을 구현하는 것이 더 좋을 것같음
             log.error("CRDT 서버 전송 실패: {}", e.getMessage());
         }
     }
