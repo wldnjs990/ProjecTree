@@ -38,7 +38,6 @@ export const ChatPanel = ({
       {/* 헤더 */}
       <ChatHeader
         workspaceName={workspaceName}
-        participantCount={participants.length}
         isConnected={isConnected}
         collapsed={collapsed}
       />
