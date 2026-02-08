@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router';
 import {
   Layers,
@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { patchMemberSignup, getMemberInfo } from '@/apis/member.api';
 import { useSetAccessToken, useAccessToken } from '@/shared/stores/authStore';
+import { useSetUser } from '@/shared/stores/userStore';
 import { parseJwt } from '@/shared/lib/utils';
 
 /**
@@ -30,10 +31,14 @@ export function ProfileForm() {
 
   const navigate = useNavigate();
   const setAccessToken = useSetAccessToken();
+  const setUser = useSetUser();
   const accessToken = useAccessToken();
+  const isSigningUp = useRef(false);
 
   // 토큰 유효성 및 권한 검사 & 이메일 조회
   useEffect(() => {
+    if (isSigningUp.current) return;
+
     if (!accessToken) {
       // 토큰이 없으면 로그인 페이지로 이동 (Alert 없이 자연스럽게)
       navigate('/login');
@@ -93,6 +98,7 @@ export function ProfileForm() {
       if (!isValid || isChecking) return;
 
       setIsChecking(true);
+      isSigningUp.current = true;
       const updatedAccessToken = await patchMemberSignup(nickname);
 
       if (!updatedAccessToken) {
@@ -100,11 +106,14 @@ export function ProfileForm() {
       }
 
       setAccessToken(updatedAccessToken);
+      const user = await getMemberInfo();
+      setUser(user);
       navigate('/workspace-lounge');
     } catch (error) {
       console.error('가입 처리 중 오류:', error);
       setErrorMessage('가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
       setIsValid(false);
+      isSigningUp.current = false;
     } finally {
       setIsChecking(false);
     }
