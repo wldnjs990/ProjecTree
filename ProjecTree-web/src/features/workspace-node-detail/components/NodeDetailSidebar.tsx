@@ -12,7 +12,7 @@ import {
   usePreviewKind,
   usePreviewCandidate,
   useCustomPreviewDraft,
-  useIsCreatingNode,
+  useIsPreviewCreating,
   useNodeDetailStore,
   previewNodesCrdtService,
   nodeDetailCrdtService,
@@ -60,7 +60,21 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   const previewKind = usePreviewKind();
   const previewCandidate = usePreviewCandidate();
   const customDraft = useCustomPreviewDraft();
-  const isCreatingNode = useIsCreatingNode();
+
+  // 현재 프리뷰 노드 ID 계산
+  const currentPreviewNodeId = useMemo(() => {
+    if (previewKind === 'candidate' && previewCandidate) {
+      return `preview-${previewCandidate.id}`;
+    }
+    if (previewKind === 'custom' && customDraft) {
+      return customDraft.previewNodeId;
+    }
+    return null;
+  }, [previewKind, previewCandidate, customDraft]);
+
+  // 현재 프리뷰 노드가 생성 중인지 확인
+  const isCreatingNode = useIsPreviewCreating(currentPreviewNodeId);
+
   // 스토어 액션
   const { exitCandidatePreview, updateCustomDraft } =
     useNodeDetailStore();
@@ -90,18 +104,17 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   // 미리보기 종료 핸들러
   // pending 중인 preview 노드는 유지, 현재 보고 있는 non-pending 노드만 제거
   const handleExitPreview = useCallback(() => {
-    const currentPreviewNodeId =
-      previewKind === 'candidate' && previewCandidate
-        ? `preview-${previewCandidate.id}`
-        : previewKind === 'custom' && customDraft
-          ? customDraft.previewNodeId
-          : null;
+    // useCallback의 closure 문제를 피하기 위해 최신 상태를 직접 확인
+    const store = useNodeDetailStore.getState();
+    const isCreating = currentPreviewNodeId
+      ? store.creatingPreviewIds.has(currentPreviewNodeId)
+      : false;
 
-    if (currentPreviewNodeId && !isCreatingNode) {
+    if (currentPreviewNodeId && !isCreating) {
       previewNodesCrdtService.removePreviewNode(currentPreviewNodeId);
     }
     exitCandidatePreview();
-  }, [exitCandidatePreview, previewKind, previewCandidate, customDraft, isCreatingNode]);
+  }, [exitCandidatePreview, currentPreviewNodeId]);
 
   const handleCustomNameChange = useCallback(
     (value: string) => {
