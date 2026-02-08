@@ -50,7 +50,7 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
         }
 
         String redirectUrl = UriComponentsBuilder.fromUriString(targetUrl)
-                .path("/login") // 로그인 페이지 경로 붙이기
+                .replacePath("/login")
                 .queryParam("error", "true")
                 .queryParam("message", errorMessage)
                 .build().encode().toUriString();
