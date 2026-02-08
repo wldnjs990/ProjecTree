@@ -226,6 +226,18 @@ class NodeService:
         )
         db.execute(stmt)
 
+        # 자기 자신 참조 (depth=0) 추가  <-- FIX
+        stmt_self = (
+            pg_insert(node_tree)
+            .values(
+                ancestor_id=child_id,
+                descendant_id=child_id,
+                depth=0,
+            )
+            .on_conflict_do_nothing(index_elements=["ancestor_id", "descendant_id"])
+        )
+        db.execute(stmt_self)
+
         # 조상들의 관계도 추가 (closure table 패턴)
         # 부모의 모든 조상에 대해 새로운 관계 추가
         ancestor_query = db.execute(
