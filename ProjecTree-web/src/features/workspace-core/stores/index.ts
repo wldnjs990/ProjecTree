@@ -35,5 +35,7 @@ export {
   usePreviewNodePosition,
   useCreatingPreviewIds,
   useIsPreviewCreating,
+  useAiStreamingText,
+  useAiStreamingType,
   type EditableNodeDetail,
 } from './nodeDetailStore';

@@ -138,8 +138,8 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   );
 
   // 확정 핸들러
-  // 클라이언트: nodeCreatingPending=true 전송 + API 호출만 수행
-  // CRDT 서버: Spring 응답 받으면 노드 추가 + 프리뷰 제거 + pending=false 브로드캐스트
+  // candidate: pending=true 전송 + API 호출 → CRDT 서버가 Spring 응답 받으면 노드 추가 + pending=false 브로드캐스트
+  // custom: pending 없이 API 호출 → 클라이언트에서 직접 preview 제거 + 상태 정리
   const handleConfirmCreate = useCallback(async () => {
     if (!selectedNodeId) return;
 
@@ -156,30 +156,28 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
       return { xpos, ypos };
     };
 
-    // 현재 프리뷰 노드 ID 결정
-    const previewNodeId =
-      previewKind === 'candidate' && previewCandidate
-        ? `preview-${previewCandidate.id}`
-        : customDraft?.previewNodeId;
-
-    if (!previewNodeId) return;
-
-    nodeDetailCrdtService.setNodeCreatingPending(previewNodeId, true);
-
     try {
       if (previewKind === 'candidate' && previewCandidate) {
-        const position = resolvePosition(`preview-${previewCandidate.id}`);
+        const previewNodeId = `preview-${previewCandidate.id}`;
+        const position = resolvePosition(previewNodeId);
         if (!position) return;
+
+        // candidate는 pending 설정 (CRDT 서버가 브로드캐스트)
+        nodeDetailCrdtService.setNodeCreatingPending(previewNodeId, true);
 
         await postCreateNode(
           { xpos: position.xpos, ypos: position.ypos, previewNodeId },
           Number(selectedNodeId),
           previewCandidate.id
         );
+        // 성공 시: CRDT 서버가 Spring 콜백을 통해 pending=false + preview 노드 삭제 처리
+        console.log('[NodeDetailSidebar] candidate 노드 생성 요청 완료:', previewNodeId);
       } else if (previewKind === 'custom' && customDraft) {
-        const position = resolvePosition(customDraft.previewNodeId);
+        const previewNodeId = customDraft.previewNodeId;
+        const position = resolvePosition(previewNodeId);
         if (!position) return;
 
+        // custom은 pending 없이 API 호출 (서버에서 브로드캐스트 안 함)
         await postCreateCustomNode({
           name: customDraft.name.trim(),
           description: customDraft.description.trim(),
@@ -190,19 +188,26 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
           ypos: position.ypos,
           previewNodeId,
         });
+
+        // 성공 시: 클라이언트에서 직접 preview 노드 제거 + 상태 정리
+        previewNodesCrdtService.removePreviewNode(previewNodeId);
+        exitCandidatePreview();
+        console.log('[NodeDetailSidebar] custom 노드 생성 완료:', previewNodeId);
       }
-      // 성공 시: CRDT 서버가 Spring 콜백을 통해 pending=false + preview 노드 삭제 처리
-      console.log('[NodeDetailSidebar] 노드 생성 요청 완료:', previewNodeId);
     } catch (error) {
       console.error('노드 생성 실패:', error);
-      // 에러 시에만 클라이언트에서 pending 해제 (서버 응답이 없으므로)
-      nodeDetailCrdtService.setNodeCreatingPending(previewNodeId, false);
+      // candidate 에러 시에만 pending 해제 (custom은 pending 사용 안 함)
+      if (previewKind === 'candidate' && previewCandidate) {
+        const previewNodeId = `preview-${previewCandidate.id}`;
+        nodeDetailCrdtService.setNodeCreatingPending(previewNodeId, false);
+      }
     }
   }, [
     selectedNodeId,
     previewKind,
     previewCandidate,
     customDraft,
+    exitCandidatePreview,
   ]);
 
   return (
