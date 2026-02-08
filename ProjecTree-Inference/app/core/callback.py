@@ -6,6 +6,8 @@ from app.core.node_messages import get_node_config, is_tracked_node
 from typing import Any, Dict, Optional
 from uuid import UUID
 import logging
+import asyncio
+import time
 from app.core.crdt_client import get_crdt_client
 
 logger = logging.getLogger(__name__)
@@ -39,6 +41,8 @@ class AgentStreamHandler(AsyncCallbackHandler):
         self.run_inputs: Dict[UUID, Dict[str, Any]] = {}
         # run_id -> tool_name 저장 (on_tool_end에서 사용)
         self.active_tool_runs: Dict[UUID, Optional[str]] = {}
+        # run_id -> start_time 저장 (최소 실행 시간 보장용)
+        self.node_start_times: Dict[UUID, float] = {}
 
     def _get_node_name(
         self, serialized: Optional[Dict[str, Any]], kwargs: Dict[str, Any]
@@ -74,6 +78,7 @@ class AgentStreamHandler(AsyncCallbackHandler):
         # 3. 실행 컨텍스트 저장
         self.active_nodes[run_id] = node_name
         self.run_inputs[run_id] = inputs
+        self.node_start_times[run_id] = time.time()
 
         # 4. 노드 설정 조회 및 시작 메시지 전송
         config = get_node_config(node_name)
@@ -111,6 +116,15 @@ class AgentStreamHandler(AsyncCallbackHandler):
             return
 
         logger.debug(f"Node ended: {node_name}, run_id: {run_id}")
+
+        # 최소 실행 시간 보장 (UX 개선)
+        start_time = self.node_start_times.pop(run_id, None)
+        if start_time:
+            elapsed_time = time.time() - start_time
+            MIN_EXECUTION_TIME = 1.0  # 최소 1초 보장
+            if elapsed_time < MIN_EXECUTION_TIME:
+                wait_time = MIN_EXECUTION_TIME - elapsed_time
+                await asyncio.sleep(wait_time)
 
         # 카테고리별 완료 메시지 생성
         content = self._build_completion_message(node_name, config, outputs)
