@@ -21,8 +21,11 @@ router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
 
   const { workspaceId, nodeId } = req.params;
 
-  // Spring 서버가 배열을 직접 전송
-  const techs = req.body as TechRecommendation[];
+  // Spring 서버가 { techs, comparison } 형식으로 전송
+  const { techs, comparison } = req.body as {
+    techs: TechRecommendation[];
+    comparison: string;
+  };
 
   if (!workspaceId || !nodeId) {
     console.error("Invalid params", new Date().toISOString());
@@ -54,7 +57,19 @@ router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
     if (yArray.length > 0) {
       yArray.delete(0, yArray.length);
     }
-    yArray.push(techs);
+
+    // 각 tech에 selected: false 추가
+    const techsWithSelected = techs.map((tech) => ({
+      ...tech,
+      selected: tech.selected ?? false,
+    }));
+    yArray.push(techsWithSelected);
+
+    // comparison 저장 (신규)
+    if (comparison) {
+      const nodeTechComparisons = doc.getMap("nodeTechComparisons");
+      nodeTechComparisons.set(nodeId, comparison);
+    }
 
     // pending 상태 해제
     const techsPending = doc.getMap("techsPending");
@@ -83,10 +98,10 @@ router.post("/:nodeId/custom-tech-stacks", (req: Request, res: Response) => {
     });
   }
 
-  if (!tech || !tech.name) {
+  if (!tech || !tech.id || !tech.name) {
     console.error("Invalid tech data", new Date().toISOString());
     return res.status(400).json({
-      message: "Invalid tech data",
+      message: "Invalid tech data - id and name are required",
       timeStamp: new Date().toISOString(),
     });
   }
@@ -101,8 +116,18 @@ router.post("/:nodeId/custom-tech-stacks", (req: Request, res: Response) => {
       nodeTechRecommendations.set(nodeId, yArray);
     }
 
-    // 기존 배열에 1개 추가
-    yArray.push([tech]);
+    // 기존 배열에 1개 추가 (기본값 채워서 저장)
+    const customTech: TechRecommendation = {
+      id: tech.id,
+      name: tech.name,
+      advantage: tech.advantage ?? "",
+      disAdvantage: tech.disAdvantage ?? "",
+      description: tech.description ?? "",
+      ref: tech.ref ?? "",
+      recommendScore: tech.recommendScore ?? -1,
+      selected: tech.selected ?? false,
+    };
+    yArray.push([customTech]);
 
     // pending 상태 해제
     const techsPending = doc.getMap("techsPending");
@@ -110,6 +135,30 @@ router.post("/:nodeId/custom-tech-stacks", (req: Request, res: Response) => {
   });
 
   console.log("add custom tech-stack success", new Date().toISOString());
+  res.status(200).json({ status: "ok" });
+});
+
+// Pending 리셋 API - AI 호출 실패 시 fallback용
+router.post("/:nodeId/tech-stacks/pending-reset", (req: Request, res: Response) => {
+  console.log("reset tech pending start", new Date().toISOString());
+
+  const { workspaceId, nodeId } = req.params;
+
+  if (!workspaceId || !nodeId) {
+    console.error("Invalid params", new Date().toISOString());
+    return res.status(400).json({
+      message: "Invalid params",
+      timeStamp: new Date().toISOString(),
+    });
+  }
+
+  const doc = getYDocByRoom(workspaceId as string);
+  doc.transact(() => {
+    const techsPending = doc.getMap("techsPending");
+    techsPending.set(nodeId, false);
+  });
+
+  console.log("reset tech pending success", new Date().toISOString());
   res.status(200).json({ status: "ok" });
 });
 

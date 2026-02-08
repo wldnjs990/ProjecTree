@@ -69,4 +69,28 @@ router.post("/:nodeId/candidate", (req: Request, res: Response) => {
   res.status(200).json({ status: "ok" });
 });
 
+// Pending 리셋 API - AI 호출 실패 시 fallback용
+router.post("/:nodeId/candidate/pending-reset", (req: Request, res: Response) => {
+  console.log("reset candidate pending start", new Date().toISOString());
+
+  const { workspaceId, nodeId } = req.params;
+
+  if (!workspaceId || !nodeId) {
+    console.error("Invalid params", new Date().toISOString());
+    return res.status(400).json({
+      message: "Invalid params",
+      timeStamp: new Date().toISOString(),
+    });
+  }
+
+  const doc = getYDocByRoom(workspaceId as string);
+  doc.transact(() => {
+    const nodeCandidatesPending = doc.getMap("nodeCandidatesPending");
+    nodeCandidatesPending.set(nodeId, false);
+  });
+
+  console.log("reset candidate pending success", new Date().toISOString());
+  res.status(200).json({ status: "ok" });
+});
+
 export default router;

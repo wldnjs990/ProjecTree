@@ -61,4 +61,35 @@ router.post("/", (req: Request, res: Response) => {
   res.status(200).json({ status: "ok" });
 });
 
+// Pending 리셋 API - 노드 생성 실패 시 fallback용
+router.post("/creating/pending-reset", (req: Request, res: Response) => {
+  console.log("reset node creating pending start", new Date().toISOString());
+
+  const { workspaceId } = req.params;
+  const { previewNodeId } = req.body as { previewNodeId: string };
+
+  if (!workspaceId || !previewNodeId) {
+    console.error("Invalid params", new Date().toISOString());
+    return res.status(400).json({
+      message: "Invalid params - workspaceId and previewNodeId are required",
+      timeStamp: new Date().toISOString(),
+    });
+  }
+
+  const doc = getYDocByRoom(workspaceId as string);
+  doc.transact(() => {
+    const nodeCreatingPending = doc.getMap("nodeCreatingPending");
+    nodeCreatingPending.set(previewNodeId, false);
+
+    // 프리뷰 노드도 제거
+    const previewNodes = doc.getMap("previewNodes");
+    if (previewNodes.has(previewNodeId)) {
+      previewNodes.delete(previewNodeId);
+    }
+  });
+
+  console.log("reset node creating pending success", new Date().toISOString());
+  res.status(200).json({ status: "ok" });
+});
+
 export default router;
