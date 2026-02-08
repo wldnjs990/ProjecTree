@@ -28,6 +28,7 @@ interface AINodeCandidateSectionProps {
     candidateId: number,
     body: { xpos: number; ypos: number }
   ) => void;
+  onCandidateDelete?: (candidateId: number) => void;
   onLockedCandidateClick?: (candidate: Candidate) => void;
   onAddManual?: () => void;
   onGenerateCandidates?: () => Promise<void>;
@@ -37,6 +38,7 @@ interface AINodeCandidateSectionProps {
 export function AINodeCandidateSection({
   candidates,
   onCandidateClick,
+  onCandidateDelete,
   onLockedCandidateClick,
   onAddManual,
   onGenerateCandidates,
@@ -51,7 +53,7 @@ export function AINodeCandidateSection({
   const streamingText = useAiStreamingText();
   const streamingType = useAiStreamingType();
 
-  // candidates 타입일 때만 스트리밍 텍스트 표시
+  // candidates ?�?�일 ?�만 ?�트리밍 ?�스???�시
   const showStreamingText = isGenerating && streamingType === 'candidates' && streamingText;
 
   const lockedCandidateIds = new Set(
@@ -64,7 +66,7 @@ export function AINodeCandidateSection({
 
   const handleCandidateClick = (candidate: Candidate) => {
     if (!selectedNodeId) return;
-    // locked 후보(생성 중) 클릭 시 해당 preview로 재진입
+    // locked ?�보(?�성 �? ?�릭 ???�당 preview�??�진??
     if (lockedCandidateIds.has(candidate.id)) {
       onLockedCandidateClick?.(candidate);
       return;
@@ -75,7 +77,7 @@ export function AINodeCandidateSection({
 
   return (
     <div className="rounded-[14px] border border-[rgba(227,228,235,0.5)] bg-[rgba(251,251,255,0.6)] backdrop-blur-sm overflow-hidden">
-      {/* 섹션 헤더 (접기/펼치기) */}
+      {/* ?�션 ?�더 (?�기/?�치�? */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between p-4 hover:bg-[rgba(0,0,0,0.02)] transition-colors"
@@ -83,7 +85,7 @@ export function AINodeCandidateSection({
         <div className="flex items-center gap-2">
           <Lightbulb className="w-4 h-4 text-[#FD9A00]" />
           <span className="text-xs font-medium text-[#0B0B0B]">
-            노드 추가 + AI 다음 노드 추천
+            ?�드 추�? + AI ?�음 ?�드 추천
           </span>
         </div>
         {isExpanded ? (
@@ -93,12 +95,12 @@ export function AINodeCandidateSection({
         )}
       </button>
 
-      {/* 콘텐츠 */}
+      {/* 콘텐�?*/}
       {isExpanded && (
         <div className="px-4 pb-4 space-y-4">
           {hasCandidates ? (
             <>
-              {/* 추천 노드 목록 */}
+              {/* 추천 ?�드 목록 */}
               <div className="space-y-2">
                 {candidates.map((node) => {
                   const isLocked = lockedCandidateIds.has(node.id);
@@ -108,14 +110,20 @@ export function AINodeCandidateSection({
                       key={node.id}
                       node={node}
                       onClick={() => handleCandidateClick(node)}
+                      onDelete={
+                        onCandidateDelete
+                          ? () => onCandidateDelete(node.id)
+                          : undefined
+                      }
                       isSelected={isSelected || isLocked}
-                      disabled={isSelected} // locked는 클릭 가능 (재진입), selected만 비활성화
+                      disabled={isSelected} // locked???�릭 가??(?�진??, selected�?비활?�화
+                      deleteDisabled={isSelected || isLocked}
                     />
                   );
                 })}
               </div>
 
-              {/* AI 재생성 버튼 또는 스트리밍 텍스트 */}
+              {/* AI ?�생??버튼 ?�는 ?�트리밍 ?�스??*/}
               {showStreamingText ? (
                 <AiStreamingCard text={streamingText} />
               ) : (
@@ -127,12 +135,12 @@ export function AINodeCandidateSection({
                   {isGenerating ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      생성 중...
+                      ?�성 �?..
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4" />
-                      AI 다시 추천받기
+                      AI ?�시 추천받기
                     </>
                   )}
                 </button>
@@ -145,16 +153,19 @@ export function AINodeCandidateSection({
             />
           )}
 
-          {/* 직접 추가 버튼 */}
+          {/* 직접 추�? 버튼 */}
           <button
             onClick={onAddManual}
             className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#6363C6] border border-[rgba(99,99,198,0.3)] rounded-lg hover:bg-[rgba(99,99,198,0.05)] transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4" />
-            직접 추가
+            직접 추�?
           </button>
         </div>
       )}
     </div>
   );
 }
+
+
+
