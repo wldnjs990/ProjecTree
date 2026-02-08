@@ -27,9 +27,9 @@ public class CustomTechCreateDto {
 
     public static class Response {
 
-        @Schema(description = "기술 단어(TechVocabulary) ID", example = "3")
-        private Long techVocaId;
+        @Schema(description = "NodeTechStack ID", example = "123")
+        private Long id;
         @Schema(description = "기술 이름", example = "java")
-        private String techName;
+        private String name;
     }
 }
