@@ -20,7 +20,9 @@ router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
   console.log("req.body:", JSON.stringify(req.body, null, 2));
 
   const { workspaceId, nodeId } = req.params;
-  const { techs } = req.body as { techs: TechRecommendation[] };
+
+  // Spring 서버가 배열을 직접 전송
+  const techs = req.body as TechRecommendation[];
 
   if (!workspaceId || !nodeId) {
     console.error("Invalid params", new Date().toISOString());
@@ -66,9 +68,12 @@ router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
 // 커스텀 기술 추가 API - 기존 배열에 1개 추가
 router.post("/:nodeId/custom-tech-stacks", (req: Request, res: Response) => {
   console.log("add custom tech-stack start", new Date().toISOString());
+  console.log("req.body:", JSON.stringify(req.body, null, 2));
 
   const { workspaceId, nodeId } = req.params;
-  const { tech } = req.body as { tech: TechRecommendation };
+
+  // Spring 서버가 객체를 직접 전송
+  const tech = req.body as TechRecommendation;
 
   if (!workspaceId || !nodeId) {
     console.error("Invalid params", new Date().toISOString());
@@ -78,7 +83,7 @@ router.post("/:nodeId/custom-tech-stacks", (req: Request, res: Response) => {
     });
   }
 
-  if (!tech) {
+  if (!tech || !tech.name) {
     console.error("Invalid tech data", new Date().toISOString());
     return res.status(400).json({
       message: "Invalid tech data",
