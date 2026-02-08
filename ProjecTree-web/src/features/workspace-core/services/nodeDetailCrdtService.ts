@@ -182,7 +182,18 @@ class NodeDetailCrdtService {
         const pending = yNodeCreatingPending.get(previewNodeId);
         if (pending === undefined) return;
 
-        // 현재 클라이언트의 프리뷰 노드인지 확인
+        // pending=false → 노드 생성 완료 → preview 노드 제거 + pending 엔트리 정리
+        if (!pending) {
+          const yPreviewNodes = client.getYMap<Y.Map<YNodeValue>>('previewNodes');
+          yPreviewNodes.delete(previewNodeId);
+          yNodeCreatingPending.delete(previewNodeId);
+          console.log(
+            '[NodeDetailCrdtService] preview node cleaned up after creation:',
+            previewNodeId
+          );
+        }
+
+        // 현재 클라이언트의 프리뷰 노드인 경우 UI 상태 업데이트
         const store = useNodeDetailStore.getState();
         const currentPreviewId =
           store.previewKind === 'candidate' && store.previewCandidate
@@ -190,12 +201,11 @@ class NodeDetailCrdtService {
             : store.customDraft?.previewNodeId;
 
         if (currentPreviewId === previewNodeId) {
-          store.setIsCreatingNode(pending);
-          console.log(
-            '[NodeDetailCrdtService] node creating pending:',
-            previewNodeId,
-            pending
-          );
+          if (!pending) {
+            store.exitCandidatePreview();
+          } else {
+            store.setIsCreatingNode(true);
+          }
         }
       });
     };
@@ -583,6 +593,37 @@ class NodeDetailCrdtService {
     if (!this.yNodeCreatingPendingRef) return;
     this.yNodeCreatingPendingRef.set(previewNodeId, pending);
     useNodeDetailStore.getState().setIsCreatingNode(pending);
+  }
+
+  /**
+   * 새로고침/재연결 시 pending이 아닌 preview 노드만 정리
+   * pending 중인 노드는 nodeCreatingPendingHandler가 완료 시 자동 정리
+   */
+  clearNonPendingPreviewNodes(ownerId: string): void {
+    const client = getCrdtClient();
+    if (!client) return;
+
+    const yPreviewNodes = client.getYMap<Y.Map<YNodeValue>>('previewNodes');
+
+    client.yDoc.transact(() => {
+      yPreviewNodes.forEach((yNode, nodeId) => {
+        // pending 중인 preview 노드는 건너뜀
+        if (this.yNodeCreatingPendingRef?.get(nodeId) === true) return;
+
+        const lockedBy =
+          (yNode.get('lockedBy') as string | undefined) ??
+          ((yNode.get('data') as { lockedBy?: string } | undefined)
+            ?.lockedBy);
+        if (lockedBy === ownerId) {
+          yPreviewNodes.delete(nodeId);
+        }
+      });
+    });
+
+    console.log(
+      '[NodeDetailCrdtService] non-pending preview nodes cleared for:',
+      ownerId
+    );
   }
 }
 export const nodeDetailCrdtService = NodeDetailCrdtService.getInstance();

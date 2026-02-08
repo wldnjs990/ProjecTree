@@ -86,15 +86,19 @@ export function AINodeCandidateSection({
             <>
               {/* 추천 노드 목록 */}
               <div className="space-y-2">
-                {candidates.map((node) => (
-                  <SubNodeCard
-                    key={node.id}
-                    node={node}
-                    onClick={() => handleCandidateClick(node)}
-                    isSelected={selectedCandidateIds.includes(node.id)}
-                    disabled={lockedCandidateIds.has(node.id)}
-                  />
-                ))}
+                {candidates.map((node) => {
+                  const isLocked = lockedCandidateIds.has(node.id);
+                  const isSelected = selectedCandidateIds.includes(node.id);
+                  return (
+                    <SubNodeCard
+                      key={node.id}
+                      node={node}
+                      onClick={() => handleCandidateClick(node)}
+                      isSelected={isSelected || isLocked}
+                      disabled={isLocked || isSelected}
+                    />
+                  );
+                })}
               </div>
 
               {/* AI 재생성 버튼 */}
