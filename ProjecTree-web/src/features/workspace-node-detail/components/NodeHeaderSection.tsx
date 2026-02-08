@@ -5,11 +5,14 @@ import {
   Maximize2,
   Minimize2,
   FileText,
+  Trash2,
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import NodeHeaderButton from './NodeHeaderButton';
 import NodeHeaderInfo from './NodeHeaderInfo';
 import { categoryTagStyles, typeTagStyles } from '@/features/workspace-core';
+import { Confirm } from '@/shared/components/Confirm';
+import { ConfirmTrigger } from '@/shared/components/ConfirmTrigger';
 
 interface NodeHeaderSectionProps {
   nodeInfo?: {
@@ -25,6 +28,7 @@ interface NodeHeaderSectionProps {
   onShowDescription?: () => void;
   onToggleExpand?: () => void;
   isExpanded?: boolean;
+  onDelete?: () => void;
 }
 
 export function NodeHeaderSection({
@@ -36,8 +40,12 @@ export function NodeHeaderSection({
   onShowDescription,
   onToggleExpand,
   isExpanded,
+  onDelete,
 }: NodeHeaderSectionProps) {
   if (!nodeInfo) return null;
+
+  // PROJECT 노드는 삭제 불가
+  const canDelete = onDelete && nodeInfo.nodeType !== 'PROJECT';
 
   const typeStyle = typeTagStyles[nodeInfo.nodeType] || typeTagStyles.TASK;
   const categoryStyle = nodeInfo.taskType
@@ -103,6 +111,23 @@ export function NodeHeaderSection({
                 <Maximize2 className="w-5 h-5 text-gray-500" />
               )}
             </NodeHeaderButton>
+          )}
+          {/* 삭제 버튼 */}
+          {canDelete && (
+            <Confirm
+              trigger={
+                <ConfirmTrigger>
+                  <NodeHeaderButton>
+                    <Trash2 className="w-5 h-5 text-gray-500 hover:text-red-500" />
+                  </NodeHeaderButton>
+                </ConfirmTrigger>
+              }
+              title="노드를 삭제하시겠습니까?"
+              description="이 노드와 모든 하위 노드가 함께 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
+              cancelText="취소"
+              actionText="삭제"
+              onAction={onDelete}
+            />
           )}
           {/* 편집 버튼 */}
           <NodeHeaderButton onClick={toggleEdit}>
