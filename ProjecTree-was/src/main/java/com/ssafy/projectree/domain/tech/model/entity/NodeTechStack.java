@@ -31,7 +31,7 @@ public class NodeTechStack extends BaseEntity {
 	@JoinColumn(name = "node_id")
 	private Node node;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "tech_vocab_id")
 	private TechVocabulary techVocabulary;
 
