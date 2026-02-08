@@ -1,7 +1,7 @@
-import { Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import forestImage from '@/assets/images/forest.jpg';
+import logoImage from '@/assets/images/logo2.png';
 
 export function LoginIntro() {
   return (
@@ -23,12 +23,11 @@ export function LoginIntro() {
           to="/"
           className="flex items-center gap-3 z-10 hover:opacity-80 transition-opacity cursor-pointer"
         >
-          <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm">
-            <Layers className="text-white h-7 w-7" />
-          </div>
-          <span className="text-2xl font-bold text-white tracking-tight">
-            ProjecTree
-          </span>
+          <img
+            src={logoImage}
+            alt="ProjecTree Logo"
+            className="h-10"
+          />
         </Link>
 
         {/* Hero Section - Vertically Centered */}

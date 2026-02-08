@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { TreeDeciduous } from 'lucide-react';
+import logoImage from '@/assets/images/logo.png';
 
 export function LandingFooter() {
   return (
@@ -17,13 +17,11 @@ export function LandingFooter() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 border border-emerald-200"
-              style={{ boxShadow: '0 0 15px rgba(16, 185, 129, 0.1)' }}
-            >
-              <TreeDeciduous className="h-4 w-4 text-emerald-600" />
-            </div>
-            <span className="text-lg font-bold text-zinc-900">ProjecTree</span>
+            <img
+              src={logoImage}
+              alt="ProjecTree Logo"
+              className="h-8"
+            />
           </div>
 
           {/* Links */}

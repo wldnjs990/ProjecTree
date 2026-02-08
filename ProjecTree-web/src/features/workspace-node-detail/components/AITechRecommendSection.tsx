@@ -248,7 +248,6 @@ function TechCardList({
 function TechEmptyState({
   onGenerate,
   isGenerating,
-  isAddingCustom,
 }: {
   onGenerate?: () => void;
   isGenerating?: boolean;
