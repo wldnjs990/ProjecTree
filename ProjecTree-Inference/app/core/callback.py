@@ -121,7 +121,7 @@ class AgentStreamHandler(AsyncCallbackHandler):
         start_time = self.node_start_times.pop(run_id, None)
         if start_time:
             elapsed_time = time.time() - start_time
-            MIN_EXECUTION_TIME = 1.0  # 최소 1초 보장
+            MIN_EXECUTION_TIME = 2.0  # 최소 2초 보장
             if elapsed_time < MIN_EXECUTION_TIME:
                 wait_time = MIN_EXECUTION_TIME - elapsed_time
                 await asyncio.sleep(wait_time)

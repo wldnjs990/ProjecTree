@@ -17,8 +17,8 @@ openai_gpt_5_2 = ChatOpenAI(
 
 # 내일 여기서 모델 수정
 openai_mini_llm = ChatOpenAI(
-    model="gpt-5-mini", 
-    name="gpt-5-mini", 
+    model="gpt-5.2", 
+    name="gpt-5.2", 
     temperature=0, 
     max_retries=3, 
     base_url=settings.OPENAI_BASE_URL, 
