@@ -1,6 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import * as Y from "yjs";
-import { getYDocByRoom } from "../../yjs/ydoc-gateway";
+import { getYDocByRoom, Y } from "../../yjs/ydoc-gateway";
 
 export interface TechRecommendation {
   id: number;
@@ -18,6 +17,7 @@ const router: Router = Router({ mergeParams: true });
 // AI 추천 - 전체 교체 API
 router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
   console.log("create tech-stacks start", new Date().toISOString());
+  console.log("req.body:", JSON.stringify(req.body, null, 2));
 
   const { workspaceId, nodeId } = req.params;
   const { techs } = req.body as { techs: TechRecommendation[] };
@@ -53,6 +53,10 @@ router.post("/:nodeId/tech-stacks", (req: Request, res: Response) => {
       yArray.delete(0, yArray.length);
     }
     yArray.push(techs);
+
+    // pending 상태 해제
+    const techsPending = doc.getMap("techsPending");
+    techsPending.set(nodeId, false);
   });
 
   console.log("create tech-stacks success", new Date().toISOString());
@@ -94,6 +98,10 @@ router.post("/:nodeId/custom-tech-stacks", (req: Request, res: Response) => {
 
     // 기존 배열에 1개 추가
     yArray.push([tech]);
+
+    // pending 상태 해제
+    const techsPending = doc.getMap("techsPending");
+    techsPending.set(nodeId, false);
   });
 
   console.log("add custom tech-stack success", new Date().toISOString());
