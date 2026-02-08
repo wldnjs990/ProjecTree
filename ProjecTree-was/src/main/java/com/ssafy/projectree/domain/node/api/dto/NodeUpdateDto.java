@@ -14,6 +14,7 @@ public class NodeUpdateDto {
     @NoArgsConstructor
     @ToString
     public static class Request {
+        private String description;
         private NodeType nodeType;
         private NodeStatus status;
         private Priority priority;

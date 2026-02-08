@@ -37,6 +37,9 @@ public class NodeSchema {
     })
     private Long parentId;
 
+    @Schema(description = "클라이언트 preview 노드 식별자", example = "preview-42")
+    private String previewNodeId;
+
     private Body data;
 
     public static NodeSchema convertToSchema(Node entity, Long parentId) {

@@ -7,6 +7,7 @@ import com.ssafy.projectree.domain.ai.dto.AiTechRecommendDto;
 import com.ssafy.projectree.domain.ai.lock.LockType;
 import com.ssafy.projectree.domain.ai.lock.utils.LockService;
 import com.ssafy.projectree.global.api.code.ErrorCode;
+import com.ssafy.projectree.domain.node.usecase.NodeCrdtService;
 import com.ssafy.projectree.global.exception.AIServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -29,6 +30,7 @@ public class InferenceServiceImpl implements InferenceService {
 
     private final RestClient restClient;
     private final LockService lockService;
+    private final NodeCrdtService nodeCrdtService;
     @Value("${inference-server.url}")
     private String serverUrl;
     @Value("${inference-server.path-prefix}")
@@ -68,7 +70,7 @@ public class InferenceServiceImpl implements InferenceService {
     @Recover
     public AiCandidateCreateDto.Response recoverCandidate(RuntimeException e, AiCandidateCreateDto.Request request) {
         log.error("Candidate 생성 3회 재시도 실패: node_id={}", request.getNodeId(), e);
-        // 여기서 최종적으로 커스텀 예외를 던집니다.
+        nodeCrdtService.sendCandidatePendingReset(request.getWorkspaceId(), request.getNodeId());
         throw new AIServiceException(ErrorCode.CANDIDATE_GENERATE_ERROR, request.getNodeId(), LockType.CANDIDATE, e.toString());
     }
 
@@ -124,6 +126,7 @@ public class InferenceServiceImpl implements InferenceService {
     @Recover
     public AiTechRecommendDto.Response recoverTech(RuntimeException e, AiTechRecommendDto.Request request) {
         log.error("Tech 추천 3회 재시도 실패: node_id={}", request.getNodeId(), e);
+        nodeCrdtService.sendTechPendingReset(request.getWorkspaceId(), request.getNodeId());
         throw new AIServiceException(ErrorCode.TECH_RECOMMEND_ERROR, request.getNodeId(), LockType.TECH, e.toString());
     }
 
