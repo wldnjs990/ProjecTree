@@ -261,7 +261,6 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
         await newRoom.localParticipant.setMicrophoneEnabled(true);
         setIsMicEnabled(true);
       } catch (micErr) {
-        console.warn('Microphone permission denied, disconnecting:', micErr);
         setIsMicEnabled(false);
         setMicPermissionDenied(true);
         await newRoom.disconnect();
@@ -271,7 +270,6 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
         return;
       }
     } catch (err) {
-      console.error('Connection error:', err);
       // 에러 메시지를 사용자 친화적으로 변환
       let errorMessage = 'Failed to connect to voice chat';
       if (err instanceof Error) {
@@ -309,7 +307,6 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       try {
         await room.disconnect();
       } catch (err) {
-        console.error('Failed to disconnect from room:', err);
       } finally {
         setRoom(undefined);
         // isLeaving은 true로 유지 - 재연결 방지
@@ -330,7 +327,6 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
       } catch (err) {
         // 마이크 권한 거부 시 연결 해제
         if (err instanceof Error && err.name === 'NotAllowedError') {
-          console.warn('Microphone permission denied, disconnecting');
           setIsMicEnabled(false);
           setMicPermissionDenied(true); // 모달 표시
           // 연결 해제
@@ -355,7 +351,6 @@ export function useVoiceChat({ workspaceId }: UseVoiceChatProps) {
 
     const handlePermissionChange = () => {
       if (permissionStatus?.state === 'denied') {
-        console.warn('Microphone permission revoked during call, disconnecting');
         setIsMicEnabled(false);
         setMicPermissionDenied(true);
         setIsConnected(false);

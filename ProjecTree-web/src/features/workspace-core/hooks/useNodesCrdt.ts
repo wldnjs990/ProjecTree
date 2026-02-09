@@ -97,7 +97,6 @@ export const useNodesCrdt = ({
   useEffect(() => {
     const client = getCrdtClient();
     if (!client) {
-      console.warn('[useNodesCrdt] CRDT 클라이언트가 초기화되지 않았습니다.');
       return;
     }
 
@@ -107,7 +106,6 @@ export const useNodesCrdt = ({
 
     // 초기 동기화 완료 시 처리
     const handleSync = (isSynced: boolean) => {
-      console.log('싱크', isSynced);
       if (isSynced) {
         // API에서 받은 초기 노드로 Y.js 동기화
         // (API 데이터를 신뢰하여 Y.js 상태 갱신)
@@ -167,7 +165,6 @@ export const useNodesCrdt = ({
     if (client.provider.synced) {
       handleSync(true);
     } else {
-      console.log('어쨰서');
     }
 
     return () => {

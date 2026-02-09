@@ -24,7 +24,6 @@ const OAuthCallback = () => {
         // was 서버에 토큰값 요청
         const accessToken = await getToken(code);
         if (!accessToken) {
-          console.error('토큰값을 못 받았습니다.');
           return;
         }
         // zustand store에 accessToken 저장

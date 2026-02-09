@@ -227,23 +227,17 @@ function TechCardList({
   // 기술 선택 핸들러
   const handleSelectTech = (techId: number) => {
     if (!selectedNodeId) {
-      console.warn('[TechCardList] 선택된 노드가 없습니다.');
       return;
     }
 
     const client = getCrdtClient();
     if (!client) {
-      console.warn('[TechCardList] CRDT 클라이언트가 초기화되지 않았습니다.');
       return;
     }
 
     // CRDT 서버에 이벤트 전송 및 YMap 브로드캐스트
     client.selectNodeTech(selectedNodeId, techId);
     setSelectedTechId(techId);
-    console.log('[TechCardList] 기술스택 선택:', {
-      nodeId: selectedNodeId,
-      techId,
-    });
   };
 
   return (
