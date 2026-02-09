@@ -80,13 +80,6 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
     useNodeDetailStore();
 
   // 디버깅용 로그
-  console.log('[NodeDetailSidebar] 상태 확인:', {
-    isOpen,
-    selectedNodeId,
-    nodeDetail: nodeDetail ? '있음' : 'null',
-    nodeListData: nodeListData ? '있음' : 'null',
-    candidatePreviewMode,
-  });
 
   // 선택된 노드의 기본 정보 (헤더용) - 실제 nodeStore에서 가져옴
   const selectedNodeInfo = useMemo(() => {
@@ -171,7 +164,6 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
           previewCandidate.id
         );
         // 성공 시: CRDT 서버가 Spring 콜백을 통해 pending=false + preview 노드 삭제 처리
-        console.log('[NodeDetailSidebar] candidate 노드 생성 요청 완료:', previewNodeId);
       } else if (previewKind === 'custom' && customDraft) {
         const previewNodeId = customDraft.previewNodeId;
         const position = resolvePosition(previewNodeId);
@@ -192,10 +184,8 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
         // 성공 시: 클라이언트에서 직접 preview 노드 제거 + 상태 정리
         previewNodesCrdtService.removePreviewNode(previewNodeId);
         exitCandidatePreview();
-        console.log('[NodeDetailSidebar] custom 노드 생성 완료:', previewNodeId);
       }
     } catch (error) {
-      console.error('노드 생성 실패:', error);
       // candidate 에러 시에만 pending 해제 (custom은 pending 사용 안 함)
       if (previewKind === 'candidate' && previewCandidate) {
         const previewNodeId = `preview-${previewCandidate.id}`;

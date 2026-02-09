@@ -69,7 +69,6 @@ export function MemberManagementModal({
                 setWorkspaceDetail(updatedDetail);
             }, 500);
         } catch (error) {
-            console.error('초대 실패:', error);
             toast.error('초대 메일 전송에 실패했습니다.');
         } finally {
             setIsLoading(false);
@@ -92,7 +91,6 @@ export function MemberManagementModal({
 
             toast.success('권한이 변경되었습니다.');
         } catch (error) {
-            console.error('권한 변경 실패:', error);
             toast.error('권한 변경에 실패했습니다.');
         }
     };

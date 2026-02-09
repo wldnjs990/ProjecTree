@@ -62,7 +62,6 @@ export const useChatPagination = (
           pagination.hasMore &&
           pagination.initialLoaded
         ) {
-          console.log('📜 [useChatPagination] Loading more messages...');
           preserveScrollPosition(loadMoreMessages);
         }
       },

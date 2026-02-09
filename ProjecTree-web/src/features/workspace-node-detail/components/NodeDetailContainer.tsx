@@ -109,7 +109,6 @@ export default function NodeDetailContainer({
       try {
         await finishEdit();
       } catch (error) {
-        console.error('저장 실패:', error);
       }
     }
   };
@@ -143,11 +142,6 @@ export default function NodeDetailContainer({
     // Enter preview mode
     enterCandidatePreview(candidate, position);
 
-    console.log('[NodeDetailContainer] Enter preview mode:', {
-      candidate,
-      position,
-      previewNode,
-    });
   };
 
   // locked 후보(생성 중) 클릭 시 해당 preview로 재진입
@@ -178,11 +172,6 @@ export default function NodeDetailContainer({
       useNodeDetailStore.getState().addCreatingPreviewId(previewNodeId);
     }
 
-    console.log('[NodeDetailContainer] Re-enter locked preview:', {
-      candidate,
-      previewNodeId,
-      isPending,
-    });
   };
 
   const handleCandidateAddManual = () => {
@@ -236,9 +225,7 @@ export default function NodeDetailContainer({
     try {
       await getAiNodeTechRecommendation(Number(selectedNodeId), workspaceId);
       // 성공 시: CRDT 서버가 Spring 응답을 받아 Y.Array 업데이트 + pending=false 브로드캐스트
-      console.log('[NodeDetailContainer] AI 기술 추천 요청 완료');
     } catch (error) {
-      console.error('AI 기술 추천 생성 실패:', error);
       // 에러 시에만 클라이언트에서 pending=false 전송 (서버 응답 없으므로)
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
@@ -253,9 +240,7 @@ export default function NodeDetailContainer({
     nodeDetailCrdtService.setCandidatesPending(selectedNodeId, true);
     try {
       await generateNodeCandidates(Number(selectedNodeId), workspaceId);
-      console.log('[NodeDetailContainer] AI 노드 후보 생성 요청 완료');
     } catch (error) {
-      console.error('AI 노드 후보 생성 실패:', error);
       nodeDetailCrdtService.setCandidatesPending(selectedNodeId, false);
     }
   };
@@ -274,7 +259,6 @@ export default function NodeDetailContainer({
         techVocaId,
       });
     } catch (error) {
-      console.error('커스텀 기술스택 추가 실패:', error);
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
   };
@@ -286,7 +270,6 @@ export default function NodeDetailContainer({
 
     const client = getCrdtClient();
     if (!client) {
-      console.warn('[NodeDetailContainer] CRDT 클라이언트가 초기화되지 않았습니다.');
       return;
     }
 
@@ -295,7 +278,6 @@ export default function NodeDetailContainer({
 
     // CRDT 서버에 삭제 요청 전송
     client.deleteNode(selectedNodeId);
-    console.log('[NodeDetailContainer] 노드 삭제 요청:', selectedNodeId);
   };
 
   // 후보 노드 삭제 핸들러
@@ -305,15 +287,10 @@ export default function NodeDetailContainer({
 
     const client = getCrdtClient();
     if (!client) {
-      console.warn('[NodeDetailContainer] CRDT 클라이언트가 초기화되지 않았습니다.');
       return;
     }
 
     client.deleteCandidate(selectedNodeId, candidateId);
-    console.log('[NodeDetailContainer] 후보 삭제 요청:', {
-      nodeId: selectedNodeId,
-      candidateId,
-    });
   };
 
   return (

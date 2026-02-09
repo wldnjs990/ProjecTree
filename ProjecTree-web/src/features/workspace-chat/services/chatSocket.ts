@@ -36,11 +36,7 @@ class ChatSocketService {
     if (this.socket?.connected) {
       // 🔍 이미 연결된 소켓이 있어도 onAny 리스너 확인 및 등록
       if (!this.onAnyRegistered) {
-        console.log(
-          '🔧 [ChatSocket] Re-registering onAny listener for existing socket'
-        );
         this.socket.onAny((eventName, ...args) => {
-          console.log(`🔔 [WebSocket Event] ${eventName}:`, args);
         });
         this.onAnyRegistered = true;
       }
@@ -60,13 +56,10 @@ class ChatSocketService {
 
     // 🔧 연결 이벤트 리스너 등록 (한 번만!)
     this.socket.on('connect', () => {
-      console.log('✅ WebSocket connected:', this.socket?.id);
 
       // 재연결 시 onAny 리스너 재등록
       if (!this.onAnyRegistered && this.socket) {
-        console.log('🔧 [ChatSocket] Re-registering onAny after reconnect');
         this.socket.onAny((eventName, ...args) => {
-          console.log(`🔔 [WebSocket Event] ${eventName}:`, args);
         });
         this.onAnyRegistered = true;
       }
@@ -77,9 +70,6 @@ class ChatSocketService {
       // 연결 완료 후, 보류 중인 채팅방 입장 요청 처리
       if (this.pendingJoins.size > 0 && this.socket) {
         this.pendingJoins.forEach((roomId) => {
-          console.log(
-            `🔄 [ChatSocket] Emitting queued join for room: ${roomId}`
-          );
           this.socket?.emit('chat:join', { chatRoomId: roomId });
         });
         this.pendingJoins.clear();
@@ -87,7 +77,6 @@ class ChatSocketService {
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('❌ WebSocket disconnected:', reason);
       this.onAnyRegistered = false; // 연결 끊기면 플래그 리셋
 
       // 연결 상태 콜백 호출
@@ -95,12 +84,10 @@ class ChatSocketService {
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('🔴 Connection error:', error);
     });
 
     // 🔍 디버깅: 모든 이벤트 로깅 (초기 연결)
     this.socket.onAny((eventName, ...args) => {
-      console.log(`🔔 [WebSocket Event] ${eventName}:`, args);
     });
     this.onAnyRegistered = true; // 등록 완료 플래그 설정
 
@@ -113,15 +100,11 @@ class ChatSocketService {
   joinChatRoom(chatRoomId: string): void {
     if (!this.socket?.connected) {
       // 아직 연결되지 않았으면 보류시키고 연결 시 발송
-      console.log(
-        `⏳ [ChatSocket] Socket not connected yet. Queuing join for: ${chatRoomId}`
-      );
       this.pendingJoins.add(chatRoomId);
       return;
     }
 
     // 백엔드 스펙: chatRoomId (ChatPayloadDto.Join)
-    console.log(`📡 [ChatSocket] Emitting chat:join for: ${chatRoomId}`);
     this.socket.emit('chat:join', { chatRoomId });
   }
 
@@ -143,7 +126,6 @@ class ChatSocketService {
       return;
     }
 
-    console.log('🚀 sendMessage:', chatRoomId, content);
 
     // 백엔드 스펙: chatRoomId 사용
     this.socket.emit('message:send', {

@@ -59,7 +59,6 @@ export function ProfileForm() {
         setEmail(info.email);
       })
       .catch((err) => {
-        console.error('회원 정보 조회 실패:', err);
       });
   }, [accessToken, navigate]);
 
@@ -110,7 +109,6 @@ export function ProfileForm() {
       setUser(user);
       navigate('/workspace-lounge');
     } catch (error) {
-      console.error('가입 처리 중 오류:', error);
       setErrorMessage('가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
       setIsValid(false);
       isSigningUp.current = false;

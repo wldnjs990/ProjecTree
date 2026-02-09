@@ -48,9 +48,6 @@ export const usePreviewNodesCrdt = () => {
   useEffect(() => {
     const client = getCrdtClient();
     if (!client) {
-      console.warn(
-        '[usePreviewNodesCrdt] CRDT 클라이언트가 초기화되지 않았습니다.'
-      );
       return;
     }
 
@@ -92,7 +89,6 @@ export const usePreviewNodesCrdt = () => {
       yPreviewNodes.set(node.id, yNode);
     });
 
-    console.log('[CRDT] Preview 노드 추가:', node.id);
   }, []);
 
   // Preview 노드 제거 (CRDT 동기화)
@@ -101,7 +97,6 @@ export const usePreviewNodesCrdt = () => {
     if (!yPreviewNodes) return;
 
     yPreviewNodes.delete(nodeId);
-    console.log('[CRDT] Preview 노드 제거:', nodeId);
   }, []);
 
   // 모든 Preview 노드 제거 (CRDT 동기화)
@@ -114,7 +109,6 @@ export const usePreviewNodesCrdt = () => {
       yPreviewNodes.clear();
     });
 
-    console.log('[CRDT] 모든 Preview 노드 제거');
   }, []);
 
   return {

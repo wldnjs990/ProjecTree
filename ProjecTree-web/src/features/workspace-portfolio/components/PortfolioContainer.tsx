@@ -67,7 +67,6 @@ export function PortfolioContainer({ workspaceId }: PortfolioContainerProps) {
                 setStatus('empty');
             }
         } catch (err) {
-            console.error('포트폴리오 조회 실패:', err);
             setError('포트폴리오를 불러오는 데 실패했습니다.');
             setStatus('error');
         }
@@ -97,7 +96,6 @@ export function PortfolioContainer({ workspaceId }: PortfolioContainerProps) {
                 toast.error('포트폴리오 생성에 실패했습니다.');
             }
         } catch (err) {
-            console.error('포트폴리오 생성 실패:', err);
             setError('서버 오류로 포트폴리오 생성에 실패했습니다.');
             toast.error('포트폴리오 생성에 실패했습니다.');
             setStatus('error');
@@ -114,7 +112,6 @@ export function PortfolioContainer({ workspaceId }: PortfolioContainerProps) {
             setStatus('content');
             toast.success('포트폴리오가 저장되었습니다.');
         } catch (err) {
-            console.error('포트폴리오 수정 실패:', err);
             toast.error('저장에 실패했습니다.');
             throw err;
         }
