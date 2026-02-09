@@ -44,7 +44,7 @@ export default function NodeDetailContainer({
   onToggleExpand,
   isExpanded,
 }: NodeDetailContainerProps) {
-  // URL¿¡¼­ workspaceId °¡Á®¿À±â
+  // URLì—ì„œ workspaceId ê°€ì ¸ì˜¤ê¸°
   const { workspaceId: paramWorkspaceId } = useParams<{
     workspaceId: string;
   }>();
@@ -109,7 +109,7 @@ export default function NodeDetailContainer({
       try {
         await finishEdit();
       } catch (error) {
-        console.error('ÀúÀå ½ÇÆĞ:', error);
+        console.error('ì €ì¥ ì‹¤íŒ¨:', error);
       }
     }
   };
@@ -150,11 +150,11 @@ export default function NodeDetailContainer({
     });
   };
 
-  // locked ÈÄº¸(»ı¼º Áß) Å¬¸¯ ½Ã ÇØ´ç preview·Î ÀçÁøÀÔ
+  // locked í›„ë³´(ìƒì„± ì¤‘) í´ë¦­ ì‹œ í•´ë‹¹ previewë¡œ ì¬ì§„ì…
   const handleLockedCandidateClick = (candidate: Candidate) => {
     const previewNodeId = `preview-${candidate.id}`;
 
-    // CRDT¿¡¼­ preview ³ëµå Ã£±â
+    // CRDTì—ì„œ preview ë…¸ë“œ ì°¾ê¸°
     const client = getCrdtClient();
     if (!client) return;
 
@@ -168,10 +168,10 @@ export default function NodeDetailContainer({
     const xpos = Number(position?.x ?? 0);
     const ypos = Number(position?.y ?? 0);
 
-    // preview ¸ğµå·Î ÁøÀÔ
+    // preview ëª¨ë“œ ì§„ì…
     enterCandidatePreview(candidate, { xpos, ypos });
 
-    // pending »óÅÂ È®ÀÎ ¹× ¼³Á¤
+    // pending ìƒíƒœ í™•ì¸ ë° ë°˜ì˜
     const yNodeCreatingPending = client.getYMap<boolean>('nodeCreatingPending');
     const isPending = yNodeCreatingPending.get(previewNodeId) === true;
     if (isPending) {
@@ -203,7 +203,7 @@ export default function NodeDetailContainer({
       position: { x: position.xpos, y: position.ypos },
       parentId: selectedNodeId,
       data: {
-        title: '»õ ³ëµå',
+        title: 'ìƒˆ ë…¸ë“œ',
         status: 'TODO',
         taskId: '#preview',
         taskType: parentNode.data.taskType ?? null,
@@ -226,43 +226,43 @@ export default function NodeDetailContainer({
     );
   };
 
-  // AI ±â¼ú ÃßÃµ »ı¼º ÇÚµé·¯
-  // Å¬¶óÀÌ¾ğÆ®: pending=true Àü¼Û + API È£Ãâ¸¸ ¼öÇà
-  // CRDT ¼­¹ö: Spring ÀÀ´ä ¹ŞÀ¸¸é Y.Array ¾÷µ¥ÀÌÆ® + pending=false ºê·ÎµåÄ³½ºÆ®
+  // AI ê¸°ìˆ  ì¶”ì²œ ìƒì„± í•¸ë“¤ëŸ¬
+  // í´ë¼ì´ì–¸íŠ¸: pending=true ì „ì†¡ + API í˜¸ì¶œë§Œ ìˆ˜í–‰
+  // CRDT ì„œë²„: Spring ì‘ë‹µ ë°›ìœ¼ë©´ Y.Array ì—…ë°ì´íŠ¸ + pending=false ë¸Œë¡œë“œìºìŠ¤íŠ¸
   const handleGenerateTechs = async () => {
     if (!selectedNodeId || !workspaceId) return;
 
     nodeDetailCrdtService.setTechsPending(selectedNodeId, true);
     try {
       await getAiNodeTechRecommendation(Number(selectedNodeId), workspaceId);
-      // ¼º°ø ½Ã: CRDT ¼­¹ö°¡ Spring ÀÀ´äÀ» ¹Ş¾Æ Y.Array ¾÷µ¥ÀÌÆ® + pending=false ºê·ÎµåÄ³½ºÆ®
-      console.log('[NodeDetailContainer] AI ±â¼ú ÃßÃµ ¿äÃ» ¿Ï·á');
+      // ì„±ê³µ ì‹œ: CRDT ì„œë²„ê°€ Spring ì‘ë‹µì„ ë°›ì•„ Y.Array ì—…ë°ì´íŠ¸ + pending=false ë¸Œë¡œë“œìºìŠ¤íŠ¸
+      console.log('[NodeDetailContainer] AI ê¸°ìˆ  ì¶”ì²œ ìš”ì²­ ì™„ë£Œ');
     } catch (error) {
-      console.error('AI ±â¼ú ÃßÃµ »ı¼º ½ÇÆĞ:', error);
-      // ¿¡·¯ ½Ã¿¡¸¸ Å¬¶óÀÌ¾ğÆ®¿¡¼­ pending=false Àü¼Û (¼­¹ö ÀÀ´ä ¾øÀ¸¹Ç·Î)
+      console.error('AI ê¸°ìˆ  ì¶”ì²œ ìƒì„± ì‹¤íŒ¨:', error);
+      // ì—ëŸ¬ ì‹œì—ë§Œ í´ë¼ì´ì–¸íŠ¸ì—ì„œ pending=false ì „ì†¡ (ì„œë²„ ì‘ë‹µ ì—†ìœ¼ë¯€ë¡œ)
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
   };
 
-  // AI ³ëµå ÈÄº¸ »ı¼º ÇÚµé·¯
-  // Å¬¶óÀÌ¾ğÆ®: pending=true Àü¼Û + API È£Ãâ¸¸ ¼öÇà
-  // CRDT ¼­¹ö: Spring ÀÀ´ä ¹ŞÀ¸¸é nodeCandidates ¾÷µ¥ÀÌÆ® + pending=false ºê·ÎµåÄ³½ºÆ®
+  // AI ë…¸ë“œ í›„ë³´ ìƒì„± í•¸ë“¤ëŸ¬
+  // í´ë¼ì´ì–¸íŠ¸: pending=true ì „ì†¡ + API í˜¸ì¶œë§Œ ìˆ˜í–‰
+  // CRDT ì„œë²„: Spring ì‘ë‹µ ë°›ìœ¼ë©´ nodeCandidates ì—…ë°ì´íŠ¸ + pending=false ë¸Œë¡œë“œìºìŠ¤íŠ¸
   const handleGenerateCandidates = async () => {
     if (!selectedNodeId || !workspaceId) return;
 
     nodeDetailCrdtService.setCandidatesPending(selectedNodeId, true);
     try {
       await generateNodeCandidates(Number(selectedNodeId), workspaceId);
-      console.log('[NodeDetailContainer] AI ³ëµå ÈÄº¸ »ı¼º ¿äÃ» ¿Ï·á');
+      console.log('[NodeDetailContainer] AI ë…¸ë“œ í›„ë³´ ìƒì„± ìš”ì²­ ì™„ë£Œ');
     } catch (error) {
-      console.error('AI ³ëµå ÈÄº¸ »ı¼º ½ÇÆĞ:', error);
+      console.error('AI ë…¸ë“œ í›„ë³´ ìƒì„± ì‹¤íŒ¨:', error);
       nodeDetailCrdtService.setCandidatesPending(selectedNodeId, false);
     }
   };
 
-  // Ä¿½ºÅÒ ±â¼ú½ºÅÃ Ãß°¡ ÇÚµé·¯
-  // Å¬¶óÀÌ¾ğÆ®: pending=true Àü¼Û + API È£Ãâ¸¸ ¼öÇà
-  // CRDT ¼­¹ö: Spring ÀÀ´ä ¹ŞÀ¸¸é Y.Array¿¡ append + pending=false ºê·ÎµåÄ³½ºÆ®
+  // ì»¤ìŠ¤í…€ ê¸°ìˆ ìŠ¤íƒ ì¶”ê°€ í•¸ë“¤ëŸ¬
+  // í´ë¼ì´ì–¸íŠ¸: pending=true ì „ì†¡ + API í˜¸ì¶œë§Œ ìˆ˜í–‰
+  // CRDT ì„œë²„: Spring ì‘ë‹µ ë°›ìœ¼ë©´ Y.Arrayì— append + pending=false ë¸Œë¡œë“œìºìŠ¤íŠ¸
   const handleAddCustomTech = async (techVocaId: number) => {
     if (!selectedNodeId || !workspaceId) return;
 
@@ -274,43 +274,43 @@ export default function NodeDetailContainer({
         techVocaId,
       });
     } catch (error) {
-      console.error('Ä¿½ºÅÒ ±â¼ú½ºÅÃ Ãß°¡ ½ÇÆĞ:', error);
+      console.error('ì»¤ìŠ¤í…€ ê¸°ìˆ ìŠ¤íƒ ì¶”ê°€ ì‹¤íŒ¨:', error);
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
   };
 
-  // ³ëµå »èÁ¦ ÇÚµé·¯
-  // CRDT ¼­¹ö¿¡ »èÁ¦ ¿äÃ» Àü¼Û ¡æ Spring DELETE È£Ãâ ¡æ Y.Doc¿¡¼­ ³ëµå+ÀÚ½Ä ÀÏ°ı »èÁ¦
+  // ë…¸ë“œ ì‚­ì œ í•¸ë“¤ëŸ¬
+  // CRDT ì„œë²„ì— ì‚­ì œ ìš”ì²­ ì „ì†¡ í›„ Spring DELETE í˜¸ì¶œ í›„ Y.Docì—ì„œ ë…¸ë“œ+ìì‹ ì¼ê´„ ì‚­ì œ
   const handleDeleteNode = () => {
     if (!selectedNodeId) return;
 
     const client = getCrdtClient();
     if (!client) {
-      console.warn('[NodeDetailContainer] CRDT Å¬¶óÀÌ¾ğÆ®°¡ ÃÊ±âÈ­µÇÁö ¾Ê¾Ò½À´Ï´Ù.');
+      console.warn('[NodeDetailContainer] CRDT í´ë¼ì´ì–¸íŠ¸ê°€ ì´ˆê¸°í™”ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.');
       return;
     }
 
-    // »çÀÌµå¹Ù ¸ÕÀú ´İ±â
+    // ì‚¬ì´ë“œë°” ë¨¼ì € ë‹«ê¸°
     closeSidebar();
 
-    // CRDT ¼­¹ö¿¡ »èÁ¦ ¿äÃ» Àü¼Û
+    // CRDT ì„œë²„ì— ì‚­ì œ ìš”ì²­ ì „ì†¡
     client.deleteNode(selectedNodeId);
-    console.log('[NodeDetailContainer] ³ëµå »èÁ¦ ¿äÃ»:', selectedNodeId);
+    console.log('[NodeDetailContainer] ë…¸ë“œ ì‚­ì œ ìš”ì²­:', selectedNodeId);
   };
 
-  // ÈÄº¸ ³ëµå »èÁ¦ ÇÚµé·¯
-  // CRDT ¼­¹ö¿¡ »èÁ¦ ¿äÃ» Àü¼Û ¡æ Spring DELETE È£Ãâ ¡æ Y.Doc¿¡¼­ ÈÄº¸ »èÁ¦ ºê·ÎµåÄ³½ºÆ®
+  // í›„ë³´ ë…¸ë“œ ì‚­ì œ í•¸ë“¤ëŸ¬
+  // CRDT ì„œë²„ì— ì‚­ì œ ìš”ì²­ ì „ì†¡ í›„ Spring DELETE í˜¸ì¶œ í›„ Y.Docì—ì„œ í›„ë³´ ì‚­ì œ ë¸Œë¡œë“œìºìŠ¤íŠ¸
   const handleDeleteCandidate = (candidateId: number) => {
     if (!selectedNodeId) return;
 
     const client = getCrdtClient();
     if (!client) {
-      console.warn('[NodeDetailContainer] CRDT Å¬¶óÀÌ¾ğÆ®°¡ ÃÊ±âÈ­µÇÁö ¾Ê¾Ò½À´Ï´Ù.');
+      console.warn('[NodeDetailContainer] CRDT í´ë¼ì´ì–¸íŠ¸ê°€ ì´ˆê¸°í™”ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.');
       return;
     }
 
     client.deleteCandidate(selectedNodeId, candidateId);
-    console.log('[NodeDetailContainer] ÈÄº¸ »èÁ¦ ¿äÃ»:', {
+    console.log('[NodeDetailContainer] í›„ë³´ ì‚­ì œ ìš”ì²­:', {
       nodeId: selectedNodeId,
       candidateId,
     });
@@ -364,6 +364,3 @@ export default function NodeDetailContainer({
     </div>
   );
 }
-
-
-
