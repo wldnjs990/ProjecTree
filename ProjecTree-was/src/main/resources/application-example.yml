@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: projectree
+  datasource:
+    # DB 연결 정보 (본인의 환경에 맞게 수정하여 사용하세요)
+    url: DATABASE-URL
+    username: DATABASE-USER
+    password: DATABASE-PASSWORD
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    # PostgreSQL 방언 설정
+    database-platform: #org.hibernate.dialect.PostgreSQLDialect
+
+    hibernate:
+      # 개발 단계에서는 update, 운영 단계에서는 validate 또는 none 권장
+      ddl-auto: update
+
+    # 쿼리 로그 출력 설정
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true            # SQL을 보기 좋게 포맷팅
+        use_sql_comments: true      # SQL에 설명 주석 추가
+        jdbc.batch_size: 50      # 한 번에 묶을 크기 (보통 20~50 권장)
+        order_inserts: true      # insert 쿼리 순서 최적화
+        order_updates: true      # update 쿼리 순서 최적화
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: GOOGLE-ID
+            client-secret: GOOGLE-SECRETE
+            scope:
+              - email
+              - profile
+          github:
+            client-id: GIT-HUB-ID
+            client-secret: GITHUB-SECRIT
+            scope:
+              - read:user
+              - user:email
+# 로깅 레벨 설정 (상세한 쿼리 파라미터 확인용)
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+#    org.hibernate.orm.jdbc.bind: TRACE
+
+livekit:
+  api:
+    key: LIVE-KIT-KEY
+    secret: LIVE-KIT-SECREYY
+inference-server:
+  url: INFERENCE-SERVER-URL
+  path-prefix: INFERENCE-SERVER-PREFIX
+  generate-candidate-path: CANDIDATE-PATH
+  generate-node-path: NODE-PATH
+  recommend-tech-path: RECOMMEND-TECH-PATH
+JWT_SECRET: JWT-SECRET
