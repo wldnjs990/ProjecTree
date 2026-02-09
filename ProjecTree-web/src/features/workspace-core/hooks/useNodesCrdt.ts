@@ -1,0 +1,250 @@
+import { useEffect, useCallback, useRef } from 'react';
+import * as Y from 'yjs';
+import type { Node } from '@xyflow/react';
+import { getCrdtClient, type YNodeValue } from '../crdt/crdtClient';
+import { useConnectionStatus, useNodeStore } from '../stores';
+import type { FlowNode, FlowNodeData, YjsNode } from '../types/node';
+import type { NodeData } from '../types/nodeDetail';
+import { flowNodeToYjsNode, yjsNodeToFlowNode } from '../utils/nodeTransform';
+import { generateEdges, getAutoLayoutedNodes } from '../utils';
+
+interface UseNodesCrdtOptions {
+  initialNodes?: FlowNode[];
+}
+
+/**
+ * 노드 CRDT 동기화 훅
+ * - Y.Map('nodes')를 구독하여 노드 변경 감지
+ * - 노드 드래그/업데이트 시 Y.js에 반영
+ */
+export const useNodesCrdt = ({
+  initialNodes = [],
+}: UseNodesCrdtOptions = {}) => {
+  // CRDT 연결 상태
+  const connectionStatus = useConnectionStatus();
+
+  // 노드리스트 관리용 ref객체
+  const yNodesRef = useRef<Y.Map<Y.Map<YNodeValue>> | null>(null);
+  const didAutoLayoutRef = useRef(false);
+
+  // Zustand 스토어 액션
+  const setNodes = useNodeStore((state) => state.setNodes);
+  const setNodeListData = useNodeStore((state) => state.setNodeListData);
+  const updateNodePosition = useNodeStore((state) => state.updateNodePosition);
+  const cleanupDeletedNodeData = useNodeStore(
+    (state) => state.cleanupDeletedNodeData
+  );
+
+  // Y.Map에서 노드 배열로 변환 후 전역 스토어 업데이트
+  const syncFromYjs = useCallback(() => {
+    // yNodesRef에 노드 데이터가 생성되지 않았으면 종료
+    if (!yNodesRef.current) return;
+
+    // 스토어에 저장할 노드 리스트
+    const nodes: FlowNode[] = [];
+    // nodeListData도 함께 구성 (O(1) 조회용)
+    const nodeListDataMap: Record<number, NodeData> = {};
+    // 현재 활성 노드 ID Set (삭제된 노드 정리용)
+    const activeNodeIds = new Set<string>();
+
+    yNodesRef.current.forEach((yNode, nodeId) => {
+      activeNodeIds.add(nodeId);
+
+      // 현재 노드의 부모id
+      const rawParentId = yNode.get('parentId');
+      const data = yNode.get('data') as FlowNodeData;
+
+      // 전역변수에 저장할 노드 생성
+      const yjsNode: YjsNode = {
+        id: nodeId,
+        // 데이터 대문자로 받아오게 설계됐지만 만일을 위해 대문자 변환 추가
+        type: String(yNode.get('type')).toUpperCase() as YjsNode['type'],
+        parentId:
+          rawParentId === null
+            ? undefined
+            : (rawParentId as string | undefined),
+        position: yNode.get('position') as { x: number; y: number },
+        data,
+      };
+      nodes.push(yjsNodeToFlowNode(yjsNode));
+
+      // nodeListData 구성 (FlowNodeData → NodeData 변환)
+      nodeListDataMap[Number(nodeId)] = {
+        identifier: data.taskId?.replace('#', '') || '',
+        taskType: data.taskType ?? null,
+        status: data.status,
+        priority: data.priority,
+        difficult: data.difficult,
+      };
+    });
+
+    setNodes(nodes);
+    setNodeListData(nodeListDataMap);
+    // 삭제된 노드의 관련 데이터(nodeDetails 등) 정리
+    cleanupDeletedNodeData(activeNodeIds);
+  }, [setNodes, setNodeListData, cleanupDeletedNodeData]);
+
+  const shouldAutoLayout = useCallback((nodes: FlowNode[]) => {
+    if (nodes.length === 0) return false;
+    const isZero = (value: unknown) =>
+      Number.isFinite(Number(value)) && Number(value) === 0;
+    return nodes.every(
+      (node) => isZero(node.position?.x) && isZero(node.position?.y)
+    );
+  }, []);
+
+  // Y.Map 초기화 및 구독
+  useEffect(() => {
+    const client = getCrdtClient();
+    if (!client) {
+      console.warn('[useNodesCrdt] CRDT 클라이언트가 초기화되지 않았습니다.');
+      return;
+    }
+
+    // 노드 리스트 가져오기
+    const yNodes = client.getYMap<Y.Map<YNodeValue>>('nodes');
+    yNodesRef.current = yNodes;
+
+    // 초기 동기화 완료 시 처리
+    const handleSync = (isSynced: boolean) => {
+      console.log('싱크', isSynced);
+      if (isSynced) {
+        // API에서 받은 초기 노드로 Y.js 동기화
+        // (API 데이터를 신뢰하여 Y.js 상태 갱신)
+        if (initialNodes.length > 0) {
+          client.yDoc.transact(() => {
+            // 기존 Y.js 데이터 클리어
+            yNodes.clear();
+            // API 데이터로 새로 세팅
+            initialNodes.forEach((node) => {
+              const yNode = new Y.Map<YNodeValue>();
+              const yjsNode = flowNodeToYjsNode(node);
+              yNode.set('type', yjsNode.type);
+              yNode.set('parentId', yjsNode.parentId);
+              yNode.set('position', yjsNode.position);
+              yNode.set('data', yjsNode.data);
+              yNodes.set(node.id, yNode);
+            });
+          });
+        }
+        syncFromYjs();
+
+        // UndoManager 초기화 (sync 완료 후)
+        client.initUndoManager();
+
+        if (!didAutoLayoutRef.current && shouldAutoLayout(initialNodes)) {
+          didAutoLayoutRef.current = true;
+          const edges = generateEdges(initialNodes);
+          const layoutedNodes = getAutoLayoutedNodes(initialNodes, edges);
+
+          client.yDoc.transact(() => {
+            layoutedNodes.forEach((node) => {
+              const yNode = yNodes.get(node.id);
+              if (!yNode) return;
+              yNode.set('position', {
+                x: node.position.x,
+                y: node.position.y,
+              });
+            });
+          });
+
+          layoutedNodes.forEach((node) => {
+            client.saveNodePosition(node.id);
+          });
+        }
+      }
+    };
+
+    // Y.Map 변경 감지 → 스토어 업데이트
+    const observeHandler = () => {
+      syncFromYjs();
+    };
+
+    client.provider.on('sync', handleSync);
+    yNodes.observeDeep(observeHandler);
+
+    // 이미 동기화된 상태라면 즉시 처리
+    if (client.provider.synced) {
+      handleSync(true);
+    } else {
+      console.log('어쨰서');
+    }
+
+    return () => {
+      client.provider.off('sync', handleSync);
+      yNodes.unobserveDeep(observeHandler);
+      yNodesRef.current = null;
+    };
+  }, [initialNodes, syncFromYjs, connectionStatus, shouldAutoLayout]);
+
+  // 노드 드래그 완료 핸들러
+  const handleNodeDragStop = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      const yNodes = yNodesRef.current;
+      if (!yNodes) return;
+
+      const yNode = yNodes.get(node.id);
+      if (!yNode) return;
+
+      // Y.Map에 position 업데이트 → observe가 감지 → 브로드캐스트
+      yNode.set('position', { x: node.position.x, y: node.position.y });
+
+      // 스프링 서버에 저장요청
+      getCrdtClient()?.saveNodePosition(node.id);
+      // 로컬 스토어도 즉시 업데이트 (UX용)
+      updateNodePosition(node.id, node.position);
+    },
+    [updateNodePosition]
+  );
+
+  // 노드 정렬 완료 핸들러
+
+  // 노드 데이터 업데이트
+  const updateNodeData = useCallback(
+    (nodeId: string, data: Partial<FlowNodeData>) => {
+      const yNodes = yNodesRef.current;
+      if (!yNodes) return;
+
+      const yNode = yNodes.get(nodeId);
+      if (!yNode) return;
+
+      const currentData = yNode.get('data') as FlowNodeData;
+      yNode.set('data', { ...currentData, ...data });
+    },
+    []
+  );
+
+  // 노드 추가
+  const addNode = useCallback((node: FlowNode) => {
+    const yNodes = yNodesRef.current;
+    const client = getCrdtClient();
+    if (!yNodes || !client) return;
+
+    client.yDoc.transact(() => {
+      const yNode = new Y.Map<YNodeValue>();
+      const yjsNode = flowNodeToYjsNode(node);
+      yNode.set('type', yjsNode.type);
+      yNode.set('parentId', yjsNode.parentId);
+      yNode.set('position', yjsNode.position);
+      yNode.set('data', yjsNode.data);
+      yNodes.set(node.id, yNode);
+    });
+  }, []);
+
+  // 노드 삭제
+  const deleteNode = useCallback((nodeId: string) => {
+    const yNodes = yNodesRef.current;
+    if (!yNodes) return;
+
+    yNodes.delete(nodeId);
+  }, []);
+
+  return {
+    handleNodeDragStop,
+    updateNodeData,
+    addNode,
+    deleteNode,
+  };
+};
+
+export default useNodesCrdt;
