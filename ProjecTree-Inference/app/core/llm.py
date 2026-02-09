@@ -22,8 +22,8 @@ openai_mini_llm = ChatOpenAI(
     temperature=0, 
     max_retries=3, 
     base_url=settings.OPENAI_BASE_URL, 
-    api_key=settings.AI_API_KEY,
-    reasoning_effort="minimal",  # 추론 토큰 생성을 억제하여 속도 향상
+    api_key=settings.AI_API_KEY
+   # reasoning_effort="minimal",  # 추론 토큰 생성을 억제하여 속도 향상
 )
 
 opendai_reasoning_llm = ChatOpenAI(
