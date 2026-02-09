@@ -41,7 +41,6 @@ export function CustomTechAddDialog({
         const results = await getTechStacks(searchTerm);
         setTechOptions(results);
       } catch (error) {
-        console.error('기술 스택 검색 실패:', error);
       } finally {
         setIsSearching(false);
       }

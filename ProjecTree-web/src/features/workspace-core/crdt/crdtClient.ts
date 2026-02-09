@@ -58,21 +58,17 @@ class CrdtClient {
     this.provider.on('status', ({ status }: { status: string }) => {
       if (status === 'connected') {
         setConnectionStatus('connected');
-        console.log('[CRDT] 서버 연결됨');
         this.setupMessageListener();
       } else if (status === 'connecting') {
         setConnectionStatus('connecting');
-        console.log('[CRDT] 연결 중...');
       } else if (status === 'disconnected') {
         setConnectionStatus('disconnected');
-        console.log('[CRDT] 연결 해제됨');
       }
     });
 
     this.provider.on('sync', (isSynced: boolean) => {
       setIsSynced(isSynced);
       if (isSynced) {
-        console.log('[CRDT] 동기화 완료');
       }
     });
 
@@ -104,7 +100,6 @@ class CrdtClient {
 
     switch (message.type) {
       case 'AI_MESSAGE':
-        console.log('[CRDT] AI_MESSAGE 수신:', message);
         if (message.isComplete) {
           // 스트리밍 완료 시 상태 초기화
           clearAiStreaming();
@@ -117,7 +112,6 @@ class CrdtClient {
         }
         break;
       case 'save_error':
-        console.error('[CRDT] 서버 에러 수신:', message);
         if (message.action === 'delete_node') {
           toast.error('노드 삭제에 실패했습니다.');
         } else if (message.action === 'delete_candidate') {
@@ -150,7 +144,6 @@ class CrdtClient {
       }
     });
 
-    console.log('[CRDT] 메시지 리스너 설정됨');
   }
 
   /**
@@ -177,7 +170,6 @@ class CrdtClient {
       captureTimeout: 300,
     });
 
-    console.log('[CRDT] UndoManager 초기화됨');
     return this.undoManager;
   }
 
@@ -187,7 +179,6 @@ class CrdtClient {
   undo(): boolean {
     if (this.undoManager?.canUndo()) {
       this.undoManager.undo();
-      console.log('[CRDT] Undo 실행');
       return true;
     }
     return false;
@@ -199,7 +190,6 @@ class CrdtClient {
   redo(): boolean {
     if (this.undoManager?.canRedo()) {
       this.undoManager.redo();
-      console.log('[CRDT] Redo 실행');
       return true;
     }
     return false;
@@ -229,13 +219,9 @@ class CrdtClient {
     const ws = this.provider.ws;
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
-      console.log('[CRDT] 노드 상세 저장 요청 전송:', {
-        requestId,
-      });
       return requestId;
     }
 
-    console.warn('[CRDT] WebSocket 연결되지 않아 저장 요청 실패');
     return null;
   }
 
@@ -256,14 +242,9 @@ class CrdtClient {
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
-      console.log('[CRDT] 노드 위치 저장 요청 전송:', {
-        requestId,
-        nodeId,
-      });
       return requestId;
     }
 
-    console.warn('[CRDT] WebSocket 연결되지 않아 저장 요청 실패');
     return null;
   }
 
@@ -290,15 +271,9 @@ class CrdtClient {
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
-      console.log('[CRDT] 노드 기술스택 선택 요청 전송:', {
-        requestId,
-        nodeId,
-        selectedTechId,
-      });
       return requestId;
     }
 
-    console.warn('[CRDT] WebSocket 연결되지 않아 기술스택 선택 요청 실패');
     return null;
   }
 
@@ -325,11 +300,9 @@ class CrdtClient {
     const ws = this.provider.ws;
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
-      console.log('[CRDT] 노드 삭제 요청 전송:', { requestId, nodeId });
       return requestId;
     }
 
-    console.warn('[CRDT] WebSocket 연결되지 않아 삭제 요청 실패');
     return null;
   }
 
@@ -351,15 +324,9 @@ class CrdtClient {
     const ws = this.provider.ws;
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
-      console.log('[CRDT] 노드 후보 삭제 요청 전송:', {
-        requestId,
-        nodeId,
-        candidateId,
-      });
       return requestId;
     }
 
-    console.warn('[CRDT] WebSocket 연결되지 않아 후보 삭제 요청 실패');
     return null;
   }
 

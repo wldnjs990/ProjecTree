@@ -215,7 +215,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
     } = get();
 
     if (!activeWorkspaceId) {
-      console.warn('No active workspace');
       return;
     }
 
@@ -250,7 +249,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
         setPaginationState({ hasMore: false });
       }
     } catch (error) {
-      console.error('Failed to load more messages:', error);
     } finally {
       setPaginationState({ isLoading: false });
     }

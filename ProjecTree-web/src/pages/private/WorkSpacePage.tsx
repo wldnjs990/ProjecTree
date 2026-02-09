@@ -143,7 +143,6 @@ export default function WorkSpacePage() {
         });
         setNodeListData(nodeListDataMap);
       } catch (error) {
-        console.error('워크스페이스 데이터 로드 실패:', error);
       } finally {
         setIsLoading(false);
       }
@@ -214,7 +213,6 @@ export default function WorkSpacePage() {
         // API 호출 완료 후 사이드바 열기 (nodeDetail이 store에 저장된 상태)
         openSidebar(nodeId);
       } catch (error) {
-        console.error('노드 상세정보 로드 실패:', error);
       }
     } else {
       closeSidebar();

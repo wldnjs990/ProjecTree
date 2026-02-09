@@ -199,7 +199,6 @@ export function WorkspaceSettingsDialog({
         const results = await getTechStacks(searchTerm);
         setTechOptions(results);
       } catch (error) {
-        console.error('Failed to fetch tech stacks:', error);
       }
     };
 
@@ -317,7 +316,6 @@ export function WorkspaceSettingsDialog({
         toast.error((response as any).message || '저장에 실패했습니다.');
       }
     } catch (error) {
-      console.error('Failed to update workspace:', error);
       toast.error('저장 중 오류가 발생했습니다.');
     } finally {
       setIsSaving(false);

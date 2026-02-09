@@ -32,7 +32,6 @@ export function ProjectDropdown({ projectName }: ProjectDropdownProps) {
         const current = data.find((p) => String(p.id) === String(workspaceId));
         if (current) setWorkspaceName(current.title);
       } catch (error) {
-        console.error('워크스페이스 목록 로드 실패:', error);
       }
     };
     fetchProjects();
