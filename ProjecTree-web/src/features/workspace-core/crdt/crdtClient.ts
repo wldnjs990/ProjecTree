@@ -25,7 +25,7 @@ export type YNodeValue =
   | Record<string, unknown>;
 
 /**
- * 싱글톤 CRDT 클라이언트
+ * CRDT 클라이언트
  */
 class CrdtClient {
   private static instance: CrdtClient | null = null;
