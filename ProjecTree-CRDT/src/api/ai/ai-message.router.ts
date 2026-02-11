@@ -6,12 +6,11 @@ import { isValidAiCategory, AI_CATEGORY } from "../../domain/ai/ai-category";
 const router: Router = Router();
 
 router.post("/messages", (req: Request, res: Response) => {
-  const { workspaceId, nodeId, category, content, text, streamType, isComplete } =
-    req.body;
+  const { workspaceId, nodeId, category, content } = req.body;
   console.log(
     "[AI_MESSAGE] incoming",
     new Date().toISOString(),
-    JSON.stringify({ workspaceId, nodeId, category, content, text, streamType, isComplete }),
+    JSON.stringify({ workspaceId, nodeId, category, content }),
   );
 
   if (!workspaceId || !nodeId || !category || !content) {
@@ -28,21 +27,15 @@ router.post("/messages", (req: Request, res: Response) => {
     });
   }
 
-  const normalizedStreamType =
-    streamType ??
-    (category === "CANDIDATE"
-      ? "candidates"
-      : category === "TECH"
-        ? "techs"
-        : undefined);
+  const payload = {
+    nodeId,
+    category,
+    content,
+  };
 
   sendToRoom(String(workspaceId), {
-    nodeId,
     type: "AI_MESSAGE",
-    text: text ?? content,
-    streamType: normalizedStreamType,
-    isComplete: Boolean(isComplete),
-    category,
+    payload,
   });
   console.log("[AI_MESSAGE] sent to room", workspaceId);
 
