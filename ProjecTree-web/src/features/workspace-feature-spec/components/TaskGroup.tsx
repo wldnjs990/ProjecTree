@@ -4,6 +4,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { ChevronDown, CheckSquare, Pin } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import type { Node } from '@xyflow/react';
@@ -21,10 +27,9 @@ import type { NodeData } from '../types';
 interface TaskGroupProps {
   task: Node;
   advanceds: Node[];
-  onNodeClick?: (nodeId: string) => void;
 }
 
-export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
+export function TaskGroup({ task, advanceds }: TaskGroupProps) {
   const data = task.data as unknown as NodeData;
 
   const taskContent = (
@@ -68,11 +73,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
       <div className="flex justify-center w-full min-w-0 px-3">
         <TruncatedLabel
           text={data.label}
-          className="font-medium text-sm cursor-pointer hover:underline text-center"
-          onClick={(e) => {
-            e.stopPropagation();
-            onNodeClick?.(task.id);
-          }}
+          className="font-medium text-sm text-center"
         />
       </div>
       <div className="flex justify-center">
@@ -103,12 +104,23 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
       </div>
       <div className="flex justify-center">
         {data.assignee ? (
-          <UserAvatar
-            initials={data.assignee.initials}
-            color={data.assignee.color}
-            size="sm"
-          />
-        ) : null}
+          <TooltipProvider>
+            <Tooltip delayDuration={300}>
+              <TooltipTrigger asChild>
+                <span>
+                  <UserAvatar
+                    initials={data.assignee.initials}
+                    color={data.assignee.color}
+                    size="sm"
+                  />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">
+                <p>{data.assignee.name}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : <span className="text-xs text-gray-400">미정</span>}
       </div>
     </div>
   );
@@ -165,16 +177,7 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
               <div className="flex justify-center w-full min-w-0 px-3">
                 <TruncatedLabel
                   text={advancedData.label}
-                  role="button"
-                  tabIndex={0}
-                  className="font-medium text-sm cursor-pointer hover:underline text-center"
-                  onClick={() => onNodeClick?.(advanced.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      onNodeClick?.(advanced.id);
-                    }
-                  }}
+                  className="font-medium text-sm text-center"
                 />
               </div>
               <div className="flex justify-center">
@@ -208,12 +211,23 @@ export function TaskGroup({ task, advanceds, onNodeClick }: TaskGroupProps) {
               </div>
               <div className="flex justify-center">
                 {advancedData.assignee ? (
-                  <UserAvatar
-                    initials={advancedData.assignee.initials}
-                    color={advancedData.assignee.color}
-                    size="sm"
-                  />
-                ) : null}
+                  <TooltipProvider>
+                    <Tooltip delayDuration={300}>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <UserAvatar
+                            initials={advancedData.assignee.initials}
+                            color={advancedData.assignee.color}
+                            size="sm"
+                          />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-xs">
+                        <p>{advancedData.assignee.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : <span className="text-xs text-gray-400">미정</span>}
               </div>
             </div>
           );

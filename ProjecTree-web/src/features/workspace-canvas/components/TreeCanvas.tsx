@@ -17,7 +17,6 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { CollabPanel } from './CollabPanel';
 import { MinimapPanel } from './MinimapPanel';
 import { ZoomControls } from './ZoomControls';
 import type { AvatarColor } from '@/shared/components/UserAvatar';
@@ -39,7 +38,6 @@ import {
   usePreviewNodes,
   usePreviewNodesCrdt,
   useCandidatePreviewMode,
-  useIsCreatingNode,
   getCrdtClient,
   type YNodeValue,
   type FlowNode,
@@ -80,7 +78,6 @@ const fitviewOptions = { padding: 0.2 };
 
 function TreeCanvasInner({
   initialNodes = [],
-  onlineUsers,
   onNodeClick,
 }: TreeCanvasProps) {
   const { fitView } = useReactFlow();
@@ -111,7 +108,6 @@ function TreeCanvasInner({
   const selectedNodeId = useSelectedNodeId();
   const previewNodes = usePreviewNodes();
   const candidatePreviewMode = useCandidatePreviewMode();
-  const isCreatingNode = useIsCreatingNode();
   const currentUser = useUser();
   const currentUserId = String(currentUser?.memberId ?? currentUser?.id ?? '');
 
@@ -193,10 +189,14 @@ function TreeCanvasInner({
   // 노드 클릭 핸들러
   const handleNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      if (candidatePreviewMode || isCreatingNode) return;
+      if (candidatePreviewMode) return;
       if (node.type === 'PREVIEW') {
         const lockedBy = String((node as FlowNode).data?.lockedBy ?? '');
         if (lockedBy && lockedBy !== currentUserId) return;
+      }
+      const client = getCrdtClient();
+      if (client && node.type !== 'PREVIEW') {
+        client.awareness.setLocalStateField('activeNodeId', node.id);
       }
       fitView({
         nodes: [{ id: node.id }],
@@ -204,12 +204,11 @@ function TreeCanvasInner({
       });
       onNodeClick?.(node.id);
     },
-    [onNodeClick, fitView, candidatePreviewMode, isCreatingNode, currentUserId]
+    [onNodeClick, fitView, candidatePreviewMode, currentUserId]
   );
 
   const handleNodeDragStop = useCallback(
     (event: React.MouseEvent, node: Node) => {
-      if (isCreatingNode) return;
       if (node.type === 'PREVIEW') {
         const lockedBy = String((node as FlowNode).data?.lockedBy ?? '');
         if (lockedBy && lockedBy !== currentUserId) return;
@@ -224,7 +223,7 @@ function TreeCanvasInner({
       }
       handleCrdtNodeDragStop(event, node);
     },
-    [isCreatingNode, handleCrdtNodeDragStop, currentUserId]
+    [handleCrdtNodeDragStop, currentUserId]
   );
 
   // 간선 변경 핸들러
@@ -244,6 +243,13 @@ function TreeCanvasInner({
     [setEdges]
   );
 
+  const handlePaneClick = useCallback(() => {
+    const client = getCrdtClient();
+    if (client) {
+      client.awareness.setLocalStateField('activeNodeId', null);
+    }
+  }, []);
+
   return (
     <div className="relative w-full h-full bg-canvas">
       <ReactFlow
@@ -254,8 +260,8 @@ function TreeCanvasInner({
         onEdgesChange={handleEdgesChange}
         onConnect={handleConnect}
         onNodeClick={handleNodeClick}
+        onPaneClick={handlePaneClick}
         onNodeDragStop={handleNodeDragStop}
-        nodesDraggable={!isCreatingNode}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={fitviewOptions}
@@ -274,9 +280,6 @@ function TreeCanvasInner({
 
       {/* 참여자 마우스 포인터 */}
       <CursorPointers cursors={cursors} />
-
-      {/* Collaboration Panel - Top Left */}
-      <CollabPanel users={onlineUsers} className="absolute top-6 left-6 z-10" />
 
       {/* Minimap Panel - Bottom Right */}
       <MinimapPanel className="absolute bottom-6 right-6 z-10" />

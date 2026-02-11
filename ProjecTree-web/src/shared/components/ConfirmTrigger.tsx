@@ -1,17 +1,20 @@
 import { cn } from '@/shared/lib/utils';
+import { Slot } from '@radix-ui/react-slot';
 import { forwardRef, type ReactElement } from 'react';
 
 interface ConfirmTriggerProps {
   children: ReactElement;
   className?: string;
+  asChild?: boolean;
 }
 export const ConfirmTrigger = forwardRef<
-  HTMLButtonElement,
+  HTMLElement,
   ConfirmTriggerProps
->(({ children, className, ...props }, ref) => {
+>(({ children, className, asChild = false, ...props }, ref) => {
+  const Comp = asChild ? Slot : 'button';
   return (
-    <button ref={ref} {...props} className={cn(className)}>
+    <Comp ref={ref} {...props} className={cn(className)}>
       {children}
-    </button>
+    </Comp>
   );
 });

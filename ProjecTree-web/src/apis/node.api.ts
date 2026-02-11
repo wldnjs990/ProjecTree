@@ -4,6 +4,7 @@ import wasApiClient from './client';
 interface CreateNodeBody {
   xpos: number;
   ypos: number;
+  previewNodeId: string;
 }
 interface CreateNodeResponse {
   nodeId: number;
@@ -42,4 +43,42 @@ const getAiNodeTechRecommendation = async (
   return response.data;
 };
 
-export { postCreateNode, getAiNodeTechRecommendation };
+interface CreateCustomNodeBody {
+  name: string;
+  description: string;
+  nodeType: string;
+  parentNodeId: number;
+  workspaceId: number;
+  xpos: number;
+  ypos: number;
+  previewNodeId: string;
+}
+
+const postCreateCustomNode = async (
+  body: CreateCustomNodeBody
+): Promise<ApiResponse<CreateNodeResponse>> => {
+  const response = await wasApiClient.post<ApiResponse<CreateNodeResponse>>(
+    '/nodes/custom',
+    body
+  );
+  return response.data;
+};
+
+interface CustomNodeTechRecommendationBody {
+  workspaceId: number;
+  techVocaId: number;
+}
+const postCustomNodeTechRecommendation = async (
+  nodeId: number,
+  body: CustomNodeTechRecommendationBody
+): Promise<ApiResponse<{}>> => {
+  const response = await wasApiClient.post(`/nodes/${nodeId}/tech-stack`, body);
+  return response.data;
+};
+
+export {
+  postCreateNode,
+  postCreateCustomNode,
+  getAiNodeTechRecommendation,
+  postCustomNodeTechRecommendation,
+};

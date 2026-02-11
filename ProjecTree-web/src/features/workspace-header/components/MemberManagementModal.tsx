@@ -17,7 +17,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Mail, X } from 'lucide-react';
 import { toast } from 'sonner';
 import type { OnlineUser } from '../types';
 import { UserAvatar } from '@/shared/components/UserAvatar';
@@ -70,7 +69,6 @@ export function MemberManagementModal({
                 setWorkspaceDetail(updatedDetail);
             }, 500);
         } catch (error) {
-            console.error('초대 실패:', error);
             toast.error('초대 메일 전송에 실패했습니다.');
         } finally {
             setIsLoading(false);
@@ -93,7 +91,6 @@ export function MemberManagementModal({
 
             toast.success('권한이 변경되었습니다.');
         } catch (error) {
-            console.error('권한 변경 실패:', error);
             toast.error('권한 변경에 실패했습니다.');
         }
     };
@@ -178,9 +175,8 @@ export function MemberManagementModal({
                                 <Button
                                     onClick={handleSendInvite}
                                     disabled={isLoading}
-                                    className="w-full h-11 mt-8 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full h-11 mt-8 bg-[var(--figma-neon-green)] text-[var(--figma-tech-green)] font-bold rounded-xl transition-all hover:bg-[var(--figma-neon-green)]/90 hover:shadow-[0_0_15px_rgba(74,222,128,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <Mail className="h-4 w-4" />
                                     {isLoading ? '전송 중...' : '초대 메일 보내기'}
                                 </Button>
                             </div>
@@ -234,14 +230,6 @@ export function MemberManagementModal({
                                                         <SelectItem value="VIEWER" className="text-xs">열람자</SelectItem>
                                                     </SelectContent>
                                                 </Select>
-
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </Button>
                                             </div>
                                         </div>
                                     ))}

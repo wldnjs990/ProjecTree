@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, TreeDeciduous } from 'lucide-react';
+import { TreeDeciduous } from 'lucide-react';
 
 export function ComparisonSection() {
   const [sliderPosition, setSliderPosition] = useState(50);
@@ -56,7 +56,7 @@ export function ComparisonSection() {
             viewport={{ once: true }}
             className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-1.5 text-sm text-emerald-600 font-medium"
           >
-            <Leaf className="h-3.5 w-3.5" />
+            <TreeDeciduous className="h-3.5 w-3.5" />
             사용 전 vs 사용 후
           </motion.div>
           <h2 className="mb-4 text-3xl font-bold text-zinc-900 md:text-5xl">

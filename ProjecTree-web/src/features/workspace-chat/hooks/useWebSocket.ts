@@ -70,17 +70,18 @@ export const useWebSocket = (workspaceId: string | null) => {
           rawMsg.member?.name ||
           'Unknown',
         content: rawMsg.content || '',
-        timestamp:
-          rawMsg.timestamp || rawMsg.created_at || new Date().toISOString(),
+        timestamp: (() => {
+          const t =
+            rawMsg.timestamp || rawMsg.created_at || new Date().toISOString();
+          return t.endsWith('Z') || t.includes('+') ? t : t + 'Z';
+        })(),
         type: 'text',
       };
     };
 
     // 메시지 수신
     const handleMessageReceive = (data: any) => {
-      console.log('📨 [useWebSocket] Message received (Raw):', data);
       const newMessage = mapToChatMessage(data);
-      console.log('✨ [useWebSocket] Mapped Message:', newMessage);
       addMessage(workspaceId, newMessage);
     };
 
@@ -184,29 +185,14 @@ export const useWebSocket = (workspaceId: string | null) => {
     };
 
     const handleChatHistory = (data: any) => {
-      console.log('📨 [useWebSocket] Chat history received:', data);
-      console.log(
-        '📨 [DEBUG] Data type:',
-        typeof data,
-        'Is array:',
-        Array.isArray(data)
-      );
-      console.log('📨 [DEBUG] Current workspaceId:', workspaceId);
 
       if (Array.isArray(data)) {
-        console.log(
-          `📨 [DEBUG] Processing ${data.length} messages from history`
-        );
 
         const messages = data.map((item) => mapToChatMessage(item));
-        console.log('📨 [DEBUG] Mapped messages:', messages);
 
         // 🎯 전체 메시지를 한 번에 설정 (배포 환경 안정성 향상)
         useChatStore.getState().setMessages(workspaceId, messages);
 
-        console.log(
-          `✅ [useWebSocket] Loaded ${messages.length} messages from history`
-        );
 
         // 히스토리 로드 완료 플래그 설정
         useChatStore.getState().setPaginationState({
@@ -215,9 +201,7 @@ export const useWebSocket = (workspaceId: string | null) => {
           isLoading: false,
         });
       } else if (data) {
-        console.log('📨 [DEBUG] Processing single message from history');
         const msg = mapToChatMessage(data);
-        console.log('📨 [DEBUG] Mapped message:', msg);
 
         useChatStore.getState().setMessages(workspaceId, [msg]);
 
@@ -227,7 +211,6 @@ export const useWebSocket = (workspaceId: string | null) => {
           isLoading: false,
         });
       } else {
-        console.log('⚠️ [DEBUG] No chat history data received');
         useChatStore.getState().setMessages(workspaceId, []);
         useChatStore.getState().setPaginationState({
           initialLoaded: true,
@@ -240,13 +223,9 @@ export const useWebSocket = (workspaceId: string | null) => {
     // 에러 처리
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleError = (error: any) => {
-      console.error('Socket error:', error);
     };
 
     // 🎯 1단계: 이벤트 리스너 먼저 등록 (chat:history 이벤트를 놓치지 않기 위해)
-    console.log(
-      '🔧 [useWebSocket] Registering event listeners BEFORE joining room'
-    );
     chatSocket.on('message:receive', handleMessageReceive);
     chatSocket.on('typing:start', handleTypingStart);
     chatSocket.on('typing:stop', handleTypingStop);
@@ -257,11 +236,7 @@ export const useWebSocket = (workspaceId: string | null) => {
 
     // 🎯 2단계: 이벤트 리스너 등록 후 채팅방 입장
     if (chatRoomId) {
-      console.log(
-        `🔄 [useWebSocket] Attempting to join chat room: ${chatRoomId}`
-      );
       chatSocket.joinChatRoom(chatRoomId);
-      console.log(`📡 [useWebSocket] Join event emitted for: ${chatRoomId}`);
     }
 
     return () => {

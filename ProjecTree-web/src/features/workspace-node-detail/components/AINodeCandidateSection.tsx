@@ -14,9 +14,12 @@ import {
   calculateChildNodePosition,
   useSelectedCandidateIds,
   usePreviewNodes,
+  useAiStreamingText,
+  useAiStreamingType,
 } from '@/features/workspace-core';
 import { SubNodeCard } from './SubNodeCard';
 import { CandidateEmptyState } from './CandidateEmptyState';
+import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 
 interface AINodeCandidateSectionProps {
   candidates: Candidate[];
@@ -25,6 +28,8 @@ interface AINodeCandidateSectionProps {
     candidateId: number,
     body: { xpos: number; ypos: number }
   ) => void;
+  onCandidateDelete?: (candidateId: number) => void;
+  onLockedCandidateClick?: (candidate: Candidate) => void;
   onAddManual?: () => void;
   onGenerateCandidates?: () => Promise<void>;
   isGenerating?: boolean;
@@ -33,6 +38,8 @@ interface AINodeCandidateSectionProps {
 export function AINodeCandidateSection({
   candidates,
   onCandidateClick,
+  onCandidateDelete,
+  onLockedCandidateClick,
   onAddManual,
   onGenerateCandidates,
   isGenerating = false,
@@ -43,6 +50,12 @@ export function AINodeCandidateSection({
   const nodes = useNodes();
   const selectedCandidateIds = useSelectedCandidateIds();
   const previewNodes = usePreviewNodes();
+  const streamingText = useAiStreamingText();
+  const streamingType = useAiStreamingType();
+
+  // candidates 타입일 때만 스트리밍 텍스트 표시
+  const showStreamingText =
+    isGenerating && streamingType === 'candidates' && streamingText;
 
   const lockedCandidateIds = new Set(
     previewNodes
@@ -54,14 +67,18 @@ export function AINodeCandidateSection({
 
   const handleCandidateClick = (candidate: Candidate) => {
     if (!selectedNodeId) return;
-    if (lockedCandidateIds.has(candidate.id)) return;
+    // locked 후보(생성 중) 클릭 시 해당 preview로 진입
+    if (lockedCandidateIds.has(candidate.id)) {
+      onLockedCandidateClick?.(candidate);
+      return;
+    }
     const position = calculateChildNodePosition(nodes, selectedNodeId);
     onCandidateClick(Number(selectedNodeId), candidate.id, position);
   };
 
   return (
     <div className="rounded-[14px] border border-[rgba(227,228,235,0.5)] bg-[rgba(251,251,255,0.6)] backdrop-blur-sm overflow-hidden">
-      {/* 섹션 헤더 (접기/펼치기) */}
+      {/* 섹션 헤더 (열기/닫기) */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between p-4 hover:bg-[rgba(0,0,0,0.02)] transition-colors"
@@ -86,35 +103,49 @@ export function AINodeCandidateSection({
             <>
               {/* 추천 노드 목록 */}
               <div className="space-y-2">
-                {candidates.map((node) => (
-                  <SubNodeCard
-                    key={node.id}
-                    node={node}
-                    onClick={() => handleCandidateClick(node)}
-                    isSelected={selectedCandidateIds.includes(node.id)}
-                    disabled={lockedCandidateIds.has(node.id)}
-                  />
-                ))}
+                {candidates.map((node) => {
+                  const isLocked = lockedCandidateIds.has(node.id);
+                  const isSelected = selectedCandidateIds.includes(node.id);
+                  return (
+                    <SubNodeCard
+                      key={node.id}
+                      node={node}
+                      onClick={() => handleCandidateClick(node)}
+                      onDelete={
+                        onCandidateDelete
+                          ? () => onCandidateDelete(node.id)
+                          : undefined
+                      }
+                      isSelected={isSelected || isLocked}
+                      disabled={isSelected} // locked는 클릭 가능(재진입), selected만 비활성화
+                      deleteDisabled={isSelected || isLocked}
+                    />
+                  );
+                })}
               </div>
 
-              {/* AI 재생성 버튼 */}
-              <button
-                onClick={onGenerateCandidates}
-                disabled={isGenerating}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    생성 중...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    AI 다시 추천받기
-                  </>
-                )}
-              </button>
+              {/* AI 생성 버튼 또는 스트리밍 텍스트 */}
+              {showStreamingText ? (
+                <AiStreamingCard text={streamingText} />
+              ) : (
+                <button
+                  onClick={onGenerateCandidates}
+                  disabled={isGenerating}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      생성 중...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      AI 다시 추천받기
+                    </>
+                  )}
+                </button>
+              )}
             </>
           ) : (
             <CandidateEmptyState

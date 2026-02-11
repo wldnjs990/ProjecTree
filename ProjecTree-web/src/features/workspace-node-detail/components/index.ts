@@ -7,6 +7,7 @@ export { default as NodeHeaderInfo } from './NodeHeaderInfo';
 export { StatusMetaSection } from './StatusMetaSection';
 export { MemoSection } from './MemoSection';
 export { AITechRecommendSection } from './AITechRecommendSection';
+export { CustomTechAddDialog } from './CustomTechAddDialog';
 export { AINodeCandidateSection } from './AINodeCandidateSection';
 export { NodeStatusField } from './NodeStatus';
 export { NodePriorityField } from './NodePriority';

@@ -110,6 +110,9 @@ export default function Step5TeamInvite({
           <h3 className="font-['Pretendard'] font-medium text-[15px] leading-5 text-[var(--figma-text-cod-gray)]">
             이메일 초대
           </h3>
+          <p className="font-['Pretendard'] font-normal text-[11.5px] leading-relaxed text-[#9E9E9E] -mt-2">
+            ProjecTree에 가입된 회원만 초대할 수 있습니다.
+          </p>
 
           <div className="flex flex-col gap-2">
             <Input

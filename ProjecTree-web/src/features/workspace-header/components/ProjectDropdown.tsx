@@ -15,24 +15,27 @@ import {
 } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { getMyWorkspaces, type WorkspaceCardData } from '@/apis/workspace-lounge.api';
+import { useWorkspaceStore } from '@/features/workspace-core';
 import type { ProjectDropdownProps } from '../types';
 
 export function ProjectDropdown({ projectName }: ProjectDropdownProps) {
   const navigate = useNavigate();
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const [projects, setProjects] = useState<WorkspaceCardData[]>([]);
+  const setWorkspaceName = useWorkspaceStore((state) => state.setWorkspaceName);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const data = await getMyWorkspaces();
         setProjects(data);
+        const current = data.find((p) => String(p.id) === String(workspaceId));
+        if (current) setWorkspaceName(current.title);
       } catch (error) {
-        console.error('워크스페이스 목록 로드 실패:', error);
       }
     };
     fetchProjects();
-  }, []);
+  }, [workspaceId, setWorkspaceName]);
 
   const handleProjectChange = (workspaceId: string) => {
     // 같은 워크스페이스면 이동 안 함 (선택적)

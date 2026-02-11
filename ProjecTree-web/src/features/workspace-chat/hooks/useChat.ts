@@ -33,10 +33,6 @@ export const useChat = (workspaceId: string) => {
             decoded.memberId || decoded.sub || decoded.userId || decoded.id;
 
           if (extractedId) {
-            console.log(
-              '🛠️ [useChat] Repairing missing user ID from token:',
-              extractedId
-            );
             useUserStore.getState().setUser({
               ...user,
               memberId: Number(extractedId), // 숫자로 변환 시도
@@ -44,7 +40,6 @@ export const useChat = (workspaceId: string) => {
             });
           }
         } catch (e) {
-          console.warn('⚠️ [useChat] Failed to repair user ID from token:', e);
         }
       }
     }
@@ -64,10 +59,6 @@ export const useChat = (workspaceId: string) => {
     if (chatRoomId) {
       chatSocket.sendMessage(chatRoomId, content.trim());
     } else {
-      console.warn(
-        '[useChat] Sending message failed: chatRoomId not found for workspace',
-        workspaceId
-      );
       // Fallback or return? user interaction implies we should try or fail visible?
       // For now, attempting with workspaceId might be better than nothing, OR just log error.
       // Given the logic, chatRoomId is required.
@@ -140,20 +131,16 @@ export const useChat = (workspaceId: string) => {
     const initializeChat = async () => {
       // workspaceDetail이 없으면 대기 (Re-render 될 때 다시 실행됨)
       if (!workspaceDetail) {
-        console.log('⏳ [useChat] Waiting for workspaceDetail...');
         return;
       }
 
-      console.log('📦 [useChat] initializeChat with detail:', workspaceDetail);
 
       // chatRoomId 설정
       let chatRoomId = '';
       if (workspaceDetail.teamInfo?.chatRoomId) {
         chatRoomId = workspaceDetail.teamInfo.chatRoomId;
         useChatStore.getState().setChatRoomId(workspaceId, chatRoomId);
-        console.log('✅ [useChat] ChatRoomId synced to store:', chatRoomId);
       } else {
-        console.warn('⚠️ [useChat] chatRoomId missing in workspaceDetail');
         return;
       }
 
@@ -171,7 +158,6 @@ export const useChat = (workspaceId: string) => {
         //     });
         //     messages = response.data || [];
         //   } catch (e) {
-        //     console.warn('[useChat] 메시지 로드 실패:', e);
         //   }
         // }
 
@@ -186,7 +172,6 @@ export const useChat = (workspaceId: string) => {
           initialLoaded: false, // WebSocket에서 설정
         });
       } catch (error) {
-        console.warn('[useChat] 초기화 실패:', error);
         setPaginationState({
           hasMore: false,
           isLoading: false,
@@ -205,10 +190,6 @@ export const useChat = (workspaceId: string) => {
 
       const memberInfos = workspaceDetail?.teamInfo?.memberInfos;
       if (memberInfos) {
-        console.log(
-          '👥 [useChat] Loading participants from workspaceDetail:',
-          memberInfos
-        );
 
         const mappedParticipants: any[] = memberInfos.map((m: any) => {
           // Safety check for ID

@@ -1,11 +1,11 @@
 import { Notebook, BookOpen, CheckSquare, Pin } from 'lucide-react';
 import type { Node, Edge } from '@xyflow/react';
-import { transformNodesForSpecView, useNodes, useEdges } from '@/features/workspace-core';
+import { transformNodesForSpecView, useNodes, useEdges, useNodeDetails, useNodeListData } from '@/features/workspace-core';
 import { EpicGroup } from './EpicGroup';
 import { StoryGroup } from './StoryGroup';
 import { TaskGroup } from './TaskGroup';
 import { specGridCols } from '../constants';
-import type { NodeData, FeatureSpecViewProps } from '../types';
+import type { NodeData } from '../types';
 import { Accordion } from '@/components/ui/accordion';
 
 // 계층 구조로 노드 그룹화 (Edge 기반)
@@ -46,17 +46,19 @@ function groupNodesByHierarchy(nodes: Node[], edges: Edge[] = []) {
   });
 }
 
-export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
+export function FeatureSpecView() {
   // Zustand 스토어에서 노드/엣지 가져오기
   const realNodes = useNodes();
   const realEdges = useEdges();
+  const nodeDetails = useNodeDetails();
+  const nodeListData = useNodeListData();
 
   // 개발 환경에서 실제 데이터가 없으면 목데이터 사용
   const nodes = realNodes;
   const edges = realEdges;
 
   // 데이터 변환
-  const transformedNodes = transformNodesForSpecView(nodes);
+  const transformedNodes = transformNodesForSpecView(nodes, nodeDetails, nodeListData);
   const hierarchy = groupNodesByHierarchy(transformedNodes, edges);
   const filteredNodes = transformedNodes.filter(
     (n) => (n.data as NodeData).level > 0
@@ -89,7 +91,6 @@ export function FeatureSpecView({ onNodeClick }: FeatureSpecViewProps) {
                   key={epic.id}
                   epic={epic}
                   stories={epic.stories}
-                  onNodeClick={onNodeClick}
                   StoryGroupComponent={(props) => (
                     <StoryGroup {...props} TaskGroupComponent={TaskGroup} />
                   )}

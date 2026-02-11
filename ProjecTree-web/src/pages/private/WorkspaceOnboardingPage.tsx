@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, ChevronLeft } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Stepper,
   Step1BasicInfo,
@@ -14,6 +15,7 @@ import {
 } from '@/features/workspace-onboarding';
 import { createWorkspace } from '@/apis/workspace.api';
 import type { Role, TechStackItem } from '@/apis/workspace.api';
+import logoImage from '@/assets/images/logo2.png';
 
 export default function WorkspaceOnboardingPage() {
   const navigate = useNavigate();
@@ -97,14 +99,13 @@ export default function WorkspaceOnboardingPage() {
           ...formData,
           techStacks: formData.techStacks.map((tech) => tech.id),
         };
-        const response = await createWorkspace(apiFormData);
+        await createWorkspace(apiFormData);
 
         // 성공 시 워크스페이스 라운지로 이동
-        alert(`워크스페이스가 생성되었습니다! (ID: ${response.data})`);
+        toast.success(`워크스페이스가 생성되었습니다!`);
         navigate('/workspace-lounge');
       } catch (error) {
-        console.error('[API] 워크스페이스 생성 실패:', error);
-        alert('워크스페이스 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+        toast.error('워크스페이스 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
       } finally {
         setIsLoading(false);
       }
@@ -144,9 +145,11 @@ export default function WorkspaceOnboardingPage() {
       <div className="hidden lg:flex flex-1 relative flex-col justify-between p-12 overflow-hidden z-10">
         {/* Brand */}
         <div className="relative z-10">
-          <h1 className="text-xl font-bold text-[var(--figma-neon-green)] tracking-widest">
-            PROJECTREE
-          </h1>
+          <img
+            src={logoImage}
+            alt="ProjecTree Logo"
+            className="h-10"
+          />
         </div>
 
         {/* Stepper (Minimalist Overlay) */}

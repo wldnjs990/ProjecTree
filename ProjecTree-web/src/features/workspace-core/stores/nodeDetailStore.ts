@@ -4,6 +4,8 @@ import type {
   Priority,
   Assignee,
   Candidate,
+  NodeType,
+  TaskType,
 } from '../types/nodeDetail';
 
 // 편집 가능한 노드 상세 필드 타입
@@ -28,9 +30,24 @@ interface NodeDetailState {
 
   // === 후보 미리보기 상태 ===
   candidatePreviewMode: boolean;
+  previewKind: 'candidate' | 'custom' | null;
   previewCandidate: Candidate | null;
   previewNodePosition: { xpos: number; ypos: number } | null;
-  isCreatingNode: boolean;
+  customDraft: {
+    name: string;
+    description: string;
+    nodeType: NodeType;
+    taskType: TaskType;
+    parentNodeId: number;
+    workspaceId: number;
+    previewNodeId: string;
+  } | null;
+  // 생성 중인 preview 노드 ID Set (CRDT의 yNodeCreatingPending과 동기화)
+  creatingPreviewIds: Set<string>;
+
+  // === AI 스트리밍 상태 ===
+  aiStreamingText: string;
+  aiStreamingType: 'candidates' | 'techs' | null;
 
   // === 단순 setter ===
   setSelectedNodeId: (id: string | null) => void;
@@ -40,14 +57,36 @@ interface NodeDetailState {
   setIsSaving: (saving: boolean) => void;
   setSelectedTechId: (techId: number | null) => void;
   setSelectedCandidateIds: (ids: number[]) => void;
-  setIsCreatingNode: (creating: boolean) => void;
+  addCreatingPreviewId: (previewNodeId: string) => void;
+  removeCreatingPreviewId: (previewNodeId: string) => void;
   setPreviewNodePosition: (position: { xpos: number; ypos: number }) => void;
+  setAiStreamingText: (text: string) => void;
+  setAiStreamingType: (type: 'candidates' | 'techs' | null) => void;
+  clearAiStreaming: () => void;
+  updateCustomDraft: (
+    patch: Partial<{
+      name: string;
+      description: string;
+    }>
+  ) => void;
 
   // === 복합 setter ===
   openSidebar: (nodeId: string) => void;
   closeSidebar: () => void;
   enterCandidatePreview: (
     candidate: Candidate,
+    position: { xpos: number; ypos: number }
+  ) => void;
+  enterCustomPreview: (
+    draft: {
+      name: string;
+      description: string;
+      nodeType: NodeType;
+      taskType: TaskType;
+      parentNodeId: number;
+      workspaceId: number;
+      previewNodeId: string;
+    },
     position: { xpos: number; ypos: number }
   ) => void;
   exitCandidatePreview: () => void;
@@ -66,9 +105,15 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
 
   // === 후보 미리보기 초기 상태 ===
   candidatePreviewMode: false,
+  previewKind: null,
   previewCandidate: null,
   previewNodePosition: null,
-  isCreatingNode: false,
+  customDraft: null,
+  creatingPreviewIds: new Set<string>(),
+
+  // === AI 스트리밍 초기 상태 ===
+  aiStreamingText: '',
+  aiStreamingType: null,
 
   // === 단순 setter ===
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
@@ -78,12 +123,32 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   setIsSaving: (saving) => set({ isSaving: saving }),
   setSelectedTechId: (techId) => set({ selectedTechId: techId }),
   setSelectedCandidateIds: (ids) => set({ selectedCandidateIds: ids }),
-  setIsCreatingNode: (creating) => set({ isCreatingNode: creating }),
+  addCreatingPreviewId: (previewNodeId) =>
+    set((state) => ({
+      creatingPreviewIds: new Set([...state.creatingPreviewIds, previewNodeId]),
+    })),
+  removeCreatingPreviewId: (previewNodeId) =>
+    set((state) => {
+      const newSet = new Set(state.creatingPreviewIds);
+      newSet.delete(previewNodeId);
+      return { creatingPreviewIds: newSet };
+    }),
   setPreviewNodePosition: (position) => set({ previewNodePosition: position }),
+  setAiStreamingText: (text) => set({ aiStreamingText: text }),
+  setAiStreamingType: (type) => set({ aiStreamingType: type }),
+  clearAiStreaming: () => set({ aiStreamingText: '', aiStreamingType: null }),
+  updateCustomDraft: (patch) =>
+    set((state) =>
+      state.customDraft ? { customDraft: { ...state.customDraft, ...patch } } : {}
+    ),
 
   // === 복합 setter ===
   openSidebar: (nodeId) => {
-    set({ selectedNodeId: nodeId, isOpen: true });
+    set({
+      selectedNodeId: nodeId,
+      isOpen: true,
+      // creatingPreviewIds는 CRDT 옵저버가 관리하므로 여기서 초기화하지 않음
+    });
   },
 
   closeSidebar: () => {
@@ -95,26 +160,41 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       selectedTechId: null,
       selectedCandidateIds: [],
       candidatePreviewMode: false,
+      previewKind: null,
       previewCandidate: null,
       previewNodePosition: null,
-      isCreatingNode: false,
+      customDraft: null,
+      // isCreatingNode는 CRDT 옵저버가 관리하므로 여기서 설정하지 않음
     });
   },
 
   enterCandidatePreview: (candidate, position) => {
     set({
       candidatePreviewMode: true,
+      previewKind: 'candidate',
       previewCandidate: candidate,
       previewNodePosition: position,
+      customDraft: null,
+    });
+  },
+  enterCustomPreview: (draft, position) => {
+    set({
+      candidatePreviewMode: true,
+      previewKind: 'custom',
+      previewCandidate: null,
+      previewNodePosition: position,
+      customDraft: draft,
     });
   },
 
   exitCandidatePreview: () => {
     set({
       candidatePreviewMode: false,
+      previewKind: null,
       previewCandidate: null,
       previewNodePosition: null,
-      isCreatingNode: false,
+      customDraft: null,
+      // isCreatingNode는 CRDT 옵저버가 관리하므로 여기서 설정하지 않음
     });
   },
 
@@ -128,9 +208,13 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       selectedTechId: null,
       selectedCandidateIds: [],
       candidatePreviewMode: false,
+      previewKind: null,
       previewCandidate: null,
       previewNodePosition: null,
-      isCreatingNode: false,
+      customDraft: null,
+      creatingPreviewIds: new Set<string>(),
+      aiStreamingText: '',
+      aiStreamingType: null,
     }),
 }));
 
@@ -170,14 +254,34 @@ export const useSelectedCandidateIds = () =>
 export const useCandidatePreviewMode = () =>
   useNodeDetailStore((state) => state.candidatePreviewMode);
 
+export const usePreviewKind = () =>
+  useNodeDetailStore((state) => state.previewKind);
+
 /** 미리보기 중인 후보 노드 */
 export const usePreviewCandidate = () =>
   useNodeDetailStore((state) => state.previewCandidate);
+
+export const useCustomPreviewDraft = () =>
+  useNodeDetailStore((state) => state.customDraft);
 
 /** 미리보기 노드 위치 (서버 전송용) */
 export const usePreviewNodePosition = () =>
   useNodeDetailStore((state) => state.previewNodePosition);
 
-/** AI 노드 생성 중 상태 */
-export const useIsCreatingNode = () =>
-  useNodeDetailStore((state) => state.isCreatingNode);
+/** 생성 중인 preview 노드 ID Set */
+export const useCreatingPreviewIds = () =>
+  useNodeDetailStore((state) => state.creatingPreviewIds);
+
+/** 특정 preview 노드가 생성 중인지 확인 */
+export const useIsPreviewCreating = (previewNodeId: string | null) =>
+  useNodeDetailStore((state) =>
+    previewNodeId ? state.creatingPreviewIds.has(previewNodeId) : false
+  );
+
+/** AI 스트리밍 텍스트 */
+export const useAiStreamingText = () =>
+  useNodeDetailStore((state) => state.aiStreamingText);
+
+/** AI 스트리밍 타입 */
+export const useAiStreamingType = () =>
+  useNodeDetailStore((state) => state.aiStreamingType);

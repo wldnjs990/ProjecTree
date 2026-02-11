@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router';
 import { NodeHeaderSection } from './NodeHeaderSection';
 import { StatusMetaSection } from './StatusMetaSection';
@@ -6,19 +6,25 @@ import { AITechRecommendSection } from './AITechRecommendSection';
 import { AINodeCandidateSection } from './AINodeCandidateSection';
 import { MemoSection } from './MemoSection';
 import { useSelectedNodeDetail, useNodeDetailEdit } from '../hooks';
+import * as Y from 'yjs';
 import {
   useSelectedNodeId,
   nodeDetailCrdtService,
   previewNodesCrdtService,
   useNodeDetailStore,
-  useNodeStore,
   useNodes,
   calculateChildNodePosition,
+  getChildNodeType,
+  getCrdtClient,
   type FlowNode,
+  type Candidate,
 } from '@/features/workspace-core';
 import { useUser } from '@/shared/stores/userStore';
 import { generateNodeCandidates } from '@/apis/workspace.api';
-import { getAiNodeTechRecommendation } from '@/apis/node.api';
+import {
+  getAiNodeTechRecommendation,
+  postCustomNodeTechRecommendation,
+} from '@/apis/node.api';
 
 interface NodeDetailContainerProps {
   nodeInfo?: {
@@ -39,7 +45,9 @@ export default function NodeDetailContainer({
   isExpanded,
 }: NodeDetailContainerProps) {
   // URL에서 workspaceId 가져오기
-  const { workspaceId: paramWorkspaceId } = useParams<{ workspaceId: string }>();
+  const { workspaceId: paramWorkspaceId } = useParams<{
+    workspaceId: string;
+  }>();
   const workspaceId = paramWorkspaceId ? Number(paramWorkspaceId) : null;
 
   // Store state subscriptions
@@ -54,9 +62,11 @@ export default function NodeDetailContainer({
   const setSelectedCandidateIds = useNodeDetailStore(
     (state) => state.setSelectedCandidateIds
   );
-  const updateNodeDetail = useNodeStore((state) => state.updateNodeDetail);
   const enterCandidatePreview = useNodeDetailStore(
     (state) => state.enterCandidatePreview
+  );
+  const enterCustomPreview = useNodeDetailStore(
+    (state) => state.enterCustomPreview
   );
   const currentUser = useUser();
 
@@ -99,7 +109,6 @@ export default function NodeDetailContainer({
       try {
         await finishEdit();
       } catch (error) {
-        console.error('저장 실패:', error);
       }
     }
   };
@@ -133,79 +142,156 @@ export default function NodeDetailContainer({
     // Enter preview mode
     enterCandidatePreview(candidate, position);
 
-    console.log('[NodeDetailContainer] Enter preview mode:', {
-      candidate,
-      position,
-      previewNode,
-    });
+  };
+
+  // locked 후보(생성 중) 클릭 시 해당 preview로 재진입
+  const handleLockedCandidateClick = (candidate: Candidate) => {
+    const previewNodeId = `preview-${candidate.id}`;
+
+    // CRDT에서 preview 노드 찾기
+    const client = getCrdtClient();
+    if (!client) return;
+
+    const yPreviewNodes = client.getYMap<Y.Map<unknown>>('previewNodes');
+    const yNode = yPreviewNodes.get(previewNodeId);
+    if (!yNode) return;
+
+    const position = yNode.get('position') as
+      | { x?: number; y?: number }
+      | undefined;
+    const xpos = Number(position?.x ?? 0);
+    const ypos = Number(position?.y ?? 0);
+
+    // preview 모드 진입
+    enterCandidatePreview(candidate, { xpos, ypos });
+
+    // pending 상태 확인 및 반영
+    const yNodeCreatingPending = client.getYMap<boolean>('nodeCreatingPending');
+    const isPending = yNodeCreatingPending.get(previewNodeId) === true;
+    if (isPending) {
+      useNodeDetailStore.getState().addCreatingPreviewId(previewNodeId);
+    }
+
   };
 
   const handleCandidateAddManual = () => {
-    console.log('Candidate add manual clicked');
+    if (!selectedNodeId || !workspaceId) return;
+
+    const parentNode = nodes.find((n) => n.id === selectedNodeId);
+    if (!parentNode) return;
+
+    const nextType = getChildNodeType(parentNode.type);
+    if (!nextType) return;
+
+    const position = calculateChildNodePosition(nodes, selectedNodeId);
+    const currentUserId = currentUser?.memberId ?? currentUser?.id;
+    const previewNodeId = `preview-custom-${Date.now()}`;
+    const previewNode: FlowNode = {
+      id: previewNodeId,
+      type: 'PREVIEW',
+      position: { x: position.xpos, y: position.ypos },
+      parentId: selectedNodeId,
+      data: {
+        title: '새 노드',
+        status: 'TODO',
+        taskId: '#preview',
+        taskType: parentNode.data.taskType ?? null,
+        ...(currentUserId ? { lockedBy: String(currentUserId) } : {}),
+      },
+    };
+
+    previewNodesCrdtService.addPreviewNode(previewNode);
+    enterCustomPreview(
+      {
+        name: '',
+        description: '',
+        nodeType: nextType,
+        taskType: parentNode.data.taskType ?? null,
+        parentNodeId: Number(selectedNodeId),
+        workspaceId,
+        previewNodeId,
+      },
+      position
+    );
   };
 
   // AI 기술 추천 생성 핸들러
+  // 클라이언트: pending=true 전송 + API 호출만 수행
+  // CRDT 서버: Spring 응답 받으면 Y.Array 업데이트 + pending=false 브로드캐스트
   const handleGenerateTechs = async () => {
     if (!selectedNodeId || !workspaceId) return;
 
     nodeDetailCrdtService.setTechsPending(selectedNodeId, true);
     try {
-      const response = await getAiNodeTechRecommendation(
-        Number(selectedNodeId),
-        workspaceId
-      );
-      const rawTechs = response?.data?.techs;
-      const techsArray = Array.isArray(rawTechs)
-        ? rawTechs
-        : rawTechs
-          ? [rawTechs]
-          : [];
-
-      const mappedTechs = techsArray.map((tech, index) => ({
-        id: tech.id ?? Date.now() + index,
-        name: tech.name,
-        advantage: tech.advantage ?? '',
-        disAdvantage: tech.disAdvantage ?? '',
-        description: tech.description ?? '',
-        ref: tech.ref ?? '',
-        recommendScore: tech.recommendScore ?? 0,
-        selected: false,
-      }));
-
-      nodeDetailCrdtService.updateTechRecommendations(
-        selectedNodeId,
-        mappedTechs
-      );
-
-      if (response?.data?.comparison) {
-        updateNodeDetail(Number(selectedNodeId), {
-          comparison: response.data.comparison,
-        });
-      }
+      await getAiNodeTechRecommendation(Number(selectedNodeId), workspaceId);
+      // 성공 시: CRDT 서버가 Spring 응답을 받아 Y.Array 업데이트 + pending=false 브로드캐스트
     } catch (error) {
-      console.error('AI 기술 추천 생성 실패:', error);
-    } finally {
+      // 에러 시에만 클라이언트에서 pending=false 전송 (서버 응답 없으므로)
       nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
     }
   };
 
   // AI 노드 후보 생성 핸들러
+  // 클라이언트: pending=true 전송 + API 호출만 수행
+  // CRDT 서버: Spring 응답 받으면 nodeCandidates 업데이트 + pending=false 브로드캐스트
   const handleGenerateCandidates = async () => {
     if (!selectedNodeId || !workspaceId) return;
 
     nodeDetailCrdtService.setCandidatesPending(selectedNodeId, true);
     try {
-      const candidates = await generateNodeCandidates(Number(selectedNodeId), workspaceId);
-      nodeDetailCrdtService.updateCandidates(selectedNodeId, candidates);
-
-      console.log('[NodeDetailContainer] AI 노드 후보 생성 완료');
+      await generateNodeCandidates(Number(selectedNodeId), workspaceId);
     } catch (error) {
-      console.error('AI 노드 후보 생성 실패:', error);
-    } finally {
       nodeDetailCrdtService.setCandidatesPending(selectedNodeId, false);
     }
   };
 
+  // 커스텀 기술스택 추가 핸들러
+  // 클라이언트: pending=true 전송 + API 호출만 수행
+  // CRDT 서버: Spring 응답 받으면 Y.Array에 append + pending=false 브로드캐스트
+  const handleAddCustomTech = async (techVocaId: number) => {
+    if (!selectedNodeId || !workspaceId) return;
+
+    nodeDetailCrdtService.setTechsPending(selectedNodeId, true);
+
+    try {
+      await postCustomNodeTechRecommendation(Number(selectedNodeId), {
+        workspaceId,
+        techVocaId,
+      });
+    } catch (error) {
+      nodeDetailCrdtService.setTechsPending(selectedNodeId, false);
+    }
+  };
+
+  // 노드 삭제 핸들러
+  // CRDT 서버에 삭제 요청 전송 후 Spring DELETE 호출 후 Y.Doc에서 노드+자식 일괄 삭제
+  const handleDeleteNode = () => {
+    if (!selectedNodeId) return;
+
+    const client = getCrdtClient();
+    if (!client) {
+      return;
+    }
+
+    // 사이드바 먼저 닫기
+    closeSidebar();
+
+    // CRDT 서버에 삭제 요청 전송
+    client.deleteNode(selectedNodeId);
+  };
+
+  // 후보 노드 삭제 핸들러
+  // CRDT 서버에 삭제 요청 전송 후 Spring DELETE 호출 후 Y.Doc에서 후보 삭제 브로드캐스트
+  const handleDeleteCandidate = (candidateId: number) => {
+    if (!selectedNodeId) return;
+
+    const client = getCrdtClient();
+    if (!client) {
+      return;
+    }
+
+    client.deleteCandidate(selectedNodeId, candidateId);
+  };
 
   return (
     <div className="p-4 space-y-4 pt-20">
@@ -219,6 +305,7 @@ export default function NodeDetailContainer({
         onShowDescription={onShowDescription}
         onToggleExpand={onToggleExpand}
         isExpanded={isExpanded}
+        onDelete={handleDeleteNode}
       />
 
       {/* Status & Meta section */}
@@ -235,6 +322,7 @@ export default function NodeDetailContainer({
           comparison={nodeDetail.comparison}
           onGenerateTechs={handleGenerateTechs}
           isGenerating={isGeneratingTechs}
+          onAddCustomTech={handleAddCustomTech}
         />
       )}
 
@@ -243,6 +331,8 @@ export default function NodeDetailContainer({
         <AINodeCandidateSection
           candidates={nodeDetail.candidates || []}
           onCandidateClick={handleCandidateClick}
+          onCandidateDelete={handleDeleteCandidate}
+          onLockedCandidateClick={handleLockedCandidateClick}
           onAddManual={handleCandidateAddManual}
           onGenerateCandidates={handleGenerateCandidates}
           isGenerating={isGeneratingCandidates}
@@ -251,5 +341,3 @@ export default function NodeDetailContainer({
     </div>
   );
 }
-
-

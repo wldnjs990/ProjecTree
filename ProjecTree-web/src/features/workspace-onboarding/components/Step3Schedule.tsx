@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Info } from 'lucide-react';
 
 interface Step3ScheduleProps {
   data: {
@@ -123,15 +123,32 @@ export default function Step3Schedule({
             <span className="font-[Inter] font-medium text-[14px] leading-5 text-[var(--figma-required-crimson)] text-red-500">
               *
             </span>
+            <div className="relative group">
+              <Info className="h-4 w-4 text-[#BDBDBD] hover:text-[#4CAF50] transition-colors cursor-help" />
+              <div className="absolute left-0 top-full mt-2 hidden group-hover:block px-4 py-3 bg-white border border-[#4ADE80] text-[#374151] text-xs rounded-xl shadow-[0_4px_14px_0_rgba(74,222,128,0.25)] z-50 w-[300px] whitespace-normal text-left leading-relaxed">
+                <p className="mb-2 text-[#4B5563]">
+                  입력한 주제를 기반으로{' '}
+                  <span className="text-[#16A34A] font-bold">AI가 프로젝트 트리를 자동 생성</span>합니다.
+                </p>
+                <div className="bg-[#F0FDF4] rounded-lg p-3 border border-[#86EFAC]">
+                  <p className="text-[11px] text-[#15803D] font-medium mb-1">작성 팁</p>
+                  <p className="text-[#374151]">
+                    구체적으로 작성할수록 더 정확한 구조가 생성됩니다.
+                  </p>
+                  <p className="text-[#6B7280] mt-1 text-[11px]">
+                    예) "여행 앱" → "사용자 취향 기반 여행지 추천 + 일정 자동 생성 + 예산 관리 웹 서비스"
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
           <Textarea
             id="description"
-            placeholder="예: AI가 사용자 취향을 분석해 최적의 여행 일정을 추천"
+            placeholder="예: AI가 사용자 취향을 분석해 최적의 여행 일정을 추천하고, 예산에 맞는 숙소와 교통편을 자동으로 비교해주는 웹 서비스"
             value={data.description}
             onChange={(e) => onChange({ description: e.target.value })}
             maxLength={500}
-            rows={5}
-            className="resize-none font-['Pretendard'] font-normal text-[13.5px] leading-relaxed p-[10px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors overflow-y-auto chat-scrollbar"
+            className="resize-none h-[120px] font-['Pretendard'] font-normal text-[13.5px] leading-relaxed p-[10px] bg-white border-[var(--figma-border-mercury)] shadow-sm rounded-md focus-visible:ring-[var(--figma-forest-primary)] focus-visible:border-[var(--figma-forest-primary)] hover:border-[var(--figma-forest-accent)] transition-colors overflow-y-auto chat-scrollbar"
           />
           <div className="flex justify-end">
             <span className="font-['Pretendard'] font-normal text-[11px] leading-3 text-[var(--figma-text-dove-gray)]">
@@ -150,6 +167,7 @@ export default function Step3Schedule({
             <Label className="font-['Pretendard'] font-medium text-[13px] leading-[14px] text-[var(--figma-text-cod-gray)]">
               프로젝트 문서 업로드
             </Label>
+            <span className="font-['Pretendard'] font-normal text-[11px] text-[#9E9E9E] ml-1">(선택)</span>
           </div>
 
           {/* 파일 업로드 영역 */}
@@ -158,7 +176,8 @@ export default function Step3Schedule({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`
-              p-3 text-center rounded-lg transition-all duration-200 border-2 border-dashed
+              text-center rounded-lg transition-all duration-200 border-2 border-dashed
+              ${data.specFiles.length > 0 ? 'p-2' : 'p-3'}
               ${
                 isDragging
                   ? 'border-[var(--figma-forest-accent)] bg-green-50'
@@ -166,12 +185,8 @@ export default function Step3Schedule({
               }
             `}
           >
-            <div className="flex flex-col items-center gap-1.5">
-              <Upload className="h-6 w-6 text-[var(--figma-text-emperor)]" />
-              <p className="font-['Pretendard'] font-normal text-[12.5px] text-[var(--figma-text-cod-gray)]">
-                PDF 파일을 여기에 놓아주세요
-              </p>
-              <label>
+            {data.specFiles.length > 0 ? (
+              <label className="flex items-center justify-center gap-2 cursor-pointer">
                 <input
                   type="file"
                   onChange={handleFileChange}
@@ -179,20 +194,40 @@ export default function Step3Schedule({
                   multiple
                   className="hidden"
                 />
-                <Button
-                  type="button"
-                  onClick={() => {
-                    const input = document.querySelector(
-                      'input[type="file"]'
-                    ) as HTMLInputElement;
-                    input?.click();
-                  }}
-                  className="font-['Pretendard'] font-normal text-[11px] h-[28px] px-2.5 bg-[var(--figma-forest-primary)] text-[var(--figma-white)] rounded-md hover:bg-[#1B5E20] transition-colors mt-0.5"
-                >
-                  파일 업로드 (최대 10MB)
-                </Button>
+                <Upload className="h-4 w-4 text-[var(--figma-text-emperor)]" />
+                <span className="font-['Pretendard'] font-normal text-[12px] text-[var(--figma-text-cod-gray)]">
+                  파일 추가 (최대 10MB)
+                </span>
               </label>
-            </div>
+            ) : (
+              <div className="flex flex-col items-center gap-1.5">
+                <Upload className="h-6 w-6 text-[var(--figma-text-emperor)]" />
+                <p className="font-['Pretendard'] font-normal text-[12.5px] text-[var(--figma-text-cod-gray)]">
+                  PDF 파일을 여기에 놓아주세요
+                </p>
+                <label>
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    accept=".pdf"
+                    multiple
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      const input = document.querySelector(
+                        'input[type="file"]'
+                      ) as HTMLInputElement;
+                      input?.click();
+                    }}
+                    className="font-['Pretendard'] font-normal text-[11px] h-[28px] px-2.5 bg-[var(--figma-forest-primary)] text-[var(--figma-white)] rounded-md hover:bg-[#1B5E20] transition-colors mt-0.5"
+                  >
+                    파일 업로드 (최대 10MB)
+                  </Button>
+                </label>
+              </div>
+            )}
           </div>
 
           {/* 업로드된 파일 목록 */}

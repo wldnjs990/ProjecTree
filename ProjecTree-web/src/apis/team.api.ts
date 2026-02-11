@@ -76,7 +76,6 @@ export const inviteMember = async (
         );
         return response.data.data;
     } catch (error) {
-        console.error('[API] 멤버 초대 실패:', error);
         throw error;
     }
 };
@@ -95,7 +94,6 @@ export const changeMemberRole = async (
     try {
         await wasApiClient.patch<ApiResponse<unknown>>('teams', request);
     } catch (error) {
-        console.error('[API] 역할 변경 실패:', error);
         throw error;
     }
 };

@@ -13,6 +13,7 @@ import { Mic, MicOff, PhoneOff, Loader2, ChevronLeft, ChevronRight } from 'lucid
 
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
+import type { AvatarColor } from '@/shared/components/UserAvatar';
 import {
   Tooltip,
   TooltipContent,
@@ -23,11 +24,19 @@ import HiddenAudioPlayer from './HiddenAudioPlayer';
 import ParticipantAvatar from './ParticipantAvatar';
 import { MicPermissionAlert } from './MicPermissionAlert';
 
+type VoiceChatMember = {
+  name: string;
+  nickname?: string | null;
+  color?: AvatarColor;
+};
+
+
 type VoiceChatBarProps = {
   isActive: boolean; // 연결 활성화 상태 (백그라운드 연결 유지)
   isVisible: boolean; // UI 표시 상태 (최소화/보이기)
   onClose: () => void; // 완전 종료 (연결 해제)
   workspaceId: string;
+  members?: VoiceChatMember[];
 };
 
 /**
@@ -38,6 +47,7 @@ export function VoiceChatBar({
   isVisible,
   onClose,
   workspaceId,
+  members = [],
 }: VoiceChatBarProps) {
   const {
     remoteTracks,
@@ -75,6 +85,20 @@ export function VoiceChatBar({
   const [currentPage, setCurrentPage] = useState(0);
 
   // "나" + 원격 참여자를 하나의 배열로 합침
+  const colorByName = useMemo(() => {
+    const map = new Map<string, AvatarColor>();
+    members.forEach((member) => {
+      if (member.nickname && member.color) {
+        map.set(member.nickname, member.color);
+      }
+      if (member.name && member.color) {
+        map.set(member.name, member.color);
+      }
+    });
+    return map;
+  }, [members]);
+
+
   const allParticipants = useMemo(() => {
     if (!isConnected) return [];
 
@@ -85,6 +109,7 @@ export function VoiceChatBar({
       isSpeaking: activeSpeakers.includes(participantName),
       isMuted: !isMicEnabled,
       isMe: true,
+      color: colorByName.get(participantName),
     };
 
     const remotes = remoteTracks.map((track) => ({
@@ -94,10 +119,11 @@ export function VoiceChatBar({
       isSpeaking: activeSpeakers.includes(track.participantIdentity),
       isMuted: track.isMuted,
       isMe: false,
+      color: colorByName.get(track.participantIdentity),
     }));
 
     return [me, ...remotes];
-  }, [isConnected, participantName, activeSpeakers, isMicEnabled, remoteTracks]);
+  }, [isConnected, participantName, activeSpeakers, isMicEnabled, remoteTracks, colorByName]);
 
   const totalPages = pageSize > 0 ? Math.ceil(allParticipants.length / pageSize) : 0;
   const needsPagination = pageSize > 0 && allParticipants.length > pageSize;
@@ -220,6 +246,7 @@ export function VoiceChatBar({
                       isSpeaking={participant.isSpeaking}
                       isMuted={participant.isMuted}
                       isMe={participant.isMe}
+                      color={participant.color}
                     />
                   ))}
                 </div>

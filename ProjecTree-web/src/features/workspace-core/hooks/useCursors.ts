@@ -21,7 +21,6 @@ export const useCursors = () => {
   useEffect(() => {
     const client = getCrdtClient();
     if (!client) {
-      console.warn('[useCursors] CRDT 클라이언트가 초기화되지 않았습니다.');
       return;
     }
 

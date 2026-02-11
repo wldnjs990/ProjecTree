@@ -1,8 +1,14 @@
 import { ArrowLeft, Sprout, Check, Loader2 } from 'lucide-react';
 import NodeHeaderButton from './NodeHeaderButton';
-import { categoryTagStyles, typeTagStyles } from '@/features/workspace-core';
+import {
+  categoryTagStyles,
+  typeTagStyles,
+  useAiStreamingText,
+  useAiStreamingType,
+} from '@/features/workspace-core';
 import type { Candidate } from '@/features/workspace-core';
 import { cn } from '@/shared/lib/utils';
+import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 
 interface CandidateNodeContainerProps {
   candidate: Candidate;
@@ -30,11 +36,16 @@ export default function CandidateNodeContainer({
     ? categoryTagStyles[candidate.taskType]
     : null;
 
+  // AI 스트리밍 상태
+  const streamingText = useAiStreamingText();
+  const streamingType = useAiStreamingType();
+  const showStreamingText = isCreating && streamingType === 'candidates' && streamingText;
+
   return (
     <div className="p-4 space-y-4 pt-6">
       {/* 헤더 - 뒤로가기 버튼 */}
       <div className="flex items-center gap-2">
-        <NodeHeaderButton onClick={onBack} disabled={isCreating}>
+        <NodeHeaderButton onClick={onBack}>
           <ArrowLeft />
         </NodeHeaderButton>
         <h3 className="text-lg font-bold text-[#0B0B0B] line-clamp-1">
@@ -100,29 +111,33 @@ export default function CandidateNodeContainer({
           의 하위 노드로 추가하시겠습니까?
         </p>
 
-        <button
-          onClick={onConfirm}
-          disabled={isCreating}
-          className={cn(
-            'w-full flex items-center justify-center gap-2 px-4 py-3',
-            'text-white font-medium rounded-lg transition-all duration-200',
-            isCreating
-              ? 'bg-[#1C69E3]/50 cursor-not-allowed'
-              : 'bg-[#1C69E3] hover:bg-[#1558C0] active:scale-[0.98]'
-          )}
-        >
-          {isCreating ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              <span>AI가 노드를 생성하고 있습니다...</span>
-            </>
-          ) : (
-            <>
-              <Check className="w-5 h-5" />
-              <span>확정</span>
-            </>
-          )}
-        </button>
+        {showStreamingText ? (
+          <AiStreamingCard text={streamingText} className="max-h-40 overflow-y-auto" />
+        ) : (
+          <button
+            onClick={onConfirm}
+            disabled={isCreating}
+            className={cn(
+              'w-full flex items-center justify-center gap-2 px-4 py-3',
+              'text-white font-medium rounded-lg transition-all duration-200',
+              isCreating
+                ? 'bg-[#1C69E3]/50 cursor-not-allowed'
+                : 'bg-[#1C69E3] hover:bg-[#1558C0] active:scale-[0.98]'
+            )}
+          >
+            {isCreating ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>AI가 노드를 생성하고 있습니다...</span>
+              </>
+            ) : (
+              <>
+                <Check className="w-5 h-5" />
+                <span>확정</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

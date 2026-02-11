@@ -14,7 +14,7 @@ import {
 } from '@/features/workspace-header';
 import { TreeCanvas } from '@/features/workspace-canvas';
 import { FeatureSpecView } from '@/features/workspace-feature-spec';
-import { TechStackStatusView } from '@/features/workspace-tech-status';
+import { PortfolioContainer } from '@/features/workspace-portfolio';
 import { LeftSidebar } from '@/features/workspace-aside';
 import {
   VoiceChatBar,
@@ -143,7 +143,6 @@ export default function WorkSpacePage() {
         });
         setNodeListData(nodeListDataMap);
       } catch (error) {
-        console.error('워크스페이스 데이터 로드 실패:', error);
       } finally {
         setIsLoading(false);
       }
@@ -214,7 +213,6 @@ export default function WorkSpacePage() {
         // API 호출 완료 후 사이드바 열기 (nodeDetail이 store에 저장된 상태)
         openSidebar(nodeId);
       } catch (error) {
-        console.error('노드 상세정보 로드 실패:', error);
       }
     } else {
       closeSidebar();
@@ -268,11 +266,11 @@ export default function WorkSpacePage() {
             ))}
 
           {activeTab === 'feature-spec' && (
-            <FeatureSpecView onNodeClick={handleNodeClick} />
+            <FeatureSpecView />
           )}
 
-          {activeTab === 'tech-selection' && (
-            <TechStackStatusView onNodeClick={handleNodeClick} />
+          {activeTab === 'portfolio' && (
+            <PortfolioContainer workspaceId={Number(workspaceId)} />
           )}
         </main>
       </div>
@@ -289,6 +287,7 @@ export default function WorkSpacePage() {
         isVisible={isVoiceChatBarVisible}
         onClose={handleVoiceChatClose}
         workspaceId={workspaceId || 'default'}
+        members={members}
       />
 
       <WorkspaceSettingsDialog

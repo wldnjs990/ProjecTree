@@ -122,19 +122,7 @@ export const handlers = [
       const formData = await request.formData();
 
       // 로그 출력 (개발 중 확인용)
-      console.log('[MSW] 워크스페이스 생성 요청:');
-      console.log('- name:', formData.get('name'));
-      console.log('- description:', formData.get('description'));
-      console.log('- domain:', formData.get('domain'));
-      console.log('- purpose:', formData.get('purpose'));
-      console.log('- serviceType:', formData.get('serviceType'));
-      console.log('- identifierPrefix:', formData.get('identifierPrefix'));
-      console.log('- startDate:', formData.get('startDate'));
-      console.log('- endDate:', formData.get('endDate'));
-      console.log('- memberRoles:', formData.get('memberRoles'));
-      console.log('- specFiles:', formData.getAll('specFiles'));
     } catch (error) {
-      console.error('[MSW] FormData 파싱 실패:', error);
     }
 
     // 로딩 UI 테스트를 위해 3초 지연

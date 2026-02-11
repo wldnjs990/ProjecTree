@@ -1,5 +1,5 @@
 // Workspace store
-export { useWorkspaceStore, useRoomId, useWorkspaceDetail } from './workspaceStore';
+export { useWorkspaceStore, useRoomId, useWorkspaceDetail, useWorkspaceName } from './workspaceStore';
 
 // Node store
 export {
@@ -29,8 +29,13 @@ export {
   useSelectedTechId,
   useSelectedCandidateIds,
   useCandidatePreviewMode,
+  usePreviewKind,
   usePreviewCandidate,
+  useCustomPreviewDraft,
   usePreviewNodePosition,
-  useIsCreatingNode,
+  useCreatingPreviewIds,
+  useIsPreviewCreating,
+  useAiStreamingText,
+  useAiStreamingType,
   type EditableNodeDetail,
 } from './nodeDetailStore';

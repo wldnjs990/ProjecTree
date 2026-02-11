@@ -64,6 +64,8 @@ interface NodeState {
   updateNodeListItem: (nodeId: number, updates: Partial<NodeData>) => void;
   // 확정 데이터 일괄 업데이트 (CRDT 브로드캐스트 수신 시)
   applyConfirmedData: (nodeId: number, data: ConfirmedNodeData) => void;
+  // 노드 관련 데이터 정리 (삭제된 노드의 nodeDetails, nodeListData 제거)
+  cleanupDeletedNodeData: (activeNodeIds: Set<string>) => void;
 
   // 연결 상태
   setConnectionStatus: (status: ConnectionStatus) => void;
@@ -202,6 +204,32 @@ export const useNodeStore = create<NodeState>((set) => ({
             }),
       },
     })),
+
+  // 노드 관련 데이터 정리 (삭제된 노드의 nodeDetails, nodeListData 제거)
+  cleanupDeletedNodeData: (activeNodeIds) =>
+    set((state) => {
+      const newNodeDetails = { ...state.nodeDetails };
+      const newNodeListData = { ...state.nodeListData };
+      let changed = false;
+
+      // nodeDetails에서 삭제된 노드 정리
+      for (const nodeIdStr of Object.keys(newNodeDetails)) {
+        if (!activeNodeIds.has(nodeIdStr)) {
+          delete newNodeDetails[Number(nodeIdStr)];
+          changed = true;
+        }
+      }
+
+      // nodeListData에서 삭제된 노드 정리
+      for (const nodeIdStr of Object.keys(newNodeListData)) {
+        if (!activeNodeIds.has(nodeIdStr)) {
+          delete newNodeListData[Number(nodeIdStr)];
+          changed = true;
+        }
+      }
+
+      return changed ? { nodeDetails: newNodeDetails, nodeListData: newNodeListData } : {};
+    }),
 
   setConnectionStatus: (status) => set({ connectionStatus: status }),
 
