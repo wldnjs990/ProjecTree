@@ -5,7 +5,6 @@ import {
   typeTagStyles,
   useAiStream,
   getAiStreamKey,
-  useSelectedNodeId,
 } from '@/features/workspace-core';
 import type { Candidate } from '@/features/workspace-core';
 import { cn } from '@/shared/lib/utils';
@@ -38,11 +37,8 @@ export default function CandidateNodeContainer({
     ? categoryTagStyles[candidate.taskType]
     : null;
 
-  // AI 스트리밍 상태 (NODE 카테고리, targetId = candidateId)
-  const selectedNodeId = useSelectedNodeId();
-  const streamKey = selectedNodeId
-    ? getAiStreamKey('NODE', selectedNodeId, candidate.id)
-    : null;
+  // AI 스트리밍 상태 (NODE 카테고리, nodeId = candidateId)
+  const streamKey = getAiStreamKey('NODE', candidate.id);
   const streamingText = useAiStream(streamKey);
   const showStreamingText = isCreating && streamingText;
 

@@ -33,3 +33,11 @@ export type {
   NodeDetailData,
   NodeDetailApiResponse,
 } from './nodeDetail';
+
+// CRDT message types
+export type {
+  AiMessageCategory,
+  AiMessagePayload,
+  SaveErrorPayload,
+  CrdtEnvelope,
+} from './crdtMessage';
