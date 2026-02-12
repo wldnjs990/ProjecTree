@@ -1,8 +1,9 @@
 // crdt 클라이언트 생성 모듈
 import { Doc, UndoManager } from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-import type { Awareness } from 'y-protocols/awareness.js';
+import { Awareness } from 'y-protocols/awareness.js';
 import { useNodeStore } from '../stores';
+import { dispatchCrdtMessage } from './dispatcher';
 
 // 모듈 스코프 변수 =====================================================
 // serverUrl
@@ -32,30 +33,49 @@ function setupConnectionListners() {
 
   // 연결 상태 이벤트
   yWebsocket.on('status', ({ status }) => {
-    switch (status) {
-      case 'connected':
-        break;
-      case 'connecting':
-        break;
-      case 'disconnected':
-        break;
-      default:
-        setConnectionStatus(status);
-        break;
+    setConnectionStatus(status);
+
+    if (status === 'connected') {
+      setupMessageListeners();
     }
   });
+
   // ydoc 동기 이벤트
-  yWebsocket.on('sync', () => {});
+  yWebsocket.on('sync', (isSynced: boolean) => {
+    setIsSynced(isSynced);
+  });
 }
 
-// y-websocket 메시지 이벤트 세팅
-function setupMessageListeners() {}
+function setupMessageListeners() {
+  const ws = yWebsocket?.ws;
+  if (!ws) return;
+
+  ws.addEventListener('message', (event: MessageEvent) => {
+    // yjs 바이너리 메시지 분리
+    if (typeof event.data !== 'string') return;
+
+    try {
+      const parsedMessage = JSON.parse(event.data);
+      dispatchCrdtMessage(parsedMessage);
+    } catch {
+      // yjs 문자열 비-JSON 메시지 분리
+      return;
+    }
+  });
+}
+
 
 // y-websocket 생성
 function initWebsocket() {
   if (!workspaceId || !yDoc) return;
   yWebsocket = new WebsocketProvider(serverUrl, workspaceId, yDoc);
   setupConnectionListners();
+}
+
+// awareness 생성
+function initAwareness() {
+  if (!yWebsocket) return;
+  awareness = yWebsocket.awareness;
 }
 
 // undoManager 생성
@@ -81,6 +101,7 @@ const destroyCrdtClient = () => {
   yWebsocket = null;
   undoManager = null;
   yDoc = null;
+  awareness = null;
   workspaceId = null;
 };
 
@@ -95,6 +116,8 @@ const initCrdtClient = (enterWorkspaceId: string) => {
   workspaceId = enterWorkspaceId;
 
   initWebsocket();
+
+  initAwareness();
 
   initUndoManager();
 };

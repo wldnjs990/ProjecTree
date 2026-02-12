@@ -6,7 +6,6 @@ import {
   getAiStreamKey,
   useAiStream,
   useIsPreviewCreating,
-  useNodes,
 } from '@/features/workspace-core';
 import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 import { NodePresenceAvatars } from './nodeParts';
@@ -22,12 +21,8 @@ interface PreviewNodeProps {
 
 export function PreviewNode({ id, data }: PreviewNodeProps) {
   const isCreating = useIsPreviewCreating(id);
-  const nodes = useNodes();
-  const parentId = nodes.find((n) => n.id === id)?.parentId ?? null;
   const candidateId = id.startsWith('preview-') ? id.replace('preview-', '') : null;
-  const streamKey = parentId && candidateId
-    ? getAiStreamKey('NODE', parentId, candidateId)
-    : null;
+  const streamKey = candidateId ? getAiStreamKey('NODE', candidateId) : null;
   const streamingText = useAiStream(streamKey);
   const showStreamingText = isCreating && streamingText;
 

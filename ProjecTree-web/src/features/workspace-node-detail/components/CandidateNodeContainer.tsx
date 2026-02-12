@@ -38,11 +38,9 @@ export default function CandidateNodeContainer({
     ? categoryTagStyles[candidate.taskType]
     : null;
 
-  // AI 스트리밍 상태 (NODE 카테고리, targetId = candidateId)
+  // AI 스트리밍 상태 (NODE 카테고리, nodeId = candidateId)
   const selectedNodeId = useSelectedNodeId();
-  const streamKey = selectedNodeId
-    ? getAiStreamKey('NODE', selectedNodeId, candidate.id)
-    : null;
+  const streamKey = selectedNodeId ? getAiStreamKey('NODE', candidate.id) : null;
   const streamingText = useAiStream(streamKey);
   const showStreamingText = isCreating && streamingText;
 

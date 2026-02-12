@@ -1,5 +1,5 @@
 import { Sparkles, Loader2 } from 'lucide-react';
-import { useAiStreamingText, useAiStreamingType } from '@/features/workspace-core';
+import { useAiStream, getAiStreamKey, useSelectedNodeId } from '@/features/workspace-core';
 import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 
 interface CandidateEmptyStateProps {
@@ -11,11 +11,12 @@ export function CandidateEmptyState({
   onGenerate,
   isGenerating,
 }: CandidateEmptyStateProps) {
-  const streamingText = useAiStreamingText();
-  const streamingType = useAiStreamingType();
+  const selectedNodeId = useSelectedNodeId();
+  const streamKey = selectedNodeId ? getAiStreamKey('CANDIDATE', selectedNodeId) : null;
+  const streamingText = useAiStream(streamKey);
 
   // candidates 타입일 때만 스트리밍 텍스트 표시
-  const showStreamingText = isGenerating && streamingType === 'candidates' && streamingText;
+  const showStreamingText = isGenerating && streamingText;
 
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-3">

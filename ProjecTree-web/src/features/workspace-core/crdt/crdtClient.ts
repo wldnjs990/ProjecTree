@@ -95,22 +95,23 @@ class CrdtClient {
     isComplete?: boolean;
     [key: string]: unknown;
   }) {
-    const { setAiStreamingText, setAiStreamingType, clearAiStreaming } =
+    const { updateAiStream, clearAiStream } =
       useNodeDetailStore.getState();
 
     switch (message.type) {
-      case 'AI_MESSAGE':
+      case 'AI_MESSAGE': {
+        const category = message.streamType === 'candidates' ? 'CANDIDATE'
+          : message.streamType === 'techs' ? 'TECH' : null;
+        const nodeId = message.nodeId;
+        if (!category || nodeId == null) break;
+        const key = `${category}-${nodeId}`;
         if (message.isComplete) {
-          // 스트리밍 완료 시 상태 초기화
-          clearAiStreaming();
+          clearAiStream(key);
         } else if (message.text) {
-          // 스트리밍 텍스트 업데이트
-          setAiStreamingText(message.text as string);
-          if (message.streamType) {
-            setAiStreamingType(message.streamType);
-          }
+          updateAiStream(key, message.text as string);
         }
         break;
+      }
       case 'save_error':
         if (message.action === 'delete_node') {
           toast.error('노드 삭제에 실패했습니다.');
