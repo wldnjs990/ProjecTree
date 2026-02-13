@@ -3,12 +3,13 @@ import NodeHeaderButton from './NodeHeaderButton';
 import {
   categoryTagStyles,
   typeTagStyles,
-  useAiStreamingText,
-  useAiStreamingType,
+  useAiStream,
+  getAiStreamKey,
 } from '@/features/workspace-core';
 import type { Candidate } from '@/features/workspace-core';
 import { cn } from '@/shared/lib/utils';
 import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
+import MarkdownRenderer from '@/shared/components/MarkdownRenderer';
 
 interface CandidateNodeContainerProps {
   candidate: Candidate;
@@ -36,10 +37,10 @@ export default function CandidateNodeContainer({
     ? categoryTagStyles[candidate.taskType]
     : null;
 
-  // AI 스트리밍 상태
-  const streamingText = useAiStreamingText();
-  const streamingType = useAiStreamingType();
-  const showStreamingText = isCreating && streamingType === 'candidates' && streamingText;
+  // AI 스트리밍 상태 (NODE 카테고리, nodeId = candidateId)
+  const streamKey = getAiStreamKey('NODE', candidate.id);
+  const streamingText = useAiStream(streamKey);
+  const showStreamingText = isCreating && streamingText;
 
   return (
     <div className="p-4 space-y-4 pt-6">
@@ -86,9 +87,7 @@ export default function CandidateNodeContainer({
       {/* 설명 섹션 */}
       <div className="rounded-lg border border-[#E2E8F0] p-4 bg-[#FAFAFA]">
         <h4 className="text-sm font-semibold text-[#0B0B0B] mb-2">설명</h4>
-        <p className="text-sm text-[#636363] leading-relaxed whitespace-pre-wrap">
-          {candidate.description || '설명이 없습니다.'}
-        </p>
+        <MarkdownRenderer content={candidate.description} />
       </div>
 
       {/* 요약 섹션 */}
@@ -112,7 +111,10 @@ export default function CandidateNodeContainer({
         </p>
 
         {showStreamingText ? (
-          <AiStreamingCard text={streamingText} className="max-h-40 overflow-y-auto" />
+          <AiStreamingCard
+            text={streamingText}
+            className="max-h-40 overflow-y-auto"
+          />
         ) : (
           <button
             onClick={onConfirm}

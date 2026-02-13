@@ -46,8 +46,8 @@ interface NodeDetailState {
   creatingPreviewIds: Set<string>;
 
   // === AI 스트리밍 상태 ===
-  aiStreamingText: string;
-  aiStreamingType: 'candidates' | 'techs' | null;
+  // key: `${category}-${nodeId}`
+  aiStreams: Record<string, string>;
 
   // === 단순 setter ===
   setSelectedNodeId: (id: string | null) => void;
@@ -60,9 +60,9 @@ interface NodeDetailState {
   addCreatingPreviewId: (previewNodeId: string) => void;
   removeCreatingPreviewId: (previewNodeId: string) => void;
   setPreviewNodePosition: (position: { xpos: number; ypos: number }) => void;
-  setAiStreamingText: (text: string) => void;
-  setAiStreamingType: (type: 'candidates' | 'techs' | null) => void;
-  clearAiStreaming: () => void;
+  updateAiStream: (key: string, content: string) => void;
+  clearAiStream: (key: string) => void;
+  clearAllAiStreams: () => void;
   updateCustomDraft: (
     patch: Partial<{
       name: string;
@@ -112,8 +112,7 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
   creatingPreviewIds: new Set<string>(),
 
   // === AI 스트리밍 초기 상태 ===
-  aiStreamingText: '',
-  aiStreamingType: null,
+  aiStreams: {},
 
   // === 단순 setter ===
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
@@ -134,12 +133,21 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       return { creatingPreviewIds: newSet };
     }),
   setPreviewNodePosition: (position) => set({ previewNodePosition: position }),
-  setAiStreamingText: (text) => set({ aiStreamingText: text }),
-  setAiStreamingType: (type) => set({ aiStreamingType: type }),
-  clearAiStreaming: () => set({ aiStreamingText: '', aiStreamingType: null }),
+  updateAiStream: (key, content) =>
+    set((state) => ({
+      aiStreams: { ...state.aiStreams, [key]: content },
+    })),
+  clearAiStream: (key) =>
+    set((state) => {
+      const { [key]: _, ...rest } = state.aiStreams;
+      return { aiStreams: rest };
+    }),
+  clearAllAiStreams: () => set({ aiStreams: {} }),
   updateCustomDraft: (patch) =>
     set((state) =>
-      state.customDraft ? { customDraft: { ...state.customDraft, ...patch } } : {}
+      state.customDraft
+        ? { customDraft: { ...state.customDraft, ...patch } }
+        : {}
     ),
 
   // === 복합 setter ===
@@ -213,8 +221,7 @@ export const useNodeDetailStore = create<NodeDetailState>((set) => ({
       previewNodePosition: null,
       customDraft: null,
       creatingPreviewIds: new Set<string>(),
-      aiStreamingText: '',
-      aiStreamingType: null,
+      aiStreams: {},
     }),
 }));
 
@@ -278,10 +285,12 @@ export const useIsPreviewCreating = (previewNodeId: string | null) =>
     previewNodeId ? state.creatingPreviewIds.has(previewNodeId) : false
   );
 
-/** AI 스트리밍 텍스트 */
-export const useAiStreamingText = () =>
-  useNodeDetailStore((state) => state.aiStreamingText);
+/** 특정 키의 AI 스트리밍 텍스트 조회 */
+export const useAiStream = (key: string | null) =>
+  useNodeDetailStore((state) => (key ? state.aiStreams[key] ?? '' : ''));
 
-/** AI 스트리밍 타입 */
-export const useAiStreamingType = () =>
-  useNodeDetailStore((state) => state.aiStreamingType);
+/** AI 스트림 키 생성 유틸 */
+export const getAiStreamKey = (
+  category: string,
+  nodeId: string | number
+): string => `${category}-${nodeId}`;

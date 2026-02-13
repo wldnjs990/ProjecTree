@@ -7,9 +7,8 @@ import {
   ArrowLeftRight,
   Loader2,
 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import type { TechRecommendation } from '../types';
+import MarkdownRenderer from '@/shared/components/MarkdownRenderer';
 import { cn } from '@/shared/lib/utils';
 import { Confirm } from '@/shared/components/Confirm';
 import { ConfirmTrigger } from '@/shared/components/ConfirmTrigger';
@@ -22,8 +21,8 @@ import {
   getCrdtClient,
   useSelectedTechId,
   useNodeDetailStore,
-  useAiStreamingText,
-  useAiStreamingType,
+  useAiStream,
+  getAiStreamKey,
 } from '@/features/workspace-core';
 
 interface AITechRecommendSectionProps {
@@ -121,93 +120,7 @@ function TechCard({
 function TechComparisonMarkdown({ comparison }: { comparison: string }) {
   return (
     <div className="space-y-4">
-      <div className="prose prose-sm max-w-none">
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          components={{
-            h2: ({ ...props }) => (
-              <h2
-                className="text-base font-bold text-[#0B0B0B] mt-4 mb-2 first:mt-0"
-                {...props}
-              />
-            ),
-            h3: ({ ...props }) => (
-              <h3
-                className="text-sm font-semibold text-[#0B0B0B] mt-3 mb-2"
-                {...props}
-              />
-            ),
-            h4: ({ ...props }) => (
-              <h4
-                className="text-xs font-semibold text-[#0B0B0B] mt-2 mb-1"
-                {...props}
-              />
-            ),
-            p: ({ ...props }) => (
-              <p
-                className="text-xs text-[#4A4A4A] leading-relaxed mb-2"
-                {...props}
-              />
-            ),
-            ul: ({ ...props }) => (
-              <ul className="list-none space-y-1 mb-2 text-xs" {...props} />
-            ),
-            li: ({ ...props }) => (
-              <li
-                className="text-xs text-[#4A4A4A] leading-relaxed"
-                {...props}
-              />
-            ),
-            table: ({ ...props }) => (
-              <div className="overflow-x-auto mb-3">
-                <table
-                  className="w-full border-collapse border border-[#E2E8F0] text-xs"
-                  {...props}
-                />
-              </div>
-            ),
-            thead: ({ ...props }) => (
-              <thead className="bg-[#F8F9FA]" {...props} />
-            ),
-            th: ({ ...props }) => (
-              <th
-                className="border border-[#E2E8F0] px-2 py-1 text-left text-[10px] font-semibold text-[#0B0B0B]"
-                {...props}
-              />
-            ),
-            td: ({ ...props }) => (
-              <td
-                className="border border-[#E2E8F0] px-2 py-1 text-[10px] text-[#4A4A4A]"
-                {...props}
-              />
-            ),
-            code: ({ className, children, ...props }) => {
-              const isInline = !className;
-              return isInline ? (
-                <code
-                  className="px-1 py-0.5 bg-[#F8F8F8] text-[#C10007] rounded text-[10px] font-mono"
-                  {...props}
-                >
-                  {children}
-                </code>
-              ) : (
-                <code
-                  className="block p-2 bg-[#F8F9FA] rounded text-[10px] font-mono overflow-x-auto mb-2"
-                  {...props}
-                >
-                  {children}
-                </code>
-              );
-            },
-            pre: ({ ...props }) => <pre className="mb-2" {...props} />,
-            strong: ({ ...props }) => (
-              <strong className="font-semibold text-[#0B0B0B]" {...props} />
-            ),
-          }}
-        >
-          {comparison}
-        </ReactMarkdown>
-      </div>
+      <MarkdownRenderer content={comparison} />
     </div>
   );
 }
@@ -279,11 +192,12 @@ function TechEmptyState({
   isGenerating?: boolean;
 }) {
   const isDisabled = isGenerating || !onGenerate;
-  const streamingText = useAiStreamingText();
-  const streamingType = useAiStreamingType();
+  const selectedNodeId = useSelectedNodeId();
+  const streamKey = selectedNodeId ? getAiStreamKey('TECH', selectedNodeId) : null;
+  const streamingText = useAiStream(streamKey);
 
   // techs 타입일 때만 스트리밍 텍스트 표시
-  const showStreamingText = isGenerating && streamingType === 'techs' && streamingText;
+  const showStreamingText = isGenerating && streamingText;
 
   return (
     <div className="flex flex-col items-center justify-center py-6 gap-3">

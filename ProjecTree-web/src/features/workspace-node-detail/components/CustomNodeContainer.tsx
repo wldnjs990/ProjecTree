@@ -3,8 +3,7 @@ import { cn } from '@/shared/lib/utils';
 import NodeHeaderButton from './NodeHeaderButton';
 import { categoryTagStyles, typeTagStyles } from '@/features/workspace-core';
 import type { NodeType, TaskType } from '@/features/workspace-core';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import MarkdownRenderer from '@/shared/components/MarkdownRenderer';
 
 interface CustomNodeContainerProps {
   draft: {
@@ -107,14 +106,7 @@ export default function CustomNodeContainer({
         <div className="rounded-md border border-[#E2E8F0] bg-white px-3 py-2">
           <div className="text-xs text-[#636363] mb-2">미리보기</div>
           <div className="prose prose-sm max-w-none text-[#0B0B0B]">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                img: () => null,
-              }}
-            >
-              {draft.description || '_미리보기 내용이 없습니다._'}
-            </ReactMarkdown>
+            <MarkdownRenderer content={draft.description} />
           </div>
         </div>
       </div>

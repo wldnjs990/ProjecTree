@@ -14,8 +14,8 @@ import {
   calculateChildNodePosition,
   useSelectedCandidateIds,
   usePreviewNodes,
-  useAiStreamingText,
-  useAiStreamingType,
+  useAiStream,
+  getAiStreamKey,
 } from '@/features/workspace-core';
 import { SubNodeCard } from './SubNodeCard';
 import { CandidateEmptyState } from './CandidateEmptyState';
@@ -50,12 +50,11 @@ export function AINodeCandidateSection({
   const nodes = useNodes();
   const selectedCandidateIds = useSelectedCandidateIds();
   const previewNodes = usePreviewNodes();
-  const streamingText = useAiStreamingText();
-  const streamingType = useAiStreamingType();
+  const streamKey = selectedNodeId ? getAiStreamKey('CANDIDATE', selectedNodeId) : null;
+  const streamingText = useAiStream(streamKey);
 
   // candidates 타입일 때만 스트리밍 텍스트 표시
-  const showStreamingText =
-    isGenerating && streamingType === 'candidates' && streamingText;
+  const showStreamingText = isGenerating && streamingText;
 
   const lockedCandidateIds = new Set(
     previewNodes
