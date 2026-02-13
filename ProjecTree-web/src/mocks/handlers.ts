@@ -116,15 +116,7 @@ export const handlers = [
   }), // <--- 콤마(,) 필수: 다음 핸들러와 구분하기 위해 꼭 필요합니다.
 
   // [POST] 워크스페이스 생성 (백엔드 명세서 기준)
-  http.post('*/workspaces', async ({ request }) => {
-    try {
-      // FormData 파싱
-      const formData = await request.formData();
-
-      // 로그 출력 (개발 중 확인용)
-    } catch (error) {
-    }
-
+  http.post('*/workspaces', async ({}) => {
     // 로딩 UI 테스트를 위해 3초 지연
     await delay(3000);
 

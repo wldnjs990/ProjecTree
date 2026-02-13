@@ -36,8 +36,6 @@ class ChatSocketService {
     if (this.socket?.connected) {
       // 🔍 이미 연결된 소켓이 있어도 onAny 리스너 확인 및 등록
       if (!this.onAnyRegistered) {
-        this.socket.onAny((eventName, ...args) => {
-        });
         this.onAnyRegistered = true;
       }
       return this.socket;
@@ -56,11 +54,8 @@ class ChatSocketService {
 
     // 🔧 연결 이벤트 리스너 등록 (한 번만!)
     this.socket.on('connect', () => {
-
       // 재연결 시 onAny 리스너 재등록
       if (!this.onAnyRegistered && this.socket) {
-        this.socket.onAny((eventName, ...args) => {
-        });
         this.onAnyRegistered = true;
       }
 
@@ -76,7 +71,7 @@ class ChatSocketService {
       }
     });
 
-    this.socket.on('disconnect', (reason) => {
+    this.socket.on('disconnect', () => {
       this.onAnyRegistered = false; // 연결 끊기면 플래그 리셋
 
       // 연결 상태 콜백 호출
@@ -84,11 +79,9 @@ class ChatSocketService {
     });
 
     this.socket.on('connect_error', (error) => {
+      console.error(error);
     });
 
-    // 🔍 디버깅: 모든 이벤트 로깅 (초기 연결)
-    this.socket.onAny((eventName, ...args) => {
-    });
     this.onAnyRegistered = true; // 등록 완료 플래그 설정
 
     return this.socket;
@@ -125,7 +118,6 @@ class ChatSocketService {
     if (!this.socket || !this.socket.connected) {
       return;
     }
-
 
     // 백엔드 스펙: chatRoomId 사용
     this.socket.emit('message:send', {

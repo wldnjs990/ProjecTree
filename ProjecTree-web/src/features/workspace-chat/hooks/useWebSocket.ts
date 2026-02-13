@@ -185,14 +185,11 @@ export const useWebSocket = (workspaceId: string | null) => {
     };
 
     const handleChatHistory = (data: any) => {
-
       if (Array.isArray(data)) {
-
         const messages = data.map((item) => mapToChatMessage(item));
 
         // 🎯 전체 메시지를 한 번에 설정 (배포 환경 안정성 향상)
         useChatStore.getState().setMessages(workspaceId, messages);
-
 
         // 히스토리 로드 완료 플래그 설정
         useChatStore.getState().setPaginationState({
@@ -222,7 +219,8 @@ export const useWebSocket = (workspaceId: string | null) => {
 
     // 에러 처리
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleError = (error: any) => {
+    const handleError = (error: Error) => {
+      console.error(error);
     };
 
     // 🎯 1단계: 이벤트 리스너 먼저 등록 (chat:history 이벤트를 놓치지 않기 위해)

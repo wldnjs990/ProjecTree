@@ -7,7 +7,7 @@ export default function NodeHeaderButton({
   disabled = false,
 }: {
   children: ReactElement;
-  onClick: () => void;
+  onClick?: () => void;
   disabled?: boolean;
 }) {
   return (
@@ -16,9 +16,7 @@ export default function NodeHeaderButton({
       disabled={disabled}
       className={cn(
         'p-1 rounded-md transition-colors',
-        disabled
-          ? 'opacity-50 cursor-not-allowed'
-          : 'hover:bg-gray-100'
+        disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'
       )}
     >
       {children}

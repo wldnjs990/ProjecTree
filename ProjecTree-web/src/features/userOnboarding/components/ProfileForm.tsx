@@ -59,6 +59,7 @@ export function ProfileForm() {
         setEmail(info.email);
       })
       .catch((err) => {
+        console.error(err);
       });
   }, [accessToken, navigate]);
 

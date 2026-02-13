@@ -8,7 +8,7 @@ interface ConfirmTriggerProps {
   asChild?: boolean;
 }
 export const ConfirmTrigger = forwardRef<
-  HTMLElement,
+  HTMLButtonElement,
   ConfirmTriggerProps
 >(({ children, className, asChild = false, ...props }, ref) => {
   const Comp = asChild ? Slot : 'button';
