@@ -1,4 +1,4 @@
-import { wasApiClient } from '@/apis/client';
+import { wasApiClient } from '@/shared/lib/axiosClient';
 import type { AccessTokenPayload } from './types';
 
 /**

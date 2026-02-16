@@ -1,5 +1,5 @@
 import type { ApiResponse } from './types';
-import wasApiClient from './client';
+import wasApiClient from '../shared/lib/axiosClient';
 
 interface CreateNodeBody {
   xpos: number;

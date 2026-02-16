@@ -21,7 +21,9 @@ interface PreviewNodeProps {
 
 export function PreviewNode({ id, data }: PreviewNodeProps) {
   const isCreating = useIsPreviewCreating(id);
-  const candidateId = id.startsWith('preview-') ? id.replace('preview-', '') : null;
+  const candidateId = id.startsWith('preview-')
+    ? id.replace('preview-', '')
+    : null;
   const streamKey = candidateId ? getAiStreamKey('NODE', candidateId) : null;
   const streamingText = useAiStream(streamKey);
   const showStreamingText = isCreating && streamingText;
@@ -29,7 +31,7 @@ export function PreviewNode({ id, data }: PreviewNodeProps) {
   return (
     <div
       className={cn(
-        'relative rounded-2xl p-3 w-[180px]',
+        'relative rounded-2xl p-3 w-45',
         'border-2 border-dashed',
         isCreating
           ? 'border-[#1C69E3] bg-[rgba(28,105,227,0.08)] shadow-[0_0_20px_rgba(28,105,227,0.4)]'
@@ -71,7 +73,7 @@ export function PreviewNode({ id, data }: PreviewNodeProps) {
             <AiStreamingCard
               text={streamingText}
               compact
-              className="w-full max-w-[160px]"
+              className="w-full max-w-40"
             />
           ) : (
             <div className="flex flex-col items-center gap-2">

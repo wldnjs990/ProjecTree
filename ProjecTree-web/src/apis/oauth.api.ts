@@ -1,6 +1,6 @@
 import { useUserStore } from '@/shared/stores/userStore';
 import type { AccessTokenPayload, ApiResponse } from './types';
-import wasApiClient from './client';
+import wasApiClient from '../shared/lib/axiosClient';
 import { useAuthStore } from '@/shared/stores/authStore';
 
 const redirectURL = `${window.location.origin}/oauth/callback`;

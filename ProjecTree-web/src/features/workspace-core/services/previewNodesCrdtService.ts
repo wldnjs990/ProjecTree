@@ -27,7 +27,7 @@ export const previewNodesCrdtService = {
       yNode.set('parentId', yjsNode.parentId);
       yNode.set('position', yjsNode.position);
       yNode.set('data', yjsNode.data);
-      const lockedBy = (yjsNode.data as { lockedBy?: unknown })?.lockedBy;
+      const lockedBy = yjsNode.data.lockedBy;
       if (typeof lockedBy === 'string' && lockedBy.length > 0) {
         yNode.set('lockedBy', lockedBy);
       }
@@ -79,9 +79,19 @@ export const previewNodesCrdtService = {
     const yPreviewNodes = client.getYMap<Y.Map<YNodeValue>>('previewNodes');
     client.yDoc.transact(() => {
       yPreviewNodes.forEach((yNode, nodeId) => {
-        const lockedBy =
-          (yNode.get('lockedBy') as string | undefined) ??
-          ((yNode.get('data') as { lockedBy?: string } | undefined)?.lockedBy);
+        const rawLockedBy = yNode.get('lockedBy');
+        const fromField = typeof rawLockedBy === 'string' ? rawLockedBy : null;
+
+        const rawData = yNode.get('data');
+        const fromData =
+          typeof rawData === 'object' &&
+          rawData !== null &&
+          'lockedBy' in rawData &&
+          typeof rawData.lockedBy === 'string'
+            ? rawData.lockedBy
+            : null;
+
+        const lockedBy = fromField ?? fromData;
         if (lockedBy === ownerId) {
           yPreviewNodes.delete(nodeId);
         }

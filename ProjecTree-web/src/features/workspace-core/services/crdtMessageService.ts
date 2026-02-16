@@ -3,22 +3,6 @@ import { getAiStreamKey } from '../stores';
 import { useNodeDetailStore } from '../stores/nodeDetailStore';
 import type { AiMessageCategory, AiMessagePayload } from '../types/crdtMessage';
 
-type FlatAiMessage = {
-  type: 'AI_MESSAGE';
-  nodeId?: unknown;
-  text?: unknown;
-  content?: unknown;
-  category?: unknown;
-  streamType?: unknown;
-  isComplete?: unknown;
-};
-
-type FlatSaveError = {
-  type: 'save_error' | 'SAVE_ERROR';
-  action?: unknown;
-  payload?: unknown;
-};
-
 function toNumber(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value === 'string' && value.trim() !== '') {
@@ -70,17 +54,16 @@ function handleAiMessage(message: Record<string, unknown>) {
     return;
   }
 
-  const flat = message as FlatAiMessage;
-  const nodeId = toNumber(flat.nodeId);
-  const category = isCategory(flat.category)
-    ? flat.category
-    : normalizeStreamType(flat.streamType);
-  const text = typeof flat.text === 'string'
-    ? flat.text
-    : typeof flat.content === 'string'
-      ? flat.content
+  const nodeId = toNumber(message.nodeId);
+  const category = isCategory(message.category)
+    ? message.category
+    : normalizeStreamType(message.streamType);
+  const text = typeof message.text === 'string'
+    ? message.text
+    : typeof message.content === 'string'
+      ? message.content
       : null;
-  const isComplete = flat.isComplete === true;
+  const isComplete = message.isComplete === true;
 
   if (!category || nodeId == null) return;
 
@@ -94,7 +77,7 @@ function handleAiMessage(message: Record<string, unknown>) {
   }
 }
 
-function handleSaveError(message: FlatSaveError) {
+function handleSaveError(message: Record<string, unknown>) {
   const payload = isRecord(message.payload) ? message.payload : null;
   const action = typeof message.action === 'string'
     ? message.action
@@ -121,6 +104,6 @@ export function processCrdtMessage(message: unknown): void {
     return;
   }
   if (message.type === 'save_error' || message.type === 'SAVE_ERROR') {
-    handleSaveError(message as FlatSaveError);
+    handleSaveError(message);
   }
 }

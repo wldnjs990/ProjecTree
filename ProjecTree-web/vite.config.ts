@@ -17,12 +17,12 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://i14d107.p.ssafy.io',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },
       '/livekit': {
-        target: 'https://i14d107.p.ssafy.io',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         ws: true,
         secure: false,

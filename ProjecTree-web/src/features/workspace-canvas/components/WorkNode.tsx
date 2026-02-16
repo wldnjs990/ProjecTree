@@ -8,10 +8,7 @@ import {
   NodeTitle,
   PriorityBadgeSlot,
 } from './nodeParts';
-import {
-  getWorkNodeRenderState,
-  type WorkNodeKind,
-} from './workNodeVariants';
+import { getWorkNodeRenderState, type WorkNodeKind } from './workNodeVariants';
 
 interface WorkNodeProps {
   id: string;
@@ -41,7 +38,7 @@ export function WorkNode({ id, data, selected, nodeType }: WorkNodeProps) {
 
   return (
     <div
-      className={`relative rounded-2xl border-2 shadow-md p-3 w-[180px] ${renderState.containerClass}`}
+      className={`relative rounded-2xl border-2 shadow-md p-3 w-45 ${renderState.containerClass}`}
     >
       <PriorityBadgeSlot priority={data.priority} />
       <NodePresenceAvatars nodeId={id} />

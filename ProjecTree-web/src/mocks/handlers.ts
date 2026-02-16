@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from 'msw';
-import { workspaces as mockWorkspaces } from '@/features/workspaceLounge/data/mockData';
+import { workspaces as mockWorkspaces } from '@/features/workspace-lounge/data/mockData';
 import {
   mockFetchMessages,
   getMockParticipants,

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   LoungeSidebar,
   WorkspaceContent,
   type FilterType,
-} from "@/features/workspaceLounge";
+} from '@/features/workspace-lounge';
 
 /**
  * [페이지] 워크스페이스 라운지 메인 페이지
@@ -15,14 +15,14 @@ export default function WorkspaceLoungePage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // 필터링 상태 관리 ('all' | 'mine' | 'joined')
-  const [filterType, setFilterType] = useState<FilterType>("all");
+  const [filterType, setFilterType] = useState<FilterType>('all');
 
   return (
     <div className="flex h-screen bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-green-50 via-zinc-50 to-[var(--figma-forest-bg)]/30 overflow-hidden">
       {/* 1. 좌측 사이드바: 네비게이션 및 프로필 설정 */}
       <LoungeSidebar
         collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(prev => !prev)}
+        onToggle={() => setSidebarCollapsed((prev) => !prev)}
         currentFilter={filterType}
         onFilterChange={setFilterType}
       />

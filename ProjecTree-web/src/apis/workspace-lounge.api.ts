@@ -1,4 +1,4 @@
-import { wasApiClient } from '@/apis/client';
+import { wasApiClient } from '@/shared/lib/axiosClient';
 
 /**
  * [타입] 워크스페이스 진행률 정보

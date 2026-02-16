@@ -6,7 +6,7 @@ import type {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import type { AccessTokenPayload, ApiResponse } from './types';
+import type { AccessTokenPayload, ApiResponse } from '../../apis/types';
 
 const BASE_URL = import.meta.env.DEV ? '/api/' : import.meta.env.VITE_API_URL;
 const MAX_RETRY = 3;

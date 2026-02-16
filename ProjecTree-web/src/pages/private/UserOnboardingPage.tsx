@@ -1,4 +1,4 @@
-import { BrandPanel, ProfileForm } from '@/features/userOnboarding';
+import { BrandPanel, ProfileForm } from '@/features/user-onboarding';
 
 export default function UserOnboardingPage() {
   return (

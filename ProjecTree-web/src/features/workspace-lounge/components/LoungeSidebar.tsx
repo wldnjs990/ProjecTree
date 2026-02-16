@@ -410,8 +410,8 @@ export function LoungeSidebar({
   }
 
   // user 확정 - 닉네임, 이메일 직접 사용
-  const nickname = user.nickname;
-  const email = user.email;
+  const nickname = user.nickname ?? '';
+  const email = user.email ?? '';
   const initialLetter = nickname?.trim().charAt(0) || '?';
   const toggleLabel = collapsed ? '사이드바 열기' : '사이드바 닫기';
   const tooltipSide = collapsed ? 'right' : 'bottom';
