@@ -1,0 +1,53 @@
+package com.ssafy.projectree.domain.node.model.entity;
+
+import com.ssafy.projectree.global.model.entity.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@SQLDelete(sql = "UPDATE candidate SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
+public class Candidate extends BaseEntity {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "node_id", nullable = false)
+	private Node parent;
+
+	@OneToOne
+	@JoinColumn(name = "derivation_node_id", nullable = true)
+	private Node derivationNode;
+
+	@Column(columnDefinition = "VARCHAR(100)")
+	private String name;
+
+	@Column(columnDefinition = "TEXT")
+	private String description;
+
+	@Column(columnDefinition = "VARCHAR(60)")
+	private String summary;
+
+	private boolean isSelected;
+
+}
