@@ -1,4 +1,4 @@
-import type { MemberInfoResponse } from '@/apis/member.api';
+import type { MemberInfoResponse } from '@/apis';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 

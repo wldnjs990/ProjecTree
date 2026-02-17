@@ -21,8 +21,8 @@ import { toast } from 'sonner';
 import type { OnlineUser } from '../types';
 import { UserAvatar } from '@/shared/components/UserAvatar';
 import { useWorkspaceDetail, useWorkspaceStore } from '@/features/workspace-core/stores/workspaceStore';
-import { inviteMember, changeMemberRole, type TeamRoleType } from '@/apis/team.api';
-import { getWorkspaceDetail } from '@/apis/workspace.api';
+import { inviteMember, changeMemberRole, getWorkspaceDetail } from '@/apis';
+import type { TeamRoleType } from '@/apis';
 
 interface MemberManagementModalProps {
     open: boolean;

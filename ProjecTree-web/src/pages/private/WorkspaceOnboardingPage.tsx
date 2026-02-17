@@ -13,8 +13,8 @@ import {
   Step7Loading,
   ONBOARDING_TEXTS,
 } from '@/features/workspace-onboarding';
-import { createWorkspace } from '@/apis/workspace.api';
-import type { Role, TechStackItem } from '@/apis/workspace.api';
+import { createWorkspace } from '@/apis';
+import type { Role, TechStackItem } from '@/apis';
 import logoImage from '@/assets/images/logo2.png';
 
 export default function WorkspaceOnboardingPage() {

@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Role } from '@/apis/workspace.api';
+import type { Role } from '@/apis';
 
 interface Step5TeamInviteProps {
   data: {

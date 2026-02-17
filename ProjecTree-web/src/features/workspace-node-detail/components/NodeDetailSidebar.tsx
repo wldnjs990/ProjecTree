@@ -25,7 +25,7 @@ import NodeDetailContainer from './NodeDetailContainer';
 import NodeDescriptionMarkdown from './NodeDescriptionMarkdown';
 import { useCallback, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { postCreateCustomNode, postCreateNode } from '@/apis/node.api';
+import { postCreateCustomNode, postCreateNode } from '@/apis';
 
 import * as Y from 'yjs';
 

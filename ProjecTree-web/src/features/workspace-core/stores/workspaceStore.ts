@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { WorkspaceDetailData } from '@/apis/workspace.api';
+import type { WorkspaceDetailData } from '@/apis';
 
 interface WorkspaceState {
   roomId: string | null;

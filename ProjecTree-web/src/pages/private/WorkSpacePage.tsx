@@ -5,7 +5,7 @@ import {
   getWorkspaceTree,
   getNodeDetail,
   getWorkspaceDetail,
-} from '@/apis/workspace.api';
+} from '@/apis';
 import {
   Header,
   type ViewTab,

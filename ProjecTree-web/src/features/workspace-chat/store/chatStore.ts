@@ -5,7 +5,7 @@ import type {
   ChatParticipant,
 } from '../types/chat.types';
 import { CHAT_PAGINATION_CONFIG } from '../types/mockData';
-import { fetchMessages } from '@/apis/chat.api';
+import { fetchMessages } from '@/apis';
 
 export const useChatStore = create<ChatState>((set, get) => ({
   messages: {},

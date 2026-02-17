@@ -1,6 +1,5 @@
 // React 예시 (OAuthCallback.jsx)
-import { getMemberInfo } from '@/apis/member.api';
-import { getToken } from '@/apis/oauth.api';
+import { getMemberInfo, getToken } from '@/apis';
 import { useSetAccessToken } from '@/shared/stores/authStore';
 import { useSetUser } from '@/shared/stores/userStore';
 import { useEffect } from 'react';

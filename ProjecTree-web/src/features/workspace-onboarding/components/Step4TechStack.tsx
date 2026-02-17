@@ -3,8 +3,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
-import { getTechStacks } from '@/apis/workspace.api';
-import type { TechStackItem } from '@/apis/workspace.api';
+import { getTechStacks } from '@/apis';
+import type { TechStackItem } from '@/apis';
 
 interface Step4TechStackProps {
   data: {

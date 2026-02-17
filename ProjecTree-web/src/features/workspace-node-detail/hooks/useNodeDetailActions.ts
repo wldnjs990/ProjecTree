@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import * as Y from 'yjs';
-import { generateNodeCandidates } from '@/apis/workspace.api';
 import {
+  generateNodeCandidates,
   getAiNodeTechRecommendation,
   postCustomNodeTechRecommendation,
-} from '@/apis/node.api';
+} from '@/apis';
 import {
   calculateChildNodePosition,
   getChildNodeType,

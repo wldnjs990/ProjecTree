@@ -14,7 +14,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { getMyWorkspaces, type WorkspaceCardData } from '@/apis/workspace-lounge.api';
+import { getMyWorkspaces } from '@/apis';
+import type { WorkspaceCardData } from '@/apis';
 import { useWorkspaceStore } from '@/features/workspace-core';
 import type { ProjectDropdownProps } from '../types';
 

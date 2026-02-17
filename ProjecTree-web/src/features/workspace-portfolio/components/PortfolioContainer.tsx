@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Loader2, AlertCircle, FileText, ClipboardList } from 'lucide-react';
-import { getPortfolio, generatePortfolio, updatePortfolio } from '@/apis/portfolio.api';
+import { getPortfolio, generatePortfolio, updatePortfolio } from '@/apis';
 import { PortfolioSkeleton } from './PortfolioSkeleton';
 import { PortfolioViewer } from './PortfolioViewer';
 import { PortfolioEditor } from './PortfolioEditor';

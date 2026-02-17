@@ -12,7 +12,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { patchMemberSignup, getMemberInfo } from '@/apis/member.api';
+import { patchMemberSignup, getMemberInfo } from '@/apis';
 import { useSetAccessToken, useAccessToken } from '@/shared/stores/authStore';
 import { useSetUser } from '@/shared/stores/userStore';
 import { parseJwt } from '@/shared/lib/utils';

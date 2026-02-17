@@ -7,8 +7,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { getTechStacks } from '@/apis/workspace.api';
-import type { TechStackItem } from '@/apis/workspace.api';
+import { getTechStacks } from '@/apis';
+import type { TechStackItem } from '@/apis';
 
 interface CustomTechAddDialogProps {
   isOpen: boolean;

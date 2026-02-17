@@ -22,12 +22,8 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
-import {
-  updateWorkspace,
-  getTechStacks,
-  type WorkspaceDetailData,
-  type TechStackItem,
-} from '@/apis/workspace.api';
+import { updateWorkspace, getTechStacks } from '@/apis';
+import type { WorkspaceDetailData, TechStackItem } from '@/apis';
 import { cn } from '@/shared/lib/utils';
 
 interface WorkspaceSettingsDialogProps {

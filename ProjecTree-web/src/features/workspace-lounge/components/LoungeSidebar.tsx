@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useUserStore, useUpdateNickname } from '@/shared/stores/userStore';
-import { updateNickname } from '@/apis/member.api';
-import { logout } from '@/apis/oauth.api';
+import { updateNickname, logout } from '@/apis';
 import {
   Dialog,
   DialogContent,

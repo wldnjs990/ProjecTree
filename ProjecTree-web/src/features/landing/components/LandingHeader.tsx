@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/shared/stores/authStore';
-import { logout } from '@/apis/oauth.api';
+import { logout } from '@/apis';
 import logoImage from '@/assets/images/logo.png';
 
 export function LandingHeader() {

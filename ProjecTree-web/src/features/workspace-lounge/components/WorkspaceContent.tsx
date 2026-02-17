@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Plus, Loader2, Layers, HelpCircle } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
 import type { FilterType } from '../types';
-import { getMyWorkspaces } from '@/apis/workspace-lounge.api';
+import { getMyWorkspaces } from '@/apis';
 import { TutorialModal } from '@/shared/components/TutorialModal';
 
 interface ContentProps {

@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { useWebSocket } from './useWebSocket';
 import { chatSocket } from '../services/chatSocket';
-// import { fetchMessages, fetchParticipants } from '@/apis/chat.api';
 import { useUserStore } from '@/shared/stores/userStore';
 import { useWorkspaceStore } from '@/features/workspace-core';
 import { useAuthStore } from '@/shared/stores/authStore';
@@ -39,8 +38,7 @@ export const useChat = (workspaceId: string) => {
               id: Number(extractedId),
             });
           }
-        } catch (e) {
-        }
+        } catch (e) {}
       }
     }
   }, []);
@@ -134,7 +132,6 @@ export const useChat = (workspaceId: string) => {
         return;
       }
 
-
       // chatRoomId 설정
       let chatRoomId = '';
       if (workspaceDetail.teamInfo?.chatRoomId) {
@@ -190,7 +187,6 @@ export const useChat = (workspaceId: string) => {
 
       const memberInfos = workspaceDetail?.teamInfo?.memberInfos;
       if (memberInfos) {
-
         const mappedParticipants: any[] = memberInfos.map((m: any) => {
           // Safety check for ID
           const rawId = m.memberId || m.member_id || m.id;
