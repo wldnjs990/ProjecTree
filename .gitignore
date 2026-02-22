@@ -1,0 +1,14 @@
+# ── 환경변수 (시크릿) ──
+.env
+!.env.example
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── IDE ──
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr

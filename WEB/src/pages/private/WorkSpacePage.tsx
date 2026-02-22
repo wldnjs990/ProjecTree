@@ -1,11 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Node, Edge } from '@xyflow/react';
 import { useParams } from 'react-router';
-import {
-  getWorkspaceTree,
-  getNodeDetail,
-  getWorkspaceDetail,
-} from '@/apis';
+import { getWorkspaceTree, getNodeDetail, getWorkspaceDetail } from '@/apis';
 import {
   Header,
   type ViewTab,
@@ -35,7 +31,7 @@ import {
   useNodeDetailCrdtObservers,
 } from '@/features/workspace-core';
 import { useUserStore } from '@/shared/stores/userStore';
-import { getAvatarColor } from '@/shared/lib/utils';
+import { getAvatarColor } from '@/shared/libs/utils';
 import { useNodeDetailEdit } from '@/features/workspace-node-detail';
 import { useMemo } from 'react';
 
@@ -85,20 +81,24 @@ export default function WorkSpacePage() {
 
   // 멤버 목록 가공 (API 데이터 -> UI 데이터)
   const members = useMemo<OnlineUser[]>(() => {
-    return workspaceDetail?.teamInfo?.memberInfos?.map((member) => ({
-      id: String(member.memberId || member.id),
-      name: member.name || 'Unknown',
-      nickname: member.nickname || member.name || 'Unknown',
-      initials: (
-        member.nickname?.[0] ||
-        member.name?.[0] ||
-        'U'
-      ).toUpperCase(),
-      color: getAvatarColor(member.memberId || member.id || member.email || '0'),
-      isOnline: member.email === user?.email, // 나 자신만 온라인
-      role: member.role,
-      isMe: member.email === user?.email,
-    })) || [];
+    return (
+      workspaceDetail?.teamInfo?.memberInfos?.map((member) => ({
+        id: String(member.memberId || member.id),
+        name: member.name || 'Unknown',
+        nickname: member.nickname || member.name || 'Unknown',
+        initials: (
+          member.nickname?.[0] ||
+          member.name?.[0] ||
+          'U'
+        ).toUpperCase(),
+        color: getAvatarColor(
+          member.memberId || member.id || member.email || '0'
+        ),
+        isOnline: member.email === user?.email, // 나 자신만 온라인
+        role: member.role,
+        isMe: member.email === user?.email,
+      })) || []
+    );
   }, [workspaceDetail, user]);
 
   // 노드 상세 편집 Hook
@@ -204,7 +204,6 @@ export default function WorkSpacePage() {
 
   // 노드 클릭 시 상세정보 API 호출
   const handleNodeClick = async (nodeId: string) => {
-
     if (!selectedNodeId || selectedNodeId !== nodeId) {
       // 노드 상세정보 API 호출 후 사이드바 열기
       try {
@@ -212,8 +211,7 @@ export default function WorkSpacePage() {
         updateNodeDetail(Number(nodeId), nodeDetail);
         // API 호출 완료 후 사이드바 열기 (nodeDetail이 store에 저장된 상태)
         openSidebar(nodeId);
-      } catch (error) {
-      }
+      } catch (error) {}
     } else {
       closeSidebar();
     }
@@ -265,9 +263,7 @@ export default function WorkSpacePage() {
               </div>
             ))}
 
-          {activeTab === 'feature-spec' && (
-            <FeatureSpecView />
-          )}
+          {activeTab === 'feature-spec' && <FeatureSpecView />}
 
           {activeTab === 'portfolio' && (
             <PortfolioContainer workspaceId={Number(workspaceId)} />

@@ -1,6 +1,6 @@
 import type { Node } from '@xyflow/react';
 import type { NodeData, NodeDetailData } from '../types/nodeDetail';
-import { getAvatarColor } from '@/shared/lib/utils';
+import { getAvatarColor } from '@/shared/libs/utils';
 
 /**
  * 노드 타입을 계층 레벨로 매핑
@@ -37,7 +37,7 @@ function mapStatus(status: string): 'TODO' | 'IN_PROGRESS' | 'DONE' {
 export function transformNodesForSpecView(
   nodes: Node[],
   nodeDetails?: Record<number, NodeDetailData>,
-  nodeListData?: Record<number, NodeData>,
+  nodeListData?: Record<number, NodeData>
 ) {
   return nodes.map((node) => {
     const nodeId = Number(node.id);
@@ -47,7 +47,11 @@ export function transformNodesForSpecView(
       ? {
           id: assignee.id,
           name: assignee.name || assignee.nickname || '',
-          initials: (assignee.nickname?.[0] || assignee.name?.[0] || 'U').toUpperCase(),
+          initials: (
+            assignee.nickname?.[0] ||
+            assignee.name?.[0] ||
+            'U'
+          ).toUpperCase(),
           color: getAvatarColor(assignee.id),
         }
       : undefined;
@@ -59,7 +63,9 @@ export function transformNodesForSpecView(
         label: node.data.title || '',
         level: getNodeLevel(node.type ?? 'ADVANCE'),
         complexity: listItem?.difficult ?? node.data.difficult,
-        status: mapStatus((listItem?.status ?? node.data.status as string) ?? 'TODO'),
+        status: mapStatus(
+          listItem?.status ?? (node.data.status as string) ?? 'TODO'
+        ),
         priority: listItem?.priority || node.data.priority || 'P2',
         assignee: specAssignee,
       },

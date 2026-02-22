@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { ChevronDown, CheckSquare, Pin } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import type { Node } from '@xyflow/react';
 import { UserAvatar } from '@/shared/components/UserAvatar';
 import { TruncatedLabel } from './TruncatedLabel';
@@ -52,10 +52,7 @@ export function TaskGroup({ task, advanceds }: TaskGroupProps) {
         ) : (
           <span className="w-4" />
         )}
-        <CheckSquare
-          className="w-4 h-4 text-sky-600"
-          aria-hidden="true"
-        />
+        <CheckSquare className="w-4 h-4 text-sky-600" aria-hidden="true" />
         <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-sky-100 text-sky-700">
           태스크
         </span>
@@ -78,7 +75,10 @@ export function TaskGroup({ task, advanceds }: TaskGroupProps) {
       </div>
       <div className="flex justify-center">
         <Badge
-          className={cn('text-xs font-normal w-12 justify-center border', statusBadge[data.status])}
+          className={cn(
+            'text-xs font-normal w-12 justify-center border',
+            statusBadge[data.status]
+          )}
         >
           {statusLabel[data.status]}
         </Badge>
@@ -91,9 +91,7 @@ export function TaskGroup({ task, advanceds }: TaskGroupProps) {
                 key={star}
                 className={cn(
                   'text-xs',
-                  star <= data.complexity!
-                    ? 'text-yellow-500'
-                    : 'text-gray-300'
+                  star <= data.complexity! ? 'text-yellow-500' : 'text-gray-300'
                 )}
               >
                 ★
@@ -120,7 +118,9 @@ export function TaskGroup({ task, advanceds }: TaskGroupProps) {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        ) : <span className="text-xs text-gray-400">미정</span>}
+        ) : (
+          <span className="text-xs text-gray-400">미정</span>
+        )}
       </div>
     </div>
   );
@@ -156,10 +156,7 @@ export function TaskGroup({ task, advanceds }: TaskGroupProps) {
                 className={cn('flex items-center gap-2', indentLevel.ADVANCE)}
               >
                 <div className="w-4" />
-                <Pin
-                  className="w1-4 h-4 text-gray-500"
-                  aria-hidden="true"
-                />
+                <Pin className="w1-4 h-4 text-gray-500" aria-hidden="true" />
                 <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
                   어드밴스
                 </span>
@@ -227,7 +224,9 @@ export function TaskGroup({ task, advanceds }: TaskGroupProps) {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                ) : <span className="text-xs text-gray-400">미정</span>}
+                ) : (
+                  <span className="text-xs text-gray-400">미정</span>
+                )}
               </div>
             </div>
           );

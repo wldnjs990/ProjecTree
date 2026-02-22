@@ -1,4 +1,4 @@
-import { wasApiClient } from '@/shared/lib/axiosClient';
+import { wasApiClient } from '@/shared/libs/axiosClient';
 import type { ApiNode, NodeDetailData } from '@/features/workspace-core';
 
 // ===== 워크스페이스 트리 조회 =====

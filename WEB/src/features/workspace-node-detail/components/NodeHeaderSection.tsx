@@ -7,7 +7,7 @@ import {
   FileText,
   Trash2,
 } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import NodeHeaderButton from './NodeHeaderButton';
 import NodeHeaderInfo from './NodeHeaderInfo';
 import { categoryTagStyles, typeTagStyles } from '@/features/workspace-core';

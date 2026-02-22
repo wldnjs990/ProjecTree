@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { ChevronDown, Notebook } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import type { Node } from '@xyflow/react';
 import { UserAvatar } from '@/shared/components/UserAvatar';
 import { TruncatedLabel } from './TruncatedLabel';
@@ -61,10 +61,7 @@ export function EpicGroup({
         ) : (
           <div className="w-4" />
         )}
-        <Notebook
-          className="w-4 h-4 text-violet-600"
-          aria-hidden="true"
-        />
+        <Notebook className="w-4 h-4 text-violet-600" aria-hidden="true" />
         <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-violet-100 text-violet-700">
           에픽
         </span>
@@ -87,7 +84,10 @@ export function EpicGroup({
       </div>
       <div className="flex justify-center">
         <Badge
-          className={cn('text-xs font-normal w-12 justify-center border', statusBadge[data.status])}
+          className={cn(
+            'text-xs font-normal w-12 justify-center border',
+            statusBadge[data.status]
+          )}
         >
           {statusLabel[data.status]}
         </Badge>
@@ -113,7 +113,9 @@ export function EpicGroup({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        ) : <span className="text-xs text-gray-400">미정</span>}
+        ) : (
+          <span className="text-xs text-gray-400">미정</span>
+        )}
       </div>
     </div>
   );

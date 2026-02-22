@@ -1,5 +1,5 @@
 import { Star } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 
 interface DifficultySelectProps {
   value: number;

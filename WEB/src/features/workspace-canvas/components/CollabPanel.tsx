@@ -1,5 +1,5 @@
-import { cn } from "@/shared/lib/utils";
-import { UserAvatar, type AvatarColor } from "@/shared/components/UserAvatar";
+import { cn } from '@/shared/libs/utils';
+import { UserAvatar, type AvatarColor } from '@/shared/components/UserAvatar';
 
 /**
  * 서버로부터 워크스페이스에 참가한 유저들의 데이터
@@ -26,8 +26,8 @@ export function CollabPanel({ users, className }: CollabPanelProps) {
   return (
     <div
       className={cn(
-        "glass rounded-3xl p-4 shadow-lg border border-white/20",
-        className,
+        'glass rounded-3xl p-4 shadow-lg border border-white/20',
+        className
       )}
     >
       <div className="flex items-center gap-3">

@@ -1,5 +1,5 @@
 import { ArrowLeft, Sprout, Check, Loader2 } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import NodeHeaderButton from './NodeHeaderButton';
 import { categoryTagStyles, typeTagStyles } from '@/features/workspace-core';
 import type { NodeType, TaskType } from '@/features/workspace-core';

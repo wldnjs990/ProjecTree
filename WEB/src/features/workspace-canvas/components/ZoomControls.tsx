@@ -2,7 +2,7 @@ import { Plus, Minus, Maximize2, LayoutGrid } from 'lucide-react';
 import * as Y from 'yjs';
 import { useReactFlow } from '@xyflow/react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import {
   Tooltip,
   TooltipContent,
