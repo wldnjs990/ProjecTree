@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @SuperBuilder
@@ -18,8 +16,6 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATE portfolio SET deleted_at = NOW() WHERE id = ?")
-@SQLRestriction("deleted_at IS NULL")
 public class Portfolio extends BaseEntity {
 
     @Id

@@ -1,0 +1,128 @@
+spring:
+  application:
+    name: projectree
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/projectree}
+    username: ${SPRING_DATASOURCE_USERNAME:projectree}
+    password: ${SPRING_DATASOURCE_PASSWORD:projectree123}
+    driver-class-name: org.postgresql.Driver
+
+  sql:
+    init:
+      mode: never
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc.batch_size: 50
+        order_inserts: true
+        order_updates: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
+            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+          github:
+            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID}
+            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET}
+            scope:
+              - read:user
+              - user:email
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_USERNAME:team.projectree.dev@gmail.com}
+    password: ${SPRING_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  cloud:
+    aws:
+      credentials:
+        access-key: ${SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY:test}
+        secret-key: ${SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY:test}
+      s3:
+        bucket: ${SPRING_CLOUD_AWS_S3_BUCKET:projectree-local}
+        region: ${SPRING_CLOUD_AWS_S3_REGION:ap-northeast-2}
+      # LocalStack 사용 시 엔드포인트 설정 (비어있으면 실제 AWS S3 사용)
+      endpoint: ${SPRING_CLOUD_AWS_ENDPOINT:}
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+
+# context root path
+server:
+  servlet:
+    context-path: /api
+
+# ====== CORS ======
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
+# ====== Socket.IO ======
+socket:
+  host: 0.0.0.0
+  port: 7092
+
+# ====== LiveKit (음성채팅) ======
+livekit:
+  api:
+    key: ${LIVEKIT_API_KEY}
+    secret: ${LIVEKIT_API_SECRET}
+
+# ====== AI Inference Server ======
+inference-server:
+  url: ${INFERENCE_SERVER_URL:http://localhost:8000}
+  path-prefix: ${INFERENCE_SERVER_PATH_PREFIX:/inference-api/v1}
+  generate-candidate-path: ${INFERENCE_SERVER_GENERATE_CANDIDATE_PATH:/candidates}
+  generate-node-path: ${INFERENCE_SERVER_GENERATE_NODE_PATH:/node}
+  recommend-tech-path: ${INFERENCE_SERVER_RECOMMEND_TECH_PATH:/tech-stacks}
+  generate-portfolio-path: ${INFERENCE_SERVER_GENERATE_PORTFOLIO_PATH:/portfolio}
+
+# ====== CRDT Server ======
+crdt-server:
+  url: ${CRDT_SERVER_URL:http://localhost:8899}
+  path-prefix: ${CRDT_SERVER_PATH_PREFIX:/internal}
+  new-node-path: ${CRDT_SERVER_NEW_NODE_PATH:/workspaces/{workspaceId}/nodes}
+  new-custom-tech-path: ${CRDT_SERVER_NEW_CUSTOM_TECH_PATH:/workspaces/{workspaceId}/nodes/{nodeId}/custom-tech-stacks}
+  new-tech-path: ${CRDT_SERVER_NEW_TECH_PATH:/workspaces/{workspaceId}/nodes/{nodeId}/tech-stacks}
+  new-candidate-path: ${CRDT_SERVER_NEW_CANDIDATE_PATH:/workspaces/{workspaceId}/nodes/{nodeId}/candidate}
+
+# ====== Workspace ======
+workspace:
+  invite_url: ${WORKSPACE_INVITE_URL:http://localhost:5173/invite}
+
+# ====== Internal Auth ======
+internal:
+  auth:
+    api-key: ${INTERNAL_AUTH_API_KEY}
+
+# ====== JWT ======
+JWT_SECRET: ${JWT_SECRET}
