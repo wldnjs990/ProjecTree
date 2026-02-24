@@ -1,4 +1,4 @@
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { StatusTag, type TagType } from '@/shared/components/StatusTag';
 import { PriorityBadge } from '@/shared/components/PriorityBadge';
 import {

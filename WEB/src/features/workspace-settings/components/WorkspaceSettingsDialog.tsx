@@ -24,7 +24,7 @@ import {
 
 import { updateWorkspace, getTechStacks } from '@/apis';
 import type { WorkspaceDetailData, TechStackItem } from '@/apis';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 
 interface WorkspaceSettingsDialogProps {
   isOpen: boolean;
@@ -132,13 +132,17 @@ export function WorkspaceSettingsDialog({
   const [selectedTechMap, setSelectedTechMap] = useState<Map<number, string>>(
     new Map()
   );
-  const [originalTechIds, setOriginalTechIds] = useState<Set<number>>(new Set()); // 서버에서 받은 기존 기술스택 ID
+  const [originalTechIds, setOriginalTechIds] = useState<Set<number>>(
+    new Set()
+  ); // 서버에서 받은 기존 기술스택 ID
   const [techOptions, setTechOptions] = useState<TechStackItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [newFiles, setNewFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<WorkspaceDetailData['files']>([]);
+  const [existingFiles, setExistingFiles] = useState<
+    WorkspaceDetailData['files']
+  >([]);
   const [deleteFileIds, setDeleteFileIds] = useState<number[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -194,8 +198,7 @@ export function WorkspaceSettingsDialog({
       try {
         const results = await getTechStacks(searchTerm);
         setTechOptions(results);
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
     const timer = setTimeout(fetchTechs, 300);
@@ -284,7 +287,11 @@ export function WorkspaceSettingsDialog({
         ...(deleteFileIds.length > 0 && { deleteFiles: deleteFileIds }),
       };
 
-      const response = await updateWorkspace(workspaceId, requestData, newFiles);
+      const response = await updateWorkspace(
+        workspaceId,
+        requestData,
+        newFiles
+      );
 
       if (response.success) {
         toast.success('워크스페이스 설정이 저장되었습니다.');
@@ -296,7 +303,9 @@ export function WorkspaceSettingsDialog({
             info: {
               ...currentInfo,
               name: form.name,
-              startDate: form.startDate ? format(form.startDate, 'yyyy-MM-dd') : null,
+              startDate: form.startDate
+                ? format(form.startDate, 'yyyy-MM-dd')
+                : null,
               endDate: form.endDate ? format(form.endDate, 'yyyy-MM-dd') : null,
               purpose: form.purpose,
               techs: form.techStacks.map((id) => ({
@@ -343,13 +352,17 @@ export function WorkspaceSettingsDialog({
           {!workspaceDetail ? (
             <div className="flex-1 flex flex-col items-center justify-center space-y-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-500"></div>
-              <p className="text-zinc-500 font-medium">정보를 불러오는 중입니다...</p>
+              <p className="text-zinc-500 font-medium">
+                정보를 불러오는 중입니다...
+              </p>
             </div>
           ) : (
             <div className="flex-1 min-h-0 overflow-y-scroll px-6 pt-6 pb-10 space-y-6 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-300/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-[3px] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-clip-content hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400/50">
               {/* 프로젝트명 */}
               <div className="space-y-2">
-                <Label className="text-sm font-bold text-zinc-700">프로젝트명</Label>
+                <Label className="text-sm font-bold text-zinc-700">
+                  프로젝트명
+                </Label>
                 <Input
                   value={form.name}
                   disabled
@@ -359,7 +372,9 @@ export function WorkspaceSettingsDialog({
 
               {/* 프로젝트 주제 */}
               <div className="space-y-2">
-                <Label className="text-sm font-bold text-zinc-700">프로젝트 주제</Label>
+                <Label className="text-sm font-bold text-zinc-700">
+                  프로젝트 주제
+                </Label>
                 <Textarea
                   value={form.description}
                   disabled
@@ -371,7 +386,9 @@ export function WorkspaceSettingsDialog({
               {/* 프로젝트 문서 */}
               <div className="space-y-2">
                 <div className="flex items-center gap-1">
-                  <Label className="text-sm font-bold text-zinc-700">프로젝트 문서 업로드</Label>
+                  <Label className="text-sm font-bold text-zinc-700">
+                    프로젝트 문서 업로드
+                  </Label>
                 </div>
                 <div className="space-y-3">
                   {/* 파일 업로드 영역 */}
@@ -387,20 +404,25 @@ export function WorkspaceSettingsDialog({
                     onDrop={(e) => {
                       e.preventDefault();
                       setIsDragging(false);
-                      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                      if (
+                        e.dataTransfer.files &&
+                        e.dataTransfer.files.length > 0
+                      ) {
                         handleFilesAdded(Array.from(e.dataTransfer.files));
                       }
                     }}
                     className={cn(
-                      "flex flex-col items-center justify-center py-6 border-2 border-dashed rounded-xl transition-all cursor-pointer group",
+                      'flex flex-col items-center justify-center py-6 border-2 border-dashed rounded-xl transition-all cursor-pointer group',
                       isDragging
-                        ? "border-[var(--figma-neon-green)] bg-green-50/50"
-                        : "border-zinc-200 bg-zinc-50/50 hover:border-[var(--figma-neon-green)]/50 hover:bg-green-50/30"
+                        ? 'border-[var(--figma-neon-green)] bg-green-50/50'
+                        : 'border-zinc-200 bg-zinc-50/50 hover:border-[var(--figma-neon-green)]/50 hover:bg-green-50/30'
                     )}
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload className="w-6 h-6 text-zinc-400 mb-2" />
-                    <p className="text-[13px] text-zinc-600 font-medium mb-3">PDF 파일을 여기에 놓아주세요</p>
+                    <p className="text-[13px] text-zinc-600 font-medium mb-3">
+                      PDF 파일을 여기에 놓아주세요
+                    </p>
                     <Button
                       type="button"
                       variant="default"
@@ -424,7 +446,16 @@ export function WorkspaceSettingsDialog({
                   </div>
 
                   {/* 파일 목록 */}
-                  {[...existingFiles, ...newFiles.map((f, i) => ({ id: `new-${i}`, orginFileName: f.name, size: f.size, isNew: true, index: i }))].length > 0 && (
+                  {[
+                    ...existingFiles,
+                    ...newFiles.map((f, i) => ({
+                      id: `new-${i}`,
+                      orginFileName: f.name,
+                      size: f.size,
+                      isNew: true,
+                      index: i,
+                    })),
+                  ].length > 0 && (
                     <div className="space-y-2">
                       {/* 기존 파일 */}
                       {existingFiles.map((file) => (
@@ -437,7 +468,11 @@ export function WorkspaceSettingsDialog({
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-bold text-zinc-800 truncate">
-                              {file.orginFileName || (file as any).originFILEName || (file as any).originFileName || (file as any).fileName || (file as any).name}
+                              {file.orginFileName ||
+                                (file as any).originFILEName ||
+                                (file as any).originFileName ||
+                                (file as any).fileName ||
+                                (file as any).name}
                             </p>
                             <p className="text-xs text-zinc-500">
                               PDF {(file.size / 1024 / 1024).toFixed(1)}MB
@@ -489,7 +524,9 @@ export function WorkspaceSettingsDialog({
 
               {/* 도메인 */}
               <div className="space-y-2">
-                <Label className="text-sm font-bold text-zinc-700">도메인</Label>
+                <Label className="text-sm font-bold text-zinc-700">
+                  도메인
+                </Label>
                 <Input
                   value={form.domain}
                   disabled
@@ -499,7 +536,9 @@ export function WorkspaceSettingsDialog({
 
               {/* 기술 스택 */}
               <div className="space-y-2">
-                <Label className="text-sm font-bold text-zinc-700">기술 스택</Label>
+                <Label className="text-sm font-bold text-zinc-700">
+                  기술 스택
+                </Label>
                 <div className="relative">
                   <div className="absolute left-3.5 top-1/2 -translate-y-1/2">
                     <Search className="w-4 h-4 text-zinc-400" />
@@ -513,7 +552,9 @@ export function WorkspaceSettingsDialog({
                       setSelectedIndex(0);
                     }}
                     onFocus={() => setShowSuggestions(searchTerm.length > 0)}
-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    onBlur={() =>
+                      setTimeout(() => setShowSuggestions(false), 200)
+                    }
                     className="h-11 pl-10 border-zinc-200 bg-zinc-50/50 rounded-xl focus-visible:ring-2 focus-visible:ring-[var(--figma-neon-green)]/20 focus-visible:border-[var(--figma-neon-green)] transition-all text-sm font-medium"
                   />
                   {showSuggestions && filteredTechs.length > 0 && (
@@ -522,8 +563,10 @@ export function WorkspaceSettingsDialog({
                         <div
                           key={tech.id}
                           className={cn(
-                            "cursor-pointer px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-zinc-700",
-                            index === selectedIndex ? "bg-zinc-100" : "hover:bg-zinc-50"
+                            'cursor-pointer px-4 py-2.5 text-sm rounded-lg transition-colors font-medium text-zinc-700',
+                            index === selectedIndex
+                              ? 'bg-zinc-100'
+                              : 'hover:bg-zinc-50'
                           )}
                           onClick={() => handleAddTech(tech)}
                           onMouseEnter={() => setSelectedIndex(index)}
@@ -542,10 +585,10 @@ export function WorkspaceSettingsDialog({
                         <Badge
                           key={techId}
                           className={cn(
-                            "px-3 py-1.5 font-bold shadow-sm rounded-lg flex items-center gap-1.5",
+                            'px-3 py-1.5 font-bold shadow-sm rounded-lg flex items-center gap-1.5',
                             isExisting
-                              ? "bg-zinc-100 text-zinc-600 border border-zinc-300" // 기존 기술스택 (제거 불가)
-                              : "bg-green-50 text-green-700 border border-green-300" // 새로 추가 (제거 가능)
+                              ? 'bg-zinc-100 text-zinc-600 border border-zinc-300' // 기존 기술스택 (제거 불가)
+                              : 'bg-green-50 text-green-700 border border-green-300' // 새로 추가 (제거 가능)
                           )}
                         >
                           {getTechName(techId)}
@@ -567,26 +610,40 @@ export function WorkspaceSettingsDialog({
 
               {/* 예상 기간 */}
               <div className="space-y-2">
-                <Label className="text-sm font-bold text-zinc-700">예상 기간</Label>
+                <Label className="text-sm font-bold text-zinc-700">
+                  예상 기간
+                </Label>
                 <div className="flex items-center gap-3">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "flex-1 h-11 justify-start text-left font-normal border-zinc-200 bg-zinc-50/50 rounded-xl hover:bg-zinc-50 focus:ring-2 focus:ring-[var(--figma-neon-green)]/20",
-                          !form.startDate && "text-zinc-400"
+                          'flex-1 h-11 justify-start text-left font-normal border-zinc-200 bg-zinc-50/50 rounded-xl hover:bg-zinc-50 focus:ring-2 focus:ring-[var(--figma-neon-green)]/20',
+                          !form.startDate && 'text-zinc-400'
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4 text-zinc-500" />
-                        {form.startDate ? format(form.startDate, 'yyyy년 M월 d일', { locale: ko }) : '시작일'}
+                        {form.startDate
+                          ? format(form.startDate, 'yyyy년 M월 d일', {
+                              locale: ko,
+                            })
+                          : '시작일'}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 rounded-xl border-zinc-200 shadow-xl" align="start">
+                    <PopoverContent
+                      className="w-auto p-0 rounded-xl border-zinc-200 shadow-xl"
+                      align="start"
+                    >
                       <Calendar
                         mode="single"
                         selected={form.startDate || undefined}
-                        onSelect={(date) => setForm((prev) => ({ ...prev, startDate: date || null }))}
+                        onSelect={(date) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            startDate: date || null,
+                          }))
+                        }
                         initialFocus
                         locale={ko}
                         className="rounded-xl bg-white"
@@ -599,21 +656,35 @@ export function WorkspaceSettingsDialog({
                       <Button
                         variant="outline"
                         className={cn(
-                          "flex-1 h-11 justify-start text-left font-normal border-zinc-200 bg-zinc-50/50 rounded-xl hover:bg-zinc-50 focus:ring-2 focus:ring-[var(--figma-neon-green)]/20",
-                          !form.endDate && "text-zinc-400"
+                          'flex-1 h-11 justify-start text-left font-normal border-zinc-200 bg-zinc-50/50 rounded-xl hover:bg-zinc-50 focus:ring-2 focus:ring-[var(--figma-neon-green)]/20',
+                          !form.endDate && 'text-zinc-400'
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4 text-zinc-500" />
-                        {form.endDate ? format(form.endDate, 'yyyy년 M월 d일', { locale: ko }) : '종료일'}
+                        {form.endDate
+                          ? format(form.endDate, 'yyyy년 M월 d일', {
+                              locale: ko,
+                            })
+                          : '종료일'}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 rounded-xl border-zinc-200 shadow-xl" align="start">
+                    <PopoverContent
+                      className="w-auto p-0 rounded-xl border-zinc-200 shadow-xl"
+                      align="start"
+                    >
                       <Calendar
                         mode="single"
                         selected={form.endDate || undefined}
-                        onSelect={(date) => setForm((prev) => ({ ...prev, endDate: date || null }))}
+                        onSelect={(date) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            endDate: date || null,
+                          }))
+                        }
                         initialFocus
-                        disabled={(date) => (form.startDate ? date < form.startDate : false)}
+                        disabled={(date) =>
+                          form.startDate ? date < form.startDate : false
+                        }
                         locale={ko}
                         className="rounded-xl bg-white"
                       />
@@ -644,7 +715,6 @@ export function WorkspaceSettingsDialog({
                   </span>
                 </div>
               </div>
-
             </div>
           )}
 

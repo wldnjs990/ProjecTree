@@ -1,15 +1,15 @@
-import { cn } from '@/shared/lib/utils'
+import { cn } from '@/shared/libs/utils';
 
 interface LegendItem {
-  label: string
-  color: string
-  borderColor: string
+  label: string;
+  color: string;
+  borderColor: string;
 }
 
 const legendItems: LegendItem[] = [
   { label: 'Frontend', color: 'bg-[#ECFDF5]', borderColor: 'border-[#00D492]' },
   { label: 'Backend', color: 'bg-[#FFF7ED]', borderColor: 'border-[#FF8904]' },
-]
+];
 
 export function LegendSection() {
   return (
@@ -31,5 +31,5 @@ export function LegendSection() {
         ))}
       </div>
     </div>
-  )
+  );
 }

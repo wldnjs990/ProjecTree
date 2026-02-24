@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { Loader2, Eye, Pencil } from 'lucide-react';
 import type { PortfolioEditorProps } from '../types';
 import MarkdownRenderer from '@/shared/components/MarkdownRenderer';

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import type { TechRecommendation } from '../types';
 import MarkdownRenderer from '@/shared/components/MarkdownRenderer';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { Confirm } from '@/shared/components/Confirm';
 import { ConfirmTrigger } from '@/shared/components/ConfirmTrigger';
 import TechDetailContent from './TechDetailContent';
@@ -193,7 +193,9 @@ function TechEmptyState({
 }) {
   const isDisabled = isGenerating || !onGenerate;
   const selectedNodeId = useSelectedNodeId();
-  const streamKey = selectedNodeId ? getAiStreamKey('TECH', selectedNodeId) : null;
+  const streamKey = selectedNodeId
+    ? getAiStreamKey('TECH', selectedNodeId)
+    : null;
   const streamingText = useAiStream(streamKey);
 
   // techs 타입일 때만 스트리밍 텍스트 표시
@@ -311,7 +313,8 @@ export function AITechRecommendSection({
                     <ConfirmTrigger
                       className={cn(
                         'w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm',
-                        isGenerating && 'opacity-50 cursor-not-allowed pointer-events-none'
+                        isGenerating &&
+                          'opacity-50 cursor-not-allowed pointer-events-none'
                       )}
                     >
                       <span className="flex items-center gap-2">

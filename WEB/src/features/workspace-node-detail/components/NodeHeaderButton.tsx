@@ -1,5 +1,5 @@
 import { type ReactElement } from 'react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 
 export default function NodeHeaderButton({
   children,

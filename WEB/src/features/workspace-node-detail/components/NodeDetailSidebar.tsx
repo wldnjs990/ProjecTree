@@ -1,4 +1,4 @@
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import {
   useSelectedNodeDetail,
   useSelectedNodeListData,
@@ -76,8 +76,7 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   const isCreatingNode = useIsPreviewCreating(currentPreviewNodeId);
 
   // 스토어 액션
-  const { exitCandidatePreview, updateCustomDraft } =
-    useNodeDetailStore();
+  const { exitCandidatePreview, updateCustomDraft } = useNodeDetailStore();
 
   // 디버깅용 로그
 

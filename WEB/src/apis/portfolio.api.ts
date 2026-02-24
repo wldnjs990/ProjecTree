@@ -1,4 +1,4 @@
-import { wasApiClient } from '../shared/lib/axiosClient';
+import { wasApiClient } from '../shared/libs/axiosClient';
 
 /**
  * [타입] 포트폴리오 데이터

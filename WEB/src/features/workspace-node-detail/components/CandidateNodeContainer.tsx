@@ -7,7 +7,7 @@ import {
   getAiStreamKey,
 } from '@/features/workspace-core';
 import type { Candidate } from '@/features/workspace-core';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 import MarkdownRenderer from '@/shared/components/MarkdownRenderer';
 

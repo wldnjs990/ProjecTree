@@ -1,6 +1,6 @@
 import { MicOff } from 'lucide-react';
 
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import type { AvatarColor } from '@/shared/components/UserAvatar';
 
@@ -45,10 +45,7 @@ export default function ParticipantAvatar({
           )}
         >
           <AvatarFallback
-            className={cn(
-              'text-white font-semibold text-sm',
-              resolvedColor
-            )}
+            className={cn('text-white font-semibold text-sm', resolvedColor)}
           >
             {initial}
           </AvatarFallback>

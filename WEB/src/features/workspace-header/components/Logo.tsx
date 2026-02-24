@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { TreeDeciduous } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import type { LogoProps } from '../types';
 
 export function Logo({ className }: LogoProps) {

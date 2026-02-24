@@ -1,5 +1,5 @@
 import { ChevronLeft, X, Maximize2, Minimize2 } from 'lucide-react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import MarkdownRenderer from '@/shared/components/MarkdownRenderer';
 
 interface NodeDescriptionMarkdownProps {

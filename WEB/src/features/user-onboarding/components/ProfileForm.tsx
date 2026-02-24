@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { patchMemberSignup, getMemberInfo } from '@/apis';
 import { useSetAccessToken, useAccessToken } from '@/shared/stores/authStore';
 import { useSetUser } from '@/shared/stores/userStore';
-import { parseJwt } from '@/shared/lib/utils';
+import { parseJwt } from '@/shared/libs/utils';
 
 /**
  * [컴포넌트] 사용자 온보딩 프로필 설정 폼
