@@ -1,5 +1,5 @@
 import * as Y from 'yjs';
-import { getCrdtClient, type YNodeValue } from '../crdt/crdtClient';
+import CrdtClient, { type YNodeValue } from '../crdt/crdtClient';
 import type { FlowNode } from '../types/node';
 import { flowNodeToYjsNode } from '../utils/nodeTransform';
 
@@ -13,7 +13,7 @@ export const previewNodesCrdtService = {
    * Preview 노드 추가 (CRDT 동기화)
    */
   addPreviewNode(node: FlowNode): void {
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) {
       return;
     }
@@ -40,7 +40,7 @@ export const previewNodesCrdtService = {
    * Preview 노드 제거 (CRDT 동기화)
    */
   removePreviewNode(nodeId: string): void {
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) {
       return;
     }
@@ -54,7 +54,7 @@ export const previewNodesCrdtService = {
    * 모든 Preview 노드 제거 (CRDT 동기화)
    */
   clearPreviewNodes(): void {
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) {
       return;
     }
@@ -71,7 +71,7 @@ export const previewNodesCrdtService = {
    * 특정 사용자 소유 Preview 노드만 제거 (CRDT 동기화)
    */
   clearPreviewNodesByOwner(ownerId: string): void {
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) {
       return;
     }

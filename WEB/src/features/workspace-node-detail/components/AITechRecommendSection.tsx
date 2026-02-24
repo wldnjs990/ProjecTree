@@ -18,7 +18,7 @@ import { CustomTechAddDialog } from './CustomTechAddDialog';
 import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 import {
   useSelectedNodeId,
-  getCrdtClient,
+  CrdtClient,
   useSelectedTechId,
   useNodeDetailStore,
   useAiStream,
@@ -143,13 +143,19 @@ function TechCardList({
       return;
     }
 
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) {
       return;
     }
 
-    // CRDT 서버에 이벤트 전송 및 YMap 브로드캐스트
-    client.selectNodeTech(selectedNodeId, techId);
+    // YMap 업데이트 + CRDT 서버에 이벤트 전송
+    client.getYMap<number>('selectedNodeTechs').set(selectedNodeId, techId);
+    client.sendMessage({
+      type: 'select_node_tech',
+      requestId: crypto.randomUUID(),
+      nodeId: selectedNodeId,
+      selectedTechId: techId,
+    });
     setSelectedTechId(techId);
   };
 

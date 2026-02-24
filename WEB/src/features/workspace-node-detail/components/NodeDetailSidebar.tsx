@@ -16,7 +16,7 @@ import {
   useNodeDetailStore,
   previewNodesCrdtService,
   nodeDetailCrdtService,
-  getCrdtClient,
+  CrdtClient,
   type YNodeValue,
 } from '@/features/workspace-core';
 import CandidateNodeContainer from './CandidateNodeContainer';
@@ -112,7 +112,7 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
     (value: string) => {
       updateCustomDraft({ name: value });
       if (!customDraft?.previewNodeId) return;
-      const client = getCrdtClient();
+      const client = CrdtClient.getInstance();
       const yPreviewNodes = client?.getYMap<Y.Map<YNodeValue>>('previewNodes');
       const yNode = yPreviewNodes?.get(customDraft.previewNodeId);
       if (!yNode) return;
@@ -135,7 +135,7 @@ export function NodeDetailSidebar({ className }: NodeDetailSidebarProps) {
   const handleConfirmCreate = useCallback(async () => {
     if (!selectedNodeId) return;
 
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     const yPreviewNodes = client?.getYMap<Y.Map<YNodeValue>>('previewNodes');
     const resolvePosition = (nodeId: string) => {
       const yNode = yPreviewNodes?.get(nodeId);

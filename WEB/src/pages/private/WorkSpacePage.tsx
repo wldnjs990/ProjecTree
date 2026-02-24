@@ -21,8 +21,7 @@ import {
   type FlowNode,
   type ApiNode,
   type NodeData,
-  initCrdtClient,
-  destroyCrdtClient,
+  useCrdtClient,
   useConnectionStatus,
   useNodeStore,
   useWorkspaceStore,
@@ -104,6 +103,9 @@ export default function WorkSpacePage() {
   // 노드 상세 편집 Hook
   const { openSidebar, closeSidebar, selectedNodeId } = useNodeDetailEdit();
 
+  // CRDT 클라이언트 생애주기 관리
+  useCrdtClient(workspaceId);
+
   // CRDT 옵저버 생명주기 관리
   useNodeDetailCrdtObservers();
 
@@ -112,14 +114,11 @@ export default function WorkSpacePage() {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // CRDT 클라이언트 초기화 및 워크스페이스 데이터 로드
+  // 워크스페이스 데이터 로드
   useEffect(() => {
     const loadWorkspaceData = async () => {
       try {
         setIsLoading(true);
-
-        // workspaceId params를 받아 crdt 인스턴스 생성
-        if (workspaceId) initCrdtClient(workspaceId);
 
         // 워크스페이스 상세 정보 조회 및 스토어 저장
         const workspaceDetail = await getWorkspaceDetail(Number(workspaceId));
@@ -147,13 +146,8 @@ export default function WorkSpacePage() {
         setIsLoading(false);
       }
     };
-    // ...
 
     loadWorkspaceData();
-
-    return () => {
-      destroyCrdtClient();
-    };
   }, [setNodeListData, workspaceId, setWorkspaceDetail]);
 
   // Header state

@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { getCrdtClient } from '../crdt/crdtClient';
+import CrdtClient from '../crdt/crdtClient';
 
 /**
  * 노드 위치 Undo/Redo 키보드 이벤트 훅
@@ -9,11 +9,17 @@ import { getCrdtClient } from '../crdt/crdtClient';
  */
 export const useUndoRedo = () => {
   const undo = useCallback(() => {
-    return getCrdtClient()?.undo() ?? false;
+    const um = CrdtClient.getInstance()?.undoManager;
+    if (!um?.canUndo()) return false;
+    um.undo();
+    return true;
   }, []);
 
   const redo = useCallback(() => {
-    return getCrdtClient()?.redo() ?? false;
+    const um = CrdtClient.getInstance()?.undoManager;
+    if (!um?.canRedo()) return false;
+    um.redo();
+    return true;
   }, []);
 
   useEffect(() => {

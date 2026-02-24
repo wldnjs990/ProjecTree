@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { getCrdtClient, type AwarenessState } from '../crdt/crdtClient';
+import CrdtClient, { type AwarenessState } from '../crdt/crdtClient';
 import { useConnectionStatus } from '../stores';
 
 export interface NodePresenceUser {
@@ -22,7 +22,7 @@ export const useNodePresence = () => {
   >(new Map());
 
   useEffect(() => {
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) {
       return;
     }

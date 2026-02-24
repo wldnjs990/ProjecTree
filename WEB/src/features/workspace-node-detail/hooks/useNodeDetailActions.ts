@@ -8,7 +8,7 @@ import {
 import {
   calculateChildNodePosition,
   getChildNodeType,
-  getCrdtClient,
+  CrdtClient,
   nodeDetailCrdtService,
   previewNodesCrdtService,
   useNodeDetailStore,
@@ -86,7 +86,7 @@ export function useNodeDetailActions({
   const handleLockedCandidateClick = useCallback(
     (candidate: Candidate) => {
       const previewNodeId = `preview-${candidate.id}`;
-      const client = getCrdtClient();
+      const client = CrdtClient.getInstance();
       if (!client) return;
 
       const yPreviewNodes = client.getYMap<Y.Map<unknown>>('previewNodes');
@@ -185,20 +185,29 @@ export function useNodeDetailActions({
 
   const handleDeleteNode = useCallback(() => {
     if (!selectedNodeId) return;
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) return;
 
     closeSidebar();
-    client.deleteNode(selectedNodeId);
+    client.sendMessage({
+      type: 'delete_node',
+      requestId: crypto.randomUUID(),
+      nodeId: Number(selectedNodeId),
+    });
   }, [selectedNodeId, closeSidebar]);
 
   const handleDeleteCandidate = useCallback(
     (candidateId: number) => {
       if (!selectedNodeId) return;
-      const client = getCrdtClient();
+      const client = CrdtClient.getInstance();
       if (!client) return;
 
-      client.deleteCandidate(selectedNodeId, candidateId);
+      client.sendMessage({
+        type: 'delete_candidate',
+        requestId: crypto.randomUUID(),
+        nodeId: Number(selectedNodeId),
+        candidateId,
+      });
     },
     [selectedNodeId]
   );
