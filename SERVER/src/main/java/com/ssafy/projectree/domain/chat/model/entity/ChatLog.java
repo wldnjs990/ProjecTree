@@ -15,8 +15,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Setter
@@ -24,8 +22,6 @@ import org.hibernate.annotations.SQLRestriction;
 @Table(name = "chat_log")
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE chat_log SET deleted_at = NOW() WHERE id = ?")
-@SQLRestriction("deleted_at IS NULL")
 public class ChatLog extends BaseEntity {
 
     @Id

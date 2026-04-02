@@ -13,7 +13,7 @@ import { deleteCandidateToSpring } from "../services/spring/node/node-candidate-
 function sendError(
   ws: WebSocket,
   payload: {
-    type: "save_error";
+    type: "SAVE_ERROR";
     action:
       | "save_node_detail"
       | "select_node_tech"
@@ -58,7 +58,7 @@ export async function handleMessage(ws: WebSocket, data: Buffer, room: string) {
     });
     if (!saved) {
       sendError(ws, {
-        type: "save_error",
+        type: "SAVE_ERROR",
         action: "save_node_detail",
         message: "spring_save_failed",
         requestId,
@@ -82,7 +82,7 @@ export async function handleMessage(ws: WebSocket, data: Buffer, room: string) {
     });
     if (!saved) {
       sendError(ws, {
-        type: "save_error",
+        type: "SAVE_ERROR",
         action: "select_node_tech",
         message: "spring_save_failed",
         requestId,
@@ -125,7 +125,7 @@ export async function handleMessage(ws: WebSocket, data: Buffer, room: string) {
     });
     if (!deleted) {
       sendError(ws, {
-        type: "save_error",
+        type: "SAVE_ERROR",
         action: "delete_node",
         message: "spring_delete_failed",
         nodeId: nodeIdValue,
@@ -193,7 +193,7 @@ export async function handleMessage(ws: WebSocket, data: Buffer, room: string) {
     });
     if (!deleted) {
       sendError(ws, {
-        type: "save_error",
+        type: "SAVE_ERROR",
         action: "delete_candidate",
         message: "spring_delete_failed",
         requestId,

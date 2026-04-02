@@ -1,22 +1,22 @@
-import { cn } from "@/shared/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from '@/shared/libs/utils';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
-export type AvatarColor = "blue" | "pink" | "orange" | "green" | "purple";
+export type AvatarColor = 'blue' | 'pink' | 'orange' | 'green' | 'purple';
 
 interface UserAvatarProps {
   initials: string;
   color?: AvatarColor;
   isOnline?: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
 const colorStyles: Record<AvatarColor, string> = {
-  blue: "bg-[#2B7FFF]",
-  pink: "bg-[#F6339A]",
-  orange: "bg-[#FD9A00]",
-  green: "bg-[#00C950]",
-  purple: "bg-[#8B5CF6]",
+  blue: 'bg-[#2B7FFF]',
+  pink: 'bg-[#F6339A]',
+  orange: 'bg-[#FD9A00]',
+  green: 'bg-[#00C950]',
+  purple: 'bg-[#8B5CF6]',
 };
 
 /**
@@ -24,23 +24,23 @@ const colorStyles: Record<AvatarColor, string> = {
  * ex) sm 안에 { avatar: string; text: string; indicator: string }가 들어간다.
  */
 const sizeStyles: Record<
-  "sm" | "md" | "lg",
+  'sm' | 'md' | 'lg',
   { avatar: string; text: string; indicator: string }
 > = {
   sm: {
-    avatar: "h-6 w-6",
-    text: "text-[10px]",
-    indicator: "h-2 w-2 -right-0.5 -bottom-0.5",
+    avatar: 'h-6 w-6',
+    text: 'text-[10px]',
+    indicator: 'h-2 w-2 -right-0.5 -bottom-0.5',
   },
   md: {
-    avatar: "h-7 w-7",
-    text: "text-xs",
-    indicator: "h-2.5 w-2.5 -right-0.5 -bottom-0.5",
+    avatar: 'h-7 w-7',
+    text: 'text-xs',
+    indicator: 'h-2.5 w-2.5 -right-0.5 -bottom-0.5',
   },
   lg: {
-    avatar: "h-9 w-9",
-    text: "text-sm",
-    indicator: "h-3 w-3 -right-0.5 -bottom-0.5",
+    avatar: 'h-9 w-9',
+    text: 'text-sm',
+    indicator: 'h-3 w-3 -right-0.5 -bottom-0.5',
   },
 };
 
@@ -50,22 +50,22 @@ const sizeStyles: Record<
  */
 export function UserAvatar({
   initials,
-  color = "blue",
+  color = 'blue',
   isOnline,
-  size = "md",
+  size = 'md',
   className,
 }: UserAvatarProps) {
   const sizeStyle = sizeStyles[size];
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn('relative', className)}>
       {/* 아바타 */}
-      <Avatar className={cn(sizeStyle.avatar, "border-2 border-white")}>
+      <Avatar className={cn(sizeStyle.avatar, 'border-2 border-white')}>
         <AvatarFallback
           className={cn(
             colorStyles[color],
-            "text-white font-normal",
-            sizeStyle.text,
+            'text-white font-normal',
+            sizeStyle.text
           )}
         >
           {initials}
@@ -75,9 +75,9 @@ export function UserAvatar({
       {isOnline !== undefined && (
         <span
           className={cn(
-            "absolute rounded-full border-2 border-white",
+            'absolute rounded-full border-2 border-white',
             sizeStyle.indicator,
-            isOnline ? "bg-success" : "bg-gray-400",
+            isOnline ? 'bg-success' : 'bg-gray-400'
           )}
         />
       )}

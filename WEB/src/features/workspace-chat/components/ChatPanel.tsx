@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { useChat } from '../hooks/useChat';
 import { ChatHeader } from './ChatHeader';
 import { ChatMessageList } from './ChatMessageList';

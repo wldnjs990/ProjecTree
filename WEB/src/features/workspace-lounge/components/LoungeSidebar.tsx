@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -96,7 +96,13 @@ function useProfileDialogState(nickname: string) {
   };
 }
 
-function ProfileDialog({ nickname, email }: { nickname: string; email: string }) {
+function ProfileDialog({
+  nickname,
+  email,
+}: {
+  nickname: string;
+  email: string;
+}) {
   const navigate = useNavigate();
   const updateStoreNickname = useUpdateNickname();
   const {
@@ -423,7 +429,8 @@ export function LoungeSidebar({
           onClick={onToggle}
           className={cn(
             'h-7 w-7 text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-zinc-100/50 transition-colors',
-            !collapsed && 'opacity-0 group-hover/header:opacity-100 transition-opacity duration-200'
+            !collapsed &&
+              'opacity-0 group-hover/header:opacity-100 transition-opacity duration-200'
           )}
           aria-label={toggleLabel}
         >
@@ -479,9 +486,7 @@ export function LoungeSidebar({
         )}
 
         {collapsed && (
-          <div className="flex w-full justify-end px-2">
-            {toggleButton}
-          </div>
+          <div className="flex w-full justify-end px-2">{toggleButton}</div>
         )}
       </div>
 

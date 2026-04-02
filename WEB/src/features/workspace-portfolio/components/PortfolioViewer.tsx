@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { useUser } from '@/shared/stores/userStore';
 import { Download, FileText } from 'lucide-react';
 import type { PortfolioViewerProps } from '../types';

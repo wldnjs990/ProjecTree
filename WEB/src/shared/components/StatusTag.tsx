@@ -1,4 +1,4 @@
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 
 export type TagType =
   | 'PROJECT'

@@ -1,7 +1,7 @@
 import type { KeyboardEvent } from 'react';
 import { Check, Plus, Trash2 } from 'lucide-react';
 import type { Candidate } from '../types';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 
 interface SubNodeCardProps extends React.HTMLAttributes<HTMLDivElement> {
   node: Candidate;
@@ -60,7 +60,8 @@ export function SubNodeCard({
               disabled={deleteDisabled}
               className={cn(
                 'p-1 rounded hover:bg-black/5 transition-colors',
-                deleteDisabled && 'opacity-50 cursor-not-allowed hover:bg-transparent'
+                deleteDisabled &&
+                  'opacity-50 cursor-not-allowed hover:bg-transparent'
               )}
               aria-label="후보 삭제"
             >

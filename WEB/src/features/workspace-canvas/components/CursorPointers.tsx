@@ -1,5 +1,5 @@
 import type { AwarenessState } from '@/features/workspace-core';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { useReactFlow } from '@xyflow/react';
 import { MousePointer2 } from 'lucide-react';
 

@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
 import * as Y from 'yjs';
-import { getCrdtClient, type YNodeValue } from '../crdt/crdtClient';
+import CrdtClient, { type YNodeValue } from '../crdt/crdtClient';
 import { useConnectionStatus, useNodeStore } from '../stores';
 import type { FlowNode, FlowNodeData, YjsNode } from '../types/node';
 import { flowNodeToYjsNode, yjsNodeToFlowNode } from '../utils/nodeTransform';
@@ -46,7 +46,7 @@ export const usePreviewNodesCrdt = () => {
 
   // Y.Map 초기화 및 구독
   useEffect(() => {
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) {
       return;
     }
@@ -76,7 +76,7 @@ export const usePreviewNodesCrdt = () => {
   // Preview 노드 추가 (CRDT 동기화)
   const addPreviewNode = useCallback((node: FlowNode) => {
     const yPreviewNodes = yPreviewNodesRef.current;
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!yPreviewNodes || !client) return;
 
     client.yDoc.transact(() => {
@@ -102,7 +102,7 @@ export const usePreviewNodesCrdt = () => {
   // 모든 Preview 노드 제거 (CRDT 동기화)
   const clearPreviewNodes = useCallback(() => {
     const yPreviewNodes = yPreviewNodesRef.current;
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!yPreviewNodes || !client) return;
 
     client.yDoc.transact(() => {

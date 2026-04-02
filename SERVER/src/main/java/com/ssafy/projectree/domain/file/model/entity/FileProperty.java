@@ -8,8 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,8 +18,6 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SuperBuilder
 @Inheritance(strategy = InheritanceType.JOINED)
-@SQLDelete(sql = "UPDATE file_property SET deleted_at = NOW() WHERE id = ?")
-@SQLRestriction("deleted_at IS NULL")
 public class FileProperty extends BaseEntity {
 
 	@Id

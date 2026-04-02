@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import type { TechRecommendation } from '../types';
 import MarkdownRenderer from '@/shared/components/MarkdownRenderer';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { Confirm } from '@/shared/components/Confirm';
 import { ConfirmTrigger } from '@/shared/components/ConfirmTrigger';
 import TechDetailContent from './TechDetailContent';
@@ -18,7 +18,7 @@ import { CustomTechAddDialog } from './CustomTechAddDialog';
 import { AiStreamingCard } from '@/shared/components/AiStreamingCard';
 import {
   useSelectedNodeId,
-  getCrdtClient,
+  CrdtClient,
   useSelectedTechId,
   useNodeDetailStore,
   useAiStream,
@@ -143,13 +143,19 @@ function TechCardList({
       return;
     }
 
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) {
       return;
     }
 
-    // CRDT 서버에 이벤트 전송 및 YMap 브로드캐스트
-    client.selectNodeTech(selectedNodeId, techId);
+    // YMap 업데이트 + CRDT 서버에 이벤트 전송
+    client.getYMap<number>('selectedNodeTechs').set(selectedNodeId, techId);
+    client.sendMessage({
+      type: 'select_node_tech',
+      requestId: crypto.randomUUID(),
+      nodeId: selectedNodeId,
+      selectedTechId: techId,
+    });
     setSelectedTechId(techId);
   };
 
@@ -193,7 +199,9 @@ function TechEmptyState({
 }) {
   const isDisabled = isGenerating || !onGenerate;
   const selectedNodeId = useSelectedNodeId();
-  const streamKey = selectedNodeId ? getAiStreamKey('TECH', selectedNodeId) : null;
+  const streamKey = selectedNodeId
+    ? getAiStreamKey('TECH', selectedNodeId)
+    : null;
   const streamingText = useAiStream(streamKey);
 
   // techs 타입일 때만 스트리밍 텍스트 표시
@@ -311,7 +319,8 @@ export function AITechRecommendSection({
                     <ConfirmTrigger
                       className={cn(
                         'w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-[#1C69E3] border border-[rgba(28,105,227,0.3)] rounded-lg hover:bg-[rgba(28,105,227,0.05)] transition-colors shadow-sm',
-                        isGenerating && 'opacity-50 cursor-not-allowed pointer-events-none'
+                        isGenerating &&
+                          'opacity-50 cursor-not-allowed pointer-events-none'
                       )}
                     >
                       <span className="flex items-center gap-2">

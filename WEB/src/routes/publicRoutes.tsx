@@ -5,16 +5,20 @@ import type { RouteObject } from 'react-router';
 
 export const publicRoutes: RouteObject[] = [
   {
-    path: '/',
-    element: <LandingPage />,
-    loader: async () => {},
-  },
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/oauth/callback',
-    element: <OAuthCallback />,
+    children: [
+      {
+        path: '/',
+        element: <LandingPage />,
+        loader: async () => {},
+      },
+      {
+        path: '/login',
+        element: <LoginPage />,
+      },
+      {
+        path: '/oauth/callback',
+        element: <OAuthCallback />,
+      },
+    ],
   },
 ];

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git ls-tree:*)",
+      "Bash(xargs -I HASH git show HASH:ProjecTree-was/Dockerfile)",
+      "Bash(xargs -I HASH bash -c \"git show HASH:SERVER/src/main/resources/application.yml 2>/dev/null | grep -q ''port:'' && echo ''Found in HASH'' && git show HASH:SERVER/src/main/resources/application.yml | head -50\")",
+      "Bash(git -C /c/Users/SSAFY/jiwon_dir/ProjecTree-Github ls-tree:*)",
+      "Bash(git checkout:*)",
+      "Bash(git -C /c/Users/SSAFY/jiwon_dir/ProjecTree-Github show:*)"
+    ]
+  }
+}

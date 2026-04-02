@@ -7,10 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,8 +17,6 @@ import java.time.LocalDate;
 @Entity
 @SuperBuilder
 @Table(name = "workspace")
-@SQLDelete(sql = "UPDATE workspace SET deleted_at = NOW() WHERE id = ?")
-@SQLRestriction("deleted_at IS NULL")
 public class Workspace extends BaseEntity {
 
 	@Id

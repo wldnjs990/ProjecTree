@@ -12,43 +12,43 @@ openai_gpt_5_2 = ChatOpenAI(
     temperature=0,
     max_retries=3,
     base_url=settings.OPENAI_BASE_URL,
-    api_key=settings.AI_API_KEY
+    api_key=settings.OPENAI_API_KEY
 )
 
 # 내일 여기서 모델 수정
 openai_mini_llm = ChatOpenAI(
-    model="gpt-5-mini", 
-    name="gpt-5-mini", 
-    temperature=0, 
-    max_retries=3, 
-    base_url=settings.OPENAI_BASE_URL, 
-    api_key=settings.AI_API_KEY,
+    model="gpt-5-mini",
+    name="gpt-5-mini",
+    temperature=0,
+    max_retries=3,
+    base_url=settings.OPENAI_BASE_URL,
+    api_key=settings.OPENAI_API_KEY,
     reasoning_effort="minimal",  # 추론 토큰 생성을 억제하여 속도 향상
 )
 
 opendai_reasoning_llm = ChatOpenAI(
-    model="gpt-5-mini", 
-    name="gpt-5-mini", 
-    temperature=0, 
-    max_retries=3, 
-    base_url=settings.OPENAI_BASE_URL, 
-    api_key=settings.AI_API_KEY,
-reasoning_effort="medium", 
+    model="gpt-5-mini",
+    name="gpt-5-mini",
+    temperature=0,
+    max_retries=3,
+    base_url=settings.OPENAI_BASE_URL,
+    api_key=settings.OPENAI_API_KEY,
+reasoning_effort="medium",
 )
 
-openai_nano_llm = ChatOpenAI(model="gpt-5-nano", 
-name="gpt-5-nano", 
-temperature=0, 
-max_retries=3, 
-base_url=settings.OPENAI_BASE_URL, 
+openai_nano_llm = ChatOpenAI(model="gpt-5-nano",
+name="gpt-5-nano",
+temperature=0,
+max_retries=3,
+base_url=settings.OPENAI_BASE_URL,
 reasoning_effort="minimal",  # 추론 토큰 생성을 억제하여 속도 향상
-api_key=settings.AI_API_KEY
+api_key=settings.OPENAI_API_KEY
 )
 
 claude_llm = ChatAnthropic(
-    model="claude-3-5-haiku-latest", 
-    temperature=0, 
-    max_retries=3, 
-    base_url=settings.ANTHROPIC_BASE_URL, 
-    api_key=settings.AI_API_KEY,
+    model="claude-3-5-haiku-latest",
+    temperature=0,
+    max_retries=3,
+    base_url=settings.ANTHROPIC_BASE_URL,
+    api_key=settings.ANTHROPIC_API_KEY,
 )

@@ -12,7 +12,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useClearAccessToken } from '@/shared/stores/authStore';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 
 interface HomeButtonWithConfirmProps {
   className?: string; // For tailoring the button style (colors, hover effects)

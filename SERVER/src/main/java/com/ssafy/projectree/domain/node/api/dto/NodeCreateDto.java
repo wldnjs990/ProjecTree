@@ -15,7 +15,6 @@ public class NodeCreateDto {
     public static class Request{
         private Double xPos;
         private Double yPos;
-        private String previewNodeId;
     }
 
     @Data

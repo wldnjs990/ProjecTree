@@ -1,4 +1,4 @@
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import { Slot } from '@radix-ui/react-slot';
 import { forwardRef, type ReactElement } from 'react';
 

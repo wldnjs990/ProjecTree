@@ -2,7 +2,7 @@ import { Plus, Minus, Maximize2, LayoutGrid } from 'lucide-react';
 import * as Y from 'yjs';
 import { useReactFlow } from '@xyflow/react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/libs/utils';
 import {
   Tooltip,
   TooltipContent,
@@ -11,7 +11,7 @@ import {
 import {
   getAutoLayoutedNodes,
   generateEdges,
-  getCrdtClient,
+  CrdtClient,
   useNodeStore,
   type FlowNode,
   type YNodeValue,
@@ -47,7 +47,7 @@ export function ZoomControls({ className }: ZoomControlsProps) {
     setStoreNodes(layoutedNodes);
 
     // Yjs에 위치 반영 + 서버 저장 트리거
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     const yNodes = client?.getYMap<Y.Map<YNodeValue>>('nodes');
     if (client && yNodes) {
       client.yDoc.transact(() => {
@@ -59,7 +59,12 @@ export function ZoomControls({ className }: ZoomControlsProps) {
       });
 
       layoutedNodes.forEach((node) => {
-        client.saveNodePosition(node.id);
+        client.sendMessage({
+          type: 'save_node_position',
+          workspaceId: client.roomId,
+          requestId: crypto.randomUUID(),
+          nodeId: node.id,
+        });
       });
     }
 

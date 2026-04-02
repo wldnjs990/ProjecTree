@@ -17,8 +17,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { cn } from '@/shared/lib/utils';
-import { buildProjectTree } from '@/shared/lib/treeUtils';
+import { cn } from '@/shared/libs/utils';
+import { buildProjectTree } from '@/shared/libs/treeUtils';
 import { ChatPanel } from '@/features/workspace-chat';
 import { ProjectTreeItem } from '@/features/workspace-aside/ProjectTreeItem';
 
@@ -53,7 +53,8 @@ export function LeftSidebar({
           onClick={() => setCollapsed((prev) => !prev)}
           className={cn(
             'grid h-7 w-7 place-items-center leading-none text-zinc-400 hover:text-[var(--figma-tech-green)] hover:bg-zinc-100/50 transition-colors rounded-md',
-            !collapsed && 'opacity-0 group-hover/header:opacity-100 transition-opacity duration-200'
+            !collapsed &&
+              'opacity-0 group-hover/header:opacity-100 transition-opacity duration-200'
           )}
           aria-label={toggleLabel}
         >
@@ -132,11 +133,9 @@ export function LeftSidebar({
                   프로젝트 탐색
                 </h2>
               </div>
-            {!collapsed && (
-              <div className="flex items-center">
-                {toggleButton}
-              </div>
-            )}
+              {!collapsed && (
+                <div className="flex items-center">{toggleButton}</div>
+              )}
             </div>
             <ScrollArea
               className={cn(
@@ -183,6 +182,6 @@ export function LeftSidebar({
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
-    </aside >
+    </aside>
   );
 }

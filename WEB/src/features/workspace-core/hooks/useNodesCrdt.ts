@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useRef } from 'react';
 import * as Y from 'yjs';
 import type { Node } from '@xyflow/react';
-import { getCrdtClient, type YNodeValue } from '../crdt/crdtClient';
+import CrdtClient, { type YNodeValue } from '../crdt/crdtClient';
 import { useConnectionStatus, useNodeStore } from '../stores';
 import type { FlowNode, FlowNodeData, YjsNode } from '../types/node';
 import type { NodeData } from '../types/nodeDetail';
@@ -95,7 +95,7 @@ export const useNodesCrdt = ({
 
   // Y.Map 초기화 및 구독
   useEffect(() => {
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) {
       return;
     }
@@ -127,9 +127,6 @@ export const useNodesCrdt = ({
         }
         syncFromYjs();
 
-        // UndoManager 초기화 (sync 완료 후)
-        client.initUndoManager();
-
         if (!didAutoLayoutRef.current && shouldAutoLayout(initialNodes)) {
           didAutoLayoutRef.current = true;
           const edges = generateEdges(initialNodes);
@@ -147,7 +144,12 @@ export const useNodesCrdt = ({
           });
 
           layoutedNodes.forEach((node) => {
-            client.saveNodePosition(node.id);
+            client.sendMessage({
+              type: 'save_node_position',
+              workspaceId: client.roomId,
+              requestId: crypto.randomUUID(),
+              nodeId: node.id,
+            });
           });
         }
       }
@@ -187,7 +189,15 @@ export const useNodesCrdt = ({
       yNode.set('position', { x: node.position.x, y: node.position.y });
 
       // 스프링 서버에 저장요청
-      getCrdtClient()?.saveNodePosition(node.id);
+      const client = CrdtClient.getInstance();
+      if (client) {
+        client.sendMessage({
+          type: 'save_node_position',
+          workspaceId: client.roomId,
+          requestId: crypto.randomUUID(),
+          nodeId: node.id,
+        });
+      }
       // 로컬 스토어도 즉시 업데이트 (UX용)
       updateNodePosition(node.id, node.position);
     },
@@ -214,7 +224,7 @@ export const useNodesCrdt = ({
   // 노드 추가
   const addNode = useCallback((node: FlowNode) => {
     const yNodes = yNodesRef.current;
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!yNodes || !client) return;
 
     client.yDoc.transact(() => {

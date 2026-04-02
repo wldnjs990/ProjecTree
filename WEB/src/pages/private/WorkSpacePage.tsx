@@ -1,11 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Node, Edge } from '@xyflow/react';
 import { useParams } from 'react-router';
-import {
-  getWorkspaceTree,
-  getNodeDetail,
-  getWorkspaceDetail,
-} from '@/apis';
+import { getWorkspaceTree, getNodeDetail, getWorkspaceDetail } from '@/apis';
 import {
   Header,
   type ViewTab,
@@ -25,8 +21,7 @@ import {
   type FlowNode,
   type ApiNode,
   type NodeData,
-  initCrdtClient,
-  destroyCrdtClient,
+  useCrdtClient,
   useConnectionStatus,
   useNodeStore,
   useWorkspaceStore,
@@ -35,7 +30,7 @@ import {
   useNodeDetailCrdtObservers,
 } from '@/features/workspace-core';
 import { useUserStore } from '@/shared/stores/userStore';
-import { getAvatarColor } from '@/shared/lib/utils';
+import { getAvatarColor } from '@/shared/libs/utils';
 import { useNodeDetailEdit } from '@/features/workspace-node-detail';
 import { useMemo } from 'react';
 
@@ -85,24 +80,31 @@ export default function WorkSpacePage() {
 
   // 멤버 목록 가공 (API 데이터 -> UI 데이터)
   const members = useMemo<OnlineUser[]>(() => {
-    return workspaceDetail?.teamInfo?.memberInfos?.map((member) => ({
-      id: String(member.memberId || member.id),
-      name: member.name || 'Unknown',
-      nickname: member.nickname || member.name || 'Unknown',
-      initials: (
-        member.nickname?.[0] ||
-        member.name?.[0] ||
-        'U'
-      ).toUpperCase(),
-      color: getAvatarColor(member.memberId || member.id || member.email || '0'),
-      isOnline: member.email === user?.email, // 나 자신만 온라인
-      role: member.role,
-      isMe: member.email === user?.email,
-    })) || [];
+    return (
+      workspaceDetail?.teamInfo?.memberInfos?.map((member) => ({
+        id: String(member.memberId || member.id),
+        name: member.name || 'Unknown',
+        nickname: member.nickname || member.name || 'Unknown',
+        initials: (
+          member.nickname?.[0] ||
+          member.name?.[0] ||
+          'U'
+        ).toUpperCase(),
+        color: getAvatarColor(
+          member.memberId || member.id || member.email || '0'
+        ),
+        isOnline: member.email === user?.email, // 나 자신만 온라인
+        role: member.role,
+        isMe: member.email === user?.email,
+      })) || []
+    );
   }, [workspaceDetail, user]);
 
   // 노드 상세 편집 Hook
   const { openSidebar, closeSidebar, selectedNodeId } = useNodeDetailEdit();
+
+  // CRDT 클라이언트 생애주기 관리
+  useCrdtClient(workspaceId);
 
   // CRDT 옵저버 생명주기 관리
   useNodeDetailCrdtObservers();
@@ -112,14 +114,11 @@ export default function WorkSpacePage() {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // CRDT 클라이언트 초기화 및 워크스페이스 데이터 로드
+  // 워크스페이스 데이터 로드
   useEffect(() => {
     const loadWorkspaceData = async () => {
       try {
         setIsLoading(true);
-
-        // workspaceId params를 받아 crdt 인스턴스 생성
-        if (workspaceId) initCrdtClient(workspaceId);
 
         // 워크스페이스 상세 정보 조회 및 스토어 저장
         const workspaceDetail = await getWorkspaceDetail(Number(workspaceId));
@@ -147,13 +146,8 @@ export default function WorkSpacePage() {
         setIsLoading(false);
       }
     };
-    // ...
 
     loadWorkspaceData();
-
-    return () => {
-      destroyCrdtClient();
-    };
   }, [setNodeListData, workspaceId, setWorkspaceDetail]);
 
   // Header state
@@ -204,7 +198,6 @@ export default function WorkSpacePage() {
 
   // 노드 클릭 시 상세정보 API 호출
   const handleNodeClick = async (nodeId: string) => {
-
     if (!selectedNodeId || selectedNodeId !== nodeId) {
       // 노드 상세정보 API 호출 후 사이드바 열기
       try {
@@ -212,8 +205,7 @@ export default function WorkSpacePage() {
         updateNodeDetail(Number(nodeId), nodeDetail);
         // API 호출 완료 후 사이드바 열기 (nodeDetail이 store에 저장된 상태)
         openSidebar(nodeId);
-      } catch (error) {
-      }
+      } catch (error) {}
     } else {
       closeSidebar();
     }
@@ -265,9 +257,7 @@ export default function WorkSpacePage() {
               </div>
             ))}
 
-          {activeTab === 'feature-spec' && (
-            <FeatureSpecView />
-          )}
+          {activeTab === 'feature-spec' && <FeatureSpecView />}
 
           {activeTab === 'portfolio' && (
             <PortfolioContainer workspaceId={Number(workspaceId)} />

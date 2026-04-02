@@ -1,7 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { HTMLAttributes } from 'react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { cn } from '@/shared/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { cn } from '@/shared/libs/utils';
 
 type TruncatedLabelProps = HTMLAttributes<HTMLSpanElement> & {
   text: string;

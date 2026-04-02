@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useReactFlow } from '@xyflow/react';
-import { getCrdtClient, type AwarenessState } from '../crdt/crdtClient';
+import CrdtClient, { type AwarenessState } from '../crdt/crdtClient';
 import { useConnectionStatus } from '../stores';
 
 /**
@@ -19,7 +19,7 @@ export const useCursors = () => {
 
   // Awareness 구독
   useEffect(() => {
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) {
       return;
     }
@@ -50,7 +50,7 @@ export const useCursors = () => {
    */
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
-      const client = getCrdtClient();
+      const client = CrdtClient.getInstance();
       if (!client) return;
 
       // screenToFlowPosition: reactflow에서 제공해주는 클라이언트 캔버스 좌표 계산 함수
@@ -71,7 +71,7 @@ export const useCursors = () => {
 
   // 사용자 정보 설정
   const setUserInfo = useCallback((name: string, color: string) => {
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (!client) return;
 
     client.awareness.setLocalStateField('user', {

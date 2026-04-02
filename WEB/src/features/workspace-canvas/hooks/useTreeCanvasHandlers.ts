@@ -11,7 +11,7 @@ import {
   type NodeChange,
   type ReactFlowInstance,
 } from '@xyflow/react';
-import { getCrdtClient, type YNodeValue, type FlowNode } from '@/features/workspace-core';
+import { CrdtClient, type YNodeValue, type FlowNode } from '@/features/workspace-core';
 
 interface UseTreeCanvasHandlersParams {
   candidatePreviewMode: boolean;
@@ -75,7 +75,7 @@ export function useTreeCanvasHandlers({
         if (lockedBy && lockedBy !== currentUserId) return;
       }
 
-      const client = getCrdtClient();
+      const client = CrdtClient.getInstance();
       if (client && node.type !== 'PREVIEW') {
         client.awareness.setLocalStateField('activeNodeId', node.id);
       }
@@ -96,7 +96,7 @@ export function useTreeCanvasHandlers({
         const lockedBy = getLockedBy(node);
         if (lockedBy && lockedBy !== currentUserId) return;
 
-        const client = getCrdtClient();
+        const client = CrdtClient.getInstance();
         const yPreviewNodes = client?.getYMap<Y.Map<YNodeValue>>('previewNodes');
         const yNode = yPreviewNodes?.get(node.id);
         if (yNode) {
@@ -130,7 +130,7 @@ export function useTreeCanvasHandlers({
   );
 
   const handlePaneClick = useCallback(() => {
-    const client = getCrdtClient();
+    const client = CrdtClient.getInstance();
     if (client) {
       client.awareness.setLocalStateField('activeNodeId', null);
     }

@@ -3,7 +3,6 @@ package com.ssafy.projectree.domain.node.usecase;
 import com.ssafy.projectree.domain.ai.dto.AiCandidateCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiNodeCreateDto;
 import com.ssafy.projectree.domain.ai.dto.AiTechRecommendDto;
-import com.ssafy.projectree.domain.ai.dto.schemas.AiCandidateSchema;
 import com.ssafy.projectree.domain.ai.service.InferenceService;
 import com.ssafy.projectree.domain.member.api.dto.schemas.MemberSchema;
 import com.ssafy.projectree.domain.member.model.entity.Member;
@@ -51,7 +50,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -239,9 +237,7 @@ public class NodeServiceImpl implements NodeService {
                 .build()
         );
 
-        NodeSchema nodeSchema = getNodeSchemaDetail(response.getNodeId(), response.getParentId());
-        nodeSchema.setPreviewNodeId(request.getPreviewNodeId());
-        nodeCrdtService.sendNodeCreationToCrdt(workspaceId, nodeSchema);
+        nodeCrdtService.sendNodeCreationToCrdt(workspaceId, getNodeSchemaDetail(response.getNodeId(), response.getParentId()));
 
         return NodeCreateDto.Response.builder().nodeId(response.getNodeId()).build();
     }
@@ -294,20 +290,16 @@ public class NodeServiceImpl implements NodeService {
     public CandidateCreateDto.Response generateCandidate(Long parentId) {
         ProjectNode projectNode = findRootNode(parentId);
         Node node = nodeRepository.findById(parentId).orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
-        if (node.getCandidateLimit() <= candidateRepository.countCandidateByParent(node)) {
+        if(node.getCandidateLimit() <= candidateRepository.countCandidateByParent(node)){
             throw new BusinessLogicException(ErrorCode.CANDIDATE_GENERATE_LIMIT, "후보 노드 생성 개수를 초과하였습니다.");
         }
-        AiCandidateCreateDto.Response aiCandidate = inferenceService.generateCandidate(AiCandidateCreateDto.Request.builder()
+        AiCandidateCreateDto.Response candidate = inferenceService.generateCandidate(AiCandidateCreateDto.Request.builder()
                 .workspaceId(projectNode.getWorkspace().getId())
                 .nodeId(parentId)
                 .candidateCount(3)
                 .build());
-//        List<Candidate> candidates = candidateRepository.findByParent(node);
-//        AiCandidateCreateDto.Response aiCandidate = AiCandidateCreateDto.Response.builder().candidates(
-//                candidates.stream().map(c -> AiCandidateSchema.builder().id(c.getId()).name(c.getName()).description(c.getDescription()).summary(c.getSummary()).build()).toList()
-//        ).build();
 
-        nodeCrdtService.sendCandidatesCreationToCrdt(projectNode.getWorkspace().getId(), parentId, aiCandidate);
+        nodeCrdtService.sendCandidatesCreationToCrdt(projectNode.getWorkspace().getId(), parentId, candidate);
 
         return CandidateCreateDto.Response.builder()
                 .nodeId(parentId)
@@ -317,7 +309,7 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public CustomNodeDto.Response createCustom(CustomNodeDto.Request dto) {
 
-        Node node = createByNodeType(dto.getNodeType(), dto.getTaskType());
+        Node node = createByNodeType(dto.getNodeType());
         node.setName(dto.getName());
         node.setDescription(dto.getDescription());
         node.setXPos(dto.getXPos());
@@ -338,10 +330,10 @@ public class NodeServiceImpl implements NodeService {
                 .build();
     }
 
-    private Node createByNodeType(NodeType nodeType, @Nullable TaskType taskType) {
+    private Node createByNodeType(NodeType nodeType) {
         if (nodeType.equals(NodeType.EPIC)) return new EpicNode();
         else if (nodeType.equals(NodeType.STORY)) return new StoryNode();
-        else if (nodeType.equals(NodeType.TASK)) return TaskNode.builder().type(taskType).build();
+        else if (nodeType.equals(NodeType.TASK)) return new TaskNode();
         else if (nodeType.equals(NodeType.ADVANCE)) return new AdvanceNode();
         else {
             throw new BusinessLogicException(ErrorCode.NODE_TYPE_NOT_SUPPORT_ERROR, "유효하지 않는 노드 타입입니다.");
@@ -377,8 +369,6 @@ public class NodeServiceImpl implements NodeService {
     public void updateNodeDetail(Long nodeId, NodeUpdateDto.Request request) {
         Node node = nodeRepository.findById(nodeId)
                 .orElseThrow(() -> new BusinessLogicException(ErrorCode.NODE_NOT_FOUND_ERROR));
-
-        if (request.getDescription() != null) node.setDescription(request.getDescription());
 
         if (request.getDifficult() != null) {
             if (node instanceof TaskNode taskNode) {
