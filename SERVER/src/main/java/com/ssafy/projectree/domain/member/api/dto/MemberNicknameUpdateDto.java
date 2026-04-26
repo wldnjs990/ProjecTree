@@ -4,10 +4,14 @@ package com.ssafy.projectree.domain.member.api.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 public class MemberNicknameUpdateDto {
 
     @Getter
+    @Setter
+    @NoArgsConstructor
     @Schema(name = "MemberNicknameUpdateDto.Request", description = "회원 닉네임 변경 요청 DTO")
     public static class Request {
 
