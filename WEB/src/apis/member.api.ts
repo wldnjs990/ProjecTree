@@ -55,9 +55,7 @@ export const getMemberEmail = async (id: number): Promise<string> => {
  * @param nickname - 새 닉네임
  */
 export const updateNickname = async (nickname: string): Promise<void> => {
-  await wasApiClient.put(`members/me/nickname`, null, {
-    params: { nickname },
-  });
+  await wasApiClient.put(`members/me/nickname`, { nickname });
 };
 
 /**

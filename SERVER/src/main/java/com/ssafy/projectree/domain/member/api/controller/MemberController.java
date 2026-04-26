@@ -29,7 +29,7 @@ public class MemberController implements MemberDocsController {
     }
 
     @PutMapping("/members/me/nickname")
-    public CommonResponse<MemberNicknameUpdateDto.Response> updateMemberNickname(@AuthenticationPrincipal Member principal, MemberNicknameUpdateDto.Request request) {
+    public CommonResponse<MemberNicknameUpdateDto.Response> updateMemberNickname(@AuthenticationPrincipal Member principal, @RequestBody MemberNicknameUpdateDto.Request request) {
         return CommonResponse.success(SuccessCode.UPDATED, memberService.updateMemberByNickname(principal.getId(), request.getNickname()));
     }
 
