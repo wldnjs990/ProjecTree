@@ -1,0 +1,4 @@
+# Always LF for shell scripts (prevents CRLF issues in Linux containers)
+*.sh text eol=lf
+gradlew text eol=lf
+gradlew.bat text eol=crlf

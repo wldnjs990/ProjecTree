@@ -31,16 +31,17 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
-//
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<CommonResponse<?>> handleException(Exception e) {
-//
-//        CommonResponse<?> res = CommonResponse.fail(
-//                ErrorCode.SERVER_ERROR, ErrorCode.SERVER_ERROR.getDefaultMessage()
-//        );
-//
-//        return new ResponseEntity<>(res, HttpStatus.OK);
-//    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<CommonResponse<?>> handleException(Exception e) {
+        log.error("Unhandled exception: {}", e.getMessage(), e);
+
+        CommonResponse<?> res = CommonResponse.fail(
+                ErrorCode.SERVER_ERROR, ErrorCode.SERVER_ERROR.getDefaultMessage()
+        );
+
+        return new ResponseEntity<>(res, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     @ExceptionHandler(AIServiceException.class)
     public CommonResponse<Void> handleAiException(AIServiceException e){
