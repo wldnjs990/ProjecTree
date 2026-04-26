@@ -7,7 +7,9 @@ import com.ssafy.projectree.domain.member.api.dto.MemberReadDto;
 import com.ssafy.projectree.domain.member.model.entity.Member;
 import com.ssafy.projectree.global.api.response.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,70 +17,89 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@Tag(name = "Member", description = "Member 관련 API")
+@Tag(name = "Member", description = "회원 정보 관련 API")
 public interface MemberDocsController {
 
     @Operation(
             summary = "회원 이메일 조회",
-            description = "회원 ID를 통해 해당 회원의 이메일 정보를 조회합니다."
+            description = "로그인한 회원의 이메일 정보를 조회합니다."
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "Successfully Completed",
-                    content = @Content
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MemberEmailReadDto.Response.class)
+                    )
             )
     })
     @GetMapping("/members/me/email")
-    CommonResponse<MemberEmailReadDto.Response> getMemberEmail(@AuthenticationPrincipal Member member);
+    CommonResponse<MemberEmailReadDto.Response> getMemberEmail(
+            @Parameter(hidden = true) @AuthenticationPrincipal Member member);
 
     @Operation(
             summary = "닉네임 중복 확인",
-            description = "입력한 닉네임이 이미 사용 중인지 확인합니다."
+            description = "입력한 닉네임이 이미 사용 중인지 확인합니다. `exist`가 true이면 이미 사용 중인 닉네임입니다."
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "Successfully Completed",
-                    content = @Content
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MemberNicknameReadDto.Response.class)
+                    )
             )
     })
     @GetMapping("/members/nickname-check")
-    CommonResponse<MemberNicknameReadDto.Response> checkNicknameCheck(@RequestParam String nickname);
+    CommonResponse<MemberNicknameReadDto.Response> checkNicknameCheck(
+            @Parameter(description = "중복 확인할 닉네임", example = "projectree_user")
+            @RequestParam String nickname);
 
     @Operation(
             summary = "닉네임 변경",
-            description = "회원의 닉네임을 변경합니다."
+            description = "회원의 닉네임을 변경합니다. 변경 전에 `/members/nickname-check`로 중복 확인을 먼저 수행해야 합니다."
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "Successfully Updated",
-                    content = @Content
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MemberNicknameUpdateDto.Response.class)
+                    )
             )
     })
     @PutMapping("/members/me/nickname")
-    CommonResponse<MemberNicknameUpdateDto.Response> updateMemberNickname(@AuthenticationPrincipal Member member, MemberNicknameUpdateDto.Request request);
+    CommonResponse<MemberNicknameUpdateDto.Response> updateMemberNickname(
+            @Parameter(hidden = true) @AuthenticationPrincipal Member member,
+            @RequestBody MemberNicknameUpdateDto.Request request);
 
     @Operation(
             summary = "회원 정보 조회",
-            description = "회원의 기본 정보를 조회합니다."
+            description = "로그인한 회원의 기본 정보(이름, 닉네임, 이메일)를 조회합니다."
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "Successfully Completed",
-                    content = @Content
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = MemberReadDto.Response.class)
+                    )
             )
     })
     @GetMapping("/members/me")
-    CommonResponse<MemberReadDto.Response> getMemberDetail(@AuthenticationPrincipal Member member);
+    CommonResponse<MemberReadDto.Response> getMemberDetail(
+            @Parameter(hidden = true) @AuthenticationPrincipal Member member);
 
     @Operation(
             summary = "회원 탈퇴",
-            description = "회원 계정을 삭제합니다."
+            description = "로그인한 회원 계정을 삭제합니다. 삭제 후 복구가 불가능합니다."
     )
     @ApiResponses({
             @ApiResponse(
@@ -87,5 +108,6 @@ public interface MemberDocsController {
             )
     })
     @DeleteMapping("/members/me")
-    CommonResponse<Void> deleteMember(@AuthenticationPrincipal Member member);
+    CommonResponse<Void> deleteMember(
+            @Parameter(hidden = true) @AuthenticationPrincipal Member member);
 }

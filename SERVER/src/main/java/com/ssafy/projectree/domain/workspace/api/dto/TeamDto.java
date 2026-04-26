@@ -47,28 +47,48 @@ public class TeamDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "TeamDto.UpdateRoleRequest", description = "팀원 역할 변경 요청 DTO")
     public static class UpdateRoleRequest {
 
+        @Schema(description = "워크스페이스 ID", example = "1")
         private Long workspaceId;
+
+        @Schema(description = "역할을 변경할 대상 회원 ID", example = "42")
         private Long targetMemberId;
+
+        @Schema(description = "변경할 역할 (OWNER / EDITOR / VIEWER)", example = "EDITOR")
         private Role role;
 
     }
 
     @Getter
     @Builder
+    @Schema(name = "TeamDto.UpdateRoleResponse", description = "팀원 역할 변경 응답 DTO")
     public static class UpdateRoleResponse {
+
+        @Schema(description = "역할이 변경된 회원 ID", example = "42")
         private Long memberId;
+
+        @Schema(description = "변경된 역할", example = "EDITOR")
         private Role role;
     }
 
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "TeamDto.Invite", description = "팀원 초대 요청 DTO")
     public static class Invite {
+
+        @Schema(description = "초대할 워크스페이스 ID", example = "1")
         private Long workspaceId;
+
+        @Schema(description = "채팅방 ID", example = "saSCasd12Hbd4!@sa")
         private String chatRoomId;
+
+        @Schema(description = "초대할 팀원 이메일", example = "invite@example.com")
         private String email;
+
+        @Schema(description = "부여할 역할 (OWNER / EDITOR / VIEWER)", example = "EDITOR")
         private Role role;
     }
 
