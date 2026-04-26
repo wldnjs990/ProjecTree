@@ -125,7 +125,7 @@ public class TeamService {
         }
 
         Member newMember = memberService.findByEmail(dto.getEmail());
-        if (newMember.isDeleted() || newMember == null) {
+        if (newMember == null || newMember.isDeleted()) {
             throw new BusinessLogicException(ErrorCode.USER_NOT_FOUND_ERROR, "존재하지 않는 사용자입니다.");
         }
 

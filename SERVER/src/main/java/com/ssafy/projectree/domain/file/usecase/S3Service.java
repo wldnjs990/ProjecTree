@@ -38,8 +38,9 @@ public class S3Service {
         metadata.setContentLength(file.getSize());
         metadata.setContentType(file.getContentType());
 
-        InputStream inputStream = file.getInputStream();
-        amazonS3Client.putObject(new PutObjectRequest(bucket, path, inputStream, metadata));
+        try (InputStream inputStream = file.getInputStream()) {
+            amazonS3Client.putObject(new PutObjectRequest(bucket, path, inputStream, metadata));
+        }
 
         return amazonS3Client.getUrl(bucket, path).toString();
     }
